@@ -227,6 +227,7 @@ export type Database = {
       }
       events: {
         Row: {
+          active_lot_id: string | null
           auctioneer_name: string | null
           banner_url: string | null
           commission_rate: number | null
@@ -246,6 +247,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          active_lot_id?: string | null
           auctioneer_name?: string | null
           banner_url?: string | null
           commission_rate?: number | null
@@ -265,6 +267,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          active_lot_id?: string | null
           auctioneer_name?: string | null
           banner_url?: string | null
           commission_rate?: number | null
@@ -284,6 +287,13 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "events_active_lot_id_fkey"
+            columns: ["active_lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "events_created_by_fkey"
             columns: ["created_by"]
