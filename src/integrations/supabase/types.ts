@@ -321,6 +321,7 @@ export type Database = {
           transmission_link: string | null
           updated_at: string
           video_url: string | null
+          viewers: number | null
         }
         Insert: {
           active_lot_id?: string | null
@@ -342,6 +343,7 @@ export type Database = {
           transmission_link?: string | null
           updated_at?: string
           video_url?: string | null
+          viewers?: number | null
         }
         Update: {
           active_lot_id?: string | null
@@ -363,6 +365,7 @@ export type Database = {
           transmission_link?: string | null
           updated_at?: string
           video_url?: string | null
+          viewers?: number | null
         }
         Relationships: [
           {
@@ -397,6 +400,7 @@ export type Database = {
           starting_price: number
           status: string | null
           updated_at: string
+          viewers: number | null
           winner_id: string | null
         }
         Insert: {
@@ -414,6 +418,7 @@ export type Database = {
           starting_price: number
           status?: string | null
           updated_at?: string
+          viewers?: number | null
           winner_id?: string | null
         }
         Update: {
@@ -431,6 +436,7 @@ export type Database = {
           starting_price?: number
           status?: string | null
           updated_at?: string
+          viewers?: number | null
           winner_id?: string | null
         }
         Relationships: [
@@ -670,6 +676,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      close_lot: { Args: { p_lot_id: string }; Returns: Json }
+      increment_viewer_count: {
+        Args: { p_entity_id: string; p_entity_type: string }
+        Returns: undefined
+      }
       place_bid: {
         Args: { p_amount: number; p_lot_id: string; p_user_id: string }
         Returns: Json
