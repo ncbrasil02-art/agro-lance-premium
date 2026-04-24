@@ -385,6 +385,7 @@ export type Database = {
           bids_count: number | null
           created_at: string
           current_price: number | null
+          end_date: string | null
           event_id: string | null
           id: string
           lot_number: number
@@ -393,6 +394,7 @@ export type Database = {
           starting_price: number
           status: string | null
           updated_at: string
+          winner_id: string | null
         }
         Insert: {
           animal_id?: string | null
@@ -400,6 +402,7 @@ export type Database = {
           bids_count?: number | null
           created_at?: string
           current_price?: number | null
+          end_date?: string | null
           event_id?: string | null
           id?: string
           lot_number: number
@@ -408,6 +411,7 @@ export type Database = {
           starting_price: number
           status?: string | null
           updated_at?: string
+          winner_id?: string | null
         }
         Update: {
           animal_id?: string | null
@@ -415,6 +419,7 @@ export type Database = {
           bids_count?: number | null
           created_at?: string
           current_price?: number | null
+          end_date?: string | null
           event_id?: string | null
           id?: string
           lot_number?: number
@@ -423,6 +428,7 @@ export type Database = {
           starting_price?: number
           status?: string | null
           updated_at?: string
+          winner_id?: string | null
         }
         Relationships: [
           {

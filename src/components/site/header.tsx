@@ -1,8 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { Gavel, Moon, Sun, Menu, X } from "lucide-react";
+import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
+import { useAuth } from "../auth/auth-provider";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const nav = [
   { to: "/", label: "Início" },
@@ -14,6 +24,7 @@ const nav = [
 
 export function Header() {
   const { theme, toggle } = useTheme();
+  const { user, profile, signOut } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -47,12 +58,55 @@ export function Header() {
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Link to="/login" className="hidden md:block">
-            <Button variant="ghost" size="sm">Entrar</Button>
-          </Link>
-          <Link to="/cadastro" className="hidden md:block">
-            <Button size="sm" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">Cadastre-se</Button>
-          </Link>
+
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Avatar className="h-9 w-9 border border-border">
+                    <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || "User"} />
+                    <AvatarFallback className="bg-secondary">
+                      {(profile?.full_name || "U").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profile?.full_name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {profile?.role === "admin" && (
+                  <>
+                    <Link to="/admin">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Painel Admin</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link to="/login" className="hidden md:block">
+                <Button variant="ghost" size="sm">Entrar</Button>
+              </Link>
+              <Link to="/cadastro" className="hidden md:block">
+                <Button size="sm" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">Cadastre-se</Button>
+              </Link>
+            </>
+          )}
+
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
