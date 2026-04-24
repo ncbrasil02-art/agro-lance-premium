@@ -122,6 +122,44 @@ export type Database = {
           },
         ]
       }
+      contracts: {
+        Row: {
+          contract_url: string | null
+          created_at: string
+          id: string
+          signed_at: string | null
+          status: string | null
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          contract_url?: string | null
+          created_at?: string
+          id?: string
+          signed_at?: string | null
+          status?: string | null
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          contract_url?: string | null
+          created_at?: string
+          id?: string
+          signed_at?: string | null
+          status?: string | null
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           animal_id: string | null
@@ -442,12 +480,79 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          buyer_commission: number
+          buyer_id: string
+          created_at: string
+          final_price: number
+          id: string
+          lot_id: string
+          payment_status: string | null
+          seller_commission: number
+          seller_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_commission?: number
+          buyer_id: string
+          created_at?: string
+          final_price: number
+          id?: string
+          lot_id: string
+          payment_status?: string | null
+          seller_commission?: number
+          seller_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_commission?: number
+          buyer_id?: string
+          created_at?: string
+          final_price?: number
+          id?: string
+          lot_id?: string
+          payment_status?: string | null
+          seller_commission?: number
+          seller_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: true
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      place_bid: {
+        Args: { p_amount: number; p_lot_id: string; p_user_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
