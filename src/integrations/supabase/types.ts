@@ -122,12 +122,78 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          animal_id: string | null
+          created_at: string
+          event_id: string | null
+          file_type: string | null
+          file_url: string
+          id: string
+          lot_id: string | null
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          animal_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          file_type?: string | null
+          file_url: string
+          id?: string
+          lot_id?: string | null
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          animal_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          lot_id?: string | null
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           auctioneer_name: string | null
           banner_url: string | null
           commission_rate: number | null
           created_at: string
+          created_by: string | null
           description: string | null
           event_type: string | null
           id: string
@@ -146,6 +212,7 @@ export type Database = {
           banner_url?: string | null
           commission_rate?: number | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           event_type?: string | null
           id?: string
@@ -164,6 +231,7 @@ export type Database = {
           banner_url?: string | null
           commission_rate?: number | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           event_type?: string | null
           id?: string
@@ -177,7 +245,15 @@ export type Database = {
           updated_at?: string
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lots: {
         Row: {
@@ -189,6 +265,7 @@ export type Database = {
           event_id: string | null
           id: string
           lot_number: number
+          payment_methods: string[] | null
           reserve_price: number | null
           starting_price: number
           status: string | null
@@ -203,6 +280,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           lot_number: number
+          payment_methods?: string[] | null
           reserve_price?: number | null
           starting_price: number
           status?: string | null
@@ -217,6 +295,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           lot_number?: number
+          payment_methods?: string[] | null
           reserve_price?: number | null
           starting_price?: number
           status?: string | null
@@ -235,6 +314,94 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          link: string | null
+          message: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
