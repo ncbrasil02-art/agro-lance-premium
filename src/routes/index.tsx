@@ -1,26 +1,171 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Gavel, Radio, ShieldCheck, Sparkles, TrendingUp, Trophy, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { events, lots, stats, formatBRL } from "@/lib/mock-data";
+import { EventCard } from "@/components/auctions/event-card";
+import { LotCard } from "@/components/auctions/lot-card";
+import heroImage from "@/assets/hero-horse.jpg";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
+function Home() {
+  const liveEvents = events.filter((e) => e.status === "live");
+  const upcomingEvents = events.filter((e) => e.status === "upcoming").slice(0, 3);
+  const featuredLots = lots.slice(0, 6);
 
-function Index() {
-  return <PlaceholderIndex />;
+  return (
+    <>
+      {/* HERO */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={heroImage} alt="Cavalo de elite ao entardecer" width={1920} height={1080} className="h-full w-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+        </div>
+
+        <div className="container relative mx-auto px-4 py-20 md:py-32">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5" />
+              A nova era dos leilões agropecuários
+            </div>
+            <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
+              Leilões <span className="text-gradient-gold">premium</span><br />
+              em tempo real
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+              Cavalos, bovinos e embriões de elite com transmissão ao vivo, curadoria genética
+              e tecnologia de ponta para compradores e leiloeiros profissionais.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/ao-vivo">
+                <Button size="lg" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">
+                  <Radio className="mr-2 h-4 w-4 animate-pulse-live" />
+                  Assistir agora
+                </Button>
+              </Link>
+              <Link to="/eventos">
+                <Button size="lg" variant="outline" className="border-gold/40 hover:bg-gold/10">
+                  Ver próximos eventos <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Stats inline */}
+            <dl className="mt-12 grid max-w-lg grid-cols-2 gap-6 sm:grid-cols-4">
+              {[
+                { v: formatBRL(stats.totalSold), l: "Vendido" },
+                { v: stats.totalAnimals.toLocaleString("pt-BR"), l: "Animais" },
+                { v: stats.totalUsers.toLocaleString("pt-BR"), l: "Usuários" },
+                { v: stats.activeEvents, l: "Eventos ativos" },
+              ].map((s) => (
+                <div key={s.l}>
+                  <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">{s.l}</dt>
+                  <dd className="mt-1 text-lg font-bold text-foreground">{s.v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      {/* AO VIVO */}
+      {liveEvents.length > 0 && (
+        <section className="container mx-auto px-4 py-16">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-live/30 bg-live/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-live">
+                <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse-live" /> Acontecendo agora
+              </div>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Eventos ao vivo</h2>
+            </div>
+            <Link to="/ao-vivo" className="hidden items-center gap-1 text-sm text-gold hover:underline md:inline-flex">
+              Ver todos <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {liveEvents.map((e) => <EventCard key={e.id} event={e} />)}
+          </div>
+        </section>
+      )}
+
+      {/* LOTES DESTAQUE */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Lotes em <span className="text-gradient-gold">destaque</span></h2>
+            <p className="mt-2 text-muted-foreground">Os animais mais disputados desta semana.</p>
+          </div>
+          <Link to="/lotes" className="hidden items-center gap-1 text-sm text-gold hover:underline md:inline-flex">
+            Ver todos os lotes <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredLots.map((l) => <LotCard key={l.id} lot={l} />)}
+        </div>
+      </section>
+
+      {/* EVENTOS FUTUROS */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
+          <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {upcomingEvents.map((e) => <EventCard key={e.id} event={e} />)}
+        </div>
+      </section>
+
+      {/* DIFERENCIAIS */}
+      <section className="border-y border-border/60 bg-card/40">
+        <div className="container mx-auto grid gap-8 px-4 py-16 md:grid-cols-3">
+          {[
+            { icon: Radio, title: "Lances em tempo real", desc: "WebSocket de baixa latência com atualização instantânea, contagem regressiva inteligente e alertas visuais." },
+            { icon: ShieldCheck, title: "Curadoria veterinária", desc: "Cada animal passa por avaliação genealógica, exames e laudos antes de entrar em leilão." },
+            { icon: Trophy, title: "Compradores qualificados", desc: "Cadastro com aprovação manual, comprovação financeira e contratos assinados digitalmente." },
+          ].map((item) => (
+            <div key={item.title} className="flex gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold-gradient shadow-gold">
+                <item.icon className="h-5 w-5 text-emerald-deep" />
+              </div>
+              <div>
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-hero-gradient p-10 md:p-16">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-emerald/30 blur-3xl" />
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
+              Pronto para <span className="text-gradient-gold">arrematar</span> o melhor do agronegócio?
+            </h2>
+            <p className="mt-4 text-lg text-white/80">
+              Cadastre-se, receba aprovação e participe dos próximos leilões em poucos cliques.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/cadastro">
+                <Button size="lg" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">
+                  Criar conta grátis
+                </Button>
+              </Link>
+              <Link to="/eventos">
+                <Button size="lg" variant="outline" className="border-white/30 bg-white/5 text-white hover:bg-white/10">
+                  Explorar leilões
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }

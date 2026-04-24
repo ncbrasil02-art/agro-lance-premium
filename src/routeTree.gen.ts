@@ -9,38 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as LotesRouteImport } from './routes/lotes'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as AoVivoRouteImport } from './routes/ao-vivo'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
+import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
 
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LotesRoute = LotesRouteImport.update({
+  id: '/lotes',
+  path: '/lotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AoVivoRoute = AoVivoRouteImport.update({
+  id: '/ao-vivo',
+  path: '/ao-vivo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LotesLotIdRoute = LotesLotIdRouteImport.update({
+  id: '/$lotId',
+  path: '/$lotId',
+  getParentRoute: () => LotesRoute,
+} as any)
+const EventosEventSlugRoute = EventosEventSlugRouteImport.update({
+  id: '/$eventSlug',
+  path: '/$eventSlug',
+  getParentRoute: () => EventosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ao-vivo': typeof AoVivoRoute
+  '/cadastro': typeof CadastroRoute
+  '/eventos': typeof EventosRouteWithChildren
+  '/login': typeof LoginRoute
+  '/lotes': typeof LotesRouteWithChildren
+  '/sobre': typeof SobreRoute
+  '/eventos/$eventSlug': typeof EventosEventSlugRoute
+  '/lotes/$lotId': typeof LotesLotIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ao-vivo': typeof AoVivoRoute
+  '/cadastro': typeof CadastroRoute
+  '/eventos': typeof EventosRouteWithChildren
+  '/login': typeof LoginRoute
+  '/lotes': typeof LotesRouteWithChildren
+  '/sobre': typeof SobreRoute
+  '/eventos/$eventSlug': typeof EventosEventSlugRoute
+  '/lotes/$lotId': typeof LotesLotIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ao-vivo': typeof AoVivoRoute
+  '/cadastro': typeof CadastroRoute
+  '/eventos': typeof EventosRouteWithChildren
+  '/login': typeof LoginRoute
+  '/lotes': typeof LotesRouteWithChildren
+  '/sobre': typeof SobreRoute
+  '/eventos/$eventSlug': typeof EventosEventSlugRoute
+  '/lotes/$lotId': typeof LotesLotIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ao-vivo'
+    | '/cadastro'
+    | '/eventos'
+    | '/login'
+    | '/lotes'
+    | '/sobre'
+    | '/eventos/$eventSlug'
+    | '/lotes/$lotId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ao-vivo'
+    | '/cadastro'
+    | '/eventos'
+    | '/login'
+    | '/lotes'
+    | '/sobre'
+    | '/eventos/$eventSlug'
+    | '/lotes/$lotId'
+  id:
+    | '__root__'
+    | '/'
+    | '/ao-vivo'
+    | '/cadastro'
+    | '/eventos'
+    | '/login'
+    | '/lotes'
+    | '/sobre'
+    | '/eventos/$eventSlug'
+    | '/lotes/$lotId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AoVivoRoute: typeof AoVivoRoute
+  CadastroRoute: typeof CadastroRoute
+  EventosRoute: typeof EventosRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  LotesRoute: typeof LotesRouteWithChildren
+  SobreRoute: typeof SobreRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lotes': {
+      id: '/lotes'
+      path: '/lotes'
+      fullPath: '/lotes'
+      preLoaderRoute: typeof LotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ao-vivo': {
+      id: '/ao-vivo'
+      path: '/ao-vivo'
+      fullPath: '/ao-vivo'
+      preLoaderRoute: typeof AoVivoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +196,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lotes/$lotId': {
+      id: '/lotes/$lotId'
+      path: '/$lotId'
+      fullPath: '/lotes/$lotId'
+      preLoaderRoute: typeof LotesLotIdRouteImport
+      parentRoute: typeof LotesRoute
+    }
+    '/eventos/$eventSlug': {
+      id: '/eventos/$eventSlug'
+      path: '/$eventSlug'
+      fullPath: '/eventos/$eventSlug'
+      preLoaderRoute: typeof EventosEventSlugRouteImport
+      parentRoute: typeof EventosRoute
+    }
   }
 }
 
+interface EventosRouteChildren {
+  EventosEventSlugRoute: typeof EventosEventSlugRoute
+}
+
+const EventosRouteChildren: EventosRouteChildren = {
+  EventosEventSlugRoute: EventosEventSlugRoute,
+}
+
+const EventosRouteWithChildren =
+  EventosRoute._addFileChildren(EventosRouteChildren)
+
+interface LotesRouteChildren {
+  LotesLotIdRoute: typeof LotesLotIdRoute
+}
+
+const LotesRouteChildren: LotesRouteChildren = {
+  LotesLotIdRoute: LotesLotIdRoute,
+}
+
+const LotesRouteWithChildren = LotesRoute._addFileChildren(LotesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AoVivoRoute: AoVivoRoute,
+  CadastroRoute: CadastroRoute,
+  EventosRoute: EventosRouteWithChildren,
+  LoginRoute: LoginRoute,
+  LotesRoute: LotesRouteWithChildren,
+  SobreRoute: SobreRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
