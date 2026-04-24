@@ -7,9 +7,9 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminLayout() {
-  const { profile, loading } = useAuth();
+  const { profile, isLoading } = useAuth();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gold" />
