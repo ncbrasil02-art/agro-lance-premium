@@ -681,6 +681,7 @@ export type Database = {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: undefined
       }
+      is_admin: { Args: never; Returns: boolean }
       place_bid: {
         Args: { p_amount: number; p_lot_id: string; p_user_id: string }
         Returns: Json
