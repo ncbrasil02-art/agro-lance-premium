@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AoVivoRouteImport } from './routes/ao-vivo'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
@@ -49,6 +50,11 @@ const AoVivoRoute = AoVivoRouteImport.update({
   path: '/ao-vivo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,6 +73,7 @@ const EventosEventSlugRoute = EventosEventSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/eventos': typeof EventosRouteWithChildren
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/eventos': typeof EventosRouteWithChildren
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/eventos': typeof EventosRouteWithChildren
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/ao-vivo'
     | '/cadastro'
     | '/eventos'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/ao-vivo'
     | '/cadastro'
     | '/eventos'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/ao-vivo'
     | '/cadastro'
     | '/eventos'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AoVivoRoute: typeof AoVivoRoute
   CadastroRoute: typeof CadastroRoute
   EventosRoute: typeof EventosRouteWithChildren
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AoVivoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -236,6 +256,7 @@ const LotesRouteWithChildren = LotesRoute._addFileChildren(LotesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AoVivoRoute: AoVivoRoute,
   CadastroRoute: CadastroRoute,
   EventosRoute: EventosRouteWithChildren,
