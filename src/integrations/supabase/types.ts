@@ -14,7 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      animals: {
+        Row: {
+          birth_date: string | null
+          breed: string | null
+          color: string | null
+          created_at: string
+          genealogy: Json | null
+          health_info: Json | null
+          height: number | null
+          id: string
+          internal_code: string | null
+          location: string | null
+          name: string
+          photos: string[] | null
+          registration_number: string | null
+          sex: string | null
+          species: string | null
+          updated_at: string
+          videos: string[] | null
+          weight: number | null
+        }
+        Insert: {
+          birth_date?: string | null
+          breed?: string | null
+          color?: string | null
+          created_at?: string
+          genealogy?: Json | null
+          health_info?: Json | null
+          height?: number | null
+          id?: string
+          internal_code?: string | null
+          location?: string | null
+          name: string
+          photos?: string[] | null
+          registration_number?: string | null
+          sex?: string | null
+          species?: string | null
+          updated_at?: string
+          videos?: string[] | null
+          weight?: number | null
+        }
+        Update: {
+          birth_date?: string | null
+          breed?: string | null
+          color?: string | null
+          created_at?: string
+          genealogy?: Json | null
+          health_info?: Json | null
+          height?: number | null
+          id?: string
+          internal_code?: string | null
+          location?: string | null
+          name?: string
+          photos?: string[] | null
+          registration_number?: string | null
+          sex?: string | null
+          species?: string | null
+          updated_at?: string
+          videos?: string[] | null
+          weight?: number | null
+        }
+        Relationships: []
+      }
+      bids: {
+        Row: {
+          amount: number
+          bid_type: string | null
+          created_at: string
+          id: string
+          is_manual: boolean | null
+          lot_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          bid_type?: string | null
+          created_at?: string
+          id?: string
+          is_manual?: boolean | null
+          lot_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          bid_type?: string | null
+          created_at?: string
+          id?: string
+          is_manual?: boolean | null
+          lot_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bids_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bids_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          auctioneer_name: string | null
+          banner_url: string | null
+          commission_rate: number | null
+          created_at: string
+          description: string | null
+          event_type: string | null
+          id: string
+          location: string | null
+          mode: string | null
+          name: string
+          promoter_company: string | null
+          start_date: string
+          status: string | null
+          transmission_link: string | null
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          auctioneer_name?: string | null
+          banner_url?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          description?: string | null
+          event_type?: string | null
+          id?: string
+          location?: string | null
+          mode?: string | null
+          name: string
+          promoter_company?: string | null
+          start_date: string
+          status?: string | null
+          transmission_link?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          auctioneer_name?: string | null
+          banner_url?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          description?: string | null
+          event_type?: string | null
+          id?: string
+          location?: string | null
+          mode?: string | null
+          name?: string
+          promoter_company?: string | null
+          start_date?: string
+          status?: string | null
+          transmission_link?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      lots: {
+        Row: {
+          animal_id: string | null
+          bid_increment: number
+          bids_count: number | null
+          created_at: string
+          current_price: number | null
+          event_id: string | null
+          id: string
+          lot_number: number
+          reserve_price: number | null
+          starting_price: number
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          animal_id?: string | null
+          bid_increment?: number
+          bids_count?: number | null
+          created_at?: string
+          current_price?: number | null
+          event_id?: string | null
+          id?: string
+          lot_number: number
+          reserve_price?: number | null
+          starting_price: number
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          animal_id?: string | null
+          bid_increment?: number
+          bids_count?: number | null
+          created_at?: string
+          current_price?: number | null
+          event_id?: string | null
+          id?: string
+          lot_number?: number
+          reserve_price?: number | null
+          starting_price?: number
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lots_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lots_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          cpf: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          is_approved: boolean
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          cpf?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          is_approved?: boolean
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          cpf?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_approved?: boolean
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
