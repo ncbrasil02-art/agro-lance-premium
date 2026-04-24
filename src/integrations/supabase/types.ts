@@ -315,6 +315,7 @@ export type Database = {
           mode: string | null
           name: string
           promoter_company: string | null
+          slug: string | null
           start_date: string
           status: string | null
           transmission_link: string | null
@@ -335,6 +336,7 @@ export type Database = {
           mode?: string | null
           name: string
           promoter_company?: string | null
+          slug?: string | null
           start_date: string
           status?: string | null
           transmission_link?: string | null
@@ -355,6 +357,7 @@ export type Database = {
           mode?: string | null
           name?: string
           promoter_company?: string | null
+          slug?: string | null
           start_date?: string
           status?: string | null
           transmission_link?: string | null
