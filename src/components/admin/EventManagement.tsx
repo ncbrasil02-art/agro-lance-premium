@@ -334,7 +334,9 @@ import { Textarea } from "@/components/ui/textarea";
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-             <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          </div>
+
+           <Dialog open={isDialogOpen} onOpenChange={(open) => {
                setIsDialogOpen(open);
                if (!open) resetForm();
              }}>
