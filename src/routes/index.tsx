@@ -5,8 +5,10 @@ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
  import { LotCard } from "@/components/auctions/lot-card";
- import { supabase } from "@/integrations/supabase/client";
- import { formatBRL } from "@/utils/format";
+  import { supabase } from "@/integrations/supabase/client";
+  import { formatBRL } from "@/utils/format";
+  import { eventSchema, lotSchema } from "@/lib/schemas";
+  import { z } from "zod";
 import heroImage from "@/assets/hero-horse.jpg";
 
   export const Route = createFileRoute("/")({
@@ -40,10 +42,14 @@ import heroImage from "@/assets/hero-horse.jpg";
           lotsCount: lotsRes.data?.length || 0
         });
 
+        const validatedEvents = z.array(eventSchema).parse(eventsRes.data || []);
+        const validatedLots = z.array(lotSchema).parse(lotsRes.data || []);
+        const validatedPastEvents = z.array(eventSchema).parse(pastEventsRes.data || []);
+
         return {
-          events: eventsRes.data || [],
-          lots: lotsRes.data || [],
-          pastEvents: pastEventsRes.data || [],
+          events: validatedEvents,
+          lots: validatedLots,
+          pastEvents: validatedPastEvents,
           announcement: settingsRes.data?.value || null
         };
       } catch (error) {
