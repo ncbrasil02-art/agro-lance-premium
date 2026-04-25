@@ -189,6 +189,27 @@ function LotDetail() {
 
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);
+  
+  // Dynamic status logic
+  const getLotStatus = () => {
+    const now = new Date();
+    const eventStart = lot.event?.start_date ? new Date(lot.event.start_date) : null;
+    
+    if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+    if (lot.status === 'active') return 'recebendo_lances';
+    
+    if (eventStart && now < eventStart) {
+      return 'loteamento';
+    }
+    
+    if (lot.status === 'upcoming' || lot.status === 'open') {
+      return 'pre_lance';
+    }
+    
+    return lot.status;
+  };
+
+  const dynamicStatus = getLotStatus();
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
@@ -217,11 +238,12 @@ function LotDetail() {
               <p className="text-gold/80 text-[10px] uppercase font-bold tracking-widest">{lot.event?.name}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {lot.status === 'active' && (
-              <div className="flex items-center gap-2 bg-live/20 border border-live/30 px-3 py-1 rounded-full">
-                <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse" />
-                <span className="text-live text-[10px] font-bold tracking-tighter">AO VIVO</span>
+          <div className="flex items-center gap-2 md:gap-3">
+            <StatusBadge status={dynamicStatus} className="scale-90 md:scale-100 origin-right" />
+            {dynamicStatus === 'loteamento' && lot.event?.start_date && (
+              <div className="hidden md:flex items-center gap-2 bg-black/20 border border-white/10 px-3 py-1 rounded-full text-[10px] font-mono text-white/60">
+                <Timer className="h-3 w-3" />
+                <Countdown endsAt={lot.event.start_date} />
               </div>
             )}
             <div className="flex flex-col text-right">
