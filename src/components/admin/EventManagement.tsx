@@ -96,10 +96,10 @@ import { Textarea } from "@/components/ui/textarea";
         
         // Custom sorting: Live first, then Scheduled, then Finished
         // Within each status, sort by start_date descending
-        const sortedData = (data || []).sort((a, b) => {
+        const sortedData = (data || []).sort((a: any, b: any) => {
           const statusPriority: Record<string, number> = { 'live': 1, 'scheduled': 2, 'finished': 3 };
-          const pA = statusPriority[a.status] || 99;
-          const pB = statusPriority[b.status] || 99;
+          const pA = statusPriority[a.status as string] || 99;
+          const pB = statusPriority[b.status as string] || 99;
           
           if (pA !== pB) return pA - pB;
           return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
