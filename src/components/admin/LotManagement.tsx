@@ -205,11 +205,11 @@
              </SelectContent>
            </Select>
          </div>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) resetForm();
-           if (open) fetchAvailableAnimals();
-         }}>
+           <Dialog open={isDialogOpen} onOpenChange={(open) => {
+             setIsDialogOpen(open);
+             if (!open) resetForm();
+             if (open) fetchData(); // Refresca os dados ao abrir o diálogo
+           }}>
            <DialogTrigger asChild>
               <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
                 resetForm();
@@ -229,20 +229,24 @@
                <div className="grid gap-2">
                  <Label htmlFor="event">Evento</Label>
                   <Select onValueChange={(v) => setFormData({ ...formData, event_id: v })} value={formData.event_id}>
-                   <SelectTrigger>
-                      <SelectValue placeholder="Selecione o evento" />
-                   </SelectTrigger>
-                    <SelectContent>
-                      {events.length === 0 ? (
-                        <div className="p-2 text-xs text-center text-muted-foreground">
-                          Nenhum evento cadastrado. <br/> 
-                          Crie um evento na aba "Eventos" primeiro.
-                        </div>
-                      ) : (
-                        events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
-                      )}
-                    </SelectContent>
-                 </Select>
+                    <SelectTrigger>
+                       <SelectValue placeholder={isLoading ? "Carregando eventos..." : "Selecione o evento"} />
+                    </SelectTrigger>
+                     <SelectContent>
+                       {isLoading ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground flex items-center justify-center">
+                           <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
+                         </div>
+                       ) : events.length === 0 ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground">
+                           Nenhum evento cadastrado. <br/> 
+                           Crie um evento na aba "Eventos" primeiro.
+                         </div>
+                       ) : (
+                         events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
+                       )}
+                     </SelectContent>
+                  </Select>
                </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
