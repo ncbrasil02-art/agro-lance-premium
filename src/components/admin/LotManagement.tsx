@@ -19,15 +19,15 @@
    }) {
      const [isDialogOpen, setIsDialogOpen] = useState(false);
      const [editingLot, setEditingLot] = useState<any>(null);
-     const [formData, setFormData] = useState({
-       event_id: "",
-       animal_id: "",
-       lot_number: 1,
-       starting_price: 0,
-       bid_increment: 1000,
-       status: "active",
-       allows_pre_bidding: true
-     });
+      const [formData, setFormData] = useState({
+        event_id: initialEventId === "all" ? "" : initialEventId,
+        animal_id: "",
+        lot_number: 1,
+        starting_price: 0,
+        bid_increment: 1000,
+        status: "active",
+        allows_pre_bidding: true
+      });
 
      const resetForm = () => {
        setEditingLot(null);
@@ -115,9 +115,13 @@
    const [events, setEvents] = useState<any[]>([]);
     const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
 
-    useEffect(() => {
-      setSelectedEventId(initialEventId);
-    }, [initialEventId]);
+      useEffect(() => {
+        setSelectedEventId(initialEventId);
+        if (initialEventId !== "all") {
+          setFormData(prev => ({ ...prev, event_id: initialEventId }));
+        }
+        fetchData();
+      }, [initialEventId]);
 
     const handleEventSelectChange = (val: string) => {
       setSelectedEventId(val);
