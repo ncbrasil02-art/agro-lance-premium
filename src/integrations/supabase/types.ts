@@ -27,13 +27,16 @@ export type Database = {
           internal_code: string | null
           location: string | null
           name: string
+          pedigree_url: string | null
           photos: string[] | null
           registration_number: string | null
           sex: string | null
           species: string | null
           updated_at: string
+          vaccination_records: Json | null
           videos: string[] | null
           weight: number | null
+          youtube_url: string | null
         }
         Insert: {
           birth_date?: string | null
@@ -47,13 +50,16 @@ export type Database = {
           internal_code?: string | null
           location?: string | null
           name: string
+          pedigree_url?: string | null
           photos?: string[] | null
           registration_number?: string | null
           sex?: string | null
           species?: string | null
           updated_at?: string
+          vaccination_records?: Json | null
           videos?: string[] | null
           weight?: number | null
+          youtube_url?: string | null
         }
         Update: {
           birth_date?: string | null
@@ -67,13 +73,16 @@ export type Database = {
           internal_code?: string | null
           location?: string | null
           name?: string
+          pedigree_url?: string | null
           photos?: string[] | null
           registration_number?: string | null
           sex?: string | null
           species?: string | null
           updated_at?: string
+          vaccination_records?: Json | null
           videos?: string[] | null
           weight?: number | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
@@ -303,6 +312,7 @@ export type Database = {
       events: {
         Row: {
           active_lot_id: string | null
+          allows_pre_bidding: boolean | null
           auctioneer_name: string | null
           banner_url: string | null
           commission_rate: number | null
@@ -315,6 +325,7 @@ export type Database = {
           mode: string | null
           name: string
           promoter_company: string | null
+          show_countdown: boolean | null
           slug: string | null
           start_date: string
           status: string | null
@@ -325,6 +336,7 @@ export type Database = {
         }
         Insert: {
           active_lot_id?: string | null
+          allows_pre_bidding?: boolean | null
           auctioneer_name?: string | null
           banner_url?: string | null
           commission_rate?: number | null
@@ -337,6 +349,7 @@ export type Database = {
           mode?: string | null
           name: string
           promoter_company?: string | null
+          show_countdown?: boolean | null
           slug?: string | null
           start_date: string
           status?: string | null
@@ -347,6 +360,7 @@ export type Database = {
         }
         Update: {
           active_lot_id?: string | null
+          allows_pre_bidding?: boolean | null
           auctioneer_name?: string | null
           banner_url?: string | null
           commission_rate?: number | null
@@ -359,6 +373,7 @@ export type Database = {
           mode?: string | null
           name?: string
           promoter_company?: string | null
+          show_countdown?: boolean | null
           slug?: string | null
           start_date?: string
           status?: string | null
@@ -386,6 +401,7 @@ export type Database = {
       }
       lots: {
         Row: {
+          allows_pre_bidding: boolean | null
           animal_id: string | null
           bid_increment: number
           bids_count: number | null
@@ -404,6 +420,7 @@ export type Database = {
           winner_id: string | null
         }
         Insert: {
+          allows_pre_bidding?: boolean | null
           animal_id?: string | null
           bid_increment?: number
           bids_count?: number | null
@@ -422,6 +439,7 @@ export type Database = {
           winner_id?: string | null
         }
         Update: {
+          allows_pre_bidding?: boolean | null
           animal_id?: string | null
           bid_increment?: number
           bids_count?: number | null
