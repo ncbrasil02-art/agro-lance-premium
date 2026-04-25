@@ -90,8 +90,22 @@ import { Textarea } from "@/components/ui/textarea";
       try {
         const { data, error } = await supabase
           .from("events")
-          .select("*")
-          .order("start_date", { ascending: false });
+          .select("*");
+
+        if (error) throw error;
+        
+        // Custom sorting: Live first, then Scheduled, then Finished
+        // Within each status, sort by start_date descending
+        const sortedData = (data || []).sort((a, b) => {
+          const statusPriority: Record<string, number> = { 'live': 1, 'scheduled': 2, 'finished': 3 };
+          const pA = statusPriority[a.status] || 99;
+          const pB = statusPriority[b.status] || 99;
+          
+          if (pA !== pB) return pA - pB;
+          return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        });
+
+        setEvents(sortedData);
 
         if (error) {
           console.error("Error fetching events:", error);
