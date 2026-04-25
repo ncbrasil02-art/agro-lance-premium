@@ -283,7 +283,7 @@
                 <TabsTrigger value="detalhes">Descrição</TabsTrigger>
                 <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
                 <TabsTrigger value="saude">Saúde</TabsTrigger>
-                <TabsTrigger value="videos">Vídeos</TabsTrigger>
+               <TabsTrigger value="videos">Vídeo</TabsTrigger>
                 <TabsTrigger value="documentos" className="hidden lg:inline-flex">Documentos</TabsTrigger>
               </TabsList>
               
@@ -351,7 +351,16 @@
 
               <TabsContent value="videos" className="mt-6">
                 <div className="grid gap-4">
-                  {lot.animal?.videos && (lot.animal.videos as string[]).length > 0 ? (
+                  {lot.animal?.youtube_url ? (
+                    <div className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
+                      <iframe 
+                        src={lot.animal.youtube_url.replace("watch?v=", "embed/").split("&")[0]} 
+                        className="h-full w-full" 
+                        allowFullScreen
+                        title="Apresentação do Animal"
+                      />
+                    </div>
+                  ) : lot.animal?.videos && (lot.animal.videos as string[]).length > 0 ? (
                     (lot.animal.videos as string[]).map((url: string, i: number) => (
                       <div key={i} className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
                         <video src={url} controls className="h-full w-full" />
@@ -360,7 +369,7 @@
                   ) : (
                     <div className="flex aspect-video flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 text-muted-foreground">
                       <Video className="mb-2 h-10 w-10 opacity-20" />
-                      <p>Vídeo de apresentação em processamento</p>
+                      <p>Vídeo de apresentação não disponível</p>
                     </div>
                   )}
                 </div>
@@ -368,12 +377,14 @@
 
               <TabsContent value="documentos" className="mt-6">
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-between" asChild>
-                    <a href="#" target="_blank">
-                      <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Registro Genealógico</span>
-                      <ChevronRight className="h-4 w-4 opacity-50" />
-                    </a>
-                  </Button>
+                  {lot.animal?.pedigree_url && (
+                    <Button variant="outline" className="w-full justify-between" asChild>
+                      <a href={lot.animal.pedigree_url} target="_blank">
+                        <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Árvore Genealógica (PDF)</span>
+                        <ChevronRight className="h-4 w-4 opacity-50" />
+                      </a>
+                    </Button>
+                  )}
                   <Button variant="outline" className="w-full justify-between" asChild>
                     <a href="#" target="_blank">
                       <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Laudo Veterinário</span>

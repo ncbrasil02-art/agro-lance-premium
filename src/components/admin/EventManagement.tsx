@@ -12,19 +12,54 @@
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  
- export function EventManagement() {
-   const [events, setEvents] = useState<any[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
-   const [searchQuery, setSearchQuery] = useState("");
-   const [isCreating, setIsCreating] = useState(false);
-   const [newEvent, setNewEvent] = useState({
-     name: "",
-     description: "",
-     start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-     location: "",
-     status: "scheduled",
-     event_type: "online"
-   });
+  export function EventManagement() {
+    const [events, setEvents] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<any>(null);
+    const [formData, setFormData] = useState({
+      name: "",
+      description: "",
+      start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+      location: "",
+      status: "scheduled",
+      event_type: "online",
+      allows_pre_bidding: true,
+      show_countdown: true,
+      transmission_link: ""
+    });
+
+    const resetForm = () => {
+      setEditingEvent(null);
+      setFormData({
+        name: "",
+        description: "",
+        start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+        location: "",
+        status: "scheduled",
+        event_type: "online",
+        allows_pre_bidding: true,
+        show_countdown: true,
+        transmission_link: ""
+      });
+    };
+
+    const handleEdit = (event: any) => {
+      setEditingEvent(event);
+      setFormData({
+        name: event.name || "",
+        description: event.description || "",
+        start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm") : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+        location: event.location || "",
+        status: event.status || "scheduled",
+        event_type: event.event_type || "online",
+        allows_pre_bidding: event.allows_pre_bidding !== false,
+        show_countdown: event.show_countdown !== false,
+        transmission_link: event.transmission_link || ""
+      });
+      setIsDialogOpen(true);
+    };
  
    const fetchEvents = async () => {
      setIsLoading(true);
@@ -47,29 +82,52 @@
      fetchEvents();
    }, []);
  
-   const handleCreate = async () => {
-     if (!newEvent.name || !newEvent.start_date) {
+    const handleSave = async () => {
+      if (!formData.name || !formData.start_date) {
        toast.error("Preencha o nome e a data");
        return;
      }
  
      try {
-       const { error } = await supabase.from("events").insert({
-         name: newEvent.name,
-         description: newEvent.description,
-         start_date: new Date(newEvent.start_date).toISOString(),
-         location: newEvent.location,
-         status: newEvent.status,
-         event_type: newEvent.event_type,
-         slug: newEvent.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
-       });
+        if (editingEvent) {
+          const { error } = await supabase
+            .from("events")
+            .update({
+              name: formData.name,
+              description: formData.description,
+              start_date: new Date(formData.start_date).toISOString(),
+              location: formData.location,
+              status: formData.status,
+              event_type: formData.event_type,
+              allows_pre_bidding: formData.allows_pre_bidding,
+              show_countdown: formData.show_countdown,
+              transmission_link: formData.transmission_link
+            })
+            .eq("id", editingEvent.id);
+          if (error) throw error;
+          toast.success("Evento atualizado com sucesso");
+        } else {
+          const { error } = await supabase.from("events").insert({
+            name: formData.name,
+            description: formData.description,
+            start_date: new Date(formData.start_date).toISOString(),
+            location: formData.location,
+            status: formData.status,
+            event_type: formData.event_type,
+            allows_pre_bidding: formData.allows_pre_bidding,
+            show_countdown: formData.show_countdown,
+            transmission_link: formData.transmission_link,
+            slug: formData.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
+          });
+          if (error) throw error;
+          toast.success("Evento criado com sucesso");
+        }
  
-       if (error) throw error;
-       toast.success("Evento criado com sucesso");
-       setIsCreating(false);
+        setIsDialogOpen(false);
+        resetForm();
        fetchEvents();
      } catch (error: any) {
-       toast.error("Erro ao criar evento: " + error.message);
+        toast.error("Erro ao salvar evento: " + error.message);
      }
    };
  
@@ -119,36 +177,42 @@
              onChange={(e) => setSearchQuery(e.target.value)}
            />
          </div>
-         <Dialog open={isCreating} onOpenChange={setIsCreating}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) resetForm();
+          }}>
            <DialogTrigger asChild>
-             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+              <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
+                resetForm();
+                setIsDialogOpen(true);
+              }}>
                <PlusCircle className="mr-2 h-4 w-4" /> Novo Evento
              </Button>
            </DialogTrigger>
-           <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
-               <DialogTitle>Criar Novo Evento</DialogTitle>
+                <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
                <DialogDescription>
-                 Defina as configurações básicas do leilão.
+                  Defina as configurações do leilão.
                </DialogDescription>
              </DialogHeader>
              <div className="grid gap-4 py-4">
                <div className="grid gap-2">
                  <Label htmlFor="name">Nome do Evento</Label>
-                 <Input value={newEvent.name} onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })} />
+                  <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                </div>
                <div className="grid gap-2">
                  <Label htmlFor="date">Data e Hora de Início</Label>
                  <Input 
                    type="datetime-local" 
-                   value={newEvent.start_date} 
-                   onChange={(e) => setNewEvent({ ...newEvent, start_date: e.target.value })} 
+                    value={formData.start_date} 
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
                  />
                </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">
                    <Label htmlFor="type">Tipo</Label>
-                   <Select onValueChange={(v) => setNewEvent({ ...newEvent, event_type: v })} defaultValue={newEvent.event_type}>
+                    <Select onValueChange={(v) => setFormData({ ...formData, event_type: v })} value={formData.event_type}>
                      <SelectTrigger><SelectValue /></SelectTrigger>
                      <SelectContent>
                        <SelectItem value="online">Online</SelectItem>
@@ -159,24 +223,50 @@
                  </div>
                  <div className="grid gap-2">
                    <Label htmlFor="status">Status Inicial</Label>
-                   <Select onValueChange={(v) => setNewEvent({ ...newEvent, status: v })} defaultValue={newEvent.status}>
+                    <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
                      <SelectTrigger><SelectValue /></SelectTrigger>
                      <SelectContent>
                        <SelectItem value="scheduled">Agendado</SelectItem>
-                       <SelectItem value="active">Ao Vivo (Ativo)</SelectItem>
+                        <SelectItem value="active">Ao Vivo</SelectItem>
                      </SelectContent>
                    </Select>
                  </div>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="location">Localização</Label>
-                 <Input value={newEvent.location} onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
-               </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Localização</Label>
+                  <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="transmission">Link da Transmissão (YouTube/Vimeo)</Label>
+                  <Input value={formData.transmission_link} onChange={(e) => setFormData({ ...formData, transmission_link: e.target.value })} placeholder="https://..." />
+                </div>
+                <div className="flex items-center gap-4 py-2">
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="pre_bidding" 
+                      checked={formData.allows_pre_bidding} 
+                      onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
+                      className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                    />
+                    <Label htmlFor="pre_bidding">Lances Antecipados</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="countdown" 
+                      checked={formData.show_countdown} 
+                      onChange={(e) => setFormData({...formData, show_countdown: e.target.checked})}
+                      className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                    />
+                    <Label htmlFor="countdown">Mostrar Contagem</Label>
+                  </div>
+                </div>
              </div>
              <DialogFooter>
-               <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
-               <Button className="bg-gold text-emerald-deep" onClick={handleCreate}>
-                 Criar Evento
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+                <Button className="bg-gold text-emerald-deep" onClick={handleSave}>
+                  {editingEvent ? "Salvar Alterações" : "Criar Evento"}
                </Button>
              </DialogFooter>
            </DialogContent>
@@ -232,16 +322,16 @@
                            {getStatusLabel(event.status)}
                          </span>
                        </TableCell>
-                       <TableCell className="text-right">
-                         <div className="flex justify-end gap-2">
-                           <Button variant="ghost" size="icon">
-                             <Pencil className="h-4 w-4" />
-                           </Button>
-                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(event.id)}>
-                             <Trash2 className="h-4 w-4" />
-                           </Button>
-                         </div>
-                       </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(event.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                      </TableRow>
                    ))
                  )}

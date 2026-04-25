@@ -1,5 +1,5 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
- import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar } from "lucide-react";
+import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from "lucide-react";
  import { Countdown } from "@/components/auctions/countdown";
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
@@ -8,25 +8,43 @@
  import { formatBRL } from "@/utils/format";
 import heroImage from "@/assets/hero-horse.jpg";
 
-export const Route = createFileRoute("/")({
-   loader: async () => {
-     const [eventsRes, lotsRes] = await Promise.all([
-       supabase.from("events").select("*").limit(6).order("start_date", { ascending: true }),
-       supabase.from("lots").select("*, animal:animals(*), event:events(*)").limit(6).order("created_at", { ascending: false })
-     ]);
- 
-     return {
-       events: eventsRes.data || [],
-       lots: lotsRes.data || []
-     };
-   },
-   component: Home,
-});
+  export const Route = createFileRoute("/")({
+    loader: async () => {
+      const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
+        supabase.from("events")
+          .select("*")
+          .or("status.eq.active,status.eq.scheduled")
+          .order("start_date", { ascending: true })
+          .limit(6),
+        supabase.from("lots")
+          .select("*, animal:animals(*), event:events(*)")
+          .limit(6)
+          .order("created_at", { ascending: false }),
+        supabase.from("events")
+          .select("*")
+          .eq("status", "finished")
+          .order("start_date", { ascending: false })
+          .limit(3),
+        supabase.from("site_settings")
+          .select("*")
+          .eq("key", "announcement")
+          .single()
+      ]);
+
+      return {
+        events: eventsRes.data || [],
+        lots: lotsRes.data || [],
+        pastEvents: pastEventsRes.data || [],
+        announcement: settingsRes.data?.value || null
+      };
+    },
+    component: Home,
+  });
 
 function Home() {
-   const { events, lots } = Route.useLoaderData();
+    const { events, lots, pastEvents, announcement } = Route.useLoaderData();
  
-   const mappedEvents = events.map((e: any) => ({
+    const mapEvent = (e: any) => ({
      id: e.id,
      slug: e.slug || "",
      name: e.name,
@@ -40,8 +58,12 @@ function Home() {
      viewers: e.viewers || 0,
      bidsCount: 0,
      auctioneer: e.auctioneer_name || "",
-     promoter: e.promoter_company || "",
-   }));
+      promoter: e.promoter_company || "",
+      show_countdown: e.show_countdown !== false,
+    });
+
+    const mappedEvents = events.map(mapEvent);
+    const mappedPastEvents = pastEvents.map(mapEvent);
  
    const mappedLots = lots.map((l: any) => ({
      id: l.id,
@@ -59,9 +81,9 @@ function Home() {
      status: l.status as any,
    }));
  
-   const liveEvents = mappedEvents.filter((e) => e.status === "live");
-   const upcomingEvents = mappedEvents.filter((e) => e.status === "upcoming" || e.status === "scheduled");
-   const nextEvent = upcomingEvents[0];
+    const liveEvents = mappedEvents.filter((e) => e.status === "active");
+    const upcomingEvents = mappedEvents.filter((e) => e.status === "scheduled");
+    const nextEvent = upcomingEvents.find(e => e.show_countdown);
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {
@@ -73,6 +95,19 @@ function Home() {
 
   return (
     <>
+      {/* ANNOUNCEMENT BANNER */}
+      {announcement && (announcement as any).active && (
+        <div className="bg-gold py-2 px-4 text-emerald-deep">
+          <div className="container mx-auto flex items-center justify-center gap-2 text-sm font-bold">
+            <Bell className="h-4 w-4" />
+            {(announcement as any).text}
+            {(announcement as any).link && (
+              <Link to={(announcement as any).link} className="underline ml-2">Saiba mais</Link>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
@@ -141,6 +176,19 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* EVENTOS PASSADOS */}
+      {mappedPastEvents.length > 0 && (
+        <section className="container mx-auto px-4 py-16 border-t border-border/40">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl text-muted-foreground">Leilões encerrados</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
+            {mappedPastEvents.map((e) => <EventCard key={e.id} event={e} />)}
+          </div>
+        </section>
+      )}
 
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
