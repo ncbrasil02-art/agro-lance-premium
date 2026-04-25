@@ -4,39 +4,47 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Eye, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { Link } from "@tanstack/react-router";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-    export function LotManagement({ 
-      initialEventId = "all", 
-      onEventChange,
-      onNavigateToAnimals,
-      onNavigateToEvents,
-      searchQuery,
-      onSearchChange,
-      currentPage,
-      onPageChange
-    }: { 
-      initialEventId?: string; 
-      onEventChange?: (id: string) => void;
-      onNavigateToAnimals?: () => void;
-      onNavigateToEvents?: () => void;
-      searchQuery: string;
-      onSearchChange: (val: string) => void;
-      currentPage: number;
-      onPageChange: (val: number) => void;
-    }) {
+  export function LotManagement({ 
+    initialEventId = "all", 
+    onEventChange,
+    onNavigateToAnimals,
+    onNavigateToEvents,
+    searchQuery,
+    onSearchChange,
+    currentPage,
+    onPageChange,
+    sortColumn,
+    sortDirection,
+    onSortChange
+  }: { 
+    initialEventId?: string; 
+    onEventChange?: (id: string) => void;
+    onNavigateToAnimals?: () => void;
+    onNavigateToEvents?: () => void;
+    searchQuery: string;
+    onSearchChange: (val: string) => void;
+    currentPage: number;
+    onPageChange: (val: number) => void;
+    sortColumn: string;
+    sortDirection: "asc" | "desc";
+    onSortChange: (col: string, dir: "asc" | "desc") => void;
+  }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
-      const [lots, setLots] = useState<any[]>([]);
-      const [events, setEvents] = useState<any[]>([]);
-      const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
-      const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
-      const [editingLot, setEditingLot] = useState<any>(null);
+  const [lots, setLots] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [events, setEvents] = useState<any[]>([]);
+  const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+  const [editingLot, setEditingLot] = useState<any>(null);
+  const ITEMS_PER_PAGE = 8;
       
       const [formData, setFormData] = useState({
         event_id: "",
@@ -50,65 +58,75 @@ import { Link } from "@tanstack/react-router";
         payment_methods: ""
       });
 
-   const ITEMS_PER_PAGE = 8;
-      const fetchData = async () => {
-        setIsLoading(true);
-        console.log("Fetching lots, events and animals...");
-        try {
-          const [lotsRes, eventsRes, animalsRes] = await Promise.all([
-            supabase
-              .from("lots")
-              .select("*, event:events!event_id(name), animal:animals(name, internal_code)")
-              .order("is_featured", { ascending: false })
-              .order("lot_number", { ascending: true }),
-            supabase
-              .from("events")
-              .select("id, name")
-              .order("name"),
-            supabase
-              .from("animals")
-              .select("id, name, internal_code")
-              .order("name")
-          ]);
-    
-          if (lotsRes.error) {
-            console.error("Error fetching lots:", lotsRes.error);
-            throw lotsRes.error;
-          }
-          if (eventsRes.error) {
-            console.error("Error fetching events for lots:", eventsRes.error);
-            throw eventsRes.error;
-          }
-          if (animalsRes.error) {
-            console.error("Error fetching animals for lots:", animalsRes.error);
-            throw animalsRes.error;
-          }
-    
-          console.log("Data loaded for Lots tab:", {
-            lots: lotsRes.data?.length || 0,
-            events: eventsRes.data?.length || 0,
-            animals: animalsRes.data?.length || 0
-          });
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [eventsRes, animalsRes] = await Promise.all([
+        supabase.from("events").select("id, name").order("name"),
+        supabase.from("animals").select("id, name, internal_code, photos").order("name"),
+      ]);
 
-          setLots(lotsRes.data || []);
-          setEvents(eventsRes.data || []);
-          setAvailableAnimals(animalsRes.data || []);
-          
-          if (initialEventId !== "all") {
-            setFormData(prev => ({ ...prev, event_id: initialEventId }));
-          }
-        } catch (error: any) {
-          console.error("Catch error in fetchData (Lots):", error);
-          toast.error("Erro ao carregar dados: " + error.message);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      if (eventsRes.error) throw eventsRes.error;
+      if (animalsRes.error) throw animalsRes.error;
 
-      useEffect(() => {
-        setSelectedEventId(initialEventId);
-        fetchData();
-      }, [initialEventId]);
+      setEvents(eventsRes.data || []);
+      setAvailableAnimals(animalsRes.data || []);
+
+      let query = supabase
+        .from("lots")
+        .select("*, event:events!event_id(name), animal:animals(name, internal_code, photos)", { count: "exact" });
+
+      if (selectedEventId !== "all") {
+        query = query.eq("event_id", selectedEventId);
+      }
+
+      if (searchQuery) {
+        query = query.ilike("animal.name", `%${searchQuery}%`);
+      }
+
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
+      const { data, error, count } = await query
+        .order(sortColumn, { ascending: sortDirection === "asc" })
+        .range(from, to);
+
+      if (error) throw error;
+      setLots(data || []);
+      setTotalCount(count || 0);
+
+      if (initialEventId !== "all") {
+        setFormData(prev => ({ ...prev, event_id: initialEventId }));
+      }
+    } catch (error: any) {
+      toast.error("Erro ao carregar lotes: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setSelectedEventId(initialEventId);
+  }, [initialEventId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, searchQuery, selectedEventId, sortColumn, sortDirection]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      onSortChange(column, "asc");
+    }
+  };
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
+    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
+  };
 
       const resetForm = () => {
         setEditingLot(null);
@@ -196,18 +214,6 @@ import { Link } from "@tanstack/react-router";
        if (onEventChange) onEventChange(val);
      };
  
-   const filteredLots = lots.filter(lot => {
-     const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          lot.lot_number?.toString().includes(searchQuery);
-     const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
-     return matchesSearch && matchesEvent;
-   });
- 
-   const totalPages = Math.ceil(filteredLots.length / ITEMS_PER_PAGE);
-   const paginatedLots = filteredLots.slice(
-     (currentPage - 1) * ITEMS_PER_PAGE,
-     currentPage * ITEMS_PER_PAGE
-   );
 
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja remover este lote? O animal voltará a ficar disponível para outros eventos.")) return;
@@ -433,54 +439,67 @@ import { Link } from "@tanstack/react-router";
             ) : (
               <>
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead className="w-[80px]">Nº Lote</TableHead>
+                      <TableHead className="w-[80px] cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('lot_number')}>
+                        <div className="flex items-center">Nº Lote <SortIndicator column="lot_number" /></div>
+                      </TableHead>
                       <TableHead>Animal</TableHead>
                       <TableHead>Evento</TableHead>
-                       <TableHead>Destaque</TableHead>
-                       <TableHead>Preço Inicial</TableHead>
-                      <TableHead>Lances</TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('is_featured')}>
+                        <div className="flex items-center">Destaque <SortIndicator column="is_featured" /></div>
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('starting_price')}>
+                        <div className="flex items-center">Preço <SortIndicator column="starting_price" /></div>
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('bids_count')}>
+                        <div className="flex items-center">Lances <SortIndicator column="bids_count" /></div>
+                      </TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedLots.length === 0 ? (
+                    {lots.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                           Nenhum lote encontrado.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      paginatedLots.map((lot) => (
-                      <TableRow key={lot.id}>
-                        <TableCell className="font-bold">{lot.lot_number}</TableCell>
-                        <TableCell>
-                          {lot.is_featured ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gold/10 text-gold border border-gold/20">
-                              Sim
+                      lots.map((lot: any) => (
+                        <TableRow key={lot.id}>
+                          <TableCell className="font-bold">{lot.lot_number}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {lot.animal?.photos?.[0] && (
+                                <img src={lot.animal.photos[0]} alt="" className="h-6 w-6 rounded-md object-cover border border-white/10" />
+                              )}
+                              <div>
+                                <div className="font-medium line-clamp-1">{lot.animal?.name}</div>
+                                <div className="text-[10px] text-muted-foreground">{lot.animal?.internal_code}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-[120px] truncate text-xs">{lot.event?.name}</TableCell>
+                          <TableCell>
+                            {lot.is_featured ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gold/10 text-gold border border-gold/20 uppercase">Sim</span>
+                            ) : (
+                              <span className="text-muted-foreground text-[10px] uppercase">Não</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}
+                          </TableCell>
+                          <TableCell className="text-center">{lot.bids_count || 0}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                              lot.status === 'active' ? 'text-emerald-500 bg-emerald-500/10' : 'text-muted-foreground bg-muted'
+                            }`}>
+                              {lot.status === 'active' ? 'Ativo' : 'Pausado'}
                             </span>
-                          ) : (
-                            <span className="text-muted-foreground text-[10px] uppercase">Não</span>
-                          )}
-                        </TableCell>
-                       <TableCell>
-                         <div className="font-medium">{lot.animal?.name}</div>
-                         <div className="text-xs text-muted-foreground">{lot.animal?.internal_code}</div>
-                       </TableCell>
-                       <TableCell>{lot.event?.name}</TableCell>
-                       <TableCell>
-                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}
-                       </TableCell>
-                       <TableCell>{lot.bids_count || 0}</TableCell>
-                       <TableCell>
-                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                           lot.status === 'active' ? 'text-emerald-500 bg-emerald-500/10' : 'text-muted-foreground bg-muted'
-                         }`}>
-                           {lot.status === 'active' ? 'Ativo' : 'Pausado'}
-                         </span>
-                       </TableCell>
+                          </TableCell>
                        <TableCell className="text-right">
                          <div className="flex justify-end gap-1 md:gap-2">
                            <Button 
@@ -512,11 +531,11 @@ import { Link } from "@tanstack/react-router";
               </Table>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-4 border-t">
-                  <div className="text-xs text-muted-foreground">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredLots.length)} de {filteredLots.length} registros
+                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
+                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>

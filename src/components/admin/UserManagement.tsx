@@ -4,35 +4,52 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Loader2, CheckCircle, XCircle, Shield, User } from "lucide-react";
+import { Search, Loader2, CheckCircle, XCircle, Shield, User, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function UserManagement({ 
   searchQuery, 
   onSearchChange,
   currentPage,
-  onPageChange
+  onPageChange,
+  sortColumn,
+  sortDirection,
+  onSortChange
 }: { 
   searchQuery: string; 
   onSearchChange: (val: string) => void;
   currentPage: number;
   onPageChange: (val: number) => void;
+  sortColumn: string;
+  sortDirection: "asc" | "desc";
+  onSortChange: (col: string, dir: "asc" | "desc") => void;
 }) {
   const [users, setUsers] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const ITEMS_PER_PAGE = 8;
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*", { count: "exact" });
+
+      if (searchQuery) {
+        query = query.or(`full_name.ilike.%${searchQuery}%,cpf.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%`);
+      }
+
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
+      const { data, error, count } = await query
+        .order(sortColumn, { ascending: sortDirection === "asc" })
+        .range(from, to);
 
       if (error) throw error;
       setUsers(data || []);
+      setTotalCount(count || 0);
     } catch (error: any) {
       toast.error("Erro ao carregar usuários: " + error.message);
     } finally {
@@ -42,7 +59,23 @@ export function UserManagement({
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [currentPage, searchQuery, sortColumn, sortDirection]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      onSortChange(column, "asc");
+    }
+  };
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
+    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
+  };
+
 
   const handleToggleApproval = async (userId: string, currentStatus: boolean) => {
     try {
@@ -60,19 +93,6 @@ export function UserManagement({
     }
   };
 
-  const ITEMS_PER_PAGE = 8;
-
-  const filteredUsers = users.filter(user => 
-    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.cpf?.includes(searchQuery) ||
-    user.phone?.includes(searchQuery)
-  );
-
-  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
   return (
     <div className="space-y-6">
@@ -103,23 +123,27 @@ export function UserManagement({
           ) : (
             <>
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead>Nome</TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('full_name')}>
+                      <div className="flex items-center">Nome <SortIndicator column="full_name" /></div>
+                    </TableHead>
                     <TableHead>Contato/CPF</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('is_approved')}>
+                      <div className="flex items-center">Status <SortIndicator column="is_approved" /></div>
+                    </TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedUsers.length === 0 ? (
+                  {users.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                         Nenhum usuário encontrado.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    paginatedUsers.map((user) => (
+                  users.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -167,11 +191,11 @@ export function UserManagement({
               </Table>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-4 border-t">
-                  <div className="text-xs text-muted-foreground">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredUsers.length)} de {filteredUsers.length} registros
+                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
+                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>

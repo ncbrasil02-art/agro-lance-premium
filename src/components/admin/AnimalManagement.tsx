@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,13 +16,19 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
     searchQuery,
     onSearchChange,
     currentPage,
-    onPageChange
+    onPageChange,
+    sortColumn,
+    sortDirection,
+    onSortChange
   }: { 
     onNavigateToLots?: () => void;
     searchQuery: string;
     onSearchChange: (val: string) => void;
     currentPage: number;
     onPageChange: (val: number) => void;
+    sortColumn: string;
+    sortDirection: "asc" | "desc";
+    onSortChange: (col: string, dir: "asc" | "desc") => void;
   }) {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
@@ -159,46 +165,57 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
         toast.error("Erro ao salvar animal: " + error.message);
       }
     };
-   const [animals, setAnimals] = useState<any[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
-    const fetchAnimals = async () => {
-      setIsLoading(true);
-      console.log("Fetching animals...");
-      try {
-        const { data, error } = await supabase
-          .from("animals")
-          .select("*")
-          .order("created_at", { ascending: false });
+  const [animals, setAnimals] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const ITEMS_PER_PAGE = 8;
 
-        if (error) {
-          console.error("Error fetching animals:", error);
-          throw error;
-        }
-        console.log("Animals loaded:", data?.length || 0);
-        setAnimals(data || []);
-      } catch (error: any) {
-        console.error("Catch error fetching animals:", error);
-        toast.error("Erro ao carregar animais: " + error.message);
-      } finally {
-        setIsLoading(false);
+  const fetchAnimals = async () => {
+    setIsLoading(true);
+    try {
+      let query = supabase
+        .from("animals")
+        .select("*", { count: "exact" });
+
+      if (searchQuery) {
+        query = query.or(`name.ilike.%${searchQuery}%,registration_number.ilike.%${searchQuery}%`);
       }
-    };
- 
-   const ITEMS_PER_PAGE = 8;
-   useEffect(() => {
-     fetchAnimals();
-   }, []); // Only fetch on mount
 
-   const filteredAnimals = animals.filter(animal => 
-     animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase())
-   );
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
 
-   const totalPages = Math.ceil(filteredAnimals.length / ITEMS_PER_PAGE);
-   const paginatedAnimals = filteredAnimals.slice(
-     (currentPage - 1) * ITEMS_PER_PAGE,
-     currentPage * ITEMS_PER_PAGE
-   );
+      const { data, error, count } = await query
+        .order(sortColumn, { ascending: sortDirection === "asc" })
+        .range(from, to);
+
+      if (error) throw error;
+      setAnimals(data || []);
+      setTotalCount(count || 0);
+    } catch (error: any) {
+      toast.error("Erro ao carregar animais: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnimals();
+  }, [currentPage, searchQuery, sortColumn, sortDirection]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      onSortChange(column, "asc");
+    }
+  };
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
+    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
+  };
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este animal?")) return;
@@ -499,25 +516,33 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
             ) : (
               <>
                 <Table>
-               <TableHeader>
-                 <TableRow>
+                <TableHeader className="bg-muted/50">
+                  <TableRow>
                     <TableHead className="w-[80px]">Foto</TableHead>
-                    <TableHead>Nome</TableHead>
-                   <TableHead>Espécie/Raça</TableHead>
-                   <TableHead>Registro</TableHead>
-                   <TableHead>Sexo</TableHead>
-                   <TableHead className="text-right">Ações</TableHead>
-                 </TableRow>
-               </TableHeader>
-               <TableBody>
-                  {paginatedAnimals.length === 0 ? (
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
+                      <div className="flex items-center">Nome <SortIndicator column="name" /></div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('species')}>
+                      <div className="flex items-center">Espécie/Raça <SortIndicator column="species" /></div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('registration_number')}>
+                      <div className="flex items-center">Registro <SortIndicator column="registration_number" /></div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('sex')}>
+                      <div className="flex items-center">Sexo <SortIndicator column="sex" /></div>
+                    </TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                   {animals.length === 0 ? (
                    <TableRow>
                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                        Nenhum animal encontrado.
                      </TableCell>
                    </TableRow>
-                 ) : (
-                    paginatedAnimals.map((animal) => (
+                  ) : (
+                     animals.map((animal) => (
                       <TableRow key={animal.id}>
                         <TableCell>
                           {animal.photos && animal.photos.length > 0 ? (
@@ -553,11 +578,11 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
               </Table>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-4 border-t">
-                  <div className="text-xs text-muted-foreground">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredAnimals.length)} de {filteredAnimals.length} registros
+                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
+                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
