@@ -18,12 +18,16 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
     onManageLots, 
     onNavigate,
     searchQuery,
-    onSearchChange
+    onSearchChange,
+    currentPage,
+    onPageChange
   }: { 
     onManageLots?: (id: string) => void; 
     onNavigate?: () => void;
     searchQuery: string;
     onSearchChange: (val: string) => void;
+    currentPage: number;
+    onPageChange: (val: number) => void;
   }) {
     const [events, setEvents] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -85,12 +89,6 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
      };
  
    const ITEMS_PER_PAGE = 8;
-   const [currentPage, setCurrentPage] = useState(1);
-
-   useEffect(() => {
-     setCurrentPage(1);
-   }, [searchQuery]);
-
     const fetchEvents = async () => {
       setIsLoading(true);
       console.log("Fetching events...");
@@ -550,11 +548,11 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                     Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredEvents.length)} de {filteredEvents.length} registros
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
