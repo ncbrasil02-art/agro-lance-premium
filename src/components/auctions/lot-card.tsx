@@ -48,7 +48,7 @@ export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEn
             </div>
           )}
         </div>
-        <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur">
+        <div className="absolute right-3 top-3 z-10 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur shadow-sm">
           LOTE {lot?.number ? String(lot.number).padStart(2, "0") : "--"}
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white/90" aria-label={`${lot?.viewers || 0} visualizações, ${lot?.bidsCount || 0} lances`}>
@@ -71,9 +71,13 @@ export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEn
             <div className="text-xl font-bold text-gradient-gold">{formatBRL(lot?.currentBid || 0)}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-            {lot?.endsAt ? (
-              <Countdown endsAt={lot.endsAt} className="font-mono text-sm font-semibold text-foreground" />
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? 'Status' : 'Encerra em'}
+            </div>
+            {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? (
+              <span className="text-sm font-semibold text-muted-foreground uppercase">Encerrado</span>
+            ) : lot.endsAt || lot.eventEndDate ? (
+              <Countdown endsAt={lot.endsAt || lot.eventEndDate || ""} className="font-mono text-sm font-semibold text-foreground" />
             ) : (
               <span className="text-sm font-semibold text-foreground">--:--:--</span>
             )}
