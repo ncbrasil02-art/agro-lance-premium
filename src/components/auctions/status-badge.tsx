@@ -20,15 +20,14 @@ const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
      cls: "bg-muted text-muted-foreground border-border" 
    };
  
-   // Final safety check to avoid the "Cannot read properties of undefined (reading 'cls')" crash
-   const cls = s?.cls || "bg-muted text-muted-foreground border-border";
-   const label = s?.label || status || "Pendente";
-   const dot = s?.dot || false;
- 
    return (
-     <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider", cls, className)}>
-       {dot && <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse-live" />}
-       {label}
+     <span className={cn(
+       "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider",
+       s.cls,
+       className
+     )}>
+       {s.dot && <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse-live" />}
+       {s.label}
      </span>
    );
  }
