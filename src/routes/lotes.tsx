@@ -27,9 +27,9 @@ export const Route = createFileRoute("/lotes")({
 });
 
 function LotsPage() {
-   const { lots } = Route.useLoaderData();
+   const { lots = [] } = Route.useLoaderData() as any;
  
-   const mappedLots = lots.map((l: any) => ({
+   const mappedLots = lots?.map((l: any) => ({
      id: l.id,
      number: l.lot_number,
      eventId: l.event_id,
