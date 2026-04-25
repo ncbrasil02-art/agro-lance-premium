@@ -1,7 +1,7 @@
  import { useState, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
- import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag } from "lucide-react";
+ import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
@@ -17,8 +17,9 @@ export const Route = createFileRoute("/admin")({
   import { AnimalManagement } from "@/components/admin/AnimalManagement";
   import { SellerManagement } from "@/components/admin/SellerManagement";
  import { CategoryManagement } from "@/components/admin/CategoryManagement";
+ import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
  
- type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "users" | "settings";
+ type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "users" | "settings";
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/admin")({
       { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
       { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
       { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
+      { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
       { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
      { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
@@ -246,6 +248,7 @@ function AdminLayout() {
           )}
           {activeTab === "animals" && <AnimalManagement />}
           {activeTab === "categories" && <CategoryManagement />}
+          {activeTab === "event_requests" && <EventRequestManagement />}
           {activeTab === "sellers" && <SellerManagement />}
           {activeTab === "users" && (
             <Card>
