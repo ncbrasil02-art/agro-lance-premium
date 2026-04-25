@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,8 +17,18 @@ import { Textarea } from "@/components/ui/textarea";
     const [events, setEvents] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<any>(null);
+    
+    const [requestFormData, setRequestFormData] = useState({
+      name: "",
+      whatsapp: "",
+      category: "",
+      location: "",
+      additional_info: ""
+    });
      const [formData, setFormData] = useState({
        name: "",
        description: "",
@@ -169,9 +179,17 @@ import { Textarea } from "@/components/ui/textarea";
      }
    };
  
-   const filteredEvents = events.filter(event => 
-     event.name?.toLowerCase().includes(searchQuery.toLowerCase())
-   );
+    const filteredEvents = events.filter(event => {
+      const matchesSearch = event.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      if (statusFilter === "all") return matchesSearch;
+      if (statusFilter === "live") return matchesSearch && event.status === "live";
+      if (statusFilter === "finished") return matchesSearch && event.status === "finished";
+      if (statusFilter === "pre-bidding") return matchesSearch && event.status === "scheduled" && event.allows_pre_bidding;
+      if (statusFilter === "scheduled") return matchesSearch && event.status === "scheduled" && !event.allows_pre_bidding;
+      
+      return matchesSearch;
+    });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este evento? Todos os lotes associados também serão afetados.")) return;
@@ -203,35 +221,131 @@ import { Textarea } from "@/components/ui/textarea";
         default: return status;
       }
    };
+    const handleSendRequest = async () => {
+      if (!requestFormData.name || !requestFormData.whatsapp) {
+        toast.error("Por favor, preencha nome e WhatsApp");
+        return;
+      }
+      
+      try {
+        const { error } = await supabase.from("event_requests").insert(requestFormData);
+        if (error) throw error;
+        toast.success("Pedido enviado com sucesso! Entraremos em contato em breve.");
+        setIsRequestDialogOpen(false);
+        setRequestFormData({ name: "", whatsapp: "", category: "", location: "", additional_info: "" });
+      } catch (error: any) {
+        toast.error("Erro ao enviar pedido: " + error.message);
+      }
+    };
+
    return (
      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
-            </Button>
-          </div>
-         <div className="relative flex-1 max-w-sm">
-           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-           <Input
-             placeholder="Buscar eventos..."
-             className="pl-10"
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-           />
-         </div>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) resetForm();
-          }}>
-           <DialogTrigger asChild>
-              <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
-                resetForm();
-                setIsDialogOpen(true);
-              }}>
-               <PlusCircle className="mr-2 h-4 w-4" /> Novo Evento
-             </Button>
-           </DialogTrigger>
+         <div className="flex flex-col gap-6">
+           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-gold/5 p-4 rounded-2xl border border-gold/10">
+             <div className="space-y-1">
+               <h3 className="font-bold text-lg text-gold">Quer realizar um evento?</h3>
+               <p className="text-xs text-muted-foreground">Fale conosco e organize seu leilão na Elite.</p>
+             </div>
+             <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
+               <DialogTrigger asChild>
+                 <Button className="bg-emerald-deep text-white hover:bg-emerald-deep/90 shadow-lg">
+                   <Send className="mr-2 h-4 w-4" /> Criar um Evento
+                 </Button>
+               </DialogTrigger>
+               <DialogContent className="sm:max-w-[450px]">
+                 <DialogHeader>
+                   <DialogTitle>Solicitar Novo Evento</DialogTitle>
+                   <DialogDescription>
+                     Preencha seus dados e as informações básicas do evento. Entraremos em contato via WhatsApp.
+                   </DialogDescription>
+                 </DialogHeader>
+                 <div className="grid gap-4 py-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="req-name">Seu Nome / Nome da Empresa</Label>
+                     <Input id="req-name" value={requestFormData.name} onChange={(e) => setRequestFormData({...requestFormData, name: e.target.value})} />
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="req-whatsapp">WhatsApp (com DDD)</Label>
+                     <Input id="req-whatsapp" value={requestFormData.whatsapp} onChange={(e) => setRequestFormData({...requestFormData, whatsapp: e.target.value})} placeholder="(00) 00000-0000" />
+                   </div>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="grid gap-2">
+                       <Label htmlFor="req-cat">Categoria</Label>
+                       <Select onValueChange={(v) => setRequestFormData({...requestFormData, category: v})} value={requestFormData.category}>
+                         <SelectTrigger id="req-cat"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                         <SelectContent>
+                           <SelectItem value="Equinos">Equinos</SelectItem>
+                           <SelectItem value="Bovinos">Bovinos</SelectItem>
+                           <SelectItem value="Geral">Geral</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
+                     <div className="grid gap-2">
+                       <Label htmlFor="req-loc">Localização</Label>
+                       <Input id="req-loc" value={requestFormData.location} onChange={(e) => setRequestFormData({...requestFormData, location: e.target.value})} placeholder="Cidade - UF" />
+                     </div>
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="req-info">Mais Informações</Label>
+                     <Textarea 
+                       id="req-info" 
+                       value={requestFormData.additional_info} 
+                       onChange={(e) => setRequestFormData({...requestFormData, additional_info: e.target.value})} 
+                       placeholder="Conte um pouco sobre o evento que deseja realizar..."
+                       className="min-h-[100px]"
+                     />
+                   </div>
+                 </div>
+                 <DialogFooter>
+                   <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)}>Cancelar</Button>
+                   <Button onClick={handleSendRequest} className="bg-gold text-emerald-deep">Enviar Pedido</Button>
+                 </DialogFooter>
+               </DialogContent>
+             </Dialog>
+           </div>
+
+           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+             <div className="flex flex-wrap items-center gap-2">
+               <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
+                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
+               </Button>
+               <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
+                 <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
+                 <Select value={statusFilter} onValueChange={setStatusFilter}>
+                   <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[140px] text-xs">
+                     <SelectValue placeholder="Filtrar Status" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="all">Todos os Status</SelectItem>
+                     <SelectItem value="live">Ao Vivo</SelectItem>
+                     <SelectItem value="pre-bidding">Loteamento</SelectItem>
+                     <SelectItem value="scheduled">Agendados</SelectItem>
+                     <SelectItem value="finished">Encerrados</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+             </div>
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar eventos..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+             <Dialog open={isDialogOpen} onOpenChange={(open) => {
+               setIsDialogOpen(open);
+               if (!open) resetForm();
+             }}>
+              <DialogTrigger asChild>
+                 <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
+                   resetForm();
+                   setIsDialogOpen(true);
+                 }}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Novo Evento
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
                 <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
