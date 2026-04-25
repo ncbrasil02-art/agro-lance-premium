@@ -5,13 +5,28 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check } from "lucide-react";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+ import { Checkbox } from "@/components/ui/checkbox";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
   import { toast } from "sonner";
  
-  export function AnimalManagement() {
+ const VETERINARY_CHECKLIST = [
+   { id: "prognata", label: "Prognata?" },
+   { id: "aerofagico", label: "Aerofágico?" },
+   { id: "criptorquidico", label: "Criptorquídico?" },
+   { id: "cirurgia_neurectomia", label: "Cirurgia de neurectomia" },
+   { id: "laminite", label: "Laminite?" },
+   { id: "cirurgia_colica", label: "Já fez Cirurgia de Cólica?" },
+   { id: "dpco", label: "DPCO?" },
+   { id: "cirurgia_grave", label: "Já fez Cirurgia Grave?" },
+   { id: "cicatrizes", label: "Tem Cicatrizes?" },
+   { id: "hypp", label: "HYPP?" },
+ ];
+ 
+ export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
      const [formData, setFormData] = useState<any>({
