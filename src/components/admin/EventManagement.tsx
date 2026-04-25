@@ -6,7 +6,7 @@ import { Link } from "@tanstack/react-router";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Eye, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,7 +20,10 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
     searchQuery,
     onSearchChange,
     currentPage,
-    onPageChange
+    onPageChange,
+    sortColumn,
+    sortDirection,
+    onSortChange
   }: { 
     onManageLots?: (id: string) => void; 
     onNavigate?: () => void;
@@ -28,9 +31,61 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
     onSearchChange: (val: string) => void;
     currentPage: number;
     onPageChange: (val: number) => void;
+    sortColumn: string;
+    sortDirection: "asc" | "desc";
+    onSortChange: (col: string, dir: "asc" | "desc") => void;
   }) {
-    const [events, setEvents] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+  const [events, setEvents] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const ITEMS_PER_PAGE = 8;
+
+  const fetchEvents = async () => {
+    setIsLoading(true);
+    try {
+      let query = supabase
+        .from("events")
+        .select("*", { count: "exact" });
+
+      if (searchQuery) {
+        query = query.ilike("name", `%${searchQuery}%`);
+      }
+
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
+      const { data, error, count } = await query
+        .order(sortColumn, { ascending: sortDirection === "asc" })
+        .range(from, to);
+
+      if (error) throw error;
+      setEvents(data || []);
+      setTotalCount(count || 0);
+    } catch (error: any) {
+      toast.error("Erro ao carregar eventos: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, [currentPage, searchQuery, sortColumn, sortDirection]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      onSortChange(column, "asc");
+    }
+  };
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
+    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
+  };
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<any>(null);
      const [formData, setFormData] = useState({
@@ -87,34 +142,6 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
        });
        setIsDialogOpen(true);
      };
- 
-   const ITEMS_PER_PAGE = 8;
-    const fetchEvents = async () => {
-      setIsLoading(true);
-      console.log("Fetching events...");
-      try {
-        const { data, error } = await supabase
-          .from("events")
-          .select("*")
-          .order("start_date", { ascending: false });
-
-        if (error) {
-          console.error("Error fetching events:", error);
-          throw error;
-        }
-        console.log("Events loaded:", data?.length || 0);
-        setEvents(data || []);
-      } catch (error: any) {
-        console.error("Catch error fetching events:", error);
-        toast.error("Erro ao carregar eventos: " + error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
- 
-   useEffect(() => {
-     fetchEvents();
-   }, []);
  
     const handleSave = async () => {
       if (!formData.name || !formData.start_date) {
@@ -184,15 +211,6 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
      }
    };
  
-   const filteredEvents = events.filter(event => 
-     event.name?.toLowerCase().includes(searchQuery.toLowerCase())
-   );
-
-   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
-   const paginatedEvents = filteredEvents.slice(
-     (currentPage - 1) * ITEMS_PER_PAGE,
-     currentPage * ITEMS_PER_PAGE
-   );
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este evento? Todos os lotes associados também serão afetados.")) return;
@@ -446,24 +464,32 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
             ) : (
               <>
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Evento</TableHead>
-                      <TableHead>Data de Início</TableHead>
-                      <TableHead>Local/Promotor</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedEvents.length === 0 ? (
+                <TableHeader className="bg-muted/50">
+                  <TableRow>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
+                      <div className="flex items-center">Evento <SortIndicator column="name" /></div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('start_date')}>
+                      <div className="flex items-center">Início <SortIndicator column="start_date" /></div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('location')}>
+                      <div className="flex items-center">Local/Promotor <SortIndicator column="location" /></div>
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('status')}>
+                      <div className="flex items-center">Status <SortIndicator column="status" /></div>
+                    </TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {events.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                           Nenhum evento encontrado.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      paginatedEvents.map((event) => (
+                    events.map((event) => (
                      <TableRow key={event.id}>
                        <TableCell className="font-medium">
                          <div>{event.name}</div>
@@ -543,11 +569,11 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
               </Table>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-4 border-t">
-                  <div className="text-xs text-muted-foreground">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredEvents.length)} de {filteredEvents.length} registros
+                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
+                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
