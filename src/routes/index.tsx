@@ -108,6 +108,8 @@ function Home() {
       endsAt: l.end_date || "",
       status: l.status as any,
       eventStartDate: (l as any).event?.start_date,
+      eventEndDate: (l as any).event?.end_date,
+      allowsPreBidding: (l as any).event?.allows_pre_bidding,
     }));
  
       const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
