@@ -15,12 +15,16 @@ import { Link } from "@tanstack/react-router";
       initialEventId = "all", 
       onEventChange,
       onNavigateToAnimals,
-      onNavigateToEvents
+      onNavigateToEvents,
+      searchQuery,
+      onSearchChange
     }: { 
       initialEventId?: string; 
       onEventChange?: (id: string) => void;
       onNavigateToAnimals?: () => void;
       onNavigateToEvents?: () => void;
+      searchQuery: string;
+      onSearchChange: (val: string) => void;
     }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +32,6 @@ import { Link } from "@tanstack/react-router";
       const [events, setEvents] = useState<any[]>([]);
       const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
       const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
-      const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
       
       const [formData, setFormData] = useState({
@@ -232,12 +235,12 @@ import { Link } from "@tanstack/react-router";
          <div className="flex flex-1 gap-4 max-w-2xl">
            <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-             <Input
-               placeholder="Buscar por animal ou número..."
-               className="pl-10"
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-             />
+              <Input
+                placeholder="Buscar por animal ou número..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+              />
            </div>
             <Select value={selectedEventId} onValueChange={handleEventSelectChange}>
              <SelectTrigger className="w-[200px]">
