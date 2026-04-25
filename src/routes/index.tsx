@@ -1,6 +1,7 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from "lucide-react";
- import { Countdown } from "@/components/auctions/countdown";
+  import { Countdown } from "@/components/auctions/countdown";
+  import { logger } from "@/utils/logger";
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
  import { LotCard } from "@/components/auctions/lot-card";
@@ -10,7 +11,9 @@ import heroImage from "@/assets/hero-horse.jpg";
 
   export const Route = createFileRoute("/")({
     loader: async () => {
-      const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
+      logger.info("Iniciando carregamento da Home");
+      try {
+        const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
         supabase.from("events")
           .select("*, lots(id)")
           .or("status.eq.live,status.eq.scheduled")
@@ -32,12 +35,21 @@ import heroImage from "@/assets/hero-horse.jpg";
           .maybeSingle()
       ]);
 
-      return {
-        events: eventsRes.data || [],
-        lots: lotsRes.data || [],
-        pastEvents: pastEventsRes.data || [],
-        announcement: settingsRes.data?.value || null
-      };
+        logger.info("Carregamento da Home concluído com sucesso", {
+          eventsCount: eventsRes.data?.length || 0,
+          lotsCount: lotsRes.data?.length || 0
+        });
+
+        return {
+          events: eventsRes.data || [],
+          lots: lotsRes.data || [],
+          pastEvents: pastEventsRes.data || [],
+          announcement: settingsRes.data?.value || null
+        };
+      } catch (error) {
+        logger.error("Erro ao carregar dados da Home", { error });
+        throw error;
+      }
     },
     component: Home,
   });

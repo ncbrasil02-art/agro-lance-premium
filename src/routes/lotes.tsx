@@ -2,7 +2,8 @@
  import { LotCard } from "@/components/auctions/lot-card";
  import { supabase } from "@/integrations/supabase/client";
  import { useQuery } from "@tanstack/react-query";
- import { Loader2 } from "lucide-react";
+  import { Loader2 } from "lucide-react";
+  import { logger } from "@/utils/logger";
 
 export const Route = createFileRoute("/lotes")({
   head: () => ({
@@ -14,15 +15,26 @@ export const Route = createFileRoute("/lotes")({
     ],
   }),
     loader: async () => {
-       const { data: lots, error } = await supabase
-         .from("lots")
-         .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
-         .order("is_featured", { ascending: false })
-        .order("lot_number", { ascending: true });
-     
-     if (error) throw error;
-     return { lots };
-   },
+      logger.info("Iniciando carregamento da página de Lotes");
+      try {
+        const { data: lots, error } = await supabase
+          .from("lots")
+          .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+          .order("is_featured", { ascending: false })
+          .order("lot_number", { ascending: true });
+       
+        if (error) {
+          logger.error("Erro Supabase ao carregar lotes", { error });
+          throw error;
+        }
+
+        logger.info("Lotes carregados com sucesso", { count: lots?.length || 0 });
+        return { lots };
+      } catch (error) {
+        logger.error("Erro ao carregar página de Lotes", { error });
+        throw error;
+      }
+    },
    component: LotsPage,
 });
 

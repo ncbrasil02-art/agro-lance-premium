@@ -10,7 +10,8 @@ export function LotCard({ lot }: { lot: Lot }) {
     <Link
       to="/lotes/$lotId"
       params={{ lotId: lot.id }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+      aria-labelledby={`lot-title-${lot.id}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img 
@@ -26,15 +27,15 @@ export function LotCard({ lot }: { lot: Lot }) {
         <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur">
           LOTE {lot?.number ? String(lot.number).padStart(2, "0") : "--"}
         </div>
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white/90">
-          <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {lot?.viewers || 0}</span>
-          <span className="flex items-center gap-1"><Gavel className="h-3 w-3" /> {lot?.bidsCount || 0} lances</span>
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white/90" aria-label={`${lot?.viewers || 0} visualizações, ${lot?.bidsCount || 0} lances`}>
+          <span className="flex items-center gap-1"><Eye className="h-3 w-3" aria-hidden="true" /> {lot?.viewers || 0}</span>
+          <span className="flex items-center gap-1"><Gavel className="h-3 w-3" aria-hidden="true" /> {lot?.bidsCount || 0} lances</span>
         </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
-          <h3 className="font-semibold tracking-tight">{lot?.name || "Lote sem nome"}</h3>
+          <h3 id={`lot-title-${lot.id}`} className="font-semibold tracking-tight">{lot?.name || "Lote sem nome"}</h3>
           <p className="text-xs text-muted-foreground">
             {lot?.breed || "Raça não informada"} {lot?.category ? `· ${lot.category}` : ""}
           </p>

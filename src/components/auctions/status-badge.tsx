@@ -26,12 +26,16 @@ const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
      cls: "bg-muted text-muted-foreground border-border" 
    };
  
-   return (
-     <span className={cn(
-       "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider",
-       s.cls,
-       className
-     )}>
+    return (
+      <span 
+        role="status"
+        aria-label={`Status: ${s.label}`}
+        className={cn(
+          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider",
+          s.cls,
+          className
+        )}
+      >
        {s.dot && <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse-live" />}
        {s.label}
      </span>
