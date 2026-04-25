@@ -318,9 +318,29 @@
                    <Label htmlFor="vaccination">Registro de Vacinação (separados por vírgula)</Label>
                    <Input value={formData.vaccination_records} onChange={(e) => setFormData({ ...formData, vaccination_records: e.target.value })} placeholder="Gripe, Tétano, etc" />
                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="photos">Fotos do Animal (Upload)</Label>
-                   <div className="flex flex-col gap-2">
+                  <div className="grid gap-4 pt-4 border-t">
+                    <Label className="text-base font-bold">Galeria de Fotos</Label>
+                    {formData.photos_urls && (
+                      <div className="grid grid-cols-4 gap-2 mb-2">
+                        {formData.photos_urls.split(",").map((url, i) => (
+                          <div key={i} className="relative aspect-square group">
+                            <img src={url.trim()} className="h-full w-full object-cover rounded-md border" alt="" />
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const urls = formData.photos_urls.split(",").map(u => u.trim()).filter(Boolean);
+                                urls.splice(i, 1);
+                                setFormData({ ...formData, photos_urls: urls.join(", ") });
+                              }}
+                              className="absolute top-1 right-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-2">
                      <div className="flex gap-2">
                        <Input 
                          type="file" 

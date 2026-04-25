@@ -393,7 +393,8 @@
                    <TableHead className="w-[80px]">Nº Lote</TableHead>
                    <TableHead>Animal</TableHead>
                    <TableHead>Evento</TableHead>
-                   <TableHead>Preço Inicial</TableHead>
+                    <TableHead>Destaque</TableHead>
+                    <TableHead>Preço Inicial</TableHead>
                    <TableHead>Lances</TableHead>
                    <TableHead>Status</TableHead>
                    <TableHead className="text-right">Ações</TableHead>
@@ -407,9 +408,18 @@
                      </TableCell>
                    </TableRow>
                  ) : (
-                   filteredLots.map((lot) => (
-                     <TableRow key={lot.id}>
-                       <TableCell className="font-bold">{lot.lot_number}</TableCell>
+                    filteredLots.map((lot) => (
+                      <TableRow key={lot.id}>
+                        <TableCell className="font-bold">{lot.lot_number}</TableCell>
+                        <TableCell>
+                          {lot.is_featured ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gold/10 text-gold border border-gold/20">
+                              Sim
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground text-[10px] uppercase">Não</span>
+                          )}
+                        </TableCell>
                        <TableCell>
                          <div className="font-medium">{lot.animal?.name}</div>
                          <div className="text-xs text-muted-foreground">{lot.animal?.internal_code}</div>

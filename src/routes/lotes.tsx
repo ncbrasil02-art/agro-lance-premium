@@ -16,7 +16,7 @@ export const Route = createFileRoute("/lotes")({
     loader: async () => {
       const { data: lots, error } = await supabase
         .from("lots")
-        .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+        .select("*, animal:animals(*), event:events(*)")
         .order("is_featured", { ascending: false })
         .order("lot_number", { ascending: true });
      
@@ -27,9 +27,9 @@ export const Route = createFileRoute("/lotes")({
 });
 
 function LotsPage() {
-   const { lots } = Route.useLoaderData();
+   const { lots = [] } = Route.useLoaderData() as any;
  
-   const mappedLots = lots.map((l: any) => ({
+   const mappedLots = lots?.map((l: any) => ({
      id: l.id,
      number: l.lot_number,
      eventId: l.event_id,
@@ -52,7 +52,7 @@ function LotsPage() {
          <p className="mt-2 text-muted-foreground">{mappedLots.length} animais disponíveis nos leilões ativos.</p>
       </header>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-         {mappedLots.map((l) => <LotCard key={l.id} lot={l as any} />)}
+          {mappedLots?.map((l: any) => <LotCard key={l.id} lot={l as any} />)}
       </div>
     </div>
   );
