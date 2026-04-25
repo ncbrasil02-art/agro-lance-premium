@@ -387,11 +387,23 @@ function LotDetail() {
                   </div>
 
                   <div className="p-8 rounded-[2rem] bg-black/40 border border-white/5 space-y-6">
-                    <div className="flex items-end justify-between">
-                      <div>
+                    <div className="flex items-end justify-between gap-4">
+                      <div className="flex-1">
                         <div className="text-[10px] uppercase tracking-widest text-gold font-black mb-2">Oferta Atual</div>
                         <div className="text-5xl md:text-6xl font-black text-white tracking-tighter leading-none italic">
                           {formatBRL(currentPrice)}
+                        </div>
+                      </div>
+                      <div className="text-right pb-1">
+                        <div className="text-[10px] uppercase tracking-widest text-white/40 font-black mb-2">
+                          {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? 'Encerrado' : 'Expira em'}
+                        </div>
+                        <div className="text-xl md:text-2xl font-mono font-bold text-white tracking-tighter">
+                          {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? (
+                            <span className="text-white/20">--:--:--</span>
+                          ) : (
+                            <Countdown endsAt={lot.end_date || lot.event?.end_date || ""} />
+                          )}
                         </div>
                       </div>
                     </div>
