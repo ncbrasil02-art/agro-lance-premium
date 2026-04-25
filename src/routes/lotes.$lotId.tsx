@@ -370,10 +370,17 @@ function LotDetail() {
                         </div>
                       </div>
                     </div>
-                    <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                  <div className="pt-6 border-t border-white/5 space-y-4">
+                    <div className="flex items-center justify-between">
                       <div className="text-white/60 text-sm font-bold">{installments}x <span className="text-white">{formatBRL(installmentValue)}</span></div>
                       <InstallmentSimulator price={currentPrice} />
                     </div>
+                    
+                    <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center gap-2 group" onClick={() => toast.info("Gerando encarte PDF...")}>
+                      <Download className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Baixar Encarte do Lote (PDF)</span>
+                    </Button>
+                  </div>
                   </div>
 
                   <div className="space-y-4">
