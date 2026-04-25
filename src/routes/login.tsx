@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,22 @@ function LoginPage() {
       navigate({ to: "/" });
     }
   }, [user, isAuthLoading, navigate]);
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast.error("Por favor, digite seu e-mail primeiro.");
+      return;
+    }
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) throw error;
+      toast.success("E-mail de recuperação enviado!");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao enviar e-mail");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,14 +107,24 @@ function LoginPage() {
               required
             />
           </div>
-          <Button 
-            type="submit" 
-            className="w-full bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold"
-            disabled={isLoading}
-          >
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Entrar
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              type="submit" 
+              className="w-full bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold"
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Entrar
+            </Button>
+            <Button 
+              type="button" 
+              variant="link" 
+              className="w-full text-xs text-muted-foreground"
+              onClick={handleResetPassword}
+            >
+              Esqueceu a senha?
+            </Button>
+          </div>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Novo por aqui? <Link to="/cadastro" className="text-gold hover:underline">Cadastre-se</Link>
