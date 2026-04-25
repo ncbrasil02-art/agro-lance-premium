@@ -81,9 +81,13 @@ function Home() {
      status: l.status as any,
    }));
  
-    const liveEvents = mappedEvents.filter((e) => e.status === "active");
-    const upcomingEvents = mappedEvents.filter((e) => e.status === "scheduled");
-    const nextEvent = upcomingEvents.find(e => e.show_countdown);
+     const liveEvents = mappedEvents.filter((e) => e.status === "active");
+     const upcomingEvents = mappedEvents.filter((e) => e.status === "scheduled");
+     
+     // Find the closest upcoming event with countdown enabled
+     const nextEvent = mappedEvents
+       .filter(e => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
+       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {
