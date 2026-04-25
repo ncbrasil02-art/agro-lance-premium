@@ -176,6 +176,12 @@ function LotDetail() {
   const placeBid = async (amount: number) => {
     if (!user) { toast.error("Faça login para dar lances."); return; }
     if (!profile?.is_approved) { toast.error("Sua conta aguarda aprovação."); return; }
+    
+    if (dynamicStatus !== 'recebendo_lances' && dynamicStatus !== 'pre_lance') {
+      toast.error("Este lote não está aceitando lances no momento.");
+      return;
+    }
+
     setIsBidding(true);
     try {
       const { error } = await supabase.from("bids").insert({ lot_id: lot.id, user_id: user.id, amount, bid_type: "online" });
