@@ -16,9 +16,9 @@ import heroImage from "@/assets/hero-horse.jpg";
           .or("status.eq.live,status.eq.scheduled")
           .order("start_date", { ascending: true })
           .limit(6),
-        supabase.from("lots")
-          .select("*, animal:animals(*), event:events(*)")
-          .order("is_featured", { ascending: false })
+         supabase.from("lots")
+           .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+           .order("is_featured", { ascending: false })
           .order("created_at", { ascending: false })
           .limit(6),
         supabase.from("events")
