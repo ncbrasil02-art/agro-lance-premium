@@ -1,5 +1,5 @@
  import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2 } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight } from "lucide-react";
  import { formatBRL } from "@/utils/format";
  import { Button } from "@/components/ui/button";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -8,6 +8,8 @@
  import { useAuth } from "@/components/auth/auth-provider";
  import { useEffect, useState } from "react";
  import { toast } from "sonner";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+ import { Card, CardContent } from "@/components/ui/card";
  
  export const Route = createFileRoute("/lotes/$lotId")({
    loader: async ({ params }) => {
@@ -36,6 +38,74 @@
    ),
    component: LotDetail,
  });
+ 
+ function GenealogyTree({ genealogy }: { genealogy: any }) {
+   if (!genealogy) return <div className="py-10 text-center text-muted-foreground">Informação de genealogia não disponível.</div>;
+ 
+   return (
+     <div className="relative overflow-x-auto py-8">
+       <div className="flex min-w-[600px] justify-center gap-8">
+         {/* Nível 1: Animal */}
+         <div className="flex flex-col justify-center">
+           <div className="rounded-lg border-2 border-gold bg-card p-4 text-center shadow-gold">
+             <div className="text-xs font-bold uppercase text-gold">Animal</div>
+             <div className="mt-1 font-bold">Principal</div>
+           </div>
+         </div>
+ 
+         <div className="flex flex-col justify-center gap-12">
+           {/* Nível 2: Pais */}
+           <div className="relative flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
+               <div className="text-[10px] uppercase text-muted-foreground">Pai</div>
+               <div className="mt-1 font-semibold">{genealogy.pai || "Não informado"}</div>
+             </div>
+           </div>
+           <div className="relative flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
+               <div className="text-[10px] uppercase text-muted-foreground">Mãe</div>
+               <div className="mt-1 font-semibold">{genealogy.mae || "Não informado"}</div>
+             </div>
+           </div>
+         </div>
+ 
+         <div className="flex flex-col justify-center gap-4">
+           {/* Nível 3: Avós */}
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avô Paterno</div>
+               <div className="mt-0.5 font-medium">{genealogy.avo_paterno || "—"}</div>
+             </div>
+           </div>
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avó Paterna</div>
+               <div className="mt-0.5 font-medium">{genealogy.ava_paterna || "—"}</div>
+             </div>
+           </div>
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avô Materno</div>
+               <div className="mt-0.5 font-medium">{genealogy.avo_materno || "—"}</div>
+             </div>
+           </div>
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avó Materna</div>
+               <div className="mt-0.5 font-medium">{genealogy.ava_materna || "—"}</div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   );
+ }
  
  function LotDetail() {
    const { lot: initialLot } = Route.useLoaderData();
