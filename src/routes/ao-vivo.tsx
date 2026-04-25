@@ -21,13 +21,24 @@ export const Route = createFileRoute("/ao-vivo")({
     ],
   }),
    loader: async () => {
-     const { data: liveEvent, error: eventError } = await supabase
+     // Search for an event that is explicitly live OR scheduled but whose time has already arrived
+     const { data: events, error: eventError } = await supabase
         .from("events")
         .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
-        .eq("status", "live")
-       .single();
- 
-     if (eventError || !liveEvent) return { liveEvent: null };
+        .or("status.eq.live,status.eq.scheduled")
+        .order("start_date", { ascending: true });
+
+     if (eventError || !events || events.length === 0) return { liveEvent: null };
+
+     const now = new Date();
+     const liveEvent = events.find(e => {
+       if (e.status === 'live') return true;
+       const start = new Date(e.start_date);
+       const end = e.end_date ? new Date(e.end_date) : null;
+       return now >= start && (!end || now < end);
+     });
+
+     if (!liveEvent) return { liveEvent: null };
  
      const { data: bids, error: bidsError } = await supabase
        .from("bids")
