@@ -96,13 +96,13 @@ function Home() {
   return (
     <>
       {/* ANNOUNCEMENT BANNER */}
-      {announcement && announcement.active && (
+      {announcement && (announcement as any).active && (
         <div className="bg-gold py-2 px-4 text-emerald-deep">
           <div className="container mx-auto flex items-center justify-center gap-2 text-sm font-bold">
             <Bell className="h-4 w-4" />
-            {announcement.text}
-            {announcement.link && (
-              <Link to={announcement.link} className="underline ml-2">Saiba mais</Link>
+            {(announcement as any).text}
+            {(announcement as any).link && (
+              <Link to={(announcement as any).link} className="underline ml-2">Saiba mais</Link>
             )}
           </div>
         </div>
