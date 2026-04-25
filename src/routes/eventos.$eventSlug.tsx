@@ -17,12 +17,12 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     return { event };
   },
   head: ({ loaderData }) => ({
-    meta: loaderData ? [
+    meta: loaderData?.event ? [
       { title: `${loaderData.event.name} — Premium Agro Leilões` },
-      { name: "description", content: loaderData.event.description },
+      { name: "description", content: loaderData.event.description || "" },
       { property: "og:title", content: loaderData.event.name },
-      { property: "og:description", content: loaderData.event.description },
-      { property: "og:image", content: loaderData.event.cover },
+      { property: "og:description", content: loaderData.event.description || "" },
+      { property: "og:image", content: loaderData.event.banner_url || "" },
     ] : [],
   }),
   notFoundComponent: () => (
@@ -42,7 +42,7 @@ function EventDetail() {
     <>
       <section className="relative">
         <div className="relative h-72 overflow-hidden md:h-96">
-          <img src={event.cover} alt={event.name} className="h-full w-full object-cover" />
+          <img src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} alt={event.name} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
         </div>
         <div className="container mx-auto -mt-32 px-4 relative">
