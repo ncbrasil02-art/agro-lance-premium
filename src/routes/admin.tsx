@@ -1,11 +1,12 @@
- import { useState } from "react";
+ import { useState, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
- import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap } from "lucide-react";
+ import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -15,7 +16,58 @@ export const Route = createFileRoute("/admin")({
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
  
-  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
+ type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
+ 
+ interface SidebarProps {
+   activeTab: AdminTab;
+   setActiveTab: (tab: AdminTab) => void;
+   signOut: () => void;
+   onItemClick?: () => void;
+ }
+ 
+ function AdminSidebar({ activeTab, setActiveTab, signOut, onItemClick }: SidebarProps) {
+   const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
+     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+     { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
+     { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
+     { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+     { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+     { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
+   ];
+ 
+   return (
+     <div className="flex h-full flex-col py-4">
+       <div className="mb-8 flex items-center gap-2 px-2 font-bold text-xl text-gold">
+         <Gavel className="h-6 w-6" />
+         <span>Elite Admin</span>
+       </div>
+       <nav className="flex-1 space-y-2">
+         {menuItems.map((item) => (
+           <Button 
+             key={item.id}
+             variant="ghost" 
+             className={`w-full justify-start ${activeTab === item.id ? "text-gold bg-gold/5" : ""}`}
+             onClick={() => {
+               setActiveTab(item.id);
+               onItemClick?.();
+             }}
+           >
+             {item.icon} {item.label}
+           </Button>
+         ))}
+       </nav>
+       <div className="pt-4 border-t">
+         <Button 
+           variant="ghost" 
+           className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" 
+           onClick={signOut}
+         >
+           <LogOut className="mr-2 h-4 w-4" /> Sair
+         </Button>
+       </div>
+     </div>
+   );
+ }
  
 function AdminLayout() {
    const { profile, isLoading, signOut } = useAuth();
@@ -39,75 +91,52 @@ function AdminLayout() {
     return <Navigate to="/" />;
   }
 
-   return (
-     <div className="flex min-h-screen bg-muted/30">
-       {/* Sidebar Sidebar */}
-       <aside className="w-64 border-r bg-card p-6 hidden md:block">
-         <div className="mb-8 flex items-center gap-2 font-bold text-xl text-gold">
-           <Gavel className="h-6 w-6" />
-           <span>Elite Admin</span>
-         </div>
-          <nav className="flex-1 space-y-2">
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "dashboard" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("dashboard")}
-            >
-              <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  return (
+    <div className="flex min-h-screen bg-muted/30 flex-col md:flex-row">
+      {/* Mobile Top Header */}
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-card px-4 md:hidden">
+        <div className="flex items-center gap-2 font-bold text-lg text-gold">
+          <Gavel className="h-5 w-5" />
+          <span>Elite Admin</span>
+        </div>
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-5 w-5" />
             </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "events" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("events")}
-            >
-              <Calendar className="mr-2 h-4 w-4" /> Eventos
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "lots" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("lots")}
-            >
-              <Gavel className="mr-2 h-4 w-4" /> Lotes
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "animals" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("animals")}
-            >
-              <Package className="mr-2 h-4 w-4" /> Animais
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "users" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("users")}
-            >
-              <Users className="mr-2 h-4 w-4" /> Usuários
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "settings" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("settings")}
-            >
-              <Settings className="mr-2 h-4 w-4" /> Configurações
-            </Button>
-          </nav>
-          <div className="pt-4 border-t">
-            <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" /> Sair
-            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-4">
+            <AdminSidebar 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+              signOut={signOut} 
+              onItemClick={() => setIsMobileMenuOpen(false)}
+            />
+          </SheetContent>
+        </Sheet>
+      </header>
+
+      {/* Desktop Sidebar */}
+      <aside className="w-64 border-r bg-card p-6 hidden md:block">
+        <AdminSidebar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          signOut={signOut} 
+        />
+      </aside>
+
+      <main className="flex-1 p-4 md:p-8 pb-16">
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:mb-8">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">Painel Administrativo</h1>
+            <p className="text-sm text-muted-foreground md:text-base">Bem-vindo de volta, {profile?.full_name}</p>
           </div>
-       </aside>
- 
-        <main className="flex-1 p-8 pb-16">
-         <header className="mb-8 flex items-center justify-between">
-           <div>
-             <h1 className="text-3xl font-bold">Painel Administrativo</h1>
-             <p className="text-muted-foreground">Bem-vindo de volta, {profile?.full_name}</p>
-           </div>
-           <Button variant="outline" asChild>
-             <Link to="/">Ver Site</Link>
-           </Button>
-          </header>
+          <Button variant="outline" size="sm" asChild className="w-fit">
+            <Link to="/">Ver Site</Link>
+          </Button>
+        </header>
 
           {activeTab === "dashboard" && (
             <>
