@@ -20,7 +20,7 @@
    location: z.string().nullable().optional(),
    banner_url: z.string().nullable().optional(),
    status: z.enum(["scheduled", "live", "finished"]).default("scheduled"),
-   lots: z.array(z.object({ id: z.string().uuid() })).optional(),
+   lots: z.array(z.any()).optional(),
    viewers: z.number().int().nonnegative().default(0),
    auctioneer_name: z.string().nullable().optional(),
    promoter_company: z.string().nullable().optional(),
