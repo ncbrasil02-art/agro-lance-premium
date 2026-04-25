@@ -59,7 +59,8 @@ function Home() {
    }));
  
    const liveEvents = mappedEvents.filter((e) => e.status === "live");
-   const upcomingEvents = mappedEvents.filter((e) => e.status === "upcoming" || e.status === "scheduled").slice(0, 3);
+   const upcomingEvents = mappedEvents.filter((e) => e.status === "upcoming" || e.status === "scheduled");
+   const nextEvent = upcomingEvents[0];
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {
@@ -89,7 +90,22 @@ function Home() {
               Leilões <span className="text-gradient-gold">premium</span><br />
               em tempo real
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+             {nextEvent && (
+               <div className="mt-8 flex flex-col gap-2 rounded-2xl border border-gold/20 bg-gold/5 p-4 backdrop-blur-sm md:w-fit">
+                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gold/80">
+                   <Calendar className="h-4 w-4" />
+                   Próximo Grande Evento: {nextEvent.name}
+                 </div>
+                 <div className="flex items-baseline gap-4">
+                   <div className="text-3xl font-bold text-white">
+                     <Countdown endsAt={nextEvent.date} className="font-mono tracking-tighter" />
+                   </div>
+                   <div className="text-xs text-muted-foreground">para o início</div>
+                 </div>
+               </div>
+             )}
+ 
               Cavalos, bovinos e embriões de elite com transmissão ao vivo, curadoria genética
               e tecnologia de ponta para compradores e leiloeiros profissionais.
             </p>
