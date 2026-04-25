@@ -4,10 +4,10 @@ import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
-import { getEffectiveLotStatus } from "@/utils/auction-status";
+import { useEffectiveLotStatus } from "@/utils/auction-status";
 
 export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEndDate?: string; allowsPreBidding?: boolean; eventStatus?: string } }) {
-  const dynamicStatus = getEffectiveLotStatus({
+  const dynamicStatus = useEffectiveLotStatus({
     status: lot.status,
     event_status: lot.eventStatus,
     event_start_date: lot.eventStartDate,

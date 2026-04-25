@@ -3,11 +3,11 @@ import { Calendar, MapPin, Users, Gavel, Timer } from "lucide-react";
 import type { AuctionEvent } from "@/lib/mock-data";
 import { formatDateBR } from "@/lib/mock-data";
 import { StatusBadge } from "@/components/auctions/status-badge";
-import { getEffectiveEventStatus } from "@/utils/auction-status";
+import { useEffectiveEventStatus } from "@/utils/auction-status";
 import { Countdown } from "@/components/auctions/countdown";
 
 export function EventCard({ event }: { event: AuctionEvent & { end_date?: string | null } }) {
-  const effectiveStatus = getEffectiveEventStatus({
+  const effectiveStatus = useEffectiveEventStatus({
     status: event.status,
     start_date: event.date,
     end_date: event.end_date
