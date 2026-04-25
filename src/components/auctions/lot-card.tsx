@@ -6,7 +6,21 @@ import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
 import { useEffectiveLotStatus } from "@/utils/auction-status";
 
-export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEndDate?: string; allowsPreBidding?: boolean; eventStatus?: string } }) {
+ export function LotCard({ lot }: { 
+   lot: Lot & { 
+     eventStartDate?: string; 
+     eventEndDate?: string; 
+     allowsPreBidding?: boolean; 
+     eventStatus?: string;
+     father?: string;
+     mother?: string;
+     sex?: string;
+     color?: string;
+     birthDate?: string;
+     seller?: string;
+     location?: string;
+   } 
+ }) {
   const dynamicStatus = useEffectiveLotStatus({
     status: lot.status,
     event_status: lot.eventStatus,
@@ -22,7 +36,7 @@ export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEn
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
       aria-labelledby={`lot-title-${lot.id}`}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[9/16] overflow-hidden bg-muted">
         <img 
           src={lot?.cover || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
           alt={lot?.name || "Animal"} 
@@ -57,12 +71,44 @@ export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEn
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div>
-          <h3 id={`lot-title-${lot.id}`} className="font-semibold tracking-tight">{lot?.name || "Lote sem nome"}</h3>
-          <p className="text-xs text-muted-foreground">
-            {lot?.breed || "Raça não informada"} {lot?.category ? `· ${lot.category}` : ""}
-          </p>
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <div className="mb-1">
+          <h3 id={`lot-title-${lot.id}`} className="font-bold text-lg leading-tight uppercase tracking-tight">{lot?.name || "Lote sem nome"}</h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-y-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3">
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Pai:</span>
+            <span className="text-foreground font-semibold truncate ml-2">{lot.father || "--"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Mãe:</span>
+            <span className="text-foreground font-semibold truncate ml-2">{lot.mother || "--"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Sexo:</span>
+            <span className="text-foreground font-semibold uppercase">{lot.sex === 'M' ? 'Macho' : lot.sex === 'F' ? 'Fêmea' : lot.sex || "--"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Raça:</span>
+            <span className="text-foreground font-semibold">{lot.breed || "--"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Pelagem:</span>
+            <span className="text-foreground font-semibold">{lot.color || "--"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Nasc.:</span>
+            <span className="text-foreground font-semibold">{lot.birthDate ? new Date(lot.birthDate).toLocaleDateString('pt-BR') : "--"}</span>
+          </div>
+          <div className="flex justify-between items-center pt-1 mt-1 border-t border-border/30">
+            <span className="font-medium uppercase">Vendedor:</span>
+            <span className="text-emerald-deep font-bold truncate ml-2">{lot.seller || "--"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium uppercase">Local:</span>
+            <span className="text-foreground font-medium truncate ml-2 italic">{lot.location || "--"}</span>
+          </div>
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-3">

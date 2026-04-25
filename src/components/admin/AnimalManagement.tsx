@@ -14,7 +14,8 @@
   export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
-    const [formData, setFormData] = useState({
+     const [formData, setFormData] = useState<any>({
+         seller_id: "",
        name: "",
        species: "Equino",
        breed: "",
@@ -36,7 +37,8 @@
 
     const resetForm = () => {
       setEditingAnimal(null);
-      setFormData({
+       setFormData({
+         seller_id: "",
         name: "",
         species: "Equino",
         breed: "",
@@ -59,7 +61,8 @@
 
     const handleEdit = (animal: any) => {
       setEditingAnimal(animal);
-      setFormData({
+       setFormData({
+         seller_id: animal.seller_id || "",
         name: animal.name || "",
         species: animal.species || "Equino",
         breed: animal.breed || "",
@@ -91,7 +94,8 @@
         if (editingAnimal) {
           const { error } = await supabase
             .from("animals")
-            .update({
+             .update({
+               seller_id: formData.seller_id || null,
               name: formData.name,
               species: formData.species,
               breed: formData.breed,
@@ -104,16 +108,17 @@
               birth_date: formData.birth_date || null,
               weight: formData.weight ? parseFloat(formData.weight as string) : null,
               height: formData.height ? parseFloat(formData.height as string) : null,
-               vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
+                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
               genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
-              photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [],
+                photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
               description: formData.description
             })
             .eq("id", editingAnimal.id);
           if (error) throw error;
           toast.success("Animal atualizado com sucesso");
         } else {
-          const { error } = await supabase.from("animals").insert({
+           const { error } = await supabase.from("animals").insert({
+             seller_id: formData.seller_id || null,
             name: formData.name,
             species: formData.species,
             breed: formData.breed,
@@ -126,10 +131,10 @@
             birth_date: formData.birth_date || null,
             weight: formData.weight ? parseFloat(formData.weight as string) : null,
             height: formData.height ? parseFloat(formData.height as string) : null,
-             vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
+              vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
             genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
             internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
-            photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [],
+             photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
             description: formData.description
           });
           if (error) throw error;
@@ -143,7 +148,13 @@
         toast.error("Erro ao salvar animal: " + error.message);
       }
     };
-   const [animals, setAnimals] = useState<any[]>([]);
+    const [animals, setAnimals] = useState<any[]>([]);
+    const [sellers, setSellers] = useState<any[]>([]);
+    const fetchSellers = async () => {
+      const { data } = await supabase.from("sellers").select("id, name").order("name");
+      if (data) setSellers(data);
+    };
+
    const [isLoading, setIsLoading] = useState(true);
    const [searchQuery, setSearchQuery] = useState("");
  
@@ -170,9 +181,10 @@
       }
     };
  
-   useEffect(() => {
-     fetchAnimals();
-   }, []);
+    useEffect(() => {
+      fetchAnimals();
+      fetchSellers();
+    }, []);
  
    const filteredAnimals = animals.filter(animal => 
      animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -322,13 +334,13 @@
                     <Label className="text-base font-bold">Galeria de Fotos</Label>
                     {formData.photos_urls && (
                       <div className="grid grid-cols-4 gap-2 mb-2">
-                        {formData.photos_urls.split(",").map((url, i) => (
+                         {formData.photos_urls.split(",").map((url: string, i: number) => (
                           <div key={i} className="relative aspect-square group">
                             <img src={url.trim()} className="h-full w-full object-cover rounded-md border" alt="" />
                             <button 
                               type="button"
                               onClick={() => {
-                                const urls = formData.photos_urls.split(",").map(u => u.trim()).filter(Boolean);
+                                 const urls = formData.photos_urls.split(",").map((u: string) => u.trim()).filter(Boolean);
                                 urls.splice(i, 1);
                                 setFormData({ ...formData, photos_urls: urls.join(", ") });
                               }}
@@ -365,7 +377,7 @@
                              const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
                              uploadedUrls.push(publicUrl);
                            }
-                           const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [];
+                            const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
                            setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
                            toast.dismiss(toastId);
                            toast.success(`${uploadedUrls.length} fotos enviadas!`);
@@ -426,11 +438,26 @@
                      </Button>
                    </div>
                   </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="location">Localização</Label>
-                  <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="location">Localização</Label>
+                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Fazenda, Cidade - UF" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="seller">Vendedor</Label>
+                    <Select onValueChange={(v) => setFormData({ ...formData, seller_id: v })} value={formData.seller_id}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o vendedor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sellers.map((seller) => (
+                          <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-             </div>
+              </div>
              <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
                 <Button className="bg-gold text-emerald-deep" onClick={handleSave}>

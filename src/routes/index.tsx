@@ -23,8 +23,8 @@ import heroImage from "@/assets/hero-horse.jpg";
            .or("status.eq.live,status.eq.scheduled")
           .order("start_date", { ascending: true })
           .limit(6),
-         supabase.from("lots")
-           .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+          supabase.from("lots")
+            .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
            .order("is_featured", { ascending: false })
           .order("created_at", { ascending: false })
           .limit(6),
@@ -120,6 +120,13 @@ function Home() {
       eventStartDate: (l as any).event?.start_date,
       eventEndDate: (l as any).event?.end_date,
       allowsPreBidding: (l as any).event?.allows_pre_bidding,
+      father: (l as any).animal?.genealogy?.father,
+      mother: (l as any).animal?.genealogy?.mother,
+      sex: (l as any).animal?.sex,
+      color: (l as any).animal?.color,
+      birthDate: (l as any).animal?.birth_date,
+      seller: (l as any).animal?.seller?.name,
+      location: (l as any).animal?.location,
     }));
  
       const liveEvents = mappedEvents.filter((e: any) => {

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
   loader: async ({ params }) => {
     const { data: event, error } = await supabase
       .from("events")
-      .select("*, lots!lots_event_id_fkey(*, animal:animals(*))")
+        .select("*, lots!lots_event_id_fkey(*, animal:animals(*, seller:sellers(name)))")
       .eq("slug", params.eventSlug)
       .maybeSingle();
 
@@ -188,7 +188,14 @@ function EventDetail() {
                   eventStartDate: event.start_date,
                   eventEndDate: event.end_date,
                   allowsPreBidding: event.allows_pre_bidding,
-                }} 
+                  father: l.animal?.genealogy?.father,
+                  mother: l.animal?.genealogy?.mother,
+                  sex: l.animal?.sex,
+                  color: l.animal?.color,
+                  birthDate: l.animal?.birth_date,
+                  seller: l.animal?.seller?.name,
+                  location: l.animal?.location,
+                }}
               />
             ))}
           </div>
