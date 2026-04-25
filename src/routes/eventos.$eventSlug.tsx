@@ -103,7 +103,7 @@ function EventDetail() {
               <div className="relative mb-12 max-w-2xl">
                 <div className="absolute -left-6 top-0 bottom-0 w-1.5 bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full" />
                 <div className="bg-white/5 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white/5 shadow-2xl">
-                  <p className="text-lg md:text-2xl text-white/90 leading-relaxed font-medium italic">
+                  <p className="text-lg md:text-2xl text-white/90 leading-relaxed font-medium italic whitespace-pre-wrap">
                     {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium selecionados cuidadosamente por nossa curadoria genética."}
                   </p>
                 </div>
