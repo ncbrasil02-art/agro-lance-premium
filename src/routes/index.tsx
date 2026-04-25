@@ -161,15 +161,22 @@ function Home() {
              <p className="mt-5 max-w-xl text-lg text-muted-foreground">
              {nextEvent && (
                <div className="mt-8 flex flex-col gap-2 rounded-2xl border border-gold/20 bg-gold/5 p-4 backdrop-blur-sm md:w-fit">
-                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gold/80">
-                   <Calendar className="h-4 w-4" />
-                   Próximo Grande Evento: {nextEvent.name}
+                  <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-gold">
+                    <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
+                    Oportunidade Imperdível: {nextEvent.name}
                  </div>
-                 <div className="flex items-baseline gap-4">
-                   <div className="text-3xl font-bold text-white">
-                     <Countdown endsAt={nextEvent.date} className="font-mono tracking-tighter" />
-                   </div>
-                   <div className="text-xs text-muted-foreground">para o início</div>
+                  <div className="mt-1 flex items-center gap-6">
+                    <div className="flex flex-col">
+                      <div className="text-4xl font-black text-white md:text-5xl tabular-nums tracking-tighter">
+                        <Countdown endsAt={nextEvent.date} className="font-mono bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
+                      </div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-white/40">Faltam para o início</div>
+                    </div>
+                    <div className="h-10 w-px bg-white/10" />
+                    <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }} className="group/btn flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                      Garantir Vaga
+                      <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
+                    </Link>
                  </div>
                </div>
              )}
