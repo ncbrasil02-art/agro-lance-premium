@@ -263,20 +263,24 @@
                       Cadastrar Novo Animal
                     </Button>
                   </div>
-                  <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o animal" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableAnimals.length === 0 ? (
-                        <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
-                      ) : (
-                        (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
-                          <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+                   <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
+                     <SelectTrigger>
+                       <SelectValue placeholder={isLoading ? "Carregando animais..." : "Selecione o animal"} />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {isLoading ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground flex items-center justify-center">
+                           <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
+                         </div>
+                       ) : availableAnimals.length === 0 ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
+                       ) : (
+                         (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
+                           <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
+                         ))
+                       )}
+                     </SelectContent>
+                   </Select>
                 </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">
