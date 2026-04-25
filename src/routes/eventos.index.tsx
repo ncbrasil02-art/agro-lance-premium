@@ -2,7 +2,7 @@
   import { EventCard } from "@/components/auctions/event-card";
   import { logger } from "@/utils/logger";
   import { supabase } from "@/integrations/supabase/client";
-  import { eventSchema } from "@/lib/schemas";
+  import { eventSchema, ValidatedEvent } from "@/lib/schemas";
   import { z } from "zod";
 
 export const Route = createFileRoute("/eventos/")({
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/eventos/")({
 function EventsPage() {
    const { events } = Route.useLoaderData();
  
-   const mappedEvents = events.map((e: any) => ({
+    const mappedEvents = events.map((e: ValidatedEvent) => ({
      id: e.id,
      slug: e.slug || "",
      name: e.name,
