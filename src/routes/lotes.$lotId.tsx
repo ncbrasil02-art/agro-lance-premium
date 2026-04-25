@@ -261,8 +261,8 @@ function LotDetail() {
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
                 <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute left-6 top-6 flex gap-2">
-                  <StatusBadge status={lot?.status} />
+                <div className="absolute left-6 top-6 flex flex-col gap-2">
+                  <StatusBadge status={dynamicStatus} />
                 </div>
               </div>
               <div className="grid grid-cols-5 gap-3">
