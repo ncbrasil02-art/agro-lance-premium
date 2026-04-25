@@ -405,7 +405,7 @@ function LotDetail() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-3 gap-3">
                       {[1, 2, 5].map((m) => (
-                        <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || (lot.status !== "active" && lot.status !== "upcoming" && lot.status !== "open")} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
+                        <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
                           <span className="text-[8px] uppercase font-black text-gold/60 mb-1">+{m} inc.</span>
                           <span className="font-bold">+{formatBRL(lot.bid_increment * m)}</span>
                         </Button>
