@@ -14,7 +14,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  
-  export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
+  export function EventManagement({ onManageLots, onNavigate }: { onManageLots?: (id: string) => void; onNavigate?: () => void }) {
     const [events, setEvents] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");

@@ -13,10 +13,14 @@ import { Link } from "@tanstack/react-router";
  
     export function LotManagement({ 
       initialEventId = "all", 
-      onEventChange 
+      onEventChange,
+      onNavigateToAnimals,
+      onNavigateToEvents
     }: { 
       initialEventId?: string; 
       onEventChange?: (id: string) => void;
+      onNavigateToAnimals?: () => void;
+      onNavigateToEvents?: () => void;
     }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
