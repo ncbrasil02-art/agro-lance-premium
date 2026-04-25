@@ -327,46 +327,68 @@
              </div>
            </div>
  
-           <div className="rounded-2xl border border-gold/30 bg-card p-6 shadow-gold">
-             <div className="flex items-end justify-between">
-               <div>
-                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lance atual</div>
-                 <div className="text-4xl font-bold text-gradient-gold">{formatBRL(currentPrice)}</div>
-               </div>
-               {lot.end_date && (
-                 <div className="text-right">
-                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-                   <Countdown endsAt={lot.end_date} className="font-mono text-xl font-bold text-foreground" />
-                 </div>
-               )}
-             </div>
- 
-             <div className="mt-6 grid grid-cols-3 gap-2">
-               {[1, 5, 10].map((m) => (
-                 <Button 
-                   key={m} 
-                   variant="outline" 
-                   className="border-gold/30 hover:bg-gold/10"
-                   disabled={isBidding || lot.status !== "active"}
-                   onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}
-                 >
-                   +{formatBRL(lot.bid_increment * m)}
-                 </Button>
-               ))}
-             </div>
-             <Button 
-               size="lg" 
-               className="mt-3 w-full bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold"
-               disabled={isBidding || lot.status !== "active"}
-               onClick={() => placeBid(nextBid)}
-             >
-               {isBidding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-               Dar lance de {formatBRL(nextBid)}
-             </Button>
-             <p className="mt-2 text-center text-xs text-muted-foreground">
-               Incremento mínimo: {formatBRL(lot.bid_increment)}
-             </p>
-           </div>
+            <Card className="border-gold/30 shadow-gold overflow-hidden">
+              <div className="bg-emerald-deep p-4 text-white flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Gavel className="h-4 w-4 text-gold" />
+                  <span className="text-xs font-bold uppercase tracking-widest">Oferta Atual</span>
+                </div>
+                {lot.end_date && (
+                  <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-medium opacity-80">Faltam:</span>
+                    <Countdown endsAt={lot.end_date as string} className="font-mono text-sm font-bold text-gold-bright" />
+                  </div>
+                )}
+              </div>
+              <CardContent className="p-6">
+                <div className="flex flex-col gap-1">
+                  <div className="text-4xl font-black text-gradient-gold tracking-tighter">
+                    {formatBRL(currentPrice)}
+                  </div>
+                  <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    ou {installments}x de <span className="text-foreground font-bold">{formatBRL(installmentValue)}</span>
+                  </div>
+                </div>
+
+                <div className="mt-8 space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 5].map((m) => (
+                      <Button 
+                        key={m} 
+                        variant="outline" 
+                        size="sm"
+                        className="border-gold/20 hover:bg-gold/5 h-12 flex flex-col"
+                        disabled={isBidding || lot.status !== "active"}
+                        onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}
+                      >
+                        <span className="text-[10px] opacity-60">+{m} inc.</span>
+                        <span className="font-bold">+{formatBRL(lot.bid_increment * m)}</span>
+                      </Button>
+                    ))}
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
+                    <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-card px-2 text-muted-foreground">Lance Personalizado</span></div>
+                  </div>
+
+                  <Button 
+                    size="lg" 
+                    className="w-full h-14 bg-gold-gradient text-emerald-deep font-bold text-lg hover:opacity-90 shadow-gold transition-all active:scale-[0.98]"
+                    disabled={isBidding || lot.status !== "active"}
+                    onClick={() => placeBid(nextBid)}
+                  >
+                    {isBidding ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Gavel className="mr-2 h-5 w-5" />}
+                    Dar lance de {formatBRL(nextBid)}
+                  </Button>
+                  
+                  <p className="text-center text-[10px] text-muted-foreground">
+                    Ao confirmar, você concorda com os termos de uso e condições do leilão.
+                    <br />Incremento mínimo: {formatBRL(lot.bid_increment)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
  
            <div className="flex gap-2">
              <Button variant="outline" className="flex-1"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
