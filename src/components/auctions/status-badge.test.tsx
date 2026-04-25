@@ -32,13 +32,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
    });
  
  
-   it('handles unknown status string', () => {
-     render(<StatusBadge status="unknown_status" />);
-     expect(screen.getByText('unknown_status')).toBeInTheDocument();
-    expect(console.warn).toHaveBeenCalledWith(
-      expect.stringContaining('Unknown status received: "unknown_status"')
-    );
-  });
+    it('handles unknown status string', () => {
+      render(<StatusBadge status="unknown_status" />);
+      expect(screen.getByText('unknown_status')).toBeInTheDocument();
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Status desconhecido recebido: "unknown_status"'),
+        expect.objectContaining({ status: 'unknown_status' })
+      );
+    });
 
   it('handles uppercase status strings', () => {
     render(<StatusBadge status="LIVE" />);
