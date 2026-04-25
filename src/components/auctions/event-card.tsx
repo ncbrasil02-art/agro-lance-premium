@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, MapPin, Users, Gavel } from "lucide-react";
+import { Calendar, MapPin, Users, Gavel, Timer } from "lucide-react";
 import type { AuctionEvent } from "@/lib/mock-data";
 import { formatDateBR } from "@/lib/mock-data";
-import { StatusBadge } from "./status-badge";
+import { StatusBadge } from "@/components/auctions/status-badge";
+import { Countdown } from "@/components/auctions/countdown";
 
 export function EventCard({ event }: { event: AuctionEvent }) {
   return (
@@ -20,8 +21,14 @@ export function EventCard({ event }: { event: AuctionEvent }) {
           className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
-        <div className="absolute left-4 top-4">
+        <div className="absolute left-4 top-4 flex flex-col gap-2 items-start">
           <StatusBadge status={event?.status} />
+          {(event?.status === 'scheduled' as any || event?.status === 'upcoming' as any) && event?.date && (
+            <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg animate-in fade-in slide-in-from-left-2">
+              <Timer className="h-3 w-3" />
+              <Countdown endsAt={event.date} className="font-mono" />
+            </div>
+          )}
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <h3 id={`event-title-${event.id}`} className="text-xl font-bold text-white">{event?.name || "Evento sem nome"}</h3>

@@ -2,11 +2,14 @@ import { cn } from "@/lib/utils";
 import { logger } from "@/utils/logger";
 
 const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
-  live: { label: "AO VIVO", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
-  active: { label: "AO VIVO", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
-  open: { label: "EM LEILÃO", cls: "bg-emerald/15 text-emerald-bright border-emerald/30" },
-  upcoming: { label: "EM BREVE", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
-  scheduled: { label: "AGENDADO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
+  live: { label: "RECEBENDO LANCES", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
+  active: { label: "RECEBENDO LANCES", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
+  open: { label: "ACEITA PRÉ-LANCE", cls: "bg-emerald/15 text-emerald-bright border-emerald/30" },
+  upcoming: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
+  scheduled: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
+  loteamento: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
+  pre_lance: { label: "ACEITA PRÉ-LANCE", cls: "bg-emerald/15 text-emerald-bright border-emerald/30" },
+  recebendo_lances: { label: "RECEBENDO LANCES", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
   closed: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   finished: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   passed: { label: "NÃO VENDIDO", cls: "bg-muted text-muted-foreground border-border" },

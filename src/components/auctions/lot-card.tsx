@@ -5,7 +5,27 @@ import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
 
-export function LotCard({ lot }: { lot: Lot }) {
+export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string } }) {
+  const getDynamicStatus = () => {
+    const now = new Date();
+    const eventStart = lot.eventStartDate ? new Date(lot.eventStartDate) : null;
+    
+    if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+    if (lot.status === 'active') return 'recebendo_lances';
+    
+    if (eventStart && now < eventStart) {
+      return 'loteamento';
+    }
+    
+    if (lot.status === 'upcoming' || lot.status === 'open') {
+      return 'pre_lance';
+    }
+    
+    return lot.status;
+  };
+
+  const dynamicStatus = getDynamicStatus();
+
   return (
     <Link
       to="/lotes/$lotId"
@@ -21,8 +41,8 @@ export function LotCard({ lot }: { lot: Lot }) {
           className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
-        <div className="absolute left-3 top-3 flex gap-2">
-          <StatusBadge status={lot?.status} />
+        <div className="absolute left-3 top-3 flex flex-col gap-2">
+          <StatusBadge status={dynamicStatus} />
         </div>
         <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur">
           LOTE {lot?.number ? String(lot.number).padStart(2, "0") : "--"}

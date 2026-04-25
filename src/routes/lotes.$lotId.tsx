@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer } from "lucide-react";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/auctions/status-badge";
@@ -81,25 +81,25 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
   const mae = genealogy.mae || genealogy.mother || "Não informado";
 
   return (
-    <div className="relative overflow-x-auto py-10 bg-black/20 rounded-2xl border border-white/5">
-      <div className="flex min-w-[800px] justify-center gap-12 px-8">
+    <div className="relative overflow-x-auto py-10 bg-black/20 rounded-2xl border border-white/5 scrollbar-hide">
+      <div className="flex min-w-[600px] md:min-w-0 justify-center gap-12 px-8">
         <div className="flex flex-col justify-center">
-          <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-emerald-deep p-5 text-center shadow-lg w-40">
-            <Award className="h-6 w-6 text-gold mb-2" />
-            <div className="text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
-            <div className="mt-1 font-bold text-sm text-white">Principal</div>
+          <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-emerald-deep p-4 md:p-5 text-center shadow-lg w-32 md:w-40">
+            <Award className="h-5 w-5 md:h-6 md:w-6 text-gold mb-2" />
+            <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
+            <div className="mt-1 font-bold text-xs md:text-sm text-white">Principal</div>
           </div>
         </div>
 
-        <div className="flex flex-col justify-center gap-16 relative">
-          <div className="absolute -left-6 top-1/2 h-24 w-6 border-y border-r border-white/20 -translate-y-1/2 rounded-r-xl"></div>
-          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-4 text-center w-48 shadow-sm">
-            <div className="text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Pai (Sire)</div>
-            <div className="font-bold text-white leading-tight">{pai}</div>
+        <div className="flex flex-col justify-center gap-12 md:gap-16 relative">
+          <div className="absolute -left-6 top-1/2 h-20 md:h-24 w-6 border-y border-r border-white/20 -translate-y-1/2 rounded-r-xl"></div>
+          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-3 md:p-4 text-center w-40 md:w-48 shadow-sm">
+            <div className="text-[8px] md:text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Pai (Sire)</div>
+            <div className="font-bold text-white text-xs md:text-sm leading-tight">{pai}</div>
           </div>
-          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-4 text-center w-48 shadow-sm">
-            <div className="text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Mãe (Dam)</div>
-            <div className="font-bold text-white leading-tight">{mae}</div>
+          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-3 md:p-4 text-center w-40 md:w-48 shadow-sm">
+            <div className="text-[8px] md:text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Mãe (Dam)</div>
+            <div className="font-bold text-white text-xs md:text-sm leading-tight">{mae}</div>
           </div>
         </div>
       </div>
@@ -189,6 +189,27 @@ function LotDetail() {
 
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);
+  
+  // Dynamic status logic
+  const getLotStatus = () => {
+    const now = new Date();
+    const eventStart = lot.event?.start_date ? new Date(lot.event.start_date) : null;
+    
+    if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+    if (lot.status === 'active') return 'recebendo_lances';
+    
+    if (eventStart && now < eventStart) {
+      return 'loteamento';
+    }
+    
+    if (lot.status === 'upcoming' || lot.status === 'open') {
+      return 'pre_lance';
+    }
+    
+    return lot.status;
+  };
+
+  const dynamicStatus = getLotStatus();
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
@@ -217,11 +238,12 @@ function LotDetail() {
               <p className="text-gold/80 text-[10px] uppercase font-bold tracking-widest">{lot.event?.name}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {lot.status === 'active' && (
-              <div className="flex items-center gap-2 bg-live/20 border border-live/30 px-3 py-1 rounded-full">
-                <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse" />
-                <span className="text-live text-[10px] font-bold tracking-tighter">AO VIVO</span>
+          <div className="flex items-center gap-2 md:gap-3">
+            <StatusBadge status={dynamicStatus} className="scale-90 md:scale-100 origin-right" />
+            {dynamicStatus === 'loteamento' && lot.event?.start_date && (
+              <div className="hidden md:flex items-center gap-2 bg-black/20 border border-white/10 px-3 py-1 rounded-full text-[10px] font-mono text-white/60">
+                <Timer className="h-3 w-3" />
+                <Countdown endsAt={lot.event.start_date} />
               </div>
             )}
             <div className="flex flex-col text-right">
@@ -239,8 +261,8 @@ function LotDetail() {
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
                 <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute left-6 top-6 flex gap-2">
-                  <StatusBadge status={lot?.status} />
+                <div className="absolute left-6 top-6 flex flex-col gap-2">
+                  <StatusBadge status={dynamicStatus} />
                 </div>
               </div>
               <div className="grid grid-cols-5 gap-3">
@@ -253,22 +275,24 @@ function LotDetail() {
             </div>
 
             <Tabs defaultValue="detalhes" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5 bg-emerald-deep/20 border border-white/5 rounded-2xl p-1">
-                <TabsTrigger value="detalhes" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Descrição</TabsTrigger>
-                <TabsTrigger value="genealogia" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Genealogia</TabsTrigger>
-                <TabsTrigger value="saude" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Saúde</TabsTrigger>
-                <TabsTrigger value="videos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Vídeo</TabsTrigger>
-                <TabsTrigger value="documentos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Documentos</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+                <TabsList className="inline-flex md:grid w-max md:w-full md:grid-cols-5 bg-emerald-deep/20 border border-white/5 rounded-2xl p-1 gap-1">
+                  <TabsTrigger value="detalhes" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Descrição</TabsTrigger>
+                  <TabsTrigger value="genealogia" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Genealogia</TabsTrigger>
+                  <TabsTrigger value="saude" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Saúde</TabsTrigger>
+                  <TabsTrigger value="videos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Vídeo</TabsTrigger>
+                  <TabsTrigger value="documentos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Documentos</TabsTrigger>
+                </TabsList>
+              </div>
               
               <TabsContent value="detalhes" className="mt-6 space-y-6">
-                <Card className="bg-card/50 border-white/5 p-8 rounded-3xl">
+                <Card className="bg-card/50 border-white/5 p-6 md:p-8 rounded-3xl">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="h-1px flex-1 bg-white/10" />
-                    <span className="text-xs font-black text-gold uppercase tracking-[0.3em]">Descrição do Animal</span>
-                    <div className="h-1px flex-1 bg-white/10" />
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em]">Descrição do Animal</span>
+                    <div className="h-px flex-1 bg-white/10" />
                   </div>
-                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap text-lg">
+                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap text-base md:text-lg">
                     {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."}
                   </p>
                   
@@ -393,14 +417,14 @@ function LotDetail() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-3 gap-3">
                       {[1, 2, 5].map((m) => (
-                        <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || lot.status !== "active"} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
+                        <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || (lot.status !== "active" && lot.status !== "upcoming" && lot.status !== "open")} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
                           <span className="text-[8px] uppercase font-black text-gold/60 mb-1">+{m} inc.</span>
                           <span className="font-bold">+{formatBRL(lot.bid_increment * m)}</span>
                         </Button>
                       ))}
                     </div>
 
-                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter" disabled={isBidding || lot.status !== "active"} onClick={() => placeBid(nextBid)}>
+                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter" disabled={isBidding || (lot.status !== "active" && lot.status !== "upcoming" && lot.status !== "open")} onClick={() => placeBid(nextBid)}>
                       {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
                     </Button>
                     
