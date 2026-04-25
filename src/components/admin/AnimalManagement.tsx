@@ -463,8 +463,9 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
              <div className="flex justify-center py-8">
                <Loader2 className="h-8 w-8 animate-spin text-gold" />
              </div>
-           ) : (
-             <Table>
+            ) : (
+              <>
+                <Table>
                <TableHeader>
                  <TableRow>
                     <TableHead className="w-[80px]">Foto</TableHead>
@@ -533,9 +534,10 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                     </Button>
                   </div>
                 </div>
-               )}
-            )}
-          </CardContent>
+              )}
+            </>
+          )}
+        </CardContent>
        </Card>
      </div>
    );
