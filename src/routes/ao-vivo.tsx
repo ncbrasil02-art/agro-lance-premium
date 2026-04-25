@@ -3,8 +3,10 @@
  import { Button } from "@/components/ui/button";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
- import { supabase } from "@/integrations/supabase/client";
- import { formatBRL } from "@/utils/format";
+  import { supabase } from "@/integrations/supabase/client";
+  import { formatBRL } from "@/utils/format";
+  import { eventSchema, lotSchema } from "@/lib/schemas";
+  import { z } from "zod";
  import { useEffect, useState } from "react";
  import { toast } from "sonner";
  import { useAuth } from "@/components/auth/auth-provider";
@@ -34,13 +36,16 @@ export const Route = createFileRoute("/ao-vivo")({
        .order("created_at", { ascending: false })
        .limit(10);
  
-     return { 
-       liveEvent: {
-         ...liveEvent,
-         active_lot: liveEvent.active_lot
-       },
-       initialBids: bids || []
-     };
+      try {
+        const validatedEvent = eventSchema.parse(liveEvent);
+        return { 
+          liveEvent: validatedEvent,
+          initialBids: bids || []
+        };
+      } catch (e) {
+        console.error("Erro de validação do evento ao vivo:", e);
+        return { liveEvent: null };
+      }
    },
    component: LivePage,
 });
