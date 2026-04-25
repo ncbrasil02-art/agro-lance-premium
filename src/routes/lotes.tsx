@@ -13,11 +13,11 @@ export const Route = createFileRoute("/lotes")({
       { property: "og:description", content: "Animais e embriões selecionados para leilão." },
     ],
   }),
-   loader: async () => {
-     const { data: lots, error } = await supabase
-       .from("lots")
-       .select("*, animal:animals(*), event:events(*)")
-       .order("lot_number");
+    loader: async () => {
+      const { data: lots, error } = await supabase
+        .from("lots")
+        .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+        .order("lot_number");
      
      if (error) throw error;
      return { lots };

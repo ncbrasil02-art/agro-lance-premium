@@ -22,10 +22,10 @@
  export const Route = createFileRoute("/lotes/$lotId")({
     loader: async ({ params }) => {
       const [lotRes, bidsRes] = await Promise.all([
-        supabase
-          .from("lots")
-          .select("*, animal:animals(*), event:events(*)")
-          .eq("id", params.lotId)
+         supabase
+           .from("lots")
+           .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+           .eq("id", params.lotId)
           .single(),
         supabase
           .from("bids")

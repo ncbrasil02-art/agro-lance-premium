@@ -20,9 +20,9 @@ export const Route = createFileRoute("/ao-vivo")({
   }),
    loader: async () => {
      const { data: liveEvent, error: eventError } = await supabase
-       .from("events")
-       .select("*, active_lot:lots(*, animal:animals(*))")
-       .eq("status", "live")
+        .from("events")
+        .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+        .eq("status", "live")
        .single();
  
      if (eventError || !liveEvent) return { liveEvent: null };
@@ -61,10 +61,10 @@ export const Route = createFileRoute("/ao-vivo")({
          "postgres_changes",
          { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${liveEvent.id}` },
          async () => {
-           const { data } = await supabase
-             .from("events")
-             .select("*, active_lot:lots(*, animal:animals(*))")
-             .eq("id", liveEvent.id)
+            const { data } = await supabase
+              .from("events")
+              .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+              .eq("id", liveEvent.id)
              .single();
            if (data) setLiveEvent(data);
          }
