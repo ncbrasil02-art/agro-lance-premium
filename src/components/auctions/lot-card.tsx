@@ -4,29 +4,16 @@ import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
+import { getEffectiveLotStatus } from "@/utils/auction-status";
 
-export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEndDate?: string; allowsPreBidding?: boolean } }) {
-  const getDynamicStatus = () => {
-    const now = new Date();
-    const eventStart = lot.eventStartDate ? new Date(lot.eventStartDate) : null;
-    const eventEnd = lot.eventEndDate ? new Date(lot.eventEndDate) : null;
-    
-    if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
-    if (eventEnd && now >= eventEnd) return 'finished';
-    if (lot.status === 'active') return 'recebendo_lances';
-    
-    if (eventStart && now < eventStart) {
-      return lot.allowsPreBidding ? 'pre_lance' : 'loteamento';
-    }
-
-    if (eventStart && now >= eventStart && (!eventEnd || now < eventEnd)) {
-      return 'recebendo_lances';
-    }
-    
-    return lot.status;
-  };
-
-  const dynamicStatus = getDynamicStatus();
+export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEndDate?: string; allowsPreBidding?: boolean; eventStatus?: string } }) {
+  const dynamicStatus = getEffectiveLotStatus({
+    status: lot.status,
+    event_status: lot.eventStatus,
+    event_start_date: lot.eventStartDate,
+    event_end_date: lot.eventEndDate,
+    allows_pre_bidding: lot.allowsPreBidding
+  });
 
   return (
     <Link
