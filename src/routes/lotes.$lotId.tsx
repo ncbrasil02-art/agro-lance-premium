@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/auctions/status-badge";
 import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
+import { lotSchema } from "@/lib/schemas";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -49,8 +50,14 @@ export const Route = createFileRoute("/lotes/$lotId")({
       console.error("Lote não encontrado ou erro:", lotRes.error);
       throw notFound();
     }
-    
-    return { lot: lotRes.data, initialBids: bidsRes.data || [] };
+
+    try {
+      const validatedLot = lotSchema.parse(lotRes.data);
+      return { lot: validatedLot, initialBids: bidsRes.data || [] };
+    } catch (e) {
+      console.error("Erro de validação de dados do lote:", e);
+      throw notFound();
+    }
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
