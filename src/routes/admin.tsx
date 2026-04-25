@@ -39,7 +39,7 @@ function AdminLayout() {
   const selectedEventId = search.eventId || "all";
 
   const setActiveTab = (tab: AdminTab) => {
-    navigate({ search: (prev) => ({ ...prev, tab }) });
+    navigate({ search: (prev) => ({ ...prev, tab, q: "" }) }); // Reset search when changing tabs? User preference.
   };
 
   const setSelectedEventId = (eventId: string) => {
@@ -47,7 +47,11 @@ function AdminLayout() {
   };
 
   const handleManageLots = (eventId: string) => {
-    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId }) });
+    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "" }) });
+  };
+
+  const onSearchChange = (q: string) => {
+    navigate({ search: (prev) => ({ ...prev, q }), replace: true }); // replace to avoid history pollution
   };
 
   if (isLoading) {
@@ -272,6 +276,8 @@ function AdminLayout() {
             <EventManagement 
               onManageLots={handleManageLots} 
               onNavigate={() => setActiveTab("animals")} 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
             />
           )}
           {activeTab === "lots" && (
@@ -280,10 +286,16 @@ function AdminLayout() {
               onEventChange={setSelectedEventId} 
               onNavigateToAnimals={() => setActiveTab("animals")}
               onNavigateToEvents={() => setActiveTab("events")}
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
             />
           )}
           {activeTab === "animals" && (
-            <AnimalManagement onNavigateToLots={() => setActiveTab("lots")} />
+            <AnimalManagement 
+              onNavigateToLots={() => setActiveTab("lots")} 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+            />
           )}
           {activeTab === "users" && (
             <Card>
