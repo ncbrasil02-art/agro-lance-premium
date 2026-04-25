@@ -34,6 +34,7 @@
         bid_increment: 1000,
         status: "active",
         allows_pre_bidding: true,
+        is_featured: false,
         payment_methods: ""
       });
 
@@ -44,7 +45,8 @@
           const [lotsRes, eventsRes, animalsRes] = await Promise.all([
             supabase
               .from("lots")
-              .select("*, event:events!lots_event_id_fkey(name), animal:animals(name, internal_code)")
+              .select("*, event:events!event_id(name), animal:animals(name, internal_code)")
+              .order("is_featured", { ascending: false })
               .order("lot_number", { ascending: true }),
             supabase
               .from("events")
@@ -105,6 +107,7 @@
           bid_increment: 1000,
           status: "active",
           allows_pre_bidding: true,
+          is_featured: false,
           payment_methods: ""
         });
       };
@@ -119,6 +122,7 @@
           bid_increment: lot.bid_increment || 1000,
           status: lot.status || "active",
           allows_pre_bidding: lot.allows_pre_bidding !== false,
+          is_featured: lot.is_featured || false,
           payment_methods: lot.payment_methods?.join(", ") || ""
         });
         setIsDialogOpen(true);
@@ -142,6 +146,7 @@
                 bid_increment: formData.bid_increment,
                 status: formData.status,
                 allows_pre_bidding: formData.allows_pre_bidding,
+                is_featured: formData.is_featured,
                 payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : []
               })
               .eq("id", editingLot.id);
@@ -157,6 +162,7 @@
               bid_increment: formData.bid_increment,
               status: formData.status,
               allows_pre_bidding: formData.allows_pre_bidding,
+              is_featured: formData.is_featured,
               payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
               end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
             });
@@ -338,15 +344,27 @@
                     placeholder="Ex: 30 parcelas (2+2+26), À vista com 10% desc"
                   />
                 </div>
-                <div className="flex items-center space-x-2 py-2">
-                  <input 
-                    type="checkbox" 
-                    id="pre_bidding_lot" 
-                    checked={formData.allows_pre_bidding} 
-                    onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
-                    className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
-                  />
-                  <Label htmlFor="pre_bidding_lot">Permitir Lances Antecipados</Label>
+                <div className="grid grid-cols-2 gap-4 py-2">
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="pre_bidding_lot" 
+                      checked={formData.allows_pre_bidding} 
+                      onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
+                      className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                    />
+                    <Label htmlFor="pre_bidding_lot">Lances Antecipados</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="is_featured" 
+                      checked={formData.is_featured} 
+                      onChange={(e) => setFormData({...formData, is_featured: e.target.checked})}
+                      className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                    />
+                    <Label htmlFor="is_featured">Lote em Destaque</Label>
+                  </div>
                 </div>
              </div>
              <DialogFooter>
