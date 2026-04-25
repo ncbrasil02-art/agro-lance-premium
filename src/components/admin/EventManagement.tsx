@@ -102,10 +102,15 @@
  
     const handleSave = async () => {
       if (!formData.name || !formData.start_date) {
-       toast.error("Preencha o nome e a data");
-       return;
-     }
- 
+        toast.error("Preencha o nome e a data de início");
+        return;
+      }
+
+      if (formData.end_date && new Date(formData.end_date) <= new Date(formData.start_date)) {
+        toast.error("A data de término deve ser posterior à data de início");
+        return;
+      }
+
       console.log("Saving event...", formData);
       try {
          if (editingEvent) {

@@ -58,6 +58,7 @@ function LotsPage() {
      viewers: l.viewers || 0,
       endsAt: l.end_date || "",
       status: l.status as any,
+      eventStatus: l.event?.status,
       eventStartDate: l.event?.start_date,
       eventEndDate: l.event?.end_date,
       allowsPreBidding: l.event?.allows_pre_bidding,

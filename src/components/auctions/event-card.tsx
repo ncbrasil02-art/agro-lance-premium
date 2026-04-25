@@ -3,9 +3,16 @@ import { Calendar, MapPin, Users, Gavel, Timer } from "lucide-react";
 import type { AuctionEvent } from "@/lib/mock-data";
 import { formatDateBR } from "@/lib/mock-data";
 import { StatusBadge } from "@/components/auctions/status-badge";
+import { getEffectiveEventStatus } from "@/utils/auction-status";
 import { Countdown } from "@/components/auctions/countdown";
 
-export function EventCard({ event }: { event: AuctionEvent }) {
+export function EventCard({ event }: { event: AuctionEvent & { end_date?: string | null } }) {
+  const effectiveStatus = getEffectiveEventStatus({
+    status: event.status,
+    start_date: event.date,
+    end_date: event.end_date
+  });
+
   return (
     <Link
       to="/eventos/$eventSlug"
@@ -22,8 +29,8 @@ export function EventCard({ event }: { event: AuctionEvent }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
         <div className="absolute left-4 top-4 flex flex-col gap-2 items-start">
-          <StatusBadge status={event?.status} />
-          {(event?.status === 'scheduled' as any || event?.status === 'upcoming' as any) && event?.date && (
+          <StatusBadge status={effectiveStatus} />
+          {effectiveStatus === 'scheduled' && event?.date && (
             <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg animate-in fade-in slide-in-from-left-2">
               <Timer className="h-3 w-3" />
               <Countdown endsAt={event.date} className="font-mono" />
