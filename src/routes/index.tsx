@@ -7,7 +7,7 @@ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from
  import { LotCard } from "@/components/auctions/lot-card";
   import { supabase } from "@/integrations/supabase/client";
   import { formatBRL } from "@/utils/format";
-  import { eventSchema, lotSchema } from "@/lib/schemas";
+  import { eventSchema, lotSchema, announcementSchema } from "@/lib/schemas";
   import { z } from "zod";
 import heroImage from "@/assets/hero-horse.jpg";
 
@@ -46,11 +46,20 @@ import heroImage from "@/assets/hero-horse.jpg";
         const validatedLots = z.array(lotSchema).parse(lotsRes.data || []);
         const validatedPastEvents = z.array(eventSchema).parse(pastEventsRes.data || []);
 
+        let validatedAnnouncement = null;
+        if (settingsRes.data?.value) {
+          try {
+            validatedAnnouncement = announcementSchema.parse(settingsRes.data.value);
+          } catch (e) {
+            logger.warn("Anúncio com formato inválido no banco de dados", { error: e });
+          }
+        }
+
         return {
           events: validatedEvents,
           lots: validatedLots,
           pastEvents: validatedPastEvents,
-          announcement: settingsRes.data?.value || null
+          announcement: validatedAnnouncement
         };
       } catch (error) {
         logger.error("Erro ao carregar dados da Home", { error });
