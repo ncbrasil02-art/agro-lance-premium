@@ -128,7 +128,31 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-col gap-2">
+              {profile?.role === "admin" && (
+                <Link to="/admin" onClick={() => setOpen(false)}>
+                  <Button variant="outline" className="w-full flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    Painel Admin
+                  </Button>
+                </Link>
+              )}
+              {!user ? (
+                <div className="flex gap-2">
+                  <Link to="/login" className="flex-1" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className="w-full">Entrar</Button>
+                  </Link>
+                  <Link to="/cadastro" className="flex-1" onClick={() => setOpen(false)}>
+                    <Button className="w-full bg-gold-gradient text-emerald-deep">Cadastre-se</Button>
+                  </Link>
+                </div>
+              ) : (
+                <Button variant="ghost" className="w-full text-destructive" onClick={() => { signOut(); setOpen(false); }}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </Button>
+              )}
+            </div>
               <Link to="/login" className="flex-1" onClick={() => setOpen(false)}>
                 <Button variant="outline" className="w-full">Entrar</Button>
               </Link>
