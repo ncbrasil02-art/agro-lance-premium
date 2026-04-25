@@ -13,8 +13,14 @@ const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
   sold: { label: "ARREMATADO", cls: "bg-gold/15 text-gold border-gold/30" },
 };
 
- export function StatusBadge({ status, className }: { status: string | null | undefined; className?: string }) {
-   const safeStatus = (status || "").toLowerCase();
+  export function StatusBadge({ status, className }: { status: string | null | undefined; className?: string }) {
+    const safeStatus = (status || "").toLowerCase();
+    const isKnownStatus = status ? safeStatus in map : true; // null/undefined are "known" as Pending
+
+    if (status && !map[safeStatus]) {
+      console.warn(`[StatusBadge] Unknown status received: "${status}". Falling back to default styling.`);
+    }
+
    const s = map[safeStatus] || { 
      label: status || "Pendente", 
      cls: "bg-muted text-muted-foreground border-border" 
