@@ -32,15 +32,21 @@
   const [customHealthItem, setCustomHealthItem] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   
-     const [formData, setFormData] = useState<any>({
-        seller_id: "",
-        category_id: "",
-       name: "",
-       species: "Equino",
-       breed: "",
-       registration_number: "",
-       sex: "M",
-       location: "",
+      const [formData, setFormData] = useState<any>({
+         seller_id: "",
+         category_id: "",
+        name: "",
+        species: "Equino",
+        breed: "",
+        registration_number: "",
+        registration_1cc: "",
+        registration_2: "",
+        chip_number: "",
+        book: "",
+        blood_typing: "",
+        blood_percentage: "",
+        sex: "M",
+        location: "",
        youtube_url: "",
        pedigree_url: "",
        color: "",
@@ -56,17 +62,23 @@
          description: ""
     });
 
-    const resetForm = () => {
-      setEditingAnimal(null);
-       setFormData({
-         seller_id: "",
-         category_id: "",
-        name: "",
-        species: "Equino",
-        breed: "",
-        registration_number: "",
-        sex: "M",
-        location: "",
+     const resetForm = () => {
+       setEditingAnimal(null);
+        setFormData({
+          seller_id: "",
+          category_id: "",
+         name: "",
+         species: "Equino",
+         breed: "",
+         registration_number: "",
+         registration_1cc: "",
+         registration_2: "",
+         chip_number: "",
+         book: "",
+         blood_typing: "",
+         blood_percentage: "",
+         sex: "M",
+         location: "",
         youtube_url: "",
         pedigree_url: "",
         color: "",
@@ -83,17 +95,23 @@
       });
     };
 
-    const handleEdit = (animal: any) => {
-      setEditingAnimal(animal);
-       setFormData({
-         seller_id: animal.seller_id || "",
-         category_id: animal.category_id || "",
-        name: animal.name || "",
-        species: animal.species || "Equino",
-        breed: animal.breed || "",
-        registration_number: animal.registration_number || "",
-        sex: animal.sex || "M",
-        location: animal.location || "",
+     const handleEdit = (animal: any) => {
+       setEditingAnimal(animal);
+        setFormData({
+          seller_id: animal.seller_id || "",
+          category_id: animal.category_id || "",
+         name: animal.name || "",
+         species: animal.species || "Equino",
+         breed: animal.breed || "",
+         registration_number: animal.registration_number || "",
+         registration_1cc: animal.registration_1cc || "",
+         registration_2: animal.registration_2 || "",
+         chip_number: animal.chip_number || "",
+         book: animal.book || "",
+         blood_typing: animal.blood_typing || "",
+         blood_percentage: animal.blood_percentage || "",
+         sex: animal.sex || "M",
+         location: animal.location || "",
         youtube_url: animal.youtube_url || "",
         pedigree_url: animal.pedigree_url || "",
         color: animal.color || "",
