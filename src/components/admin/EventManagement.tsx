@@ -14,10 +14,19 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  
-  export function EventManagement({ onManageLots, onNavigate }: { onManageLots?: (id: string) => void; onNavigate?: () => void }) {
+  export function EventManagement({ 
+    onManageLots, 
+    onNavigate,
+    searchQuery,
+    onSearchChange
+  }: { 
+    onManageLots?: (id: string) => void; 
+    onNavigate?: () => void;
+    searchQuery: string;
+    onSearchChange: (val: string) => void;
+  }) {
     const [events, setEvents] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<any>(null);
      const [formData, setFormData] = useState({
@@ -227,12 +236,12 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
           </div>
          <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-           <Input
-             placeholder="Buscar eventos..."
-             className="pl-10"
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-           />
+            <Input
+              placeholder="Buscar eventos..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
