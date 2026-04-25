@@ -297,17 +297,18 @@ import { Link } from "@tanstack/react-router";
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="animal">Animal</Label>
-                    <Button 
-                      variant="link" 
-                      className="h-auto p-0 text-[10px] text-gold" 
-                      onClick={() => {
-                        setIsDialogOpen(false);
-                        // This is tricky as we need to switch tabs in the parent.
-                        // For now, let's just use a hint.
-                      }}
-                    >
-                      Cadastrar Novo Animal
-                    </Button>
+                     {onNavigateToAnimals && (
+                       <Button 
+                         variant="link" 
+                         className="h-auto p-0 text-[10px] text-gold" 
+                         onClick={() => {
+                           setIsDialogOpen(false);
+                           onNavigateToAnimals();
+                         }}
+                       >
+                         Cadastrar Novo Animal
+                       </Button>
+                     )}
                   </div>
                    <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
                      <SelectTrigger>
