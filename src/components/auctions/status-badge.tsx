@@ -11,6 +11,7 @@ const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
   finished: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   passed: { label: "NÃO VENDIDO", cls: "bg-muted text-muted-foreground border-border" },
   sold: { label: "ARREMATADO", cls: "bg-gold/15 text-gold border-gold/30" },
+  "": { label: "PENDENTE", cls: "bg-muted text-muted-foreground border-border" },
 };
 
   export function StatusBadge({ status, className }: { status: string | null | undefined; className?: string }) {
