@@ -21,7 +21,7 @@ import {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const Route = createFileRoute("/lotes_/$lotId")({
+export const Route = createFileRoute("/lotes/$lotId")({
   loader: async ({ params }) => {
     const { lotId } = params;
     
