@@ -196,28 +196,27 @@ function Home() {
               <Sparkles className="h-3.5 w-3.5" />
               A nova era dos leilões agropecuários
             </div>
+            {nextEvent && (
+              <div className="mt-8 flex flex-col gap-2 rounded-2xl border border-gold/20 bg-gold/5 p-4 backdrop-blur-sm md:w-fit mb-8">
+                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-gold">
+                  <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
+                  Oportunidade Imperdível: {nextEvent.name}
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-6">
+                  <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
+                  <div className="h-10 w-px bg-white/10" />
+                  <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }} className="group/btn flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                    Garantir Vaga
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
+                  </Link>
+                </div>
+              </div>
+            )}
             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
               Leilões <span className="text-gradient-gold">premium</span><br />
               em tempo real
             </h1>
              <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-             {nextEvent && (
-               <div className="mt-8 flex flex-col gap-2 rounded-2xl border border-gold/20 bg-gold/5 p-4 backdrop-blur-sm md:w-fit">
-                  <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-gold">
-                    <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
-                    Oportunidade Imperdível: {nextEvent.name}
-                 </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-6">
-                    <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
-                    <div className="h-10 w-px bg-white/10" />
-                    <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }} className="group/btn flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                      Garantir Vaga
-                      <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
-                 </div>
-               </div>
-             )}
- 
               Cavalos, bovinos e embriões de elite com transmissão ao vivo, curadoria genética
               e tecnologia de ponta para compradores e leiloeiros profissionais.
             </p>
@@ -253,19 +252,6 @@ function Home() {
         </div>
       </section>
 
-      {/* EVENTOS PASSADOS */}
-      {mappedPastEvents.length > 0 && (
-        <section className="container mx-auto px-4 py-16 border-t border-border/40">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl text-muted-foreground">Leilões encerrados</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
-            {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
-          </div>
-        </section>
-      )}
-
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
         <section className="container mx-auto px-4 py-16">
@@ -286,6 +272,17 @@ function Home() {
         </section>
       )}
 
+      {/* EVENTOS FUTUROS */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
+          <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+        </div>
+      </section>
+
       {/* LOTES DESTAQUE */}
       <section className="container mx-auto px-4 py-16">
         <div className="mb-8 flex items-end justify-between">
@@ -302,16 +299,18 @@ function Home() {
         </div>
       </section>
 
-      {/* EVENTOS FUTUROS */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
-          <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
-        </div>
-      </section>
+      {/* EVENTOS PASSADOS */}
+      {mappedPastEvents.length > 0 && (
+        <section className="container mx-auto px-4 py-16 border-t border-border/40">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl text-muted-foreground">Leilões encerrados</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
+            {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+          </div>
+        </section>
+      )}
 
       {/* DIFERENCIAIS */}
       <section className="border-y border-border/60 bg-card/40">
