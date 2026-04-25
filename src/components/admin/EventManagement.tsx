@@ -521,9 +521,15 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
             ) : (
               <>
                 <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
+                  <TableHeader className="bg-muted/50 select-none">
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox 
+                          checked={events.length > 0 && selectedIds.length === events.length}
+                          onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                        />
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
                       <div className="flex items-center">Evento <SortIndicator column="name" /></div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('start_date')}>
@@ -547,8 +553,14 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                       </TableRow>
                     ) : (
                     events.map((event) => (
-                     <TableRow key={event.id}>
-                       <TableCell className="font-medium">
+                      <TableRow key={event.id} className={selectedIds.includes(event.id) ? "bg-gold/5" : ""}>
+                        <TableCell>
+                          <Checkbox 
+                            checked={selectedIds.includes(event.id)}
+                            onCheckedChange={(checked) => handleSelectOne(event.id, !!checked)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
                          <div>{event.name}</div>
                          <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Presencial'}</div>
                        </TableCell>
