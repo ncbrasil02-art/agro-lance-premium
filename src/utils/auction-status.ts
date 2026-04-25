@@ -76,7 +76,15 @@ export function getEffectiveLotStatus(lot: {
   const eventEnd = lot.event_end_date ? new Date(lot.event_end_date) : null;
 
   if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
-  if (lot.event_status === 'finished' || (eventEnd && now >= eventEnd)) return 'finished';
+  if (lot.event_status === 'finished' || (eventEnd && now >= eventEnd)) {
+    return lot.status === 'sold' ? 'sold' : 'finished';
+  }
+
+  // Se a data de início do evento já passou há mais de 24h e não tem data de fim, 
+  // provavelmente já encerrou (safeguard para eventos esquecidos abertos)
+  if (eventStart && !eventEnd && now.getTime() - eventStart.getTime() > 24 * 60 * 60 * 1000 && lot.event_status !== 'live') {
+    return lot.status === 'sold' ? 'sold' : 'finished';
+  }
 
   if (eventStart && now >= eventStart && (!eventEnd || now < eventEnd)) {
     return 'recebendo_lances';
