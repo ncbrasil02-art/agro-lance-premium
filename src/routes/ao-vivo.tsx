@@ -102,7 +102,7 @@ export const Route = createFileRoute("/ao-vivo")({
      setIsBidding(true);
      try {
        const { error } = await supabase.from("bids").insert({
-         lot_id: liveLot.id,
+        lot_id: liveLot!.id,
          user_id: user.id,
          amount,
          bid_type: "online",
@@ -170,7 +170,7 @@ export const Route = createFileRoute("/ao-vivo")({
                {liveLot.end_date && (
                  <div className="text-right">
                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-                   <Countdown endsAt={liveLot.end_date} className="font-mono text-2xl font-bold text-live" />
+                    <Countdown endsAt={liveLot.end_date!} className="font-mono text-2xl font-bold text-live" />
                  </div>
                 )}
               </div>
@@ -211,7 +211,7 @@ export const Route = createFileRoute("/ao-vivo")({
             <p className="text-xs text-muted-foreground">Atualização em tempo real</p>
           </div>
           <ul className="max-h-[600px] overflow-auto p-4 text-sm">
-             {bids.map((bid: any, i: number) => (
+              {bids?.map((bid: any, i: number) => (
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
                    <div className="font-semibold">Comprador ...{bid.user_id.slice(-4)}</div>
