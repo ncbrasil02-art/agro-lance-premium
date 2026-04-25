@@ -102,7 +102,7 @@ export const Route = createFileRoute("/ao-vivo")({
      setIsBidding(true);
      try {
        const { error } = await supabase.from("bids").insert({
-        lot_id: liveLot!.id,
+        lot_id: (liveLot as any).id,
          user_id: user.id,
          amount,
          bid_type: "online",
@@ -170,7 +170,7 @@ export const Route = createFileRoute("/ao-vivo")({
                {liveLot.end_date && (
                  <div className="text-right">
                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-                    <Countdown endsAt={liveLot.end_date!} className="font-mono text-2xl font-bold text-live" />
+                    <Countdown endsAt={liveLot.end_date as string} className="font-mono text-2xl font-bold text-live" />
                  </div>
                 )}
               </div>
