@@ -1,5 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@tanstack/react-router";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
   const [events, setEvents] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const ITEMS_PER_PAGE = 8;
 
   const fetchEvents = async () => {
@@ -70,7 +72,38 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
 
   useEffect(() => {
     fetchEvents();
+    setSelectedIds([]);
   }, [currentPage, searchQuery, sortColumn, sortDirection]);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(events.map(e => e.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Deseja excluir permanentemente os ${selectedIds.length} eventos selecionados? Todos os lotes associados serão removidos.`)) return;
+    
+    try {
+      const { error } = await supabase.from("events").delete().in("id", selectedIds);
+      if (error) throw error;
+      toast.success(`${selectedIds.length} eventos excluídos com sucesso`);
+      setSelectedIds([]);
+      fetchEvents();
+    } catch (error: any) {
+      toast.error("Erro ao excluir em lote: " + error.message);
+    }
+  };
+
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -243,8 +276,32 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
       }
    };
    return (
-     <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative">
+           {selectedIds.length > 0 && (
+             <div className="absolute inset-0 bg-emerald-deep/95 z-20 rounded-lg flex items-center px-4 animate-in fade-in slide-in-from-top-2 border border-gold/30">
+               <div className="flex items-center gap-3">
+                 <span className="text-xs font-black text-white uppercase tracking-widest">{selectedIds.length} selecionados</span>
+                 <div className="h-4 w-px bg-white/20" />
+                 <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   className="h-8 text-destructive hover:bg-destructive/10 text-[10px] font-bold"
+                   onClick={handleBulkDelete}
+                 >
+                   <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir em Lote
+                 </Button>
+               </div>
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 className="ml-auto text-white/60 hover:text-white text-[10px] font-bold"
+                 onClick={() => setSelectedIds([])}
+               >
+                 Cancelar
+               </Button>
+             </div>
+           )}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
