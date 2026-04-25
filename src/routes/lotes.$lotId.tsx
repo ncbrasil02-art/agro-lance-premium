@@ -62,7 +62,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
   head: ({ loaderData }) => ({
     meta: loaderData ? [
       { title: `Lote ${loaderData.lot.lot_number} — ${loaderData.lot.animal?.name} — Auditor de Lances` },
-      { name: "description", content: `${loaderData.lot.animal?.name}, ${loaderData.lot.animal?.breed}. Lance atual ${formatBRL(loaderData.lot.current_price || loaderData.lot.starting_price)}.` },
+      { name: "description", content: `${loaderData.lot.animal?.name}, ${loaderData.lot.animal?.breed}. Lance atual ${formatBRL(loaderData.lot.current_price || loaderData.lot.starting_price || 0)}.` },
     ] : [],
   }),
   notFoundComponent: () => (
