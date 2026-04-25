@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Calendar, MapPin, Gavel, Users, Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { eventSchema } from "@/lib/schemas";
 import { LotCard } from "@/components/auctions/lot-card";
 import { StatusBadge } from "@/components/auctions/status-badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,14 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
       .maybeSingle();
 
     if (error || !event) throw notFound();
-    return { event };
+
+    try {
+      const validatedEvent = eventSchema.parse(event);
+      return { event: validatedEvent };
+    } catch (e) {
+      console.error("Erro de validação do evento:", e);
+      throw notFound();
+    }
   },
   head: ({ loaderData }) => ({
     meta: loaderData?.event ? [
