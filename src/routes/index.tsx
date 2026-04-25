@@ -51,7 +51,6 @@ import heroImage from "@/assets/hero-horse.jpg";
         throw error;
       }
     },
-    },
     component: Home,
   });
 
