@@ -12,19 +12,54 @@
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  
- export function EventManagement() {
-   const [events, setEvents] = useState<any[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
-   const [searchQuery, setSearchQuery] = useState("");
-   const [isCreating, setIsCreating] = useState(false);
-   const [newEvent, setNewEvent] = useState({
-     name: "",
-     description: "",
-     start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-     location: "",
-     status: "scheduled",
-     event_type: "online"
-   });
+  export function EventManagement() {
+    const [events, setEvents] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<any>(null);
+    const [formData, setFormData] = useState({
+      name: "",
+      description: "",
+      start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+      location: "",
+      status: "scheduled",
+      event_type: "online",
+      allows_pre_bidding: true,
+      show_countdown: true,
+      transmission_link: ""
+    });
+
+    const resetForm = () => {
+      setEditingEvent(null);
+      setFormData({
+        name: "",
+        description: "",
+        start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+        location: "",
+        status: "scheduled",
+        event_type: "online",
+        allows_pre_bidding: true,
+        show_countdown: true,
+        transmission_link: ""
+      });
+    };
+
+    const handleEdit = (event: any) => {
+      setEditingEvent(event);
+      setFormData({
+        name: event.name || "",
+        description: event.description || "",
+        start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm") : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+        location: event.location || "",
+        status: event.status || "scheduled",
+        event_type: event.event_type || "online",
+        allows_pre_bidding: event.allows_pre_bidding !== false,
+        show_countdown: event.show_countdown !== false,
+        transmission_link: event.transmission_link || ""
+      });
+      setIsDialogOpen(true);
+    };
  
    const fetchEvents = async () => {
      setIsLoading(true);
