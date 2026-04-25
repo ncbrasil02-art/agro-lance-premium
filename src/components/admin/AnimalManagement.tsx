@@ -410,7 +410,8 @@
              <Table>
                <TableHeader>
                  <TableRow>
-                   <TableHead>Nome</TableHead>
+                    <TableHead className="w-[80px]">Foto</TableHead>
+                    <TableHead>Nome</TableHead>
                    <TableHead>Espécie/Raça</TableHead>
                    <TableHead>Registro</TableHead>
                    <TableHead>Sexo</TableHead>
@@ -426,8 +427,21 @@
                    </TableRow>
                  ) : (
                    filteredAnimals.map((animal) => (
-                     <TableRow key={animal.id}>
-                       <TableCell className="font-medium">{animal.name}</TableCell>
+                      <TableRow key={animal.id}>
+                        <TableCell>
+                          {animal.photos && animal.photos.length > 0 ? (
+                            <img 
+                              src={animal.photos[0]} 
+                              alt={animal.name} 
+                              className="h-10 w-10 rounded-md object-cover border"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-[10px] text-muted-foreground border border-dashed">
+                              Sem foto
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="font-medium">{animal.name}</TableCell>
                        <TableCell>{animal.species} / {animal.breed}</TableCell>
                        <TableCell>{animal.registration_number}</TableCell>
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
