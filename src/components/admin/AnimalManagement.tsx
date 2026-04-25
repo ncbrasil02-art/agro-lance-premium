@@ -29,6 +29,8 @@
  export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
+  const [customHealthItem, setCustomHealthItem] = useState("");
+  
      const [formData, setFormData] = useState<any>({
          seller_id: "",
        name: "",
