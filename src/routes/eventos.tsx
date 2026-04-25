@@ -50,7 +50,7 @@ function EventsPage() {
         <p className="mt-2 text-muted-foreground">Acompanhe todos os leilões em andamento e agendados.</p>
       </header>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-         {mappedEvents.map((e) => <EventCard key={e.id} event={e as any} />)}
+         {mappedEvents.map((e: any) => <EventCard key={e.id} event={e as any} />)}
       </div>
     </div>
   );
