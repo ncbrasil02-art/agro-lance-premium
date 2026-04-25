@@ -11,7 +11,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
   import { toast } from "sonner";
  
-  export function AnimalManagement() {
+  export function AnimalManagement({ onNavigateToLots }: { onNavigateToLots?: () => void }) {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
     const [formData, setFormData] = useState({
@@ -136,9 +136,13 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
           toast.success("Animal cadastrado com sucesso");
         }
  
-        setIsDialogOpen(false);
-        resetForm();
-        fetchAnimals();
+         setIsDialogOpen(false);
+         const isNew = !editingAnimal;
+         resetForm();
+         fetchAnimals();
+         if (isNew && onNavigateToLots && confirm("Animal cadastrado! Deseja ir para a aba de Lotes para alocá-lo em um evento?")) {
+           onNavigateToLots();
+         }
       } catch (error: any) {
         toast.error("Erro ao salvar animal: " + error.message);
       }

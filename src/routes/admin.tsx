@@ -259,7 +259,9 @@ function AdminLayout() {
               onNavigateToEvents={() => setActiveTab("events")}
             />
           )}
-          {activeTab === "animals" && <AnimalManagement />}
+          {activeTab === "animals" && (
+            <AnimalManagement onNavigateToLots={() => setActiveTab("lots")} />
+          )}
           {activeTab === "users" && (
             <Card>
               <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
