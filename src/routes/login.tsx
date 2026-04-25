@@ -20,6 +20,7 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Tentativa de login iniciada para:", email);
     setIsLoading(true);
 
     try {
@@ -28,11 +29,16 @@ function LoginPage() {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro no login do Supabase:", error);
+        throw error;
+      }
 
+      console.log("Login realizado com sucesso no Supabase");
       toast.success("Login realizado com sucesso!");
       navigate({ to: "/" });
     } catch (error: any) {
+      console.error("Erro capturado no handleSubmit:", error);
       toast.error(error.message || "Erro ao entrar");
     } finally {
       setIsLoading(false);
