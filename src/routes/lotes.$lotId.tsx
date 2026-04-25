@@ -115,6 +115,39 @@
    );
  }
  
+ function InstallmentSimulator({ price }: { price: number }) {
+   const options = [1, 10, 20, 30, 40, 50];
+   return (
+     <Dialog>
+       <DialogTrigger asChild>
+         <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-gold hover:text-gold-bright flex items-center gap-1">
+           <Calculator className="h-3 w-3" /> Ver simulador de parcelas
+         </Button>
+       </DialogTrigger>
+       <DialogContent className="sm:max-w-[425px]">
+         <DialogHeader>
+           <DialogTitle>Simulador de Pagamento</DialogTitle>
+           <DialogDescription>
+             Veja as condições de parcelamento para este lote.
+           </DialogDescription>
+         </DialogHeader>
+         <div className="mt-4 space-y-3">
+           {options.map((opt) => (
+             <div key={opt} className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0">
+               <span className="text-sm font-medium">{opt === 1 ? "À vista (PIX/TED)" : `${opt} parcelas mensais`}</span>
+               <span className="font-bold text-foreground">{formatBRL(price / opt)}</span>
+             </div>
+           ))}
+           <div className="mt-6 rounded-lg bg-gold/5 p-3 text-[10px] text-muted-foreground flex gap-2">
+             <Info className="h-4 w-4 shrink-0 text-gold" />
+             <p>As condições finais dependem da aprovação de cadastro e podem variar conforme o regulamento do leiloeiro.</p>
+           </div>
+         </div>
+       </DialogContent>
+     </Dialog>
+   );
+ }
+ 
  function LotDetail() {
    const { lot: initialLot } = Route.useLoaderData();
    const { user, profile } = useAuth();
@@ -356,6 +389,7 @@
                   <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     ou {installments}x de <span className="text-foreground font-bold">{formatBRL(installmentValue)}</span>
                   </div>
+                  <InstallmentSimulator price={currentPrice} />
                 </div>
 
                 <div className="mt-8 space-y-4">
