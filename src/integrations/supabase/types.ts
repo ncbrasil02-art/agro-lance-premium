@@ -31,6 +31,7 @@ export type Database = {
           pedigree_url: string | null
           photos: string[] | null
           registration_number: string | null
+          seller_id: string | null
           sex: string | null
           species: string | null
           updated_at: string
@@ -55,6 +56,7 @@ export type Database = {
           pedigree_url?: string | null
           photos?: string[] | null
           registration_number?: string | null
+          seller_id?: string | null
           sex?: string | null
           species?: string | null
           updated_at?: string
@@ -79,6 +81,7 @@ export type Database = {
           pedigree_url?: string | null
           photos?: string[] | null
           registration_number?: string | null
+          seller_id?: string | null
           sex?: string | null
           species?: string | null
           updated_at?: string
@@ -87,7 +90,15 @@ export type Database = {
           weight?: number | null
           youtube_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "animals_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       audit_logs: {
         Row: {
@@ -603,6 +614,39 @@ export type Database = {
           is_approved?: boolean
           phone?: string | null
           role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sellers: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          location: string | null
+          name: string
+          phone: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          phone?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          phone?: string | null
+          type?: string
           updated_at?: string
         }
         Relationships: []
