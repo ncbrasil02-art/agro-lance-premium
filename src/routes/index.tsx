@@ -109,13 +109,13 @@ function Home() {
      status: l.status as any,
    }));
  
-      const liveEvents = mappedEvents.filter((e) => e.status === "live");
-      const upcomingEvents = mappedEvents.filter((e) => e.status === "scheduled");
+      const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
+      const upcomingEvents = mappedEvents.filter((e: any) => e.status === "scheduled");
      
      // Find the closest upcoming event with countdown enabled
       const nextEvent = mappedEvents
-        .filter((e) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+        .filter((e: any) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
+        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {
@@ -217,7 +217,7 @@ function Home() {
             <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
-            {mappedPastEvents.map((e) => <EventCard key={e.id} event={e} />)}
+            {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
           </div>
         </section>
       )}
@@ -237,7 +237,7 @@ function Home() {
             </Link>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {liveEvents.map((e) => <EventCard key={e.id} event={e} />)}
+            {liveEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
           </div>
         </section>
       )}
@@ -254,7 +254,7 @@ function Home() {
           </Link>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredLots.map((l) => <LotCard key={l.id} lot={l} />)}
+          {featuredLots.map((l: any) => <LotCard key={l.id} lot={l} />)}
         </div>
       </section>
 
@@ -265,7 +265,7 @@ function Home() {
           <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((e) => <EventCard key={e.id} event={e} />)}
+          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
         </div>
       </section>
 
