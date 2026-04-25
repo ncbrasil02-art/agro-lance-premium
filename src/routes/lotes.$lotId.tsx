@@ -36,7 +36,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
     const [lotRes, bidsRes] = await Promise.all([
        supabase
          .from("lots")
-         .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+         .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
          .eq("id", lotId)
          .maybeSingle(),
       supabase
@@ -320,8 +320,9 @@ function LotDetail() {
                       { icon: Award, label: "Raça", value: lot.animal?.breed },
                       { icon: Info, label: "Sexo", value: lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea' },
                       { icon: Calendar, label: "Idade", value: getAge(lot.animal?.birth_date) },
-                      { icon: MapPin, label: "Local", value: lot.animal?.location || "Brasil" },
-                      { icon: Scale, label: "Peso", value: lot.animal?.weight ? `${lot.animal.weight} kg` : null },
+                       { icon: MapPin, label: "Local", value: lot.animal?.location || "Brasil" },
+                       { icon: Users, label: "Vendedor", value: lot.animal?.seller?.name },
+                       { icon: Scale, label: "Peso", value: lot.animal?.weight ? `${lot.animal.weight} kg` : null },
                       { icon: Ruler, label: "Altura", value: lot.animal?.height ? `${lot.animal.height} m` : null },
                       { icon: Sparkles, label: "Pelagem", value: lot.animal?.color },
                       { icon: Fingerprint, label: "Registro", value: lot.animal?.registration_number },
