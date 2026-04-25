@@ -357,6 +357,42 @@ export type Database = {
           },
         ]
       }
+      event_requests: {
+        Row: {
+          additional_info: string | null
+          category: string | null
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          status: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          additional_info?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          status?: string | null
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          additional_info?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          status?: string | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           active_lot_id: string | null
