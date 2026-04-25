@@ -438,6 +438,18 @@ function LotDetail() {
                       </div>
                     )}
 
+                    {dynamicStatus === 'pre_lance' && (
+                      <div className="p-4 rounded-2xl bg-emerald-bright/10 border border-emerald-bright/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                        <Zap className="h-5 w-5 text-emerald-bright shrink-0 mt-0.5 animate-pulse" />
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-emerald-bright uppercase tracking-wider">Pré-lance Liberado</p>
+                          <p className="text-[11px] text-white/70 leading-relaxed">
+                            O evento principal ainda não começou, mas você já pode antecipar seus lances! Aproveite para garantir sua vantagem.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-3 gap-3">
                       {[1, 2, 5].map((m) => (
                         <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
