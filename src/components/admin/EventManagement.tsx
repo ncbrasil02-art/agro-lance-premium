@@ -253,7 +253,32 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                   Defina as configurações do leilão.
                </DialogDescription>
              </DialogHeader>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-6 py-4">
+                {/* Fixed Image Preview */}
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border-2 border-white/5 bg-black/40 group">
+                  <img 
+                    src={formData.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+                    alt="Banner Preview" 
+                    className={`h-full w-full object-cover transition-all duration-700 ${!formData.banner_url ? 'opacity-20 grayscale' : ''}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                    <div>
+                      <p className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Flyer do Evento</p>
+                      <p className="text-sm font-bold text-white uppercase italic">{formData.name || "Nome do Evento"}</p>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 bg-white/10 hover:bg-gold hover:text-emerald-deep text-white text-[10px] font-bold rounded-lg border border-white/10 backdrop-blur-md"
+                      onClick={() => document.getElementById('banner-upload')?.click()}
+                    >
+                      <PlusCircle className="mr-2 h-3.5 w-3.5" /> Upload Flyer
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome do Evento</Label>
                   <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
