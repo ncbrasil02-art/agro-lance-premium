@@ -228,9 +228,16 @@
                    <SelectTrigger>
                       <SelectValue placeholder="Selecione o evento" />
                    </SelectTrigger>
-                   <SelectContent>
-                     {events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
-                   </SelectContent>
+                    <SelectContent>
+                      {events.length === 0 ? (
+                        <div className="p-2 text-xs text-center text-muted-foreground">
+                          Nenhum evento cadastrado. <br/> 
+                          Crie um evento na aba "Eventos" primeiro.
+                        </div>
+                      ) : (
+                        events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
+                      )}
+                    </SelectContent>
                  </Select>
                </div>
                 <div className="grid gap-2">
