@@ -445,7 +445,11 @@ import { Link } from "@tanstack/react-router";
                              asChild
                              title="Visualizar Lote"
                            >
-                             <Link to={`/lotes/${lot.id}`} target="_blank">
+                             <Link 
+                               to="/lotes/$lotId" 
+                               params={{ lotId: lot.id }} 
+                               target="_blank"
+                             >
                                <Eye className="h-4 w-4 text-gold" />
                              </Link>
                            </Button>

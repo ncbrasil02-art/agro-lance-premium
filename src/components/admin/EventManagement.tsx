@@ -1,5 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
+ import { Link } from "@tanstack/react-router";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
@@ -445,7 +446,11 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                               asChild
                               title="Visualizar Página Pública"
                             >
-                              <Link to={`/eventos/${event.slug}`} target="_blank">
+                              <Link 
+                                to="/eventos/$eventSlug" 
+                                params={{ eventSlug: event.slug || "" }} 
+                                target="_blank"
+                              >
                                 <Eye className="h-4 w-4 text-gold" />
                               </Link>
                             </Button>
