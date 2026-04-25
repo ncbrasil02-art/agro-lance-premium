@@ -1,5 +1,5 @@
  import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare } from "lucide-react";
  import { formatBRL } from "@/utils/format";
  import { Button } from "@/components/ui/button";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -9,7 +9,15 @@
  import { useEffect, useState } from "react";
  import { toast } from "sonner";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
- import { Card, CardContent } from "@/components/ui/card";
+ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+ import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+ } from "@/components/ui/dialog";
  
  export const Route = createFileRoute("/lotes/$lotId")({
    loader: async ({ params }) => {
@@ -43,67 +51,96 @@
    if (!genealogy) return <div className="py-10 text-center text-muted-foreground">Informação de genealogia não disponível.</div>;
  
    return (
-     <div className="relative overflow-x-auto py-8">
-       <div className="flex min-w-[600px] justify-center gap-8">
+     <div className="relative overflow-x-auto py-10 bg-muted/20 rounded-2xl border border-border/40">
+       <div className="flex min-w-[800px] justify-center gap-12 px-8">
          {/* Nível 1: Animal */}
          <div className="flex flex-col justify-center">
-           <div className="rounded-lg border-2 border-gold bg-card p-4 text-center shadow-gold">
-             <div className="text-xs font-bold uppercase text-gold">Animal</div>
-             <div className="mt-1 font-bold">Principal</div>
+           <div className="group relative">
+             <div className="absolute -inset-1 rounded-xl bg-gold/20 blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+             <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-card p-5 text-center shadow-lg w-40">
+               <Award className="h-6 w-6 text-gold mb-2" />
+               <div className="text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
+               <div className="mt-1 font-bold text-sm">Principal</div>
+             </div>
            </div>
          </div>
  
-         <div className="flex flex-col justify-center gap-12">
+         <div className="flex flex-col justify-center gap-16 relative">
+           {/* Linhas conectoras Pais */}
+           <div className="absolute -left-6 top-1/2 h-24 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-xl"></div>
+           
            {/* Nível 2: Pais */}
-           <div className="relative flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
-               <div className="text-[10px] uppercase text-muted-foreground">Pai</div>
-               <div className="mt-1 font-semibold">{genealogy.pai || "Não informado"}</div>
+           <div className="relative flex items-center group">
+             <div className="absolute -inset-0.5 rounded-lg bg-border/20 blur-sm opacity-0 group-hover:opacity-100 transition"></div>
+             <div className="relative rounded-lg border border-border bg-card p-4 text-center w-48 shadow-sm group-hover:border-gold/30 transition-smooth">
+               <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">Pai (Sire)</div>
+               <div className="font-bold text-foreground leading-tight">{genealogy.pai || "Não informado"}</div>
              </div>
            </div>
-           <div className="relative flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
-               <div className="text-[10px] uppercase text-muted-foreground">Mãe</div>
-               <div className="mt-1 font-semibold">{genealogy.mae || "Não informado"}</div>
+           <div className="relative flex items-center group">
+             <div className="absolute -inset-0.5 rounded-lg bg-border/20 blur-sm opacity-0 group-hover:opacity-100 transition"></div>
+             <div className="relative rounded-lg border border-border bg-card p-4 text-center w-48 shadow-sm group-hover:border-gold/30 transition-smooth">
+               <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">Mãe (Dam)</div>
+               <div className="font-bold text-foreground leading-tight">{genealogy.mae || "Não informado"}</div>
              </div>
            </div>
          </div>
  
-         <div className="flex flex-col justify-center gap-4">
+         <div className="flex flex-col justify-center gap-6 relative">
+           {/* Linhas conectoras Avós */}
+           <div className="absolute -left-6 top-[25%] h-12 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-lg"></div>
+           <div className="absolute -left-6 top-[75%] h-12 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-lg"></div>
+ 
            {/* Nível 3: Avós */}
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avô Paterno</div>
-               <div className="mt-0.5 font-medium">{genealogy.avo_paterno || "—"}</div>
+           {[
+             { label: "Avô Paterno", val: genealogy.avo_paterno },
+             { label: "Avó Paterna", val: genealogy.ava_paterna },
+             { label: "Avô Materno", val: genealogy.avo_materno },
+             { label: "Avó Materna", val: genealogy.ava_materna }
+           ].map((avo, i) => (
+             <div key={i} className="relative group">
+               <div className="relative rounded-lg border border-border/60 bg-card/60 p-3 text-center text-xs w-44 shadow-xs group-hover:border-gold/20 transition-smooth">
+                 <div className="text-[9px] uppercase font-medium text-muted-foreground tracking-tight mb-0.5">{avo.label}</div>
+                 <div className="font-semibold text-foreground/90">{avo.val || "—"}</div>
+               </div>
              </div>
-           </div>
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avó Paterna</div>
-               <div className="mt-0.5 font-medium">{genealogy.ava_paterna || "—"}</div>
-             </div>
-           </div>
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avô Materno</div>
-               <div className="mt-0.5 font-medium">{genealogy.avo_materno || "—"}</div>
-             </div>
-           </div>
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avó Materna</div>
-               <div className="mt-0.5 font-medium">{genealogy.ava_materna || "—"}</div>
-             </div>
-           </div>
+           ))}
          </div>
        </div>
      </div>
+   );
+ }
+ 
+ function InstallmentSimulator({ price }: { price: number }) {
+   const options = [1, 10, 20, 30, 40, 50];
+   return (
+     <Dialog>
+       <DialogTrigger asChild>
+         <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-gold hover:text-gold-bright flex items-center gap-1">
+           <Calculator className="h-3 w-3" /> Ver simulador de parcelas
+         </Button>
+       </DialogTrigger>
+       <DialogContent className="sm:max-w-[425px]">
+         <DialogHeader>
+           <DialogTitle>Simulador de Pagamento</DialogTitle>
+           <DialogDescription>
+             Veja as condições de parcelamento para este lote.
+           </DialogDescription>
+         </DialogHeader>
+         <div className="mt-4 space-y-3">
+           {options.map((opt) => (
+             <div key={opt} className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0">
+               <span className="text-sm font-medium">{opt === 1 ? "À vista (PIX/TED)" : `${opt} parcelas mensais`}</span>
+               <span className="font-bold text-foreground">{formatBRL(price / opt)}</span>
+             </div>
+           ))}
+           <div className="mt-6 rounded-lg bg-gold/5 p-3 text-[10px] text-muted-foreground flex gap-2">
+             <Info className="h-4 w-4 shrink-0 text-gold" />
+             <p>As condições finais dependem da aprovação de cadastro e podem variar conforme o regulamento do leiloeiro.</p>
+           </div>
+         </div>
+       </DialogContent>
+     </Dialog>
    );
  }
  
@@ -348,6 +385,7 @@
                   <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     ou {installments}x de <span className="text-foreground font-bold">{formatBRL(installmentValue)}</span>
                   </div>
+                  <InstallmentSimulator price={currentPrice} />
                 </div>
 
                 <div className="mt-8 space-y-4">
@@ -396,10 +434,15 @@
               </CardContent>
             </Card>
  
-           <div className="flex gap-2">
-             <Button variant="outline" className="flex-1"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
-             <Button variant="outline" className="flex-1"><Share2 className="mr-2 h-4 w-4" /> Compartilhar</Button>
-           </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="lg" className="border-border hover:bg-secondary"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
+              <Button variant="outline" size="lg" className="border-border hover:bg-secondary"><Share2 className="mr-2 h-4 w-4" /> Compartilhar</Button>
+              <Button variant="outline" size="lg" className="col-span-2 border-emerald/30 text-emerald-bright hover:bg-emerald/5" asChild>
+                <a href={`https://wa.me/5511999999999?text=Olá, gostaria de mais informações sobre o Lote ${lot.lot_number}: ${lot.animal?.name}`} target="_blank">
+                  <MessageSquare className="mr-2 h-4 w-4" /> Dúvidas? Fale no WhatsApp
+                </a>
+              </Button>
+            </div>
  
            <div className="rounded-2xl border border-border bg-card p-6">
              <h2 className="font-semibold">Pagamento</h2>

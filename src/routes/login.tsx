@@ -70,10 +70,32 @@ function LoginPage() {
         message = "E-mail ou senha incorretos.";
       } else if (message === "Email not confirmed") {
         message = "Por favor, confirme seu e-mail antes de entrar.";
+      } else if (message === "Email not confirmed") {
+        message = "Por favor, confirme seu e-mail. Verifique sua caixa de entrada e spam.";
       }
       toast.error(message || "Erro ao entrar");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      toast.error("Por favor, digite seu e-mail primeiro.");
+      return;
+    }
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+        }
+      });
+      if (error) throw error;
+      toast.success("E-mail de confirmação reenviado!");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao reenviar e-mail");
     }
   };
 
@@ -116,14 +138,24 @@ function LoginPage() {
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Entrar
             </Button>
-            <Button 
-              type="button" 
-              variant="link" 
-              className="w-full text-xs text-muted-foreground"
-              onClick={handleResetPassword}
-            >
-              Esqueceu a senha?
-            </Button>
+            <div className="flex flex-col gap-1">
+              <Button 
+                type="button" 
+                variant="link" 
+                className="h-auto p-0 text-xs text-muted-foreground"
+                onClick={handleResetPassword}
+              >
+                Esqueceu a senha?
+              </Button>
+              <Button 
+                type="button" 
+                variant="link" 
+                className="h-auto p-0 text-xs text-muted-foreground"
+                onClick={handleResendConfirmation}
+              >
+                Não recebeu o e-mail de confirmação? Reenviar
+              </Button>
+            </div>
           </div>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
