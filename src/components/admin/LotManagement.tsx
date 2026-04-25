@@ -17,7 +17,9 @@ import { Link } from "@tanstack/react-router";
       onNavigateToAnimals,
       onNavigateToEvents,
       searchQuery,
-      onSearchChange
+      onSearchChange,
+      currentPage,
+      onPageChange
     }: { 
       initialEventId?: string; 
       onEventChange?: (id: string) => void;
@@ -25,6 +27,8 @@ import { Link } from "@tanstack/react-router";
       onNavigateToEvents?: () => void;
       searchQuery: string;
       onSearchChange: (val: string) => void;
+      currentPage: number;
+      onPageChange: (val: number) => void;
     }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
@@ -47,12 +51,6 @@ import { Link } from "@tanstack/react-router";
       });
 
    const ITEMS_PER_PAGE = 8;
-   const [currentPage, setCurrentPage] = useState(1);
-
-   useEffect(() => {
-     setCurrentPage(1);
-   }, [searchQuery, selectedEventId]);
-
       const fetchData = async () => {
         setIsLoading(true);
         console.log("Fetching lots, events and animals...");
@@ -519,11 +517,11 @@ import { Link } from "@tanstack/react-router";
                     Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredLots.length)} de {filteredLots.length} registros
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
