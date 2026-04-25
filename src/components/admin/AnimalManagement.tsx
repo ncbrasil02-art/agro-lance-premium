@@ -73,8 +73,7 @@
         height: animal.height || "",
         vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
         genealogy_father: animal.genealogy?.father || "",
-        genealogy_mother: animal.genealogy?.mother || "",
-        pedigree_url: animal.pedigree_url || ""
+        genealogy_mother: animal.genealogy?.mother || ""
       });
       setIsDialogOpen(true);
     };
