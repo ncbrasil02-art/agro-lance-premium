@@ -10,6 +10,7 @@ import { createFileRoute, Navigate, Link, useNavigate, useSearch } from "@tansta
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
+import { UserManagement } from "@/components/admin/UserManagement";
  
 type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
 
@@ -298,10 +299,10 @@ function AdminLayout() {
             />
           )}
           {activeTab === "users" && (
-            <Card>
-              <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
-              <CardContent><p className="text-muted-foreground">Módulo de gestão de usuários em desenvolvimento.</p></CardContent>
-            </Card>
+            <UserManagement 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+            />
           )}
            {activeTab === "settings" && (
              <Card>
