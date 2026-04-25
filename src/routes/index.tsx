@@ -12,7 +12,7 @@ import heroImage from "@/assets/hero-horse.jpg";
     loader: async () => {
       const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
         supabase.from("events")
-          .select("*, lots(id)")
+          .select("*, lots!lots_event_id_fkey(id)")
           .or("status.eq.live,status.eq.scheduled")
           .order("start_date", { ascending: true })
           .limit(6),
@@ -22,7 +22,7 @@ import heroImage from "@/assets/hero-horse.jpg";
           .order("created_at", { ascending: false })
           .limit(6),
         supabase.from("events")
-          .select("*, lots(id)")
+          .select("*, lots!lots_event_id_fkey(id)")
           .eq("status", "finished")
           .order("start_date", { ascending: false })
           .limit(3),

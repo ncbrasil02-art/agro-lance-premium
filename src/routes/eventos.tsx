@@ -14,7 +14,7 @@ export const Route = createFileRoute("/eventos")({
     loader: async () => {
       const { data: events, error } = await supabase
         .from("events")
-        .select("*, lots(id)")
+        .select("*, lots!lots_event_id_fkey(id)")
         .order("start_date");
  
       if (error) throw error;
