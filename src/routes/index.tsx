@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
   import { eventSchema, lotSchema, announcementSchema, ValidatedEvent, ValidatedLot } from "@/lib/schemas";
   import { z } from "zod";
 import heroImage from "@/assets/hero-horse.jpg";
+import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   export const Route = createFileRoute("/")({
     loader: async () => {
@@ -232,6 +233,7 @@ function Home() {
                   Ver próximos eventos <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
+              <EventRequestDialog />
             </div>
 
             {/* Stats inline */}
