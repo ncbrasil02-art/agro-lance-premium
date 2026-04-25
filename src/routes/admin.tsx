@@ -15,11 +15,17 @@ export const Route = createFileRoute("/admin")({
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
  
- type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
+  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
  
 function AdminLayout() {
    const { profile, isLoading, signOut } = useAuth();
    const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+
+   const handleManageLots = (eventId: string) => {
+     setSelectedEventId(eventId);
+     setActiveTab("lots");
+   };
 
   if (isLoading) {
     return (
@@ -185,8 +191,13 @@ function AdminLayout() {
             </>
           )}
 
-          {activeTab === "events" && <EventManagement />}
-          {activeTab === "lots" && <LotManagement />}
+          {activeTab === "events" && <EventManagement onManageLots={handleManageLots} />}
+          {activeTab === "lots" && (
+            <LotManagement 
+              initialEventId={selectedEventId} 
+              onEventChange={setSelectedEventId} 
+            />
+          )}
           {activeTab === "animals" && <AnimalManagement />}
           {activeTab === "users" && (
             <Card>
