@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/lotes.$lotId")({
+export const Route = createFileRoute("/lotes/$lotId")({
   loader: async ({ params }) => {
     const [lotRes, bidsRes] = await Promise.all([
       supabase
@@ -116,7 +116,7 @@ function InstallmentSimulator({ price }: { price: number }) {
 }
 
 function LotDetail() {
-  const { lot: initialLot, initialBids } = Route.useLoaderData();
+  const { lot: initialLot, initialBids } = Route.useLoaderData() as any;
   const { user, profile } = useAuth();
   const [lot, setLot] = useState(initialLot);
   const [recentBids, setRecentBids] = useState<any[]>(initialBids);

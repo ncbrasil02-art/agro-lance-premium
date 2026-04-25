@@ -28,9 +28,10 @@
        photos_urls: "",
        weight: "",
        height: "",
-       vaccination_records: "",
-       genealogy_father: "",
-       genealogy_mother: ""
+        vaccination_records: "",
+        genealogy_father: "",
+        genealogy_mother: "",
+        description: ""
     });
 
     const resetForm = () => {
