@@ -48,30 +48,35 @@ function EventDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Hero Section with Blur and Rectangular Banner */}
-      <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24">
-        {/* Atmospheric Background Blur */}
-        <div className="absolute inset-0 z-0 h-[70vh]">
-          <img 
-            src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
-            alt="" 
-            className="h-full w-full object-cover blur-3xl opacity-15" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
-        </div>
+      {/* Header com transição suave para o conteúdo */}
+      <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
+        <img 
+          src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+          alt="" 
+          className="h-full w-full object-cover blur-sm brightness-50" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+      </div>
 
-        <div className="container relative z-10 mx-auto px-4">
-          <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr] items-center">
+      <section className="relative -mt-40 md:-mt-60 z-10 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.8fr] items-start">
             {/* Main Rectangular Banner */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gold/20 blur-2xl rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative aspect-[4/5] md:aspect-auto overflow-hidden rounded-[2.5rem] border border-white/10 bg-emerald-deep shadow-2xl transition-transform duration-500 hover:scale-[1.02]">
+            <div className="relative group mx-auto w-full max-w-md lg:max-w-none">
+              <div className="absolute -inset-2 bg-gold/10 blur-3xl rounded-[2.5rem] opacity-30 group-hover:opacity-50 transition-opacity" />
+              <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30">
                 <img 
                   src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
                   alt={event.name} 
-                  className="h-full w-full object-cover" 
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/80 via-transparent to-transparent opacity-60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-8 left-8 right-8">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
+                    <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em]">Flyer Oficial</span>
+                  </div>
+                </div>
               </div>
             </div>
 
