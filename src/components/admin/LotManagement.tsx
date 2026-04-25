@@ -164,7 +164,7 @@
               allows_pre_bidding: formData.allows_pre_bidding,
               is_featured: formData.is_featured,
               payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
-              end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+              end_date: null // Lotes agora seguem a data de término do evento por padrão
             });
             if (error) throw error;
             toast.success("Lote alocado com sucesso");
