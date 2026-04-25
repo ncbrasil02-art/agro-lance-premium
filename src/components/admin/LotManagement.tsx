@@ -497,8 +497,14 @@ import { Link } from "@tanstack/react-router";
             ) : (
               <>
                 <Table>
-                  <TableHeader className="bg-muted/50">
+                  <TableHeader className="bg-muted/50 select-none">
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox 
+                          checked={lots.length > 0 && selectedIds.length === lots.length}
+                          onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                        />
+                      </TableHead>
                       <TableHead className="w-[80px] cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('lot_number')}>
                         <div className="flex items-center">Nº Lote <SortIndicator column="lot_number" /></div>
                       </TableHead>
@@ -526,7 +532,13 @@ import { Link } from "@tanstack/react-router";
                       </TableRow>
                     ) : (
                       lots.map((lot: any) => (
-                        <TableRow key={lot.id}>
+                        <TableRow key={lot.id} className={selectedIds.includes(lot.id) ? "bg-gold/5" : ""}>
+                          <TableCell>
+                            <Checkbox 
+                              checked={selectedIds.includes(lot.id)}
+                              onCheckedChange={(checked) => handleSelectOne(lot.id, !!checked)}
+                            />
+                          </TableCell>
                           <TableCell className="font-bold">{lot.lot_number}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
