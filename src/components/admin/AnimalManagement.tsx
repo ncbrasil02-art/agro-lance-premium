@@ -14,7 +14,8 @@
   export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
-    const [formData, setFormData] = useState({
+     const [formData, setFormData] = useState<any>({
+         seller_id: "",
        name: "",
        species: "Equino",
        breed: "",
@@ -36,7 +37,8 @@
 
     const resetForm = () => {
       setEditingAnimal(null);
-      setFormData({
+       setFormData({
+         seller_id: "",
         name: "",
         species: "Equino",
         breed: "",
@@ -59,7 +61,8 @@
 
     const handleEdit = (animal: any) => {
       setEditingAnimal(animal);
-      setFormData({
+       setFormData({
+         seller_id: animal.seller_id || "",
         name: animal.name || "",
         species: animal.species || "Equino",
         breed: animal.breed || "",
@@ -91,7 +94,8 @@
         if (editingAnimal) {
           const { error } = await supabase
             .from("animals")
-            .update({
+             .update({
+               seller_id: formData.seller_id || null,
               name: formData.name,
               species: formData.species,
               breed: formData.breed,
@@ -113,7 +117,8 @@
           if (error) throw error;
           toast.success("Animal atualizado com sucesso");
         } else {
-          const { error } = await supabase.from("animals").insert({
+           const { error } = await supabase.from("animals").insert({
+             seller_id: formData.seller_id || null,
             name: formData.name,
             species: formData.species,
             breed: formData.breed,
@@ -143,7 +148,13 @@
         toast.error("Erro ao salvar animal: " + error.message);
       }
     };
-   const [animals, setAnimals] = useState<any[]>([]);
+    const [animals, setAnimals] = useState<any[]>([]);
+    const [sellers, setSellers] = useState<any[]>([]);
+    const fetchSellers = async () => {
+      const { data } = await supabase.from("sellers").select("id, name").order("name");
+      if (data) setSellers(data);
+    };
+
    const [isLoading, setIsLoading] = useState(true);
    const [searchQuery, setSearchQuery] = useState("");
  
@@ -170,9 +181,10 @@
       }
     };
  
-   useEffect(() => {
-     fetchAnimals();
-   }, []);
+    useEffect(() => {
+      fetchAnimals();
+      fetchSellers();
+    }, []);
  
    const filteredAnimals = animals.filter(animal => 
      animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -426,11 +438,26 @@
                      </Button>
                    </div>
                   </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="location">Localização</Label>
-                  <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="location">Localização</Label>
+                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Fazenda, Cidade - UF" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="seller">Vendedor</Label>
+                    <Select onValueChange={(v) => setFormData({ ...formData, seller_id: v })} value={formData.seller_id}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o vendedor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sellers.map((seller) => (
+                          <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-             </div>
+              </div>
              <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
                 <Button className="bg-gold text-emerald-deep" onClick={handleSave}>
