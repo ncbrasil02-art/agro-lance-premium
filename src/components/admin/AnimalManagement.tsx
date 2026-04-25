@@ -4,7 +4,46 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2 } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle } from "lucide-react";
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+ import { Label } from "@/components/ui/label";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+   const [isCreating, setIsCreating] = useState(false);
+   const [newAnimal, setNewAnimal] = useState({
+     name: "",
+     species: "Equino",
+     breed: "",
+     registration_number: "",
+     sex: "M",
+     location: ""
+   });
+ 
+   const handleCreate = async () => {
+     if (!newAnimal.name || !newAnimal.breed) {
+       toast.error("Preencha o nome e a raça");
+       return;
+     }
+ 
+     try {
+       const { error } = await supabase.from("animals").insert({
+         name: newAnimal.name,
+         species: newAnimal.species,
+         breed: newAnimal.breed,
+         registration_number: newAnimal.registration_number,
+         sex: newAnimal.sex,
+         location: newAnimal.location,
+         internal_code: `AN-${Math.floor(Math.random() * 10000)}`
+       });
+ 
+       if (error) throw error;
+       toast.success("Animal cadastrado com sucesso");
+       setIsCreating(false);
+       fetchAnimals();
+     } catch (error: any) {
+       toast.error("Erro ao cadastrar animal: " + error.message);
+     }
+   };
+ 
  import { toast } from "sonner";
  
  export function AnimalManagement() {
@@ -63,9 +102,64 @@
              onChange={(e) => setSearchQuery(e.target.value)}
            />
          </div>
-         <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
-           <Plus className="mr-2 h-4 w-4" /> Novo Animal
-         </Button>
+         <Dialog open={isCreating} onOpenChange={setIsCreating}>
+           <DialogTrigger asChild>
+             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+               <PlusCircle className="mr-2 h-4 w-4" /> Novo Animal
+             </Button>
+           </DialogTrigger>
+           <DialogContent className="sm:max-w-[425px]">
+             <DialogHeader>
+               <DialogTitle>Cadastrar Novo Animal</DialogTitle>
+               <DialogDescription>
+                 Preencha as informações básicas do animal.
+               </DialogDescription>
+             </DialogHeader>
+             <div className="grid gap-4 py-4">
+               <div className="grid gap-2">
+                 <Label htmlFor="name">Nome</Label>
+                 <Input value={newAnimal.name} onChange={(e) => setNewAnimal({ ...newAnimal, name: e.target.value })} />
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="grid gap-2">
+                   <Label htmlFor="species">Espécie</Label>
+                   <Select onValueChange={(v) => setNewAnimal({ ...newAnimal, species: v })} defaultValue={newAnimal.species}>
+                     <SelectTrigger><SelectValue /></SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="Equino">Equino</SelectItem>
+                       <SelectItem value="Bovino">Bovino</SelectItem>
+                       <SelectItem value="Ovino">Ovino</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="sex">Sexo</Label>
+                   <Select onValueChange={(v) => setNewAnimal({ ...newAnimal, sex: v })} defaultValue={newAnimal.sex}>
+                     <SelectTrigger><SelectValue /></SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="M">Macho</SelectItem>
+                       <SelectItem value="F">Fêmea</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+               </div>
+               <div className="grid gap-2">
+                 <Label htmlFor="breed">Raça</Label>
+                 <Input value={newAnimal.breed} onChange={(e) => setNewAnimal({ ...newAnimal, breed: e.target.value })} />
+               </div>
+               <div className="grid gap-2">
+                 <Label htmlFor="reg">Registro</Label>
+                 <Input value={newAnimal.registration_number} onChange={(e) => setNewAnimal({ ...newAnimal, registration_number: e.target.value })} />
+               </div>
+             </div>
+             <DialogFooter>
+               <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
+               <Button className="bg-gold text-emerald-deep" onClick={handleCreate}>
+                 Salvar Animal
+               </Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
        </div>
  
        <Card>
