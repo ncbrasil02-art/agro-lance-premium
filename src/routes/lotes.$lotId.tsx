@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer } from "lucide-react";
+import { getEffectiveLotStatus } from "@/utils/auction-status";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/auctions/status-badge";
@@ -190,28 +191,13 @@ function LotDetail() {
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);
   
-  // Dynamic status logic
-  const getLotStatus = () => {
-    const now = new Date();
-    const eventStart = lot.event?.start_date ? new Date(lot.event.start_date) : null;
-    const eventEnd = lot.event?.end_date ? new Date(lot.event.end_date) : null;
-    
-    if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
-    if (eventEnd && now >= eventEnd) return 'finished';
-    if (lot.status === 'active') return 'recebendo_lances';
-    
-    if (eventStart && now < eventStart) {
-      return lot.event?.allows_pre_bidding ? 'pre_lance' : 'loteamento';
-    }
-    
-    if (eventStart && now >= eventStart && (!eventEnd || now < eventEnd)) {
-      return 'recebendo_lances';
-    }
-    
-    return lot.status;
-  };
-
-  const dynamicStatus = getLotStatus();
+  const dynamicStatus = getEffectiveLotStatus({
+    status: lot.status,
+    event_status: lot.event?.status,
+    event_start_date: lot.event?.start_date,
+    event_end_date: lot.event?.end_date,
+    allows_pre_bidding: lot.event?.allows_pre_bidding
+  });
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
@@ -426,7 +412,7 @@ function LotDetail() {
                       ))}
                     </div>
 
-                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter" disabled={isBidding || (lot.status !== "active" && lot.status !== "upcoming" && lot.status !== "open")} onClick={() => placeBid(nextBid)}>
+                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter" disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} onClick={() => placeBid(nextBid)}>
                       {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
                     </Button>
                     
