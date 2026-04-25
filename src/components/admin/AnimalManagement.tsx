@@ -534,6 +534,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                   </div>
                 </div>
                )}
+            )}
           </CardContent>
        </Card>
      </div>
