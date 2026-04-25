@@ -275,22 +275,24 @@ function LotDetail() {
             </div>
 
             <Tabs defaultValue="detalhes" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5 bg-emerald-deep/20 border border-white/5 rounded-2xl p-1">
-                <TabsTrigger value="detalhes" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Descrição</TabsTrigger>
-                <TabsTrigger value="genealogia" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Genealogia</TabsTrigger>
-                <TabsTrigger value="saude" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Saúde</TabsTrigger>
-                <TabsTrigger value="videos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Vídeo</TabsTrigger>
-                <TabsTrigger value="documentos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Documentos</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+                <TabsList className="inline-flex md:grid w-max md:w-full md:grid-cols-5 bg-emerald-deep/20 border border-white/5 rounded-2xl p-1 gap-1">
+                  <TabsTrigger value="detalhes" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Descrição</TabsTrigger>
+                  <TabsTrigger value="genealogia" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Genealogia</TabsTrigger>
+                  <TabsTrigger value="saude" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Saúde</TabsTrigger>
+                  <TabsTrigger value="videos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Vídeo</TabsTrigger>
+                  <TabsTrigger value="documentos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Documentos</TabsTrigger>
+                </TabsList>
+              </div>
               
               <TabsContent value="detalhes" className="mt-6 space-y-6">
-                <Card className="bg-card/50 border-white/5 p-8 rounded-3xl">
+                <Card className="bg-card/50 border-white/5 p-6 md:p-8 rounded-3xl">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="h-1px flex-1 bg-white/10" />
-                    <span className="text-xs font-black text-gold uppercase tracking-[0.3em]">Descrição do Animal</span>
-                    <div className="h-1px flex-1 bg-white/10" />
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em]">Descrição do Animal</span>
+                    <div className="h-px flex-1 bg-white/10" />
                   </div>
-                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap text-lg">
+                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap text-base md:text-lg">
                     {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."}
                   </p>
                   
