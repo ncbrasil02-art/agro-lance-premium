@@ -9,7 +9,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
   loader: async ({ params }) => {
     const { data: event, error } = await supabase
       .from("events")
-      .select("*, lots(*, animal:animals(*))")
+      .select("*, lots!lots_event_id_fkey(*, animal:animals(*))")
       .eq("slug", params.eventSlug)
       .maybeSingle();
 

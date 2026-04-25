@@ -16,9 +16,9 @@ import heroImage from "@/assets/hero-horse.jpg";
       logger.info("Iniciando carregamento da Home");
       try {
         const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
-        supabase.from("events")
-          .select("*, lots(id)")
-          .or("status.eq.live,status.eq.scheduled")
+         supabase.from("events")
+           .select("*, lots!lots_event_id_fkey(id)")
+           .or("status.eq.live,status.eq.scheduled")
           .order("start_date", { ascending: true })
           .limit(6),
          supabase.from("lots")
@@ -26,9 +26,9 @@ import heroImage from "@/assets/hero-horse.jpg";
            .order("is_featured", { ascending: false })
           .order("created_at", { ascending: false })
           .limit(6),
-        supabase.from("events")
-          .select("*, lots(id)")
-          .eq("status", "finished")
+         supabase.from("events")
+           .select("*, lots!lots_event_id_fkey(id)")
+           .eq("status", "finished")
           .order("start_date", { ascending: false })
           .limit(3),
         supabase.from("site_settings")

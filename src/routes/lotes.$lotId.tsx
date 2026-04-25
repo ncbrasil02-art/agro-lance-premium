@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles } from "lucide-react";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/auctions/status-badge";
 import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
+import { lotSchema } from "@/lib/schemas";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -32,11 +33,11 @@ export const Route = createFileRoute("/lotes/$lotId")({
     }
 
     const [lotRes, bidsRes] = await Promise.all([
-      supabase
-        .from("lots")
-        .select("*, animal:animals(*), event:events(*)")
-        .eq("id", lotId)
-        .maybeSingle(),
+       supabase
+         .from("lots")
+         .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+         .eq("id", lotId)
+         .maybeSingle(),
       supabase
         .from("bids")
         .select("*, profile:profiles(full_name)")
@@ -49,13 +50,19 @@ export const Route = createFileRoute("/lotes/$lotId")({
       console.error("Lote não encontrado ou erro:", lotRes.error);
       throw notFound();
     }
-    
-    return { lot: lotRes.data, initialBids: bidsRes.data || [] };
+
+    try {
+      const validatedLot = lotSchema.parse(lotRes.data);
+      return { lot: validatedLot, initialBids: bidsRes.data || [] };
+    } catch (e) {
+      console.error("Erro de validação de dados do lote:", e);
+      throw notFound();
+    }
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
       { title: `Lote ${loaderData.lot.lot_number} — ${loaderData.lot.animal?.name} — Auditor de Lances` },
-      { name: "description", content: `${loaderData.lot.animal?.name}, ${loaderData.lot.animal?.breed}. Lance atual ${formatBRL(loaderData.lot.current_price || loaderData.lot.starting_price)}.` },
+      { name: "description", content: `${loaderData.lot.animal?.name}, ${loaderData.lot.animal?.breed}. Lance atual ${formatBRL(loaderData.lot.current_price || loaderData.lot.starting_price || 0)}.` },
     ] : [],
   }),
   notFoundComponent: () => (
@@ -185,6 +192,20 @@ function LotDetail() {
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
+  const getAge = (birthDate: string) => {
+    if (!birthDate) return null;
+    const birth = new Date(birthDate);
+    const now = new Date();
+    let years = now.getFullYear() - birth.getFullYear();
+    let months = now.getMonth() - birth.getMonth();
+    if (months < 0 || (months === 0 && now.getDate() < birth.getDate())) {
+      years--;
+      months += 12;
+    }
+    if (years === 0) return `${months} meses`;
+    return `${years} anos e ${months} meses`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
@@ -237,27 +258,37 @@ function LotDetail() {
                 <TabsTrigger value="genealogia" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Genealogia</TabsTrigger>
                 <TabsTrigger value="saude" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Saúde</TabsTrigger>
                 <TabsTrigger value="videos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Vídeo</TabsTrigger>
-                <TabsTrigger value="documentos" className="hidden lg:inline-flex rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Documentos</TabsTrigger>
+                <TabsTrigger value="documentos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Documentos</TabsTrigger>
               </TabsList>
               
               <TabsContent value="detalhes" className="mt-6 space-y-6">
-                <Card className="bg-card/50 border-white/5 p-6 rounded-3xl">
-                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap">
+                <Card className="bg-card/50 border-white/5 p-8 rounded-3xl">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="h-1px flex-1 bg-white/10" />
+                    <span className="text-xs font-black text-gold uppercase tracking-[0.3em]">Descrição do Animal</span>
+                    <div className="h-1px flex-1 bg-white/10" />
+                  </div>
+                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap text-lg">
                     {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."}
                   </p>
-                  <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-[10px] uppercase text-gold/60 font-bold mb-1">Raça</div>
-                      <div className="font-bold text-white text-lg">{lot.animal?.breed}</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-[10px] uppercase text-gold/60 font-bold mb-1">Sexo</div>
-                      <div className="font-bold text-white text-lg">{lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea'}</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-[10px] uppercase text-gold/60 font-bold mb-1">Localização</div>
-                      <div className="font-bold text-white text-lg">{lot.animal?.location || "Brasil"}</div>
-                    </div>
+                  
+                  <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { icon: Award, label: "Raça", value: lot.animal?.breed },
+                      { icon: Info, label: "Sexo", value: lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea' },
+                      { icon: Calendar, label: "Idade", value: getAge(lot.animal?.birth_date) },
+                      { icon: MapPin, label: "Local", value: lot.animal?.location || "Brasil" },
+                      { icon: Scale, label: "Peso", value: lot.animal?.weight ? `${lot.animal.weight} kg` : null },
+                      { icon: Ruler, label: "Altura", value: lot.animal?.height ? `${lot.animal.height} m` : null },
+                      { icon: Sparkles, label: "Pelagem", value: lot.animal?.color },
+                      { icon: Fingerprint, label: "Registro", value: lot.animal?.registration_number },
+                    ].filter(item => item.value).map((item) => (
+                      <div key={item.label} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center">
+                        <item.icon className="h-4 w-4 text-gold/60 mb-2" />
+                        <div className="text-[9px] uppercase text-gold/40 font-black tracking-widest mb-1">{item.label}</div>
+                        <div className="font-bold text-white text-sm">{item.value}</div>
+                      </div>
+                    ))}
                   </div>
                 </Card>
               </TabsContent>
@@ -298,15 +329,29 @@ function LotDetail() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="documentos" className="mt-6 space-y-3">
-                {lot.animal?.pedigree_url && (
-                  <Button variant="outline" className="w-full h-14 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
-                    <a href={lot.animal.pedigree_url} target="_blank">
-                      <span className="flex items-center font-bold"><FileText className="mr-3" /> VER PEDIGREE COMPLETO</span>
-                      <ChevronRight />
-                    </a>
+              <TabsContent value="documentos" className="mt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {lot.animal?.pedigree_url && (
+                    <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
+                      <a href={lot.animal.pedigree_url} target="_blank">
+                        <span className="flex items-center font-bold"><FileText className="mr-3 h-6 w-6 text-gold" /> PEDIGREE COMPLETO</span>
+                        <Download className="h-5 w-5" />
+                      </a>
+                    </Button>
+                  )}
+                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando encarte do lote...")}>
+                    <span className="flex items-center font-bold"><Download className="mr-3 h-6 w-6 text-gold" /> ENCARTE DO LOTE (PDF)</span>
+                    <Download className="h-5 w-5" />
                   </Button>
-                )}
+                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando exames laboratoriais...")}>
+                    <span className="flex items-center font-bold"><Stethoscope className="mr-3 h-6 w-6 text-gold" /> LAUDOS & EXAMES</span>
+                    <Download className="h-5 w-5" />
+                  </Button>
+                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Visualizando histórico reprodutivo...")}>
+                    <span className="flex items-center font-bold"><Fingerprint className="mr-3 h-6 w-6 text-gold" /> HISTÓRICO REPRODUTIVO</span>
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
@@ -332,10 +377,17 @@ function LotDetail() {
                         </div>
                       </div>
                     </div>
-                    <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                  <div className="pt-6 border-t border-white/5 space-y-4">
+                    <div className="flex items-center justify-between">
                       <div className="text-white/60 text-sm font-bold">{installments}x <span className="text-white">{formatBRL(installmentValue)}</span></div>
                       <InstallmentSimulator price={currentPrice} />
                     </div>
+                    
+                    <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center gap-2 group" onClick={() => toast.info("Gerando encarte PDF...")}>
+                      <Download className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Baixar Encarte do Lote (PDF)</span>
+                    </Button>
+                  </div>
                   </div>
 
                   <div className="space-y-4">

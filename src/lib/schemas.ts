@@ -1,3 +1,4 @@
+ import { z } from "zod";
  
  export const siteSettingsSchema = z.object({
    key: z.string(),
@@ -9,7 +10,6 @@
    text: z.string().default(""),
    link: z.string().nullable().optional(),
  });
- import { z } from "zod";
  
  export const eventSchema = z.object({
    id: z.string().uuid(),
@@ -33,6 +33,17 @@
    breed: z.string().nullable().optional(),
    species: z.string().nullable().optional(),
    photos: z.array(z.string().url()).nullable().optional(),
+   description: z.string().nullable().optional(),
+   birth_date: z.string().nullable().optional(),
+   registration_number: z.string().nullable().optional(),
+   color: z.string().nullable().optional(),
+   weight: z.number().nullable().optional(),
+   height: z.number().nullable().optional(),
+   sex: z.string().nullable().optional(),
+   location: z.string().nullable().optional(),
+   genealogy: z.any().nullable().optional(),
+   youtube_url: z.string().nullable().optional(),
+   pedigree_url: z.string().nullable().optional(),
  });
  
  export const lotSchema = z.object({
