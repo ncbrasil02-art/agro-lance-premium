@@ -22,8 +22,9 @@
       location: "",
       youtube_url: "",
       pedigree_url: "",
-      color: "",
-      birth_date: ""
+       color: "",
+       birth_date: "",
+       photos_urls: ""
     });
 
     const resetForm = () => {
@@ -38,7 +39,8 @@
         youtube_url: "",
         pedigree_url: "",
         color: "",
-        birth_date: ""
+        birth_date: "",
+        photos_urls: ""
       });
     };
 
@@ -54,7 +56,8 @@
         youtube_url: animal.youtube_url || "",
         pedigree_url: animal.pedigree_url || "",
         color: animal.color || "",
-        birth_date: animal.birth_date || ""
+        birth_date: animal.birth_date || "",
+        photos_urls: animal.photos ? animal.photos.join(", ") : ""
       });
       setIsDialogOpen(true);
     };
@@ -79,7 +82,8 @@
               youtube_url: formData.youtube_url,
               pedigree_url: formData.pedigree_url,
               color: formData.color,
-              birth_date: formData.birth_date || null
+              birth_date: formData.birth_date || null,
+              photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
             })
             .eq("id", editingAnimal.id);
           if (error) throw error;
@@ -96,7 +100,8 @@
             pedigree_url: formData.pedigree_url,
             color: formData.color,
             birth_date: formData.birth_date || null,
-            internal_code: `AN-${Math.floor(Math.random() * 10000)}`
+            internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
+            photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
           });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
@@ -238,6 +243,10 @@
                 <div className="grid gap-2">
                   <Label htmlFor="pedigree">Link da Genealogia (PDF ou Imagem)</Label>
                   <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="https://..." />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="photos">URLs das Fotos (separadas por vírgula)</Label>
+                  <Input value={formData.photos_urls} onChange={(e) => setFormData({ ...formData, photos_urls: e.target.value })} placeholder="https://link1.com, https://link2.com" />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="location">Localização</Label>
