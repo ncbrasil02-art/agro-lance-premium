@@ -180,8 +180,8 @@ function LotDetail() {
     }
   };
 
-  const currentPrice = lot.current_price || lot.starting_price;
-  const nextBid = currentPrice + lot.bid_increment;
+  const currentPrice = lot?.current_price || lot?.starting_price || 0;
+  const nextBid = currentPrice + (lot?.bid_increment || 0);
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
@@ -219,7 +219,7 @@ function LotDetail() {
                 <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute left-6 top-6 flex gap-2">
-                  <StatusBadge status={lot.status as any} />
+                  <StatusBadge status={lot?.status} />
                 </div>
               </div>
               <div className="grid grid-cols-5 gap-3">
@@ -320,7 +320,7 @@ function LotDetail() {
                       <Gavel className="h-4 w-4" />
                       <span className="text-[10px] font-black uppercase tracking-[0.2em]">Painel do Licitante</span>
                     </div>
-                    <h2 className="text-4xl font-black text-white tracking-tight">{lot.animal?.name}</h2>
+                  <h2 className="text-4xl font-black text-white tracking-tight">{lot?.animal?.name || "Sem nome"}</h2>
                   </div>
 
                   <div className="p-8 rounded-[2rem] bg-black/40 border border-white/5 space-y-6">
