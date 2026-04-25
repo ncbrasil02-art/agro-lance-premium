@@ -30,9 +30,11 @@
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
   const [customHealthItem, setCustomHealthItem] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
   
      const [formData, setFormData] = useState<any>({
-         seller_id: "",
+        seller_id: "",
+        category_id: "",
        name: "",
        species: "Equino",
        breed: "",
@@ -58,6 +60,7 @@
       setEditingAnimal(null);
        setFormData({
          seller_id: "",
+         category_id: "",
         name: "",
         species: "Equino",
         breed: "",
@@ -84,6 +87,7 @@
       setEditingAnimal(animal);
        setFormData({
          seller_id: animal.seller_id || "",
+         category_id: animal.category_id || "",
         name: animal.name || "",
         species: animal.species || "Equino",
         breed: animal.breed || "",
@@ -119,6 +123,7 @@
             .from("animals")
              .update({
                seller_id: formData.seller_id || null,
+               category_id: formData.category_id || null,
               name: formData.name,
               species: formData.species,
               breed: formData.breed,
@@ -143,6 +148,7 @@
         } else {
            const { error } = await supabase.from("animals").insert({
              seller_id: formData.seller_id || null,
+             category_id: formData.category_id || null,
             name: formData.name,
             species: formData.species,
             breed: formData.breed,
@@ -175,6 +181,12 @@
     };
     const [animals, setAnimals] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
+
+    const fetchCategories = async () => {
+      const { data } = await supabase.from("categories").select("id, name").order("name");
+      if (data) setCategories(data);
+    };
+
     const fetchSellers = async () => {
       const { data } = await supabase.from("sellers").select("id, name").order("name");
       if (data) setSellers(data);
@@ -187,10 +199,10 @@
       setIsLoading(true);
       console.log("Fetching animals...");
       try {
-        const { data, error } = await supabase
-          .from("animals")
-          .select("*")
-          .order("created_at", { ascending: false });
+         const { data, error } = await supabase
+           .from("animals")
+           .select("*, categories(name)")
+           .order("created_at", { ascending: false });
 
         if (error) {
           console.error("Error fetching animals:", error);
@@ -208,6 +220,7 @@
  
     useEffect(() => {
       fetchAnimals();
+      fetchCategories();
       fetchSellers();
     }, []);
  
@@ -288,23 +301,34 @@
                      placeholder="Fale um pouco sobre as qualidades do animal..."
                    />
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="species">Espécie</Label>
-                     <Select onValueChange={(v) => setFormData({ ...formData, species: v })} value={formData.species}>
-                       <SelectTrigger id="species"><SelectValue /></SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="Equino">Equino</SelectItem>
-                         <SelectItem value="Bovino">Bovino</SelectItem>
-                         <SelectItem value="Ovino">Ovino</SelectItem>
-                       </SelectContent>
-                     </Select>
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="breed">Raça</Label>
-                     <Input id="breed" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
-                   </div>
-                 </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="category">Categoria</Label>
+                      <Select onValueChange={(v) => setFormData({ ...formData, category_id: v })} value={formData.category_id}>
+                        <SelectTrigger id="category"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="species">Espécie</Label>
+                      <Select onValueChange={(v) => setFormData({ ...formData, species: v })} value={formData.species}>
+                        <SelectTrigger id="species"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Equino">Equino</SelectItem>
+                          <SelectItem value="Bovino">Bovino</SelectItem>
+                          <SelectItem value="Ovino">Ovino</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="breed">Raça</Label>
+                      <Input id="breed" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
+                    </div>
+                  </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    <div className="grid gap-2">
                      <Label htmlFor="sex">Sexo</Label>
@@ -593,7 +617,7 @@
                  <TableRow>
                     <TableHead className="w-[80px]">Foto</TableHead>
                     <TableHead>Nome</TableHead>
-                   <TableHead>Espécie/Raça</TableHead>
+                    <TableHead>Categoria/Raça</TableHead>
                    <TableHead>Registro</TableHead>
                    <TableHead>Sexo</TableHead>
                    <TableHead className="text-right">Ações</TableHead>
@@ -622,8 +646,13 @@
                             </div>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium">{animal.name}</TableCell>
-                       <TableCell>{animal.species} / {animal.breed}</TableCell>
+                         <TableCell className="font-medium">
+                           <div>{animal.name}</div>
+                           {animal.categories?.name && (
+                             <div className="text-[10px] text-muted-foreground uppercase">{animal.categories.name}</div>
+                           )}
+                         </TableCell>
+                        <TableCell>{animal.species} / {animal.breed}</TableCell>
                        <TableCell>{animal.registration_number}</TableCell>
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
                       <TableCell className="text-right">
