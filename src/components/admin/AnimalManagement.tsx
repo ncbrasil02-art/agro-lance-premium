@@ -11,7 +11,15 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
   import { toast } from "sonner";
  
-  export function AnimalManagement({ onNavigateToLots }: { onNavigateToLots?: () => void }) {
+  export function AnimalManagement({ 
+    onNavigateToLots,
+    searchQuery,
+    onSearchChange 
+  }: { 
+    onNavigateToLots?: () => void;
+    searchQuery: string;
+    onSearchChange: (val: string) => void;
+  }) {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
     const [formData, setFormData] = useState({
@@ -149,8 +157,6 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
     };
    const [animals, setAnimals] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
-   const [searchQuery, setSearchQuery] = useState("");
- 
     const fetchAnimals = async () => {
       setIsLoading(true);
       console.log("Fetching animals...");
@@ -219,12 +225,12 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
           </div>
          <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-           <Input
-             placeholder="Buscar por nome ou registro..."
-             className="pl-10"
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-           />
+            <Input
+              placeholder="Buscar por nome ou registro..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
