@@ -7,7 +7,7 @@ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from
  import { LotCard } from "@/components/auctions/lot-card";
   import { supabase } from "@/integrations/supabase/client";
   import { formatBRL } from "@/utils/format";
-  import { eventSchema, lotSchema, announcementSchema } from "@/lib/schemas";
+  import { eventSchema, lotSchema, announcementSchema, ValidatedEvent, ValidatedLot } from "@/lib/schemas";
   import { z } from "zod";
 import heroImage from "@/assets/hero-horse.jpg";
 
@@ -72,7 +72,7 @@ import heroImage from "@/assets/hero-horse.jpg";
 function Home() {
     const { events, lots, pastEvents, announcement } = Route.useLoaderData();
  
-    const mapEvent = (e: any) => ({
+    const mapEvent = (e: ValidatedEvent) => ({
      id: e.id,
      slug: e.slug || "",
      name: e.name,
@@ -93,7 +93,7 @@ function Home() {
     const mappedEvents = events.map(mapEvent);
     const mappedPastEvents = pastEvents.map(mapEvent);
  
-   const mappedLots = lots.map((l: any) => ({
+    const mappedLots = lots.map((l: ValidatedLot) => ({
      id: l.id,
      number: l.lot_number,
      eventId: l.event_id,
@@ -109,13 +109,13 @@ function Home() {
      status: l.status as any,
    }));
  
-     const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
-     const upcomingEvents = mappedEvents.filter((e: any) => e.status === "scheduled");
+      const liveEvents = mappedEvents.filter((e) => e.status === "live");
+      const upcomingEvents = mappedEvents.filter((e) => e.status === "scheduled");
      
      // Find the closest upcoming event with countdown enabled
-     const nextEvent = mappedEvents
-       .filter((e: any) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
-       .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+      const nextEvent = mappedEvents
+        .filter((e) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {
@@ -217,7 +217,7 @@ function Home() {
             <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
-            {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+            {mappedPastEvents.map((e) => <EventCard key={e.id} event={e} />)}
           </div>
         </section>
       )}
@@ -237,7 +237,7 @@ function Home() {
             </Link>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {liveEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+            {liveEvents.map((e) => <EventCard key={e.id} event={e} />)}
           </div>
         </section>
       )}
@@ -254,7 +254,7 @@ function Home() {
           </Link>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredLots.map((l: any) => <LotCard key={l.id} lot={l} />)}
+          {featuredLots.map((l) => <LotCard key={l.id} lot={l} />)}
         </div>
       </section>
 
@@ -265,7 +265,7 @@ function Home() {
           <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+          {upcomingEvents.map((e) => <EventCard key={e.id} event={e} />)}
         </div>
       </section>
 
