@@ -1,5 +1,5 @@
- import { useState } from "react";
- import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { createFileRoute, Navigate, Link, useNavigate, useSearch } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
  import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
@@ -7,25 +7,48 @@
  import { Button } from "@/components/ui/button";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
-export const Route = createFileRoute("/admin")({
-  component: AdminLayout,
-});
-
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
  
-  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
- 
-function AdminLayout() {
-   const { profile, isLoading, signOut } = useAuth();
-   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
-   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
 
-   const handleManageLots = (eventId: string) => {
-     setSelectedEventId(eventId);
-     setActiveTab("lots");
-   };
+interface AdminSearch {
+  tab?: AdminTab;
+  eventId?: string;
+  q?: string;
+}
+
+export const Route = createFileRoute("/admin")({
+  validateSearch: (search: Record<string, unknown>): AdminSearch => {
+    return {
+      tab: (search.tab as AdminTab) || "dashboard",
+      eventId: (search.eventId as string) || "all",
+      q: (search.q as string) || "",
+    };
+  },
+  component: AdminLayout,
+});
+
+function AdminLayout() {
+  const { profile, isLoading, signOut } = useAuth();
+  const search = useSearch({ from: "/admin" });
+  const navigate = useNavigate({ from: "/admin" });
+
+  const activeTab = search.tab || "dashboard";
+  const selectedEventId = search.eventId || "all";
+
+  const setActiveTab = (tab: AdminTab) => {
+    navigate({ search: (prev) => ({ ...prev, tab }) });
+  };
+
+  const setSelectedEventId = (eventId: string) => {
+    navigate({ search: (prev) => ({ ...prev, eventId }) });
+  };
+
+  const handleManageLots = (eventId: string) => {
+    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId }) });
+  };
 
   if (isLoading) {
     return (
