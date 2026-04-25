@@ -439,54 +439,67 @@ import { Link } from "@tanstack/react-router";
             ) : (
               <>
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead className="w-[80px]">Nº Lote</TableHead>
+                      <TableHead className="w-[80px] cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('lot_number')}>
+                        <div className="flex items-center">Nº Lote <SortIndicator column="lot_number" /></div>
+                      </TableHead>
                       <TableHead>Animal</TableHead>
                       <TableHead>Evento</TableHead>
-                       <TableHead>Destaque</TableHead>
-                       <TableHead>Preço Inicial</TableHead>
-                      <TableHead>Lances</TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('is_featured')}>
+                        <div className="flex items-center">Destaque <SortIndicator column="is_featured" /></div>
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('starting_price')}>
+                        <div className="flex items-center">Preço <SortIndicator column="starting_price" /></div>
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('bids_count')}>
+                        <div className="flex items-center">Lances <SortIndicator column="bids_count" /></div>
+                      </TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedLots.length === 0 ? (
+                    {lots.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                           Nenhum lote encontrado.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      paginatedLots.map((lot) => (
-                      <TableRow key={lot.id}>
-                        <TableCell className="font-bold">{lot.lot_number}</TableCell>
-                        <TableCell>
-                          {lot.is_featured ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gold/10 text-gold border border-gold/20">
-                              Sim
+                      lots.map((lot: any) => (
+                        <TableRow key={lot.id}>
+                          <TableCell className="font-bold">{lot.lot_number}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {lot.animal?.photos?.[0] && (
+                                <img src={lot.animal.photos[0]} alt="" className="h-6 w-6 rounded-md object-cover border border-white/10" />
+                              )}
+                              <div>
+                                <div className="font-medium line-clamp-1">{lot.animal?.name}</div>
+                                <div className="text-[10px] text-muted-foreground">{lot.animal?.internal_code}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-[120px] truncate text-xs">{lot.event?.name}</TableCell>
+                          <TableCell>
+                            {lot.is_featured ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gold/10 text-gold border border-gold/20 uppercase">Sim</span>
+                            ) : (
+                              <span className="text-muted-foreground text-[10px] uppercase">Não</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}
+                          </TableCell>
+                          <TableCell className="text-center">{lot.bids_count || 0}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                              lot.status === 'active' ? 'text-emerald-500 bg-emerald-500/10' : 'text-muted-foreground bg-muted'
+                            }`}>
+                              {lot.status === 'active' ? 'Ativo' : 'Pausado'}
                             </span>
-                          ) : (
-                            <span className="text-muted-foreground text-[10px] uppercase">Não</span>
-                          )}
-                        </TableCell>
-                       <TableCell>
-                         <div className="font-medium">{lot.animal?.name}</div>
-                         <div className="text-xs text-muted-foreground">{lot.animal?.internal_code}</div>
-                       </TableCell>
-                       <TableCell>{lot.event?.name}</TableCell>
-                       <TableCell>
-                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}
-                       </TableCell>
-                       <TableCell>{lot.bids_count || 0}</TableCell>
-                       <TableCell>
-                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                           lot.status === 'active' ? 'text-emerald-500 bg-emerald-500/10' : 'text-muted-foreground bg-muted'
-                         }`}>
-                           {lot.status === 'active' ? 'Ativo' : 'Pausado'}
-                         </span>
-                       </TableCell>
+                          </TableCell>
                        <TableCell className="text-right">
                          <div className="flex justify-end gap-1 md:gap-2">
                            <Button 
@@ -518,11 +531,11 @@ import { Link } from "@tanstack/react-router";
               </Table>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-4 border-t">
-                  <div className="text-xs text-muted-foreground">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredLots.length)} de {filteredLots.length} registros
+                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
+                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
