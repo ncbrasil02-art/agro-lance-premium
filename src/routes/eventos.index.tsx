@@ -64,7 +64,7 @@ function EventsPage() {
         <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Calendário de eventos</h1>
         <p className="mt-2 text-muted-foreground">Acompanhe todos os leilões em andamento e agendados.</p>
       </header>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
          {mappedEvents.map((e: any) => <EventCard key={e.id} event={e as any} />)}
       </div>
     </div>

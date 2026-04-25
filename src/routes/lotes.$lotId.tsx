@@ -80,28 +80,43 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
 
   const pai = genealogy.pai || genealogy.father || "Não informado";
   const mae = genealogy.mae || genealogy.mother || "Não informado";
+  const avoPaterno = genealogy.avo_paterno || "A definir";
+  const avoMaterna = genealogy.avo_materna || "A definir";
 
   return (
-    <div className="relative overflow-x-auto py-10 bg-black/20 rounded-2xl border border-white/5 scrollbar-hide">
-        <div className="flex min-w-[500px] md:min-w-0 justify-center gap-6 md:gap-12 px-4 md:px-8">
+    <div className="relative overflow-x-auto py-6 md:py-10 bg-black/40 rounded-[2rem] border border-white/5 scrollbar-hide shadow-inner">
+      <div className="flex min-w-[700px] lg:min-w-0 justify-center gap-4 md:gap-12 px-6 md:px-12">
         <div className="flex flex-col justify-center">
-          <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-emerald-deep p-3 md:p-5 text-center shadow-lg w-28 md:w-40">
-            <Award className="h-4 w-4 md:h-6 md:w-6 text-gold mb-1 md:mb-2" />
-            <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
-            <div className="mt-1 font-bold text-xs md:text-sm text-white">Principal</div>
+          <div className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-gold bg-emerald-deep p-4 md:p-6 text-center shadow-[0_0_20px_rgba(212,175,55,0.2)] w-32 md:w-44 h-32 md:h-44">
+            <Award className="h-6 w-6 md:h-10 md:w-10 text-gold mb-2 md:mb-3" />
+            <div className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gold/60">Animal</div>
+            <div className="mt-1 font-black text-xs md:text-lg text-white leading-tight uppercase italic">Principal</div>
           </div>
         </div>
 
-          <div className="flex flex-col justify-center gap-8 md:gap-16 relative">
-          <div className="absolute -left-4 md:-left-6 top-1/2 h-16 md:h-24 w-4 md:w-6 border-y border-r border-white/20 -translate-y-1/2 rounded-r-xl"></div>
-          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-2 md:p-4 text-center w-32 md:w-48 shadow-sm">
-            <div className="text-[8px] md:text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Pai (Sire)</div>
-            <div className="font-bold text-white text-xs md:text-sm leading-tight">{pai}</div>
+        <div className="flex flex-col justify-center gap-12 md:gap-20 relative">
+          <div className="absolute -left-4 md:-left-8 top-[25%] bottom-[25%] w-4 md:w-8 border-y border-r border-white/20 rounded-r-2xl" />
+          <div className="relative rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6 text-center w-40 md:w-56 shadow-xl backdrop-blur-sm group hover:border-gold/30 transition-all">
+            <div className="text-[8px] md:text-[10px] uppercase font-black text-gold/40 tracking-[0.2em] mb-2">Pai (Sire)</div>
+            <div className="font-black text-white text-xs md:text-base leading-tight uppercase italic line-clamp-2">{pai}</div>
           </div>
-          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-3 md:p-4 text-center w-40 md:w-48 shadow-sm">
-            <div className="text-[8px] md:text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Mãe (Dam)</div>
-            <div className="font-bold text-white text-xs md:text-sm leading-tight">{mae}</div>
+          <div className="relative rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6 text-center w-40 md:w-56 shadow-xl backdrop-blur-sm group hover:border-gold/30 transition-all">
+            <div className="text-[8px] md:text-[10px] uppercase font-black text-gold/40 tracking-[0.2em] mb-2">Mãe (Dam)</div>
+            <div className="font-black text-white text-xs md:text-base leading-tight uppercase italic line-clamp-2">{mae}</div>
           </div>
+        </div>
+
+        <div className="flex flex-col justify-center gap-4 md:gap-8 relative">
+          <div className="absolute -left-4 md:-left-8 top-[12%] bottom-[62%] w-4 md:w-8 border-y border-r border-white/20 rounded-r-2xl" />
+          <div className="absolute -left-4 md:-left-8 top-[62%] bottom-[12%] w-4 md:w-8 border-y border-r border-white/20 rounded-r-2xl" />
+          {[avoPaterno, "A definir", avoMaterna, "A definir"].map((avo, idx) => (
+            <div key={idx} className="relative rounded-xl border border-white/5 bg-white/5 p-3 md:p-4 text-center w-32 md:w-44 shadow-sm group hover:bg-gold/5 transition-all">
+              <div className="text-[7px] md:text-[9px] uppercase font-bold text-white/30 tracking-widest mb-1">
+                {idx === 0 ? "Avô Pat." : idx === 1 ? "Avó Pat." : idx === 2 ? "Avô Mat." : "Avó Mat."}
+              </div>
+              <div className="font-bold text-white/80 text-[10px] md:text-sm leading-tight uppercase truncate">{avo}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -252,13 +267,23 @@ function LotDetail() {
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-8">
             <div className="space-y-4">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
-                <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute left-6 top-6 flex flex-col gap-2">
-                  <StatusBadge status={dynamicStatus} />
-                </div>
-              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl group cursor-zoom-in">
+                    <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute left-6 top-6 flex flex-col gap-2">
+                      <StatusBadge status={dynamicStatus} />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                      <Eye className="h-10 w-10 text-white/50" />
+                    </div>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black border-white/10 flex items-center justify-center overflow-hidden">
+                  <img src={lot.animal?.photos?.[activePhoto] || ""} alt="" className="max-w-full max-h-full object-contain" />
+                </DialogContent>
+              </Dialog>
               <div className="grid grid-cols-5 gap-3">
                 {lot.animal?.photos?.map((src: string, i: number) => (
                   <button key={i} onClick={() => setActivePhoto(i)} className={`aspect-square overflow-hidden rounded-xl border-2 transition-all ${activePhoto === i ? 'border-gold shadow-gold/20' : 'border-transparent opacity-60 hover:opacity-100'}`}>
@@ -290,7 +315,7 @@ function LotDetail() {
                     {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."}
                   </p>
                   
-                  <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
                     {[
                       { icon: Award, label: "Raça", value: lot.animal?.breed },
                       { icon: Info, label: "Sexo", value: lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea' },
@@ -301,10 +326,10 @@ function LotDetail() {
                       { icon: Sparkles, label: "Pelagem", value: lot.animal?.color },
                       { icon: Fingerprint, label: "Registro", value: lot.animal?.registration_number },
                     ].filter(item => item.value).map((item) => (
-                      <div key={item.label} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center">
+                      <div key={item.label} className="p-3 md:p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center group hover:bg-gold/5 transition-all">
                         <item.icon className="h-4 w-4 text-gold/60 mb-2" />
                         <div className="text-[9px] uppercase text-gold/40 font-black tracking-widest mb-1">{item.label}</div>
-                        <div className="font-bold text-white text-sm">{item.value}</div>
+                        <div className="font-bold text-white text-xs md:text-sm line-clamp-1">{item.value}</div>
                       </div>
                     ))}
                   </div>
@@ -420,23 +445,28 @@ function LotDetail() {
                   </div>
                   </div>
 
-                  <div className="space-y-4" id="bidding-panel">
+                  <div className="space-y-4">
                     {lot.animal?.youtube_url && (
-                      <Button 
-                        variant="ghost" 
-                        className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
-                        onClick={() => {
-                          const tabs = document.querySelector('[role="tablist"]');
-                          const videoTab = document.querySelector('[value="videos"]') as HTMLElement;
-                          if (videoTab) {
-                            videoTab.click();
-                            videoTab.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                          }
-                        }}
-                      >
-                        <PlayCircle className="h-4 w-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
-                      </Button>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
+                          >
+                            <PlayCircle className="h-4 w-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[800px] bg-black p-0 border-white/10 overflow-hidden">
+                          <div className="aspect-video">
+                            <iframe 
+                              src={lot.animal.youtube_url.replace("watch?v=", "embed/").split("&")[0]} 
+                              className="h-full w-full" 
+                              allowFullScreen 
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     )}
                     {dynamicStatus === 'loteamento' && (
                       <div className="p-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">

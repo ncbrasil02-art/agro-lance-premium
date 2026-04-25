@@ -1,12 +1,11 @@
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
- import { Link } from "@tanstack/react-router";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Eye } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -212,7 +211,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
             </Button>
           </div>
-         <div className="relative flex-1 max-w-sm w-full">
+         <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input
              placeholder="Buscar eventos..."
@@ -235,20 +234,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
            </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
-                <div className="flex items-center justify-between pr-8">
-                  <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
-                  {editingEvent && (
-                    <Link 
-                      to="/eventos/$eventSlug" 
-                      params={{ eventSlug: editingEvent.slug || "" }} 
-                      target="_blank"
-                      className="text-[10px] font-bold text-gold uppercase flex items-center gap-1 hover:underline"
-                    >
-                      <Eye className="h-3 w-3" />
-                      Ver Público
-                    </Link>
-                  )}
-                </div>
+                <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
                <DialogDescription>
                   Defina as configurações do leilão.
                </DialogDescription>
@@ -303,11 +289,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                     </Button>
                   </div>
                   {formData.banner_url && (
-                    <div className="relative mt-2 aspect-video overflow-hidden rounded-lg border border-border bg-muted">
-                      <img src={formData.banner_url} alt="Banner Preview" className="h-full w-full object-contain" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                      <p className="absolute bottom-2 left-2 text-[8px] font-black text-white uppercase tracking-widest">Pré-visualização do Banner</p>
-                    </div>
+                    <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
                   )}
                   <p className="text-[10px] text-muted-foreground">Esta imagem aparece na página inicial e no topo do evento.</p>
                 </div>
@@ -456,21 +438,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                          </span>
                        </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-1 md:gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              asChild
-                              title="Visualizar Página Pública"
-                            >
-                              <Link 
-                                to="/eventos/$eventSlug" 
-                                params={{ eventSlug: event.slug || "" }} 
-                                target="_blank"
-                              >
-                                <Eye className="h-4 w-4 text-gold" />
-                              </Link>
-                            </Button>
+                          <div className="flex justify-end gap-2">
                             {event.status !== 'finished' && (
                               <Button 
                                 variant="outline" 

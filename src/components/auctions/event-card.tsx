@@ -44,36 +44,32 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
             </div>
           )}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-      </div>
-
-      <div className="flex flex-col p-5 gap-4">
-        <div>
-          <h3 id={`event-title-${event.id}`} className="text-xl font-black text-foreground uppercase leading-none tracking-tight mb-2 italic">
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent">
+          <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter mb-2 italic">
             {event?.name || "Evento sem nome"}
           </h3>
-          <p className="text-xs text-muted-foreground line-clamp-2 font-medium italic">
+          <p className="text-xs text-white/70 line-clamp-2 font-medium italic">
             {event?.description || "Leilão premium com curadoria genética de elite."}
           </p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-3 border-t border-border pt-4 text-[11px]">
-          <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Data do evento: ${event?.date ? formatDateBR(event.date) : "--"}`}>
-            <Calendar className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-            <span suppressHydrationWarning>{event?.date ? formatDateBR(event.date) : "--"}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Localização: ${event?.city || ""}/${event?.state || ""}`}>
-            <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-            <span>{event?.city || ""}/{event?.state || ""}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Total de lotes: ${event?.lotsCount || 0}`}>
-            <Gavel className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-            <span>{event?.lotsCount || 0} lotes</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground" aria-label={`${(event?.viewers || 0).toLocaleString("pt-BR")} visualizações`}>
-            <Users className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-            <span>{(event?.viewers || 0).toLocaleString("pt-BR")} visualizações</span>
-          </div>
+      <div className="grid grid-cols-2 gap-3 p-4 text-xs">
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Data do evento: ${event?.date ? formatDateBR(event.date) : "--"}`}>
+           <Calendar className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+          <span suppressHydrationWarning>{event?.date ? formatDateBR(event.date) : "--"}</span>
+        </div>
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Localização: ${event?.city || ""}/${event?.state || ""}`}>
+           <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+          <span>{event?.city || ""}/{event?.state || ""}</span>
+        </div>
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Total de lotes: ${event?.lotsCount || 0}`}>
+           <Gavel className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+          <span>{event?.lotsCount || 0} lotes</span>
+        </div>
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`${(event?.viewers || 0).toLocaleString("pt-BR")} visualizações`}>
+           <Users className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+          <span>{(event?.viewers || 0).toLocaleString("pt-BR")} visualizações</span>
         </div>
       </div>
     </Link>

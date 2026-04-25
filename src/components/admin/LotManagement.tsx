@@ -4,8 +4,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Eye } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+ import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
@@ -212,7 +211,7 @@ import { Link } from "@tanstack/react-router";
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
             </Button>
           </div>
-         <div className="flex flex-1 flex-col sm:flex-row gap-4 max-w-2xl">
+         <div className="flex flex-1 gap-4 max-w-2xl">
            <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
              <Input
@@ -223,7 +222,7 @@ import { Link } from "@tanstack/react-router";
              />
            </div>
             <Select value={selectedEventId} onValueChange={handleEventSelectChange}>
-              <SelectTrigger className="w-full sm:w-[200px]">
+             <SelectTrigger className="w-[200px]">
                <SelectValue placeholder="Filtrar por Evento" />
              </SelectTrigger>
              <SelectContent>
@@ -249,20 +248,7 @@ import { Link } from "@tanstack/react-router";
            </DialogTrigger>
             <DialogContent className="sm:max-w-[450px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
-                <div className="flex items-center justify-between pr-8">
-                  <DialogTitle>{editingLot ? "Editar Lote" : "Alocar Animal em Evento"}</DialogTitle>
-                  {editingLot && (
-                    <Link 
-                      to="/lotes/$lotId" 
-                      params={{ lotId: editingLot.id }} 
-                      target="_blank"
-                      className="text-[10px] font-bold text-gold uppercase flex items-center gap-1 hover:underline"
-                    >
-                      <Eye className="h-3 w-3" />
-                      Ver Público
-                    </Link>
-                  )}
-                </div>
+                <DialogTitle>{editingLot ? "Editar Lote" : "Alocar Animal em Evento"}</DialogTitle>
                <DialogDescription>
                   Defina as regras do animal neste evento.
                </DialogDescription>
@@ -305,44 +291,24 @@ import { Link } from "@tanstack/react-router";
                       Cadastrar Novo Animal
                     </Button>
                   </div>
-                    <div className="flex flex-col gap-3">
-                      <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
-                        <SelectTrigger>
-                          <SelectValue placeholder={isLoading ? "Carregando animais..." : "Selecione o animal"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {isLoading ? (
-                            <div className="p-2 text-xs text-center text-muted-foreground flex items-center justify-center">
-                              <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
-                            </div>
-                          ) : availableAnimals.length === 0 ? (
-                            <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
-                          ) : (
-                            (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
-                              <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                      
-                      {formData.animal_id && (
-                        <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/5">
-                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
-                            <img 
-                              src={(editingLot?.animal?.id === formData.animal_id ? editingLot.animal : availableAnimals.find(a => a.id === formData.animal_id))?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-                              alt="" 
-                              className="h-full w-full object-cover" 
-                            />
-                          </div>
-                          <div className="flex-1 overflow-hidden">
-                            <p className="text-xs font-bold text-white truncate">
-                              {(editingLot?.animal?.id === formData.animal_id ? editingLot.animal : availableAnimals.find(a => a.id === formData.animal_id))?.name}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">Animal selecionado para este lote</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                   <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
+                     <SelectTrigger>
+                       <SelectValue placeholder={isLoading ? "Carregando animais..." : "Selecione o animal"} />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {isLoading ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground flex items-center justify-center">
+                           <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
+                         </div>
+                       ) : availableAnimals.length === 0 ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
+                       ) : (
+                         (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
+                           <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
+                         ))
+                       )}
+                     </SelectContent>
+                   </Select>
                 </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">
@@ -470,22 +436,8 @@ import { Link } from "@tanstack/react-router";
                            {lot.status === 'active' ? 'Ativo' : 'Pausado'}
                          </span>
                        </TableCell>
-                       <TableCell className="text-right">
-                         <div className="flex justify-end gap-1 md:gap-2">
-                           <Button 
-                             variant="ghost" 
-                             size="icon" 
-                             asChild
-                             title="Visualizar Lote"
-                           >
-                             <Link 
-                               to="/lotes/$lotId" 
-                               params={{ lotId: lot.id }} 
-                               target="_blank"
-                             >
-                               <Eye className="h-4 w-4 text-gold" />
-                             </Link>
-                           </Button>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(lot)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
