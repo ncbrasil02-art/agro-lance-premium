@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer } from "lucide-react";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/auctions/status-badge";
@@ -81,25 +81,25 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
   const mae = genealogy.mae || genealogy.mother || "Não informado";
 
   return (
-    <div className="relative overflow-x-auto py-10 bg-black/20 rounded-2xl border border-white/5">
-      <div className="flex min-w-[800px] justify-center gap-12 px-8">
+    <div className="relative overflow-x-auto py-10 bg-black/20 rounded-2xl border border-white/5 scrollbar-hide">
+      <div className="flex min-w-[600px] md:min-w-0 justify-center gap-12 px-8">
         <div className="flex flex-col justify-center">
-          <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-emerald-deep p-5 text-center shadow-lg w-40">
-            <Award className="h-6 w-6 text-gold mb-2" />
-            <div className="text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
-            <div className="mt-1 font-bold text-sm text-white">Principal</div>
+          <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-emerald-deep p-4 md:p-5 text-center shadow-lg w-32 md:w-40">
+            <Award className="h-5 w-5 md:h-6 md:w-6 text-gold mb-2" />
+            <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
+            <div className="mt-1 font-bold text-xs md:text-sm text-white">Principal</div>
           </div>
         </div>
 
-        <div className="flex flex-col justify-center gap-16 relative">
-          <div className="absolute -left-6 top-1/2 h-24 w-6 border-y border-r border-white/20 -translate-y-1/2 rounded-r-xl"></div>
-          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-4 text-center w-48 shadow-sm">
-            <div className="text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Pai (Sire)</div>
-            <div className="font-bold text-white leading-tight">{pai}</div>
+        <div className="flex flex-col justify-center gap-12 md:gap-16 relative">
+          <div className="absolute -left-6 top-1/2 h-20 md:h-24 w-6 border-y border-r border-white/20 -translate-y-1/2 rounded-r-xl"></div>
+          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-3 md:p-4 text-center w-40 md:w-48 shadow-sm">
+            <div className="text-[8px] md:text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Pai (Sire)</div>
+            <div className="font-bold text-white text-xs md:text-sm leading-tight">{pai}</div>
           </div>
-          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-4 text-center w-48 shadow-sm">
-            <div className="text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Mãe (Dam)</div>
-            <div className="font-bold text-white leading-tight">{mae}</div>
+          <div className="relative rounded-lg border border-white/10 bg-emerald-deep/40 p-3 md:p-4 text-center w-40 md:w-48 shadow-sm">
+            <div className="text-[8px] md:text-[10px] uppercase font-semibold text-gold/60 tracking-wider mb-1">Mãe (Dam)</div>
+            <div className="font-bold text-white text-xs md:text-sm leading-tight">{mae}</div>
           </div>
         </div>
       </div>
