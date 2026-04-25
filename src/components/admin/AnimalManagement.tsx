@@ -574,8 +574,14 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
             ) : (
               <>
                 <Table>
-                <TableHeader className="bg-muted/50">
+                <TableHeader className="bg-muted/50 select-none">
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox 
+                        checked={animals.length > 0 && selectedIds.length === animals.length}
+                        onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                      />
+                    </TableHead>
                     <TableHead className="w-[80px]">Foto</TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
                       <div className="flex items-center">Nome <SortIndicator column="name" /></div>
@@ -601,8 +607,14 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                    </TableRow>
                   ) : (
                      animals.map((animal) => (
-                      <TableRow key={animal.id}>
-                        <TableCell>
+                       <TableRow key={animal.id} className={selectedIds.includes(animal.id) ? "bg-gold/5" : ""}>
+                         <TableCell>
+                           <Checkbox 
+                             checked={selectedIds.includes(animal.id)}
+                             onCheckedChange={(checked) => handleSelectOne(animal.id, !!checked)}
+                           />
+                         </TableCell>
+                         <TableCell>
                           {animal.photos && animal.photos.length > 0 ? (
                             <img 
                               src={animal.photos[0]} 
