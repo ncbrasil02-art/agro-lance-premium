@@ -21,7 +21,8 @@
      const [formData, setFormData] = useState({
        name: "",
        description: "",
-       start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        end_date: format(new Date(Date.now() + 4 * 60 * 60 * 1000), "yyyy-MM-dd'T'HH:mm:ss"),
        location: "",
         status: "scheduled",
        event_type: "online",
@@ -38,7 +39,8 @@
        setFormData({
          name: "",
          description: "",
-       start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        end_date: format(new Date(Date.now() + 4 * 60 * 60 * 1000), "yyyy-MM-dd'T'HH:mm:ss"),
          location: "",
          status: "scheduled",
          event_type: "online",
@@ -56,7 +58,8 @@
        setFormData({
          name: event.name || "",
          description: event.description || "",
-         start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm:ss") : format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm:ss") : format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        end_date: event.end_date ? format(new Date(event.end_date), "yyyy-MM-dd'T'HH:mm:ss") : format(new Date(Date.now() + 4 * 60 * 60 * 1000), "yyyy-MM-dd'T'HH:mm:ss"),
          location: event.location || "",
          status: event.status || "scheduled",
          event_type: event.event_type || "online",
@@ -111,7 +114,8 @@
              .update({
                name: formData.name,
                description: formData.description,
-               start_date: new Date(formData.start_date).toISOString(),
+                start_date: new Date(formData.start_date).toISOString(),
+                end_date: formData.end_date ? new Date(formData.end_date).toISOString() : null,
                location: formData.location,
                status: formData.status,
                event_type: formData.event_type,
@@ -135,6 +139,7 @@
             name: formData.name,
             description: formData.description,
             start_date: new Date(formData.start_date).toISOString(),
+            end_date: formData.end_date ? new Date(formData.end_date).toISOString() : null,
             location: formData.location,
             status: formData.status,
             event_type: formData.event_type,
