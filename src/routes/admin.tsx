@@ -18,6 +18,7 @@ interface AdminSearch {
   tab?: AdminTab;
   eventId?: string;
   q?: string;
+  page?: number;
 }
 
 export const Route = createFileRoute("/admin")({
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/admin")({
       tab: (search.tab as AdminTab) || "dashboard",
       eventId: (search.eventId as string) || "all",
       q: (search.q as string) || "",
+      page: (search.page as number) || 1,
     };
   },
   component: AdminLayout,
@@ -40,19 +42,23 @@ function AdminLayout() {
   const selectedEventId = search.eventId || "all";
 
   const setActiveTab = (tab: AdminTab) => {
-    navigate({ search: (prev) => ({ ...prev, tab, q: "" }) }); // Reset search when changing tabs? User preference.
+    navigate({ search: (prev) => ({ ...prev, tab, q: "", page: 1 }) });
   };
 
   const setSelectedEventId = (eventId: string) => {
-    navigate({ search: (prev) => ({ ...prev, eventId }) });
+    navigate({ search: (prev) => ({ ...prev, eventId, page: 1 }) });
   };
 
   const handleManageLots = (eventId: string) => {
-    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "" }) });
+    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "", page: 1 }) });
   };
 
   const onSearchChange = (q: string) => {
-    navigate({ search: (prev) => ({ ...prev, q }), replace: true }); // replace to avoid history pollution
+    navigate({ search: (prev) => ({ ...prev, q, page: 1 }), replace: true });
+  };
+
+  const onPageChange = (page: number) => {
+    navigate({ search: (prev) => ({ ...prev, page }) });
   };
 
   if (isLoading) {
@@ -279,6 +285,8 @@ function AdminLayout() {
               onNavigate={() => setActiveTab("animals")} 
               searchQuery={search.q || ""}
               onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
             />
           )}
           {activeTab === "lots" && (
@@ -289,6 +297,8 @@ function AdminLayout() {
               onNavigateToEvents={() => setActiveTab("events")}
               searchQuery={search.q || ""}
               onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
             />
           )}
           {activeTab === "animals" && (
@@ -296,6 +306,16 @@ function AdminLayout() {
               onNavigateToLots={() => setActiveTab("lots")} 
               searchQuery={search.q || ""}
               onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
+            />
+          )}
+          {activeTab === "users" && (
+            <UserManagement 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
             />
           )}
           {activeTab === "users" && (
