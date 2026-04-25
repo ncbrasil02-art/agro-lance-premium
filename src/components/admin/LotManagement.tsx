@@ -15,12 +15,20 @@ import { Link } from "@tanstack/react-router";
       initialEventId = "all", 
       onEventChange,
       onNavigateToAnimals,
-      onNavigateToEvents
+      onNavigateToEvents,
+      searchQuery,
+      onSearchChange,
+      currentPage,
+      onPageChange
     }: { 
       initialEventId?: string; 
       onEventChange?: (id: string) => void;
       onNavigateToAnimals?: () => void;
       onNavigateToEvents?: () => void;
+      searchQuery: string;
+      onSearchChange: (val: string) => void;
+      currentPage: number;
+      onPageChange: (val: number) => void;
     }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +36,6 @@ import { Link } from "@tanstack/react-router";
       const [events, setEvents] = useState<any[]>([]);
       const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
       const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
-      const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
       
       const [formData, setFormData] = useState({
@@ -44,12 +51,6 @@ import { Link } from "@tanstack/react-router";
       });
 
    const ITEMS_PER_PAGE = 8;
-   const [currentPage, setCurrentPage] = useState(1);
-
-   useEffect(() => {
-     setCurrentPage(1);
-   }, [searchQuery, selectedEventId]);
-
       const fetchData = async () => {
         setIsLoading(true);
         console.log("Fetching lots, events and animals...");
@@ -232,12 +233,12 @@ import { Link } from "@tanstack/react-router";
          <div className="flex flex-1 gap-4 max-w-2xl">
            <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-             <Input
-               placeholder="Buscar por animal ou número..."
-               className="pl-10"
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-             />
+              <Input
+                placeholder="Buscar por animal ou número..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+              />
            </div>
             <Select value={selectedEventId} onValueChange={handleEventSelectChange}>
              <SelectTrigger className="w-[200px]">
@@ -516,11 +517,11 @@ import { Link } from "@tanstack/react-router";
                     Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredLots.length)} de {filteredLots.length} registros
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

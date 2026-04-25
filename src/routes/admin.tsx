@@ -1,5 +1,5 @@
- import { useState } from "react";
- import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { createFileRoute, Navigate, Link, useNavigate, useSearch } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
  import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
@@ -7,25 +7,59 @@
  import { Button } from "@/components/ui/button";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
-export const Route = createFileRoute("/admin")({
-  component: AdminLayout,
-});
-
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
+import { UserManagement } from "@/components/admin/UserManagement";
  
-  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
- 
-function AdminLayout() {
-   const { profile, isLoading, signOut } = useAuth();
-   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
-   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
 
-   const handleManageLots = (eventId: string) => {
-     setSelectedEventId(eventId);
-     setActiveTab("lots");
-   };
+interface AdminSearch {
+  tab?: AdminTab;
+  eventId?: string;
+  q?: string;
+  page?: number;
+}
+
+export const Route = createFileRoute("/admin")({
+  validateSearch: (search: Record<string, unknown>): AdminSearch => {
+    return {
+      tab: (search.tab as AdminTab) || "dashboard",
+      eventId: (search.eventId as string) || "all",
+      q: (search.q as string) || "",
+      page: (search.page as number) || 1,
+    };
+  },
+  component: AdminLayout,
+});
+
+function AdminLayout() {
+  const { profile, isLoading, signOut } = useAuth();
+  const search = useSearch({ from: "/admin" });
+  const navigate = useNavigate({ from: "/admin" });
+
+  const activeTab = search.tab || "dashboard";
+  const selectedEventId = search.eventId || "all";
+
+  const setActiveTab = (tab: AdminTab) => {
+    navigate({ search: (prev) => ({ ...prev, tab, q: "", page: 1 }) });
+  };
+
+  const setSelectedEventId = (eventId: string) => {
+    navigate({ search: (prev) => ({ ...prev, eventId, page: 1 }) });
+  };
+
+  const handleManageLots = (eventId: string) => {
+    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "", page: 1 }) });
+  };
+
+  const onSearchChange = (q: string) => {
+    navigate({ search: (prev) => ({ ...prev, q, page: 1 }), replace: true });
+  };
+
+  const onPageChange = (page: number) => {
+    navigate({ search: (prev) => ({ ...prev, page }) });
+  };
 
   if (isLoading) {
     return (
@@ -249,6 +283,10 @@ function AdminLayout() {
             <EventManagement 
               onManageLots={handleManageLots} 
               onNavigate={() => setActiveTab("animals")} 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
             />
           )}
           {activeTab === "lots" && (
@@ -257,16 +295,36 @@ function AdminLayout() {
               onEventChange={setSelectedEventId} 
               onNavigateToAnimals={() => setActiveTab("animals")}
               onNavigateToEvents={() => setActiveTab("events")}
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
             />
           )}
           {activeTab === "animals" && (
-            <AnimalManagement onNavigateToLots={() => setActiveTab("lots")} />
+            <AnimalManagement 
+              onNavigateToLots={() => setActiveTab("lots")} 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
+            />
           )}
           {activeTab === "users" && (
-            <Card>
-              <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
-              <CardContent><p className="text-muted-foreground">Módulo de gestão de usuários em desenvolvimento.</p></CardContent>
-            </Card>
+            <UserManagement 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
+            />
+          )}
+          {activeTab === "users" && (
+            <UserManagement 
+              searchQuery={search.q || ""}
+              onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
+            />
           )}
            {activeTab === "settings" && (
              <Card>
