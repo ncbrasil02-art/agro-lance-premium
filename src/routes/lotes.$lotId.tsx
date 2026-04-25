@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint } from "lucide-react";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/auctions/status-badge";
@@ -185,6 +185,20 @@ function LotDetail() {
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
+  const getAge = (birthDate: string) => {
+    if (!birthDate) return null;
+    const birth = new Date(birthDate);
+    const now = new Date();
+    let years = now.getFullYear() - birth.getFullYear();
+    let months = now.getMonth() - birth.getMonth();
+    if (months < 0 || (months === 0 && now.getDate() < birth.getDate())) {
+      years--;
+      months += 12;
+    }
+    if (years === 0) return `${months} meses`;
+    return `${years} anos e ${months} meses`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
@@ -237,27 +251,37 @@ function LotDetail() {
                 <TabsTrigger value="genealogia" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Genealogia</TabsTrigger>
                 <TabsTrigger value="saude" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Saúde</TabsTrigger>
                 <TabsTrigger value="videos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Vídeo</TabsTrigger>
-                <TabsTrigger value="documentos" className="hidden lg:inline-flex rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Documentos</TabsTrigger>
+                <TabsTrigger value="documentos" className="rounded-xl data-[state=active]:bg-gold data-[state=active]:text-emerald-deep">Documentos</TabsTrigger>
               </TabsList>
               
               <TabsContent value="detalhes" className="mt-6 space-y-6">
-                <Card className="bg-card/50 border-white/5 p-6 rounded-3xl">
-                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap">
+                <Card className="bg-card/50 border-white/5 p-8 rounded-3xl">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="h-1px flex-1 bg-white/10" />
+                    <span className="text-xs font-black text-gold uppercase tracking-[0.3em]">Descrição do Animal</span>
+                    <div className="h-1px flex-1 bg-white/10" />
+                  </div>
+                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap text-lg">
                     {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."}
                   </p>
-                  <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-[10px] uppercase text-gold/60 font-bold mb-1">Raça</div>
-                      <div className="font-bold text-white text-lg">{lot.animal?.breed}</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-[10px] uppercase text-gold/60 font-bold mb-1">Sexo</div>
-                      <div className="font-bold text-white text-lg">{lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea'}</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-[10px] uppercase text-gold/60 font-bold mb-1">Localização</div>
-                      <div className="font-bold text-white text-lg">{lot.animal?.location || "Brasil"}</div>
-                    </div>
+                  
+                  <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { icon: Award, label: "Raça", value: lot.animal?.breed },
+                      { icon: Info, label: "Sexo", value: lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea' },
+                      { icon: Calendar, label: "Idade", value: getAge(lot.animal?.birth_date) },
+                      { icon: MapPin, label: "Local", value: lot.animal?.location || "Brasil" },
+                      { icon: Scale, label: "Peso", value: lot.animal?.weight ? `${lot.animal.weight} kg` : null },
+                      { icon: Ruler, label: "Altura", value: lot.animal?.height ? `${lot.animal.height} m` : null },
+                      { icon: Sparkles, label: "Pelagem", value: lot.animal?.color },
+                      { icon: Fingerprint, label: "Registro", value: lot.animal?.registration_number },
+                    ].filter(item => item.value).map((item) => (
+                      <div key={item.label} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center">
+                        <item.icon className="h-4 w-4 text-gold/60 mb-2" />
+                        <div className="text-[9px] uppercase text-gold/40 font-black tracking-widest mb-1">{item.label}</div>
+                        <div className="font-bold text-white text-sm">{item.value}</div>
+                      </div>
+                    ))}
                   </div>
                 </Card>
               </TabsContent>
