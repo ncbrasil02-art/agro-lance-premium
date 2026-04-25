@@ -47,53 +47,105 @@ function EventDetail() {
   const eventLots = event.lots || [];
 
   return (
-    <>
-      <section className="relative">
-        <div className="relative h-72 overflow-hidden md:h-96">
-          <img src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} alt={event.name} className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
+    <div className="min-h-screen bg-background pb-20">
+      {/* Hero Section with Blur and Rectangular Banner */}
+      <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24">
+        {/* Atmospheric Background Blur */}
+        <div className="absolute inset-0 z-0 h-[70vh]">
+          <img 
+            src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+            alt="" 
+            className="h-full w-full object-cover blur-3xl opacity-15" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
         </div>
-        <div className="container mx-auto -mt-32 px-4 relative">
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-elegant">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <StatusBadge status={event.status} />
-                <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">{event.name}</h1>
-                <p className="mt-2 max-w-2xl text-muted-foreground">{event.description}</p>
+
+        <div className="container relative z-10 mx-auto px-4">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr] items-center">
+            {/* Main Rectangular Banner */}
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gold/20 blur-2xl rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative aspect-[4/5] md:aspect-auto overflow-hidden rounded-[2.5rem] border border-white/10 bg-emerald-deep shadow-2xl transition-transform duration-500 hover:scale-[1.02]">
+                <img 
+                  src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+                  alt={event.name} 
+                  className="h-full w-full object-cover" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/80 via-transparent to-transparent opacity-60" />
               </div>
-              {event.status === "live" && (
-                <Link to="/ao-vivo">
-                  <Button size="lg" className="bg-gold-gradient text-emerald-deep shadow-gold">Assistir ao vivo</Button>
-                </Link>
-              )}
             </div>
 
-            <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { icon: Calendar, label: "Data", value: new Date(event.start_date).toLocaleString('pt-BR') },
-                { icon: MapPin, label: "Local", value: event.location || "A definir" },
-                { icon: Gavel, label: "Leiloeiro", value: event.auctioneer_name || "A definir" },
-                { icon: Trophy, label: "Promotor", value: event.promoter_company || "A definir" },
-              ].map((m) => (
-                <div key={m.label} className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient">
-                    <m.icon className="h-4 w-4 text-emerald-deep" />
+            {/* Event Header Info */}
+            <div className="flex flex-col">
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <StatusBadge status={event.status} />
+                {event.event_type && (
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white/60">
+                    {event.event_type}
+                  </span>
+                )}
+              </div>
+              
+              <h1 className="text-4xl md:text-7xl font-black tracking-tight text-white mb-6 uppercase leading-[0.9] italic">
+                {event.name}
+              </h1>
+              
+              <div className="relative mb-8">
+                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gold rounded-full" />
+                <p className="text-lg md:text-xl text-white/90 leading-relaxed font-medium italic pl-4">
+                  {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium."}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                  { icon: Calendar, label: "Data/Hora", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
+                  { icon: MapPin, label: "Localização", value: event.location || "Online" },
+                  { icon: Gavel, label: "Leiloeiro", value: event.auctioneer_name || "Convidado" },
+                  { icon: Trophy, label: "Promotor", value: event.promoter_company || "Elite" },
+                ].map((m) => (
+                  <div key={m.label} className="p-4 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm group hover:bg-gold/5 hover:border-gold/20 transition-all">
+                    <div className="flex items-center gap-2 mb-2">
+                      <m.icon className="h-3.5 w-3.5 text-gold" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gold/60">{m.label}</span>
+                    </div>
+                    <div className="text-sm font-bold text-white leading-snug line-clamp-1">{m.value}</div>
                   </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{m.label}</div>
-                    <div className="text-sm font-semibold">{m.value}</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+                {event.status === "live" && (
+                  <Link to="/ao-vivo" className="w-full sm:w-auto">
+                    <Button size="lg" className="w-full h-16 px-10 bg-gold-gradient text-emerald-deep font-black text-xl shadow-gold hover:scale-105 active:scale-95 transition-all rounded-2xl">
+                      ASSISTIR AO VIVO
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="outline" size="lg" className="w-full sm:w-auto h-16 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-2xl">
+                  Saber mais detalhes
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Lots Section */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="mb-6 text-2xl font-bold tracking-tight">Lotes do evento ({eventLots.length})</h2>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Lotes Disponíveis</h2>
+            <p className="mt-2 text-muted-foreground font-medium">Exemplares selecionados exclusivamente para este evento.</p>
+          </div>
+          <div className="h-px flex-1 bg-white/5 hidden md:block mx-8" />
+          <div className="text-right">
+            <span className="text-5xl font-black text-gold/20 tabular-nums">#{eventLots.length}</span>
+          </div>
+        </div>
+
         {eventLots.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {eventLots.map((l: any) => (
               <LotCard 
                 key={l.id} 
@@ -109,16 +161,24 @@ function EventDetail() {
                   minIncrement: l.bid_increment,
                   bidsCount: l.bids_count || 0,
                   viewers: l.viewers || 0,
-                  endsAt: l.end_date || "",
+                  endsAt: l.end_date || event.end_date || "",
                   status: l.status as any,
+                  eventStatus: event.status,
+                  eventStartDate: event.start_date,
+                  eventEndDate: event.end_date,
+                  allowsPreBidding: event.allows_pre_bidding,
                 }} 
               />
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">Lotes serão divulgados em breve.</p>
+          <div className="text-center py-20 rounded-[3rem] bg-white/5 border border-dashed border-white/10">
+            <Gavel className="h-16 w-16 text-white/10 mx-auto mb-4" />
+            <p className="text-xl text-muted-foreground font-medium italic">Lotes em fase de preparação.</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">Acompanhe nossas redes para saber quando os lotes forem liberados.</p>
+          </div>
         )}
       </section>
-    </>
+    </div>
   );
 }
