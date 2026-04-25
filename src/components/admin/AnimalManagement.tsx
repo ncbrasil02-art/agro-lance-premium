@@ -11,6 +11,8 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
   import { toast } from "sonner";
  
+  import { Checkbox } from "@/components/ui/checkbox";
+
   export function AnimalManagement({ 
     onNavigateToLots,
     searchQuery,
@@ -168,6 +170,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
   const [animals, setAnimals] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const ITEMS_PER_PAGE = 8;
 
   const fetchAnimals = async () => {
@@ -200,7 +203,38 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
 
   useEffect(() => {
     fetchAnimals();
+    setSelectedIds([]); // Clear selection on table change
   }, [currentPage, searchQuery, sortColumn, sortDirection]);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(animals.map(a => a.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Deseja excluir permanentemente os ${selectedIds.length} animais selecionados?`)) return;
+    
+    try {
+      const { error } = await supabase.from("animals").delete().in("id", selectedIds);
+      if (error) throw error;
+      toast.success(`${selectedIds.length} animais excluídos com sucesso`);
+      setSelectedIds([]);
+      fetchAnimals();
+    } catch (error: any) {
+      toast.error("Erro ao excluir em lote: " + error.message);
+    }
+  };
+
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -232,7 +266,31 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
  
    return (
      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative">
+           {selectedIds.length > 0 && (
+             <div className="absolute inset-0 bg-emerald-deep/95 z-20 rounded-lg flex items-center px-4 animate-in fade-in slide-in-from-top-2 border border-gold/30">
+               <div className="flex items-center gap-3">
+                 <span className="text-xs font-black text-white uppercase tracking-widest">{selectedIds.length} selecionados</span>
+                 <div className="h-4 w-px bg-white/20" />
+                 <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   className="h-8 text-destructive hover:bg-destructive/10 text-[10px] font-bold"
+                   onClick={handleBulkDelete}
+                 >
+                   <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir em Lote
+                 </Button>
+               </div>
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 className="ml-auto text-white/60 hover:text-white text-[10px] font-bold"
+                 onClick={() => setSelectedIds([])}
+               >
+                 Cancelar
+               </Button>
+             </div>
+           )}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={fetchAnimals} disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
@@ -516,8 +574,14 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
             ) : (
               <>
                 <Table>
-                <TableHeader className="bg-muted/50">
+                <TableHeader className="bg-muted/50 select-none">
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox 
+                        checked={animals.length > 0 && selectedIds.length === animals.length}
+                        onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                      />
+                    </TableHead>
                     <TableHead className="w-[80px]">Foto</TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
                       <div className="flex items-center">Nome <SortIndicator column="name" /></div>
@@ -543,8 +607,14 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                    </TableRow>
                   ) : (
                      animals.map((animal) => (
-                      <TableRow key={animal.id}>
-                        <TableCell>
+                       <TableRow key={animal.id} className={selectedIds.includes(animal.id) ? "bg-gold/5" : ""}>
+                         <TableCell>
+                           <Checkbox 
+                             checked={selectedIds.includes(animal.id)}
+                             onCheckedChange={(checked) => handleSelectOne(animal.id, !!checked)}
+                           />
+                         </TableCell>
+                         <TableCell>
                           {animal.photos && animal.photos.length > 0 ? (
                             <img 
                               src={animal.photos[0]} 

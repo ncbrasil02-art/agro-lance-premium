@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export function UserManagement({
   const [users, setUsers] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const ITEMS_PER_PAGE = 8;
 
   const fetchUsers = async () => {
@@ -59,7 +61,44 @@ export function UserManagement({
 
   useEffect(() => {
     fetchUsers();
+    setSelectedIds([]);
   }, [currentPage, searchQuery, sortColumn, sortDirection]);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(users.map(u => u.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  };
+
+  const handleBulkApproval = async (approve: boolean) => {
+    const action = approve ? "aprovar" : "remover o acesso de";
+    if (!confirm(`Deseja ${action} os ${selectedIds.length} usuários selecionados?`)) return;
+    
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_approved: approve })
+        .in("id", selectedIds);
+
+      if (error) throw error;
+      
+      toast.success(`${selectedIds.length} usuários ${approve ? 'aprovados' : 'com acesso removido'} com sucesso!`);
+      setSelectedIds([]);
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Erro na ação em lote: " + error.message);
+    }
+  };
+
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -96,7 +135,40 @@ export function UserManagement({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative">
+         {selectedIds.length > 0 && (
+           <div className="absolute inset-0 bg-emerald-deep/95 z-20 rounded-lg flex items-center px-4 animate-in fade-in slide-in-from-top-2 border border-gold/30">
+             <div className="flex items-center gap-3">
+               <span className="text-xs font-black text-white uppercase tracking-widest">{selectedIds.length} selecionados</span>
+               <div className="h-4 w-px bg-white/20" />
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 className="h-8 text-gold hover:bg-gold/10 text-[10px] font-bold"
+                 onClick={() => handleBulkApproval(true)}
+               >
+                 <CheckCircle className="mr-2 h-3.5 w-3.5" /> Aprovar Selecionados
+               </Button>
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 className="h-8 text-white/80 hover:bg-white/10 text-[10px] font-bold"
+                 onClick={() => handleBulkApproval(false)}
+               >
+                 <XCircle className="mr-2 h-3.5 w-3.5" /> Remover Acesso
+               </Button>
+             </div>
+             <Button 
+               variant="ghost" 
+               size="sm" 
+               className="ml-auto text-white/60 hover:text-white text-[10px] font-bold"
+               onClick={() => setSelectedIds([])}
+             >
+               Cancelar
+             </Button>
+           </div>
+         )}
+
         <Button variant="outline" size="sm" onClick={fetchUsers} disabled={isLoading}>
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
         </Button>
@@ -123,8 +195,14 @@ export function UserManagement({
           ) : (
             <>
               <Table>
-                <TableHeader className="bg-muted/50">
+                <TableHeader className="bg-muted/50 select-none">
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox 
+                        checked={users.length > 0 && selectedIds.length === users.length}
+                        onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                      />
+                    </TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('full_name')}>
                       <div className="flex items-center">Nome <SortIndicator column="full_name" /></div>
                     </TableHead>
@@ -144,7 +222,13 @@ export function UserManagement({
                     </TableRow>
                   ) : (
                   users.map((user) => (
-                      <TableRow key={user.id}>
+                      <TableRow key={user.id} className={selectedIds.includes(user.id) ? "bg-gold/5" : ""}>
+                        <TableCell>
+                          <Checkbox 
+                            checked={selectedIds.includes(user.id)}
+                            onCheckedChange={(checked) => handleSelectOne(user.id, !!checked)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
