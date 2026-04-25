@@ -48,7 +48,9 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
           <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter mb-2 italic">
             {event?.name || "Evento sem nome"}
           </h3>
-          <p className="text-xs text-white/70 line-clamp-1 font-medium italic">{event?.description || ""}</p>
+          <p className="text-xs text-white/70 line-clamp-2 font-medium italic">
+            {event?.description || "Leilão premium com curadoria genética de elite."}
+          </p>
         </div>
       </div>
 

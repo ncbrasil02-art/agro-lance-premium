@@ -152,7 +152,10 @@ export const Route = createFileRoute("/ao-vivo")({
         <div>
           <StatusBadge status="live" />
           <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{liveEvent.name}</h1>
-           <p className="text-sm text-muted-foreground">Leiloeiro: {liveEvent.auctioneer_name || "A definir"} · {liveEvent.promoter_company || "A definir"}</p>
+           <div className="flex flex-col gap-1">
+             <p className="text-sm text-muted-foreground italic line-clamp-1">{liveEvent.description || "Transmissão ao vivo do leilão premium."}</p>
+             <p className="text-xs text-gold/60 font-bold uppercase tracking-wider">Leiloeiro: {liveEvent.auctioneer_name || "A definir"} · {liveEvent.promoter_company || "A definir"}</p>
+           </div>
         </div>
         <div className="flex gap-4 text-sm">
            <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="h-4 w-4 text-gold" /> {(liveEvent.viewers || 0).toLocaleString("pt-BR")} assistindo</span>
