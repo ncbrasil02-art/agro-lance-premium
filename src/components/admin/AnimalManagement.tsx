@@ -8,43 +8,43 @@
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-   const [isCreating, setIsCreating] = useState(false);
-   const [newAnimal, setNewAnimal] = useState({
-     name: "",
-     species: "Equino",
-     breed: "",
-     registration_number: "",
-     sex: "M",
-     location: ""
-   });
+   export function AnimalManagement() {
+     const [isCreating, setIsCreating] = useState(false);
+     const [newAnimal, setNewAnimal] = useState({
+       name: "",
+       species: "Equino",
+       breed: "",
+       registration_number: "",
+       sex: "M",
+       location: ""
+     });
  
-   const handleCreate = async () => {
-     if (!newAnimal.name || !newAnimal.breed) {
-       toast.error("Preencha o nome e a raça");
-       return;
-     }
+     const handleCreate = async () => {
+       if (!newAnimal.name || !newAnimal.breed) {
+         toast.error("Preencha o nome e a raça");
+         return;
+       }
  
-     try {
-       const { error } = await supabase.from("animals").insert({
-         name: newAnimal.name,
-         species: newAnimal.species,
-         breed: newAnimal.breed,
-         registration_number: newAnimal.registration_number,
-         sex: newAnimal.sex,
-         location: newAnimal.location,
-         internal_code: `AN-${Math.floor(Math.random() * 10000)}`
-       });
+       try {
+         const { error } = await supabase.from("animals").insert({
+           name: newAnimal.name,
+           species: newAnimal.species,
+           breed: newAnimal.breed,
+           registration_number: newAnimal.registration_number,
+           sex: newAnimal.sex,
+           location: newAnimal.location,
+           internal_code: `AN-${Math.floor(Math.random() * 10000)}`
+         });
  
-       if (error) throw error;
-       toast.success("Animal cadastrado com sucesso");
-       setIsCreating(false);
-       fetchAnimals();
-     } catch (error: any) {
-       toast.error("Erro ao cadastrar animal: " + error.message);
-     }
-   };
+         if (error) throw error;
+         toast.success("Animal cadastrado com sucesso");
+         setIsCreating(false);
+         fetchAnimals();
+       } catch (error: any) {
+         toast.error("Erro ao cadastrar animal: " + error.message);
+       }
+     };
  
- import { toast } from "sonner";
  
  export function AnimalManagement() {
    const [animals, setAnimals] = useState<any[]>([]);
