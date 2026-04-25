@@ -16,7 +16,7 @@ export const Route = createFileRoute("/lotes")({
     loader: async () => {
       const { data: lots, error } = await supabase
         .from("lots")
-        .select("*, animal:animals(*), event:events!event_id(*)")
+        .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
         .order("is_featured", { ascending: false })
         .order("lot_number", { ascending: true });
      
