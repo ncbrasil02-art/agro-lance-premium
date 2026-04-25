@@ -1,5 +1,5 @@
  import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap } from "lucide-react";
  import { formatBRL } from "@/utils/format";
  import { Button } from "@/components/ui/button";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -154,7 +154,28 @@
  
   function LotDetail() {
     const { lot: initialLot, initialBids } = Route.useLoaderData();
-    const [recentBids, setRecentBids] = useState(initialBids);
+    const { user, profile } = useAuth();
+    const [lot, setLot] = useState(initialLot);
+    const [recentBids, setRecentBids] = useState<any[]>(initialBids);
+    const [isBidding, setIsBidding] = useState(false);
+  
+    useEffect(() => {
+      const lotChannel = supabase
+        .channel(`lot-${lot.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "lots",
+            filter: `id=eq.${lot.id}`,
+          },
+          (payload) => {
+            setLot((prev) => ({ ...prev, ...payload.new }));
+          }
+        )
+        .subscribe();
+ 
       const bidsChannel = supabase
         .channel(`bids-${lot.id}`)
         .on(
@@ -166,7 +187,6 @@
             filter: `lot_id=eq.${lot.id}`,
           },
           async (payload) => {
-            // Fetch profile for the new bid
             const { data: profile } = await supabase
               .from("profiles")
               .select("full_name")
@@ -178,55 +198,12 @@
           }
         )
         .subscribe();
- 
+  
       return () => {
-        supabase.removeChannel(channel);
+        supabase.removeChannel(lotChannel);
         supabase.removeChannel(bidsChannel);
       };
-             {/* Histórico de Lances */}
-             <div className="rounded-2xl border border-border bg-card p-6">
-               <h2 className="flex items-center gap-2 font-semibold"><Zap className="h-4 w-4 text-gold" /> Lances recentes</h2>
-               <div className="mt-4 space-y-3">
-                 {recentBids.length > 0 ? (
-                   recentBids.map((bid: any) => (
-                     <div key={bid.id} className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0 last:pb-0">
-                       <div>
-                         <div className="text-sm font-bold">{bid.profile?.full_name || "Participante"}</div>
-                         <div className="text-[10px] text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString()}</div>
-                       </div>
-                       <div className="text-sm font-black text-gold-bright">{formatBRL(bid.amount)}</div>
-                     </div>
-                   ))
-                 ) : (
-                   <div className="text-center py-4 text-xs text-muted-foreground">Nenhum lance efetuado ainda.</div>
-                 )}
-               </div>
-             </div>
-   const { user, profile } = useAuth();
-   const [lot, setLot] = useState(initialLot);
-   const [isBidding, setIsBidding] = useState(false);
- 
-   useEffect(() => {
-     const channel = supabase
-       .channel(`lot-${lot.id}`)
-       .on(
-         "postgres_changes",
-         {
-           event: "UPDATE",
-           schema: "public",
-           table: "lots",
-           filter: `id=eq.${lot.id}`,
-         },
-         (payload) => {
-           setLot((prev) => ({ ...prev, ...payload.new }));
-         }
-       )
-       .subscribe();
- 
-     return () => {
-       supabase.removeChannel(channel);
-     };
-   }, [lot.id]);
+    }, [lot.id]);
  
    const placeBid = async (amount: number) => {
      if (!user) {
