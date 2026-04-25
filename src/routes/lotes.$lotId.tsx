@@ -409,6 +409,18 @@ function LotDetail() {
                   </div>
 
                   <div className="space-y-4">
+                    {dynamicStatus === 'loteamento' && (
+                      <div className="p-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                        <Info className="h-5 w-5 text-gold shrink-0 mt-0.5" />
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-gold uppercase tracking-wider">Lances em breve</p>
+                          <p className="text-[11px] text-white/70 leading-relaxed">
+                            Este lote está em fase de loteamento. Os lances serão liberados assim que o evento for iniciado ou o pré-lance for autorizado pelo administrador.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-3 gap-3">
                       {[1, 2, 5].map((m) => (
                         <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
