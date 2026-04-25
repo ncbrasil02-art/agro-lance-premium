@@ -105,9 +105,10 @@ function Home() {
      minIncrement: l.bid_increment,
      bidsCount: l.bids_count || 0,
      viewers: l.viewers || 0,
-     endsAt: l.end_date || "",
-     status: l.status as any,
-   }));
+      endsAt: l.end_date || "",
+      status: l.status as any,
+      eventStartDate: (l as any).event?.start_date,
+    }));
  
       const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
       const upcomingEvents = mappedEvents.filter((e: any) => e.status === "scheduled");
