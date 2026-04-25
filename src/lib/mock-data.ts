@@ -37,8 +37,8 @@ export interface Lot {
   minIncrement: number;
   bidsCount: number;
   viewers: number;
-  endsAt: string;
-  status: "open" | "live" | "sold" | "scheduled";
+  endsAt?: string;
+  status?: any;
 }
 
 export const events: AuctionEvent[] = [
