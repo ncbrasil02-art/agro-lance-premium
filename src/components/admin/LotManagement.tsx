@@ -10,17 +10,24 @@
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-   export function LotManagement({ 
-     initialEventId = "all", 
-     onEventChange 
-   }: { 
-     initialEventId?: string; 
-     onEventChange?: (id: string) => void;
-   }) {
-     const [isDialogOpen, setIsDialogOpen] = useState(false);
-     const [editingLot, setEditingLot] = useState<any>(null);
+    export function LotManagement({ 
+      initialEventId = "all", 
+      onEventChange 
+    }: { 
+      initialEventId?: string; 
+      onEventChange?: (id: string) => void;
+    }) {
+      const [isDialogOpen, setIsDialogOpen] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
+      const [lots, setLots] = useState<any[]>([]);
+      const [events, setEvents] = useState<any[]>([]);
+      const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
+      const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [editingLot, setEditingLot] = useState<any>(null);
+      
       const [formData, setFormData] = useState({
-        event_id: initialEventId === "all" ? "" : initialEventId,
+        event_id: "",
         animal_id: "",
         lot_number: 1,
         starting_price: 0,
@@ -30,140 +37,128 @@
         payment_methods: ""
       });
 
-     const resetForm = () => {
-       setEditingLot(null);
-       setFormData({
-         event_id: "",
-         animal_id: "",
-         lot_number: 1,
-         starting_price: 0,
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          const [lotsRes, eventsRes, animalsRes] = await Promise.all([
+            supabase
+              .from("lots")
+              .select("*, event:events(name), animal:animals(name, internal_code)")
+              .order("lot_number", { ascending: true }),
+            supabase
+              .from("events")
+              .select("id, name")
+              .order("name"),
+            supabase
+              .from("animals")
+              .select("id, name, internal_code")
+              .order("name")
+          ]);
+    
+          if (lotsRes.error) throw lotsRes.error;
+          if (eventsRes.error) throw eventsRes.error;
+          if (animalsRes.error) throw animalsRes.error;
+    
+          setLots(lotsRes.data || []);
+          setEvents(eventsRes.data || []);
+          setAvailableAnimals(animalsRes.data || []);
+          
+          if (initialEventId !== "all") {
+            setFormData(prev => ({ ...prev, event_id: initialEventId }));
+          }
+        } catch (error: any) {
+          toast.error("Erro ao carregar dados: " + error.message);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        setSelectedEventId(initialEventId);
+        fetchData();
+      }, [initialEventId]);
+
+      const resetForm = () => {
+        setEditingLot(null);
+        setFormData({
+          event_id: initialEventId !== "all" ? initialEventId : "",
+          animal_id: "",
+          lot_number: 1,
+          starting_price: 0,
           bid_increment: 1000,
           status: "active",
           allows_pre_bidding: true,
           payment_methods: ""
-       });
-     };
+        });
+      };
 
-     const handleEdit = (lot: any) => {
-       setEditingLot(lot);
-       setFormData({
-         event_id: lot.event_id || "",
-         animal_id: lot.animal_id || "",
-         lot_number: lot.lot_number || 1,
-         starting_price: lot.starting_price || 0,
-         bid_increment: lot.bid_increment || 1000,
+      const handleEdit = (lot: any) => {
+        setEditingLot(lot);
+        setFormData({
+          event_id: lot.event_id || "",
+          animal_id: lot.animal_id || "",
+          lot_number: lot.lot_number || 1,
+          starting_price: lot.starting_price || 0,
+          bid_increment: lot.bid_increment || 1000,
           status: lot.status || "active",
           allows_pre_bidding: lot.allows_pre_bidding !== false,
           payment_methods: lot.payment_methods?.join(", ") || ""
-       });
-       setIsDialogOpen(true);
-     };
-
-    const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
-  
-    const fetchAvailableAnimals = async () => {
-      const { data, error } = await supabase
-        .from("animals")
-        .select("id, name, internal_code");
-      
-      if (!error) setAvailableAnimals(data || []);
-    };
-  
-     const handleSave = async () => {
-       if (!formData.event_id || !formData.animal_id || !formData.lot_number) {
-        toast.error("Preencha todos os campos obrigatórios");
-        return;
-      }
-  
-      try {
-         if (editingLot) {
-           const { error } = await supabase
-             .from("lots")
-             .update({
-               event_id: formData.event_id,
-               animal_id: formData.animal_id,
-               lot_number: formData.lot_number,
-               starting_price: formData.starting_price,
-               bid_increment: formData.bid_increment,
+        });
+        setIsDialogOpen(true);
+      };
+   
+      const handleSave = async () => {
+        if (!formData.event_id || !formData.animal_id || !formData.lot_number) {
+         toast.error("Preencha todos os campos obrigatórios");
+         return;
+       }
+   
+       try {
+          if (editingLot) {
+            const { error } = await supabase
+              .from("lots")
+              .update({
+                event_id: formData.event_id,
+                animal_id: formData.animal_id,
+                lot_number: formData.lot_number,
+                starting_price: formData.starting_price,
+                bid_increment: formData.bid_increment,
                 status: formData.status,
                 allows_pre_bidding: formData.allows_pre_bidding,
                 payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : []
-             })
-             .eq("id", editingLot.id);
-           if (error) throw error;
-           toast.success("Lote atualizado com sucesso");
-         } else {
-           const { error } = await supabase.from("lots").insert({
-             event_id: formData.event_id,
-             animal_id: formData.animal_id,
-             lot_number: formData.lot_number,
-             starting_price: formData.starting_price,
-             current_price: formData.starting_price,
-             bid_increment: formData.bid_increment,
+              })
+              .eq("id", editingLot.id);
+            if (error) throw error;
+            toast.success("Lote atualizado com sucesso");
+          } else {
+            const { error } = await supabase.from("lots").insert({
+              event_id: formData.event_id,
+              animal_id: formData.animal_id,
+              lot_number: formData.lot_number,
+              starting_price: formData.starting_price,
+              current_price: formData.starting_price,
+              bid_increment: formData.bid_increment,
               status: formData.status,
               allows_pre_bidding: formData.allows_pre_bidding,
               payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
-             end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-           });
-           if (error) throw error;
-           toast.success("Lote alocado com sucesso");
-         }
-  
-         setIsDialogOpen(false);
-         resetForm();
-        fetchData();
-      } catch (error: any) {
-         toast.error("Erro ao salvar lote: " + error.message);
-      }
-    };
-   const [lots, setLots] = useState<any[]>([]);
-   const [events, setEvents] = useState<any[]>([]);
-    const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+              end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+            });
+            if (error) throw error;
+            toast.success("Lote alocado com sucesso");
+          }
+   
+          setIsDialogOpen(false);
+          resetForm();
+          fetchData();
+       } catch (error: any) {
+          toast.error("Erro ao salvar lote: " + error.message);
+       }
+     };
 
-      useEffect(() => {
-        setSelectedEventId(initialEventId);
-        if (initialEventId !== "all") {
-          setFormData(prev => ({ ...prev, event_id: initialEventId }));
-        }
-        fetchData();
-      }, [initialEventId]);
-
-    const handleEventSelectChange = (val: string) => {
-      setSelectedEventId(val);
-      if (onEventChange) onEventChange(val);
-    };
-   const [isLoading, setIsLoading] = useState(true);
-   const [searchQuery, setSearchQuery] = useState("");
- 
-   const fetchData = async () => {
-     setIsLoading(true);
-     try {
-       const [lotsRes, eventsRes] = await Promise.all([
-         supabase
-           .from("lots")
-           .select("*, event:events(name), animal:animals(name, internal_code)")
-           .order("lot_number", { ascending: true }),
-         supabase
-           .from("events")
-           .select("id, name")
-           .order("name")
-       ]);
- 
-       if (lotsRes.error) throw lotsRes.error;
-       if (eventsRes.error) throw eventsRes.error;
- 
-       setLots(lotsRes.data || []);
-       setEvents(eventsRes.data || []);
-     } catch (error: any) {
-       toast.error("Erro ao carregar dados: " + error.message);
-     } finally {
-       setIsLoading(false);
-     }
-   };
- 
-   useEffect(() => {
-     fetchData();
-   }, []);
+     const handleEventSelectChange = (val: string) => {
+       setSelectedEventId(val);
+       if (onEventChange) onEventChange(val);
+     };
  
    const filteredLots = lots.filter(lot => {
      const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -210,11 +205,11 @@
              </SelectContent>
            </Select>
          </div>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) resetForm();
-           if (open) fetchAvailableAnimals();
-         }}>
+           <Dialog open={isDialogOpen} onOpenChange={(open) => {
+             setIsDialogOpen(open);
+             if (!open) resetForm();
+             if (open) fetchData(); // Refresca os dados ao abrir o diálogo
+           }}>
            <DialogTrigger asChild>
               <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
                 resetForm();
@@ -234,20 +229,24 @@
                <div className="grid gap-2">
                  <Label htmlFor="event">Evento</Label>
                   <Select onValueChange={(v) => setFormData({ ...formData, event_id: v })} value={formData.event_id}>
-                   <SelectTrigger>
-                      <SelectValue placeholder="Selecione o evento" />
-                   </SelectTrigger>
-                    <SelectContent>
-                      {events.length === 0 ? (
-                        <div className="p-2 text-xs text-center text-muted-foreground">
-                          Nenhum evento cadastrado. <br/> 
-                          Crie um evento na aba "Eventos" primeiro.
-                        </div>
-                      ) : (
-                        events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
-                      )}
-                    </SelectContent>
-                 </Select>
+                    <SelectTrigger>
+                       <SelectValue placeholder={isLoading ? "Carregando eventos..." : "Selecione o evento"} />
+                    </SelectTrigger>
+                     <SelectContent>
+                       {isLoading ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground flex items-center justify-center">
+                           <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
+                         </div>
+                       ) : events.length === 0 ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground">
+                           Nenhum evento cadastrado. <br/> 
+                           Crie um evento na aba "Eventos" primeiro.
+                         </div>
+                       ) : (
+                         events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
+                       )}
+                     </SelectContent>
+                  </Select>
                </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
@@ -264,20 +263,24 @@
                       Cadastrar Novo Animal
                     </Button>
                   </div>
-                  <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o animal" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableAnimals.length === 0 ? (
-                        <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
-                      ) : (
-                        (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
-                          <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+                   <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
+                     <SelectTrigger>
+                       <SelectValue placeholder={isLoading ? "Carregando animais..." : "Selecione o animal"} />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {isLoading ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground flex items-center justify-center">
+                           <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
+                         </div>
+                       ) : availableAnimals.length === 0 ? (
+                         <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
+                       ) : (
+                         (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
+                           <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
+                         ))
+                       )}
+                     </SelectContent>
+                   </Select>
                 </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">

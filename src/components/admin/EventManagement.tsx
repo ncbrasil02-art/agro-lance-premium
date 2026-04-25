@@ -21,7 +21,7 @@
      const [formData, setFormData] = useState({
        name: "",
        description: "",
-       start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+       start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
        location: "",
        status: "scheduled",
        event_type: "online",
@@ -38,7 +38,7 @@
        setFormData({
          name: "",
          description: "",
-         start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+       start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
          location: "",
          status: "scheduled",
          event_type: "online",
@@ -56,7 +56,7 @@
        setFormData({
          name: event.name || "",
          description: event.description || "",
-         start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm") : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+         start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm:ss") : format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
          location: event.location || "",
          status: event.status || "scheduled",
          event_type: event.event_type || "online",
@@ -229,7 +229,7 @@
                     value={formData.start_date} 
                     onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
                   />
-                  <p className="text-[10px] text-muted-foreground">O leilão iniciará automaticamente nesta data/hora.</p>
+                  <p className="text-[10px] text-muted-foreground">O leilão iniciará automaticamente nesta data/hora. Certifique-se de definir também os segundos para maior precisão.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
