@@ -383,7 +383,13 @@
                   </Button>
                   
                   <p className="text-center text-[10px] text-muted-foreground">
-                    Ao confirmar, você concorda com os termos de uso e condições do leilão.
+                    {!user ? (
+                      <Link to="/login" className="text-gold hover:underline font-bold">Faça login para dar lances</Link>
+                    ) : !profile?.is_approved ? (
+                      <span className="text-destructive font-semibold">Conta aguardando aprovação administrativa</span>
+                    ) : (
+                      "Ao confirmar, você concorda com os termos de uso e condições do leilão."
+                    )}
                     <br />Incremento mínimo: {formatBRL(lot.bid_increment)}
                   </p>
                 </div>
