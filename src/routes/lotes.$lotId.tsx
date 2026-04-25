@@ -267,13 +267,23 @@ function LotDetail() {
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-8">
             <div className="space-y-4">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
-                <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute left-6 top-6 flex flex-col gap-2">
-                  <StatusBadge status={dynamicStatus} />
-                </div>
-              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl group cursor-zoom-in">
+                    <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute left-6 top-6 flex flex-col gap-2">
+                      <StatusBadge status={dynamicStatus} />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                      <Eye className="h-10 w-10 text-white/50" />
+                    </div>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black border-white/10 flex items-center justify-center overflow-hidden">
+                  <img src={lot.animal?.photos?.[activePhoto] || ""} alt="" className="max-w-full max-h-full object-contain" />
+                </DialogContent>
+              </Dialog>
               <div className="grid grid-cols-5 gap-3">
                 {lot.animal?.photos?.map((src: string, i: number) => (
                   <button key={i} onClick={() => setActivePhoto(i)} className={`aspect-square overflow-hidden rounded-xl border-2 transition-all ${activePhoto === i ? 'border-gold shadow-gold/20' : 'border-transparent opacity-60 hover:opacity-100'}`}>
@@ -436,6 +446,28 @@ function LotDetail() {
                   </div>
 
                   <div className="space-y-4">
+                    {lot.animal?.youtube_url && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
+                          >
+                            <PlayCircle className="h-4 w-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[800px] bg-black p-0 border-white/10 overflow-hidden">
+                          <div className="aspect-video">
+                            <iframe 
+                              src={lot.animal.youtube_url.replace("watch?v=", "embed/").split("&")[0]} 
+                              className="h-full w-full" 
+                              allowFullScreen 
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
                     {dynamicStatus === 'loteamento' && (
                       <div className="p-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                         <Info className="h-5 w-5 text-gold shrink-0 mt-0.5" />
