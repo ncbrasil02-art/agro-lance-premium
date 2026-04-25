@@ -11,39 +11,102 @@
   import { toast } from "sonner";
  
   export function AnimalManagement() {
-    const [isCreating, setIsCreating] = useState(false);
-    const [newAnimal, setNewAnimal] = useState({
+   const [isDialogOpen, setIsDialogOpen] = useState(false);
+   const [editingAnimal, setEditingAnimal] = useState<any>(null);
+   const [formData, setFormData] = useState({
       name: "",
       species: "Equino",
       breed: "",
       registration_number: "",
       sex: "M",
-      location: ""
+      location: "",
+      youtube_url: "",
+      pedigree_url: "",
+      color: "",
+      birth_date: ""
     });
+
+    const resetForm = () => {
+      setEditingAnimal(null);
+      setFormData({
+        name: "",
+        species: "Equino",
+        breed: "",
+        registration_number: "",
+        sex: "M",
+        location: "",
+        youtube_url: "",
+        pedigree_url: "",
+        color: "",
+        birth_date: ""
+      });
+    };
+
+    const handleEdit = (animal: any) => {
+      setEditingAnimal(animal);
+      setFormData({
+        name: animal.name || "",
+        species: animal.species || "Equino",
+        breed: animal.breed || "",
+        registration_number: animal.registration_number || "",
+        sex: animal.sex || "M",
+        location: animal.location || "",
+        youtube_url: animal.youtube_url || "",
+        pedigree_url: animal.pedigree_url || "",
+        color: animal.color || "",
+        birth_date: animal.birth_date || ""
+      });
+      setIsDialogOpen(true);
+    };
  
-    const handleCreate = async () => {
-      if (!newAnimal.name || !newAnimal.breed) {
+    const handleSave = async () => {
+      if (!formData.name || !formData.breed) {
         toast.error("Preencha o nome e a raça");
         return;
       }
  
       try {
-        const { error } = await supabase.from("animals").insert({
-          name: newAnimal.name,
-          species: newAnimal.species,
-          breed: newAnimal.breed,
-          registration_number: newAnimal.registration_number,
-          sex: newAnimal.sex,
-          location: newAnimal.location,
-          internal_code: `AN-${Math.floor(Math.random() * 10000)}`
-        });
+        if (editingAnimal) {
+          const { error } = await supabase
+            .from("animals")
+            .update({
+              name: formData.name,
+              species: formData.species,
+              breed: formData.breed,
+              registration_number: formData.registration_number,
+              sex: formData.sex,
+              location: formData.location,
+              youtube_url: formData.youtube_url,
+              pedigree_url: formData.pedigree_url,
+              color: formData.color,
+              birth_date: formData.birth_date || null
+            })
+            .eq("id", editingAnimal.id);
+          if (error) throw error;
+          toast.success("Animal atualizado com sucesso");
+        } else {
+          const { error } = await supabase.from("animals").insert({
+            name: formData.name,
+            species: formData.species,
+            breed: formData.breed,
+            registration_number: formData.registration_number,
+            sex: formData.sex,
+            location: formData.location,
+            youtube_url: formData.youtube_url,
+            pedigree_url: formData.pedigree_url,
+            color: formData.color,
+            birth_date: formData.birth_date || null,
+            internal_code: `AN-${Math.floor(Math.random() * 10000)}`
+          });
+          if (error) throw error;
+          toast.success("Animal cadastrado com sucesso");
+        }
  
-        if (error) throw error;
-        toast.success("Animal cadastrado com sucesso");
-        setIsCreating(false);
+        setIsDialogOpen(false);
+        resetForm();
         fetchAnimals();
       } catch (error: any) {
-        toast.error("Erro ao cadastrar animal: " + error.message);
+        toast.error("Erro ao salvar animal: " + error.message);
       }
     };
    const [animals, setAnimals] = useState<any[]>([]);
@@ -101,60 +164,90 @@
              onChange={(e) => setSearchQuery(e.target.value)}
            />
          </div>
-         <Dialog open={isCreating} onOpenChange={setIsCreating}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) resetForm();
+          }}>
            <DialogTrigger asChild>
-             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+              <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
+                resetForm();
+                setIsDialogOpen(true);
+              }}>
                <PlusCircle className="mr-2 h-4 w-4" /> Novo Animal
              </Button>
            </DialogTrigger>
-           <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
-               <DialogTitle>Cadastrar Novo Animal</DialogTitle>
+                <DialogTitle>{editingAnimal ? "Editar Animal" : "Cadastrar Novo Animal"}</DialogTitle>
                <DialogDescription>
-                 Preencha as informações básicas do animal.
+                  Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
              <div className="grid gap-4 py-4">
                <div className="grid gap-2">
                  <Label htmlFor="name">Nome</Label>
-                 <Input value={newAnimal.name} onChange={(e) => setNewAnimal({ ...newAnimal, name: e.target.value })} />
+                  <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                </div>
-               <div className="grid grid-cols-2 gap-4">
-                 <div className="grid gap-2">
-                   <Label htmlFor="species">Espécie</Label>
-                   <Select onValueChange={(v) => setNewAnimal({ ...newAnimal, species: v })} defaultValue={newAnimal.species}>
-                     <SelectTrigger><SelectValue /></SelectTrigger>
-                     <SelectContent>
-                       <SelectItem value="Equino">Equino</SelectItem>
-                       <SelectItem value="Bovino">Bovino</SelectItem>
-                       <SelectItem value="Ovino">Ovino</SelectItem>
-                     </SelectContent>
-                   </Select>
-                 </div>
-                 <div className="grid gap-2">
-                   <Label htmlFor="sex">Sexo</Label>
-                   <Select onValueChange={(v) => setNewAnimal({ ...newAnimal, sex: v })} defaultValue={newAnimal.sex}>
-                     <SelectTrigger><SelectValue /></SelectTrigger>
-                     <SelectContent>
-                       <SelectItem value="M">Macho</SelectItem>
-                       <SelectItem value="F">Fêmea</SelectItem>
-                     </SelectContent>
-                   </Select>
-                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="species">Espécie</Label>
+                    <Select onValueChange={(v) => setFormData({ ...formData, species: v })} value={formData.species}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Equino">Equino</SelectItem>
+                        <SelectItem value="Bovino">Bovino</SelectItem>
+                        <SelectItem value="Ovino">Ovino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="breed">Raça</Label>
+                    <Input value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
+                  </div>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="breed">Raça</Label>
-                 <Input value={newAnimal.breed} onChange={(e) => setNewAnimal({ ...newAnimal, breed: e.target.value })} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="sex">Sexo</Label>
+                    <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="M">Macho</SelectItem>
+                        <SelectItem value="F">Fêmea</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="reg">Registro</Label>
+                    <Input value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
+                  </div>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="reg">Registro</Label>
-                 <Input value={newAnimal.registration_number} onChange={(e) => setNewAnimal({ ...newAnimal, registration_number: e.target.value })} />
-               </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="birth_date">Data de Nascimento</Label>
+                    <Input type="date" value={formData.birth_date} onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="color">Pelagem/Cor</Label>
+                    <Input value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="youtube">Link do Vídeo (YouTube)</Label>
+                  <Input value={formData.youtube_url} onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="pedigree">Link da Genealogia (PDF ou Imagem)</Label>
+                  <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="https://..." />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Localização</Label>
+                  <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
+                </div>
              </div>
              <DialogFooter>
-               <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
-               <Button className="bg-gold text-emerald-deep" onClick={handleCreate}>
-                 Salvar Animal
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+                <Button className="bg-gold text-emerald-deep" onClick={handleSave}>
+                  {editingAnimal ? "Salvar Alterações" : "Salvar Animal"}
                </Button>
              </DialogFooter>
            </DialogContent>
@@ -195,16 +288,16 @@
                        <TableCell>{animal.species} / {animal.breed}</TableCell>
                        <TableCell>{animal.registration_number}</TableCell>
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
-                       <TableCell className="text-right">
-                         <div className="flex justify-end gap-2">
-                           <Button variant="ghost" size="icon">
-                             <Pencil className="h-4 w-4" />
-                           </Button>
-                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(animal.id)}>
-                             <Trash2 className="h-4 w-4" />
-                           </Button>
-                         </div>
-                       </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(animal)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(animal.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                      </TableRow>
                    ))
                  )}
