@@ -46,7 +46,13 @@
    location: z.string().nullable().optional(),
    genealogy: z.any().nullable().optional(),
    youtube_url: z.string().nullable().optional(),
-   pedigree_url: z.string().nullable().optional(),
+    pedigree_url: z.string().nullable().optional(),
+    registration_1cc: z.string().nullable().optional(),
+    registration_2: z.string().nullable().optional(),
+    chip_number: z.string().nullable().optional(),
+    book: z.string().nullable().optional(),
+    blood_typing: z.string().nullable().optional(),
+    blood_percentage: z.string().nullable().optional(),
  });
  
  export const lotSchema = z.object({

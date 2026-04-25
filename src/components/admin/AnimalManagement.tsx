@@ -32,15 +32,21 @@
   const [customHealthItem, setCustomHealthItem] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   
-     const [formData, setFormData] = useState<any>({
-        seller_id: "",
-        category_id: "",
-       name: "",
-       species: "Equino",
-       breed: "",
-       registration_number: "",
-       sex: "M",
-       location: "",
+      const [formData, setFormData] = useState<any>({
+         seller_id: "",
+         category_id: "",
+        name: "",
+        species: "Equino",
+        breed: "",
+        registration_number: "",
+        registration_1cc: "",
+        registration_2: "",
+        chip_number: "",
+        book: "",
+        blood_typing: "",
+        blood_percentage: "",
+        sex: "M",
+        location: "",
        youtube_url: "",
        pedigree_url: "",
        color: "",
@@ -56,17 +62,23 @@
          description: ""
     });
 
-    const resetForm = () => {
-      setEditingAnimal(null);
-       setFormData({
-         seller_id: "",
-         category_id: "",
-        name: "",
-        species: "Equino",
-        breed: "",
-        registration_number: "",
-        sex: "M",
-        location: "",
+     const resetForm = () => {
+       setEditingAnimal(null);
+        setFormData({
+          seller_id: "",
+          category_id: "",
+         name: "",
+         species: "Equino",
+         breed: "",
+         registration_number: "",
+         registration_1cc: "",
+         registration_2: "",
+         chip_number: "",
+         book: "",
+         blood_typing: "",
+         blood_percentage: "",
+         sex: "M",
+         location: "",
         youtube_url: "",
         pedigree_url: "",
         color: "",
@@ -83,17 +95,23 @@
       });
     };
 
-    const handleEdit = (animal: any) => {
-      setEditingAnimal(animal);
-       setFormData({
-         seller_id: animal.seller_id || "",
-         category_id: animal.category_id || "",
-        name: animal.name || "",
-        species: animal.species || "Equino",
-        breed: animal.breed || "",
-        registration_number: animal.registration_number || "",
-        sex: animal.sex || "M",
-        location: animal.location || "",
+     const handleEdit = (animal: any) => {
+       setEditingAnimal(animal);
+        setFormData({
+          seller_id: animal.seller_id || "",
+          category_id: animal.category_id || "",
+         name: animal.name || "",
+         species: animal.species || "Equino",
+         breed: animal.breed || "",
+         registration_number: animal.registration_number || "",
+         registration_1cc: animal.registration_1cc || "",
+         registration_2: animal.registration_2 || "",
+         chip_number: animal.chip_number || "",
+         book: animal.book || "",
+         blood_typing: animal.blood_typing || "",
+         blood_percentage: animal.blood_percentage || "",
+         sex: animal.sex || "M",
+         location: animal.location || "",
         youtube_url: animal.youtube_url || "",
         pedigree_url: animal.pedigree_url || "",
         color: animal.color || "",
@@ -126,9 +144,15 @@
                category_id: formData.category_id || null,
               name: formData.name,
               species: formData.species,
-              breed: formData.breed,
-              registration_number: formData.registration_number,
-              sex: formData.sex,
+               breed: formData.breed,
+               registration_number: formData.registration_number,
+               registration_1cc: formData.registration_1cc,
+               registration_2: formData.registration_2,
+               chip_number: formData.chip_number,
+               book: formData.book,
+               blood_typing: formData.blood_typing,
+               blood_percentage: formData.blood_percentage,
+               sex: formData.sex,
               location: formData.location,
               youtube_url: formData.youtube_url,
               pedigree_url: formData.pedigree_url,
@@ -151,9 +175,15 @@
              category_id: formData.category_id || null,
             name: formData.name,
             species: formData.species,
-            breed: formData.breed,
-            registration_number: formData.registration_number,
-            sex: formData.sex,
+             breed: formData.breed,
+             registration_number: formData.registration_number,
+             registration_1cc: formData.registration_1cc,
+             registration_2: formData.registration_2,
+             chip_number: formData.chip_number,
+             book: formData.book,
+             blood_typing: formData.blood_typing,
+             blood_percentage: formData.blood_percentage,
+             sex: formData.sex,
             location: formData.location,
             youtube_url: formData.youtube_url,
             pedigree_url: formData.pedigree_url,
@@ -278,15 +308,55 @@
                   Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
-             <Tabs defaultValue="geral" className="w-full">
-               <TabsList className="grid w-full grid-cols-4">
-                 <TabsTrigger value="geral">Geral</TabsTrigger>
-                 <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
-                 <TabsTrigger value="saude">Saúde</TabsTrigger>
-                 <TabsTrigger value="midia">Mídia</TabsTrigger>
-               </TabsList>
+              <Tabs defaultValue="geral" className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="geral">Geral</TabsTrigger>
+                  <TabsTrigger value="registros">Registros</TabsTrigger>
+                  <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
+                  <TabsTrigger value="saude">Saúde</TabsTrigger>
+                  <TabsTrigger value="midia">Mídia</TabsTrigger>
+                </TabsList>
                
-               <TabsContent value="geral" className="space-y-4 pt-4">
+                <TabsContent value="registros" className="space-y-4 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="reg_main">Registro Principal</Label>
+                      <Input id="reg_main" value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="reg1cc">Registro 1cc</Label>
+                      <Input id="reg1cc" value={formData.registration_1cc} onChange={(e) => setFormData({ ...formData, registration_1cc: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="reg2">Registro 2</Label>
+                      <Input id="reg2" value={formData.registration_2} onChange={(e) => setFormData({ ...formData, registration_2: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="chip">Informe o Chip</Label>
+                      <Input id="chip" value={formData.chip_number} onChange={(e) => setFormData({ ...formData, chip_number: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="livro">Livro</Label>
+                      <Input id="livro" value={formData.book} onChange={(e) => setFormData({ ...formData, book: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="tipagem">Tipagem</Label>
+                      <Input id="tipagem" value={formData.blood_typing} onChange={(e) => setFormData({ ...formData, blood_typing: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="grau">Grau Sangue</Label>
+                      <Input id="grau" value={formData.blood_percentage} onChange={(e) => setFormData({ ...formData, blood_percentage: e.target.value })} />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="geral" className="space-y-4 pt-4">
                  <div className="grid gap-2">
                    <Label htmlFor="name">Nome</Label>
                    <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
@@ -329,22 +399,16 @@
                       <Input id="breed" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
                     </div>
                   </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="sex">Sexo</Label>
-                     <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
-                       <SelectTrigger id="sex"><SelectValue /></SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="M">Macho</SelectItem>
-                         <SelectItem value="F">Fêmea</SelectItem>
-                       </SelectContent>
-                     </Select>
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="reg">Registro</Label>
-                     <Input id="reg" value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
-                   </div>
-                 </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="sex">Sexo</Label>
+                    <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
+                      <SelectTrigger id="sex"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="M">Macho</SelectItem>
+                        <SelectItem value="F">Fêmea</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    <div className="grid gap-2">
                      <Label htmlFor="birth_date">Data de Nascimento</Label>

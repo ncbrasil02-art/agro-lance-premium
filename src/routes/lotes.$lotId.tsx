@@ -325,8 +325,14 @@ function LotDetail() {
                        { icon: Scale, label: "Peso", value: lot.animal?.weight ? `${lot.animal.weight} kg` : null },
                       { icon: Ruler, label: "Altura", value: lot.animal?.height ? `${lot.animal.height} m` : null },
                       { icon: Sparkles, label: "Pelagem", value: lot.animal?.color },
-                      { icon: Fingerprint, label: "Registro", value: lot.animal?.registration_number },
-                    ].filter(item => item.value).map((item) => (
+                       { icon: Fingerprint, label: "Registro", value: lot.animal?.registration_number },
+                       { icon: Fingerprint, label: "Registro 1cc", value: lot.animal?.registration_1cc },
+                       { icon: Fingerprint, label: "Registro 2", value: lot.animal?.registration_2 },
+                       { icon: Zap, label: "Chip", value: lot.animal?.chip_number },
+                       { icon: FileText, label: "Livro", value: lot.animal?.book },
+                       { icon: Zap, label: "Tipagem", value: lot.animal?.blood_typing },
+                       { icon: Zap, label: "Grau Sangue", value: lot.animal?.blood_percentage },
+                     ].filter(item => item.value && item.value !== "").map((item) => (
                       <div key={item.label} className="p-3 md:p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center group hover:bg-gold/5 transition-all">
                         <item.icon className="h-4 w-4 text-gold/60 mb-2" />
                         <div className="text-[9px] uppercase text-gold/40 font-black tracking-widest mb-1">{item.label}</div>
