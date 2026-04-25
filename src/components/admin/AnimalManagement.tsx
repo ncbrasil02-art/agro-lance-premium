@@ -187,7 +187,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
    const ITEMS_PER_PAGE = 8;
    useEffect(() => {
      fetchAnimals();
-   }, []);
+   }, []); // Only fetch on mount
 
    const filteredAnimals = animals.filter(animal => 
      animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
