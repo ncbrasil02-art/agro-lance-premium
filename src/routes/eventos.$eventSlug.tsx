@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Calendar, MapPin, Gavel, Users, Trophy } from "lucide-react";
+import { Calendar, MapPin, Gavel, Users, Trophy, Zap } from "lucide-react";
+import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
 import { eventSchema } from "@/lib/schemas";
 import { LotCard } from "@/components/auctions/lot-card";
