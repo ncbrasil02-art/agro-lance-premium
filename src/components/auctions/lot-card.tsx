@@ -39,7 +39,11 @@ export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEn
               </div>
               <div className="absolute left-0 top-8 z-50 hidden w-48 rounded-xl bg-emerald-deep p-3 text-[10px] text-white/90 shadow-2xl border border-white/10 group-hover:block animate-in fade-in zoom-in-95">
                 <p className="font-bold text-gold uppercase mb-1">Em Loteamento</p>
-                Lances ainda não abertos. Aguarde o início do evento ou liberação do pré-lance.
+                {lot.eventStartDate ? (
+                  <>Lances abrem em {new Date(lot.eventStartDate).toLocaleDateString('pt-BR')} às {new Date(lot.eventStartDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.</>
+                ) : (
+                  <>Lances ainda não abertos. Aguarde o início do evento.</>
+                )}
               </div>
             </div>
           )}
