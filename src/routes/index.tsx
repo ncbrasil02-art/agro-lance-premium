@@ -1,5 +1,6 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
- import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar } from "lucide-react";
+ import { Countdown } from "@/components/auctions/countdown";
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
  import { LotCard } from "@/components/auctions/lot-card";
