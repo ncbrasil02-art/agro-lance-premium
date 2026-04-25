@@ -71,9 +71,10 @@
         photos_urls: animal.photos ? animal.photos.join(", ") : "",
         weight: animal.weight || "",
         height: animal.height || "",
-        vaccination_records: animal.vaccination_records?.join(", ") || "",
+        vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
         genealogy_father: animal.genealogy?.father || "",
-        genealogy_mother: animal.genealogy?.mother || ""
+        genealogy_mother: animal.genealogy?.mother || "",
+        pedigree_url: animal.pedigree_url || ""
       });
       setIsDialogOpen(true);
     };
@@ -101,7 +102,7 @@
               birth_date: formData.birth_date || null,
               weight: formData.weight ? parseFloat(formData.weight as string) : null,
               height: formData.height ? parseFloat(formData.height as string) : null,
-              vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()) : [],
+               vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
               genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
               photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
             })
@@ -122,7 +123,7 @@
             birth_date: formData.birth_date || null,
             weight: formData.weight ? parseFloat(formData.weight as string) : null,
             height: formData.height ? parseFloat(formData.height as string) : null,
-            vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()) : [],
+             vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
             genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
             internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
             photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
@@ -293,47 +294,94 @@
                    <Input value={formData.vaccination_records} onChange={(e) => setFormData({ ...formData, vaccination_records: e.target.value })} placeholder="Gripe, Tétano, etc" />
                  </div>
                  <div className="grid gap-2">
-                   <Label htmlFor="photos">Fotos do Animal</Label>
+                   <Label htmlFor="photos">Fotos do Animal (Clique para upload ou cole as URLs)</Label>
+                   <div className="flex flex-col gap-2">
+                     <div className="flex gap-2">
+                       <Input 
+                         type="file" 
+                         multiple 
+                         accept="image/*" 
+                         className="hidden" 
+                         id="photo-upload" 
+                         onChange={async (e) => {
+                           const files = e.target.files;
+                           if (!files) return;
+                           const toastId = toast.loading("Enviando fotos...");
+                           const uploadedUrls = [];
+                           for (let i = 0; i < files.length; i++) {
+                             const file = files[i];
+                             const fileExt = file.name.split('.').pop();
+                             const fileName = `${Math.random()}.${fileExt}`;
+                             const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+                             if (error) {
+                               toast.error(`Erro no upload: ${error.message}`);
+                               continue;
+                             }
+                             const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+                             uploadedUrls.push(publicUrl);
+                           }
+                           const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [];
+                           setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
+                           toast.dismiss(toastId);
+                           toast.success(`${uploadedUrls.length} fotos enviadas!`);
+                         }}
+                       />
+                       <Button 
+                         type="button" 
+                         variant="outline" 
+                         className="flex-1 border-dashed" 
+                         onClick={() => document.getElementById('photo-upload')?.click()}
+                       >
+                         <Upload className="mr-2 h-4 w-4" /> Upload de Fotos
+                       </Button>
+                       <Button 
+                         type="button" 
+                         variant="ghost" 
+                         size="sm"
+                         onClick={() => setFormData({ ...formData, photos_urls: "" })}
+                         className="text-[10px]"
+                       >
+                         Limpar
+                       </Button>
+                     </div>
+                     <Input value={formData.photos_urls} onChange={(e) => setFormData({ ...formData, photos_urls: e.target.value })} placeholder="URLs separadas por vírgula" />
+                   </div>
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="docs">Documentos / Pedigree (Upload PDF/Imagem)</Label>
                    <div className="flex gap-2">
                      <Input 
                        type="file" 
-                       multiple 
-                       accept="image/*" 
+                       accept=".pdf,image/*" 
                        className="hidden" 
-                       id="photo-upload" 
+                       id="doc-upload" 
                        onChange={async (e) => {
-                         const files = e.target.files;
-                         if (!files) return;
-                         const toastId = toast.loading("Enviando fotos...");
-                         const uploadedUrls = [];
-                         for (let i = 0; i < files.length; i++) {
-                           const file = files[i];
-                           const fileExt = file.name.split('.').pop();
-                           const fileName = `${Math.random()}.${fileExt}`;
-                           const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
-                           if (error) {
-                             toast.error(`Erro no upload: ${error.message}`);
-                             continue;
-                           }
-                           const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
-                           uploadedUrls.push(publicUrl);
+                         const file = e.target.files?.[0];
+                         if (!file) return;
+                         const toastId = toast.loading("Enviando documento...");
+                         const fileExt = file.name.split('.').pop();
+                         const fileName = `${Math.random()}.${fileExt}`;
+                         const { data, error } = await supabase.storage.from('documents').upload(fileName, file);
+                         if (error) {
+                           toast.error(`Erro no upload: ${error.message}`);
+                         } else {
+                           const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(data.path);
+                           setFormData({ ...formData, pedigree_url: publicUrl });
+                           toast.success("Documento enviado!");
                          }
-                         const currentUrls = formData.photos_urls ? formData.photos_urls.split(", ") : [];
-                         setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
                          toast.dismiss(toastId);
-                         toast.success("Fotos enviadas com sucesso!");
                        }}
                      />
                      <Button 
                        type="button" 
                        variant="outline" 
-                       className="w-full border-dashed" 
-                       onClick={() => document.getElementById('photo-upload')?.click()}
+                       className="flex-1 border-dashed" 
+                       onClick={() => document.getElementById('doc-upload')?.click()}
                      >
-                       <Upload className="mr-2 h-4 w-4" /> Enviar Fotos
+                       <Upload className="mr-2 h-4 w-4" /> Upload Documento
                      </Button>
                    </div>
-                   <Input value={formData.photos_urls} onChange={(e) => setFormData({ ...formData, photos_urls: e.target.value })} placeholder="Ou cole as URLs separadas por vírgula" />
+                   <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="URL do documento" />
                  </div>
                 <div className="grid gap-2">
                   <Label htmlFor="location">Localização</Label>
