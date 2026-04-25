@@ -168,6 +168,8 @@
  
    const currentPrice = lot.current_price || lot.starting_price;
    const nextBid = currentPrice + lot.bid_increment;
+  const installments = 30; // Exemplo de 30 parcelas
+  const installmentValue = currentPrice / installments;
  
    return (
      <div className="container mx-auto px-4 py-8">
@@ -184,27 +186,135 @@
        <div className="mt-4 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
          {/* Galeria */}
          <div>
-           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
-             <img 
-               src={lot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-               alt={lot.animal?.name} 
-               className="h-full w-full object-cover" 
-             />
-             <div className="absolute left-4 top-4 flex gap-2">
-               <StatusBadge status={lot.status as any} />
-               <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-bold backdrop-blur">
-                 LOTE {String(lot.lot_number).padStart(2, "0")}
-               </span>
-             </div>
-           </div>
-           <div className="mt-3 grid grid-cols-4 gap-3">
-             {lot.animal?.photos?.map((src, i) => (
-               <button key={i} className="aspect-square overflow-hidden rounded-lg border border-border opacity-70 transition hover:opacity-100">
-                 <img src={src} alt="" className="h-full w-full object-cover" />
-               </button>
-             ))}
-           </div>
-         </div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
+            <img 
+              src={lot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+              alt={lot.animal?.name} 
+              className="h-full w-full object-cover" 
+            />
+            <div className="absolute left-4 top-4 flex gap-2">
+              <StatusBadge status={lot.status as any} />
+              <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-bold backdrop-blur">
+                LOTE {String(lot.lot_number).padStart(2, "0")}
+              </span>
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-3">
+            {lot.animal?.photos?.map((src, i) => (
+              <button key={i} className="aspect-square overflow-hidden rounded-lg border border-border opacity-70 transition hover:opacity-100 focus:ring-2 focus:ring-gold outline-none">
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <Tabs defaultValue="detalhes" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5">
+                <TabsTrigger value="detalhes">Descrição</TabsTrigger>
+                <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
+                <TabsTrigger value="saude">Saúde</TabsTrigger>
+                <TabsTrigger value="videos">Vídeos</TabsTrigger>
+                <TabsTrigger value="documentos" className="hidden lg:inline-flex">Documentos</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="detalhes" className="mt-6">
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <p className="text-muted-foreground leading-relaxed">
+                    {lot.animal?.description || "Este exemplar apresenta características excepcionais da raça, com excelente conformação e temperamento. Ideal para quem busca genética de ponta e resultados comprovados em pista ou reprodução."}
+                  </p>
+                  <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-[10px] uppercase text-muted-foreground">Raça</div>
+                        <div className="font-semibold">{lot.animal?.breed}</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-[10px] uppercase text-muted-foreground">Sexo</div>
+                        <div className="font-semibold">{lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea'}</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-[10px] uppercase text-muted-foreground">Localização</div>
+                        <div className="font-semibold">{lot.animal?.location || "Não informada"}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="genealogia" className="mt-6">
+                <GenealogyTree genealogy={lot.animal?.genealogy} />
+              </TabsContent>
+
+              <TabsContent value="saude" className="mt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Card>
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className="rounded-full bg-emerald/10 p-2">
+                        <Stethoscope className="h-5 w-5 text-emerald-bright" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Exames Veterinários</div>
+                        <div className="font-semibold">Aprovado e Regularizado</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className="rounded-full bg-emerald/10 p-2">
+                        <Award className="h-5 w-5 text-emerald-bright" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Vacinação</div>
+                        <div className="font-semibold">Plano Sanitário em Dia</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  Todos os animais possuem atestado negativo para Anemia Infecciosa Equina (AIE) e Mormo, além de estarem com a vacinação de Influenza e Encefalomielite atualizadas.
+                </div>
+              </TabsContent>
+
+              <TabsContent value="videos" className="mt-6">
+                <div className="grid gap-4">
+                  {lot.animal?.videos && lot.animal.videos.length > 0 ? (
+                    lot.animal.videos.map((url: string, i: number) => (
+                      <div key={i} className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
+                        <video src={url} controls className="h-full w-full" />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex aspect-video flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 text-muted-foreground">
+                      <Video className="mb-2 h-10 w-10 opacity-20" />
+                      <p>Vídeo de apresentação em processamento</p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="documentos" className="mt-6">
+                <div className="space-y-3">
+                  <Button variant="outline" className="w-full justify-between" asChild>
+                    <a href="#" target="_blank">
+                      <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Registro Genealógico</span>
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </a>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-between" asChild>
+                    <a href="#" target="_blank">
+                      <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Laudo Veterinário</span>
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </a>
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
  
          {/* Info + Lance */}
          <div className="space-y-6">
