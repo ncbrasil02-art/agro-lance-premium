@@ -235,7 +235,20 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
            </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
-                <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
+                <div className="flex items-center justify-between pr-8">
+                  <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
+                  {editingEvent && (
+                    <Link 
+                      to="/eventos/$eventSlug" 
+                      params={{ eventSlug: editingEvent.slug || "" }} 
+                      target="_blank"
+                      className="text-[10px] font-bold text-gold uppercase flex items-center gap-1 hover:underline"
+                    >
+                      <Eye className="h-3 w-3" />
+                      Ver Público
+                    </Link>
+                  )}
+                </div>
                <DialogDescription>
                   Defina as configurações do leilão.
                </DialogDescription>
@@ -290,7 +303,11 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                     </Button>
                   </div>
                   {formData.banner_url && (
-                    <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
+                    <div className="relative mt-2 aspect-video overflow-hidden rounded-lg border border-border bg-muted">
+                      <img src={formData.banner_url} alt="Banner Preview" className="h-full w-full object-contain" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <p className="absolute bottom-2 left-2 text-[8px] font-black text-white uppercase tracking-widest">Pré-visualização do Banner</p>
+                    </div>
                   )}
                   <p className="text-[10px] text-muted-foreground">Esta imagem aparece na página inicial e no topo do evento.</p>
                 </div>
