@@ -19,6 +19,8 @@ interface AdminSearch {
   eventId?: string;
   q?: string;
   page?: number;
+  sort?: string;
+  order?: "asc" | "desc";
 }
 
 export const Route = createFileRoute("/admin")({
@@ -28,6 +30,8 @@ export const Route = createFileRoute("/admin")({
       eventId: (search.eventId as string) || "all",
       q: (search.q as string) || "",
       page: (search.page as number) || 1,
+      sort: (search.sort as string) || "created_at",
+      order: (search.order as "asc" | "desc") || "desc",
     };
   },
   component: AdminLayout,
@@ -42,7 +46,7 @@ function AdminLayout() {
   const selectedEventId = search.eventId || "all";
 
   const setActiveTab = (tab: AdminTab) => {
-    navigate({ search: (prev) => ({ ...prev, tab, q: "", page: 1 }) });
+    navigate({ search: (prev) => ({ ...prev, tab, q: "", page: 1, sort: undefined, order: undefined }) });
   };
 
   const setSelectedEventId = (eventId: string) => {
@@ -50,7 +54,7 @@ function AdminLayout() {
   };
 
   const handleManageLots = (eventId: string) => {
-    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "", page: 1 }) });
+    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "", page: 1, sort: undefined, order: undefined }) });
   };
 
   const onSearchChange = (q: string) => {
@@ -59,6 +63,10 @@ function AdminLayout() {
 
   const onPageChange = (page: number) => {
     navigate({ search: (prev) => ({ ...prev, page }) });
+  };
+
+  const onSortChange = (sort: string, order: "asc" | "desc") => {
+    navigate({ search: (prev) => ({ ...prev, sort, order, page: 1 }) });
   };
 
   if (isLoading) {
@@ -287,6 +295,9 @@ function AdminLayout() {
               onSearchChange={onSearchChange}
               currentPage={search.page || 1}
               onPageChange={onPageChange}
+              sortColumn={search.sort || "start_date"}
+              sortDirection={search.order || "desc"}
+              onSortChange={onSortChange}
             />
           )}
           {activeTab === "lots" && (
@@ -299,6 +310,9 @@ function AdminLayout() {
               onSearchChange={onSearchChange}
               currentPage={search.page || 1}
               onPageChange={onPageChange}
+              sortColumn={search.sort || "lot_number"}
+              sortDirection={search.order || "asc"}
+              onSortChange={onSortChange}
             />
           )}
           {activeTab === "animals" && (
@@ -308,6 +322,9 @@ function AdminLayout() {
               onSearchChange={onSearchChange}
               currentPage={search.page || 1}
               onPageChange={onPageChange}
+              sortColumn={search.sort || "name"}
+              sortDirection={search.order || "asc"}
+              onSortChange={onSortChange}
             />
           )}
           {activeTab === "users" && (
@@ -316,14 +333,9 @@ function AdminLayout() {
               onSearchChange={onSearchChange}
               currentPage={search.page || 1}
               onPageChange={onPageChange}
-            />
-          )}
-          {activeTab === "users" && (
-            <UserManagement 
-              searchQuery={search.q || ""}
-              onSearchChange={onSearchChange}
-              currentPage={search.page || 1}
-              onPageChange={onPageChange}
+              sortColumn={search.sort || "full_name"}
+              sortDirection={search.order || "asc"}
+              onSortChange={onSortChange}
             />
           )}
            {activeTab === "settings" && (
