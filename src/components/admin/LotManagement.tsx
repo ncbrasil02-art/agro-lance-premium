@@ -271,7 +271,25 @@ import { Link } from "@tanstack/react-router";
                   Defina as regras do animal neste evento.
                </DialogDescription>
              </DialogHeader>
-             <div className="grid gap-4 py-4">
+              <div className="grid gap-6 py-4">
+                {/* Fixed Image Preview of Animal */}
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border-2 border-white/5 bg-black/40 group">
+                  <img 
+                    src={(editingLot?.animal?.id === formData.animal_id ? editingLot.animal : availableAnimals.find(a => a.id === formData.animal_id))?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+                    alt="Animal Preview" 
+                    className={`h-full w-full object-cover transition-all duration-700 ${!formData.animal_id ? 'opacity-20 grayscale' : ''}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                    <div>
+                      <p className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Visualização do Lote</p>
+                      <p className="text-sm font-bold text-white uppercase italic">
+                        {(editingLot?.animal?.id === formData.animal_id ? editingLot.animal : availableAnimals.find(a => a.id === formData.animal_id))?.name || "Selecione um animal"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                <div className="grid gap-2">
                  <Label htmlFor="event">Evento</Label>
                   <Select onValueChange={(v) => setFormData({ ...formData, event_id: v })} value={formData.event_id}>
