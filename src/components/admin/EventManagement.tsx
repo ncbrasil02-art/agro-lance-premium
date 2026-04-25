@@ -212,7 +212,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
             </Button>
           </div>
-         <div className="relative flex-1 max-w-sm">
+         <div className="relative flex-1 max-w-sm w-full">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input
              placeholder="Buscar eventos..."

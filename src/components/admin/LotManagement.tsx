@@ -212,7 +212,7 @@ import { Link } from "@tanstack/react-router";
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
             </Button>
           </div>
-         <div className="flex flex-1 gap-4 max-w-2xl">
+         <div className="flex flex-1 flex-col sm:flex-row gap-4 max-w-2xl">
            <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
              <Input
@@ -223,7 +223,7 @@ import { Link } from "@tanstack/react-router";
              />
            </div>
             <Select value={selectedEventId} onValueChange={handleEventSelectChange}>
-             <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                <SelectValue placeholder="Filtrar por Evento" />
              </SelectTrigger>
              <SelectContent>
