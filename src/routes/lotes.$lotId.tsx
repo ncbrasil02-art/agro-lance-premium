@@ -1,5 +1,5 @@
  import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2 } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight } from "lucide-react";
  import { formatBRL } from "@/utils/format";
  import { Button } from "@/components/ui/button";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -8,6 +8,8 @@
  import { useAuth } from "@/components/auth/auth-provider";
  import { useEffect, useState } from "react";
  import { toast } from "sonner";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+ import { Card, CardContent } from "@/components/ui/card";
  
  export const Route = createFileRoute("/lotes/$lotId")({
    loader: async ({ params }) => {
@@ -36,6 +38,74 @@
    ),
    component: LotDetail,
  });
+ 
+ function GenealogyTree({ genealogy }: { genealogy: any }) {
+   if (!genealogy) return <div className="py-10 text-center text-muted-foreground">Informação de genealogia não disponível.</div>;
+ 
+   return (
+     <div className="relative overflow-x-auto py-8">
+       <div className="flex min-w-[600px] justify-center gap-8">
+         {/* Nível 1: Animal */}
+         <div className="flex flex-col justify-center">
+           <div className="rounded-lg border-2 border-gold bg-card p-4 text-center shadow-gold">
+             <div className="text-xs font-bold uppercase text-gold">Animal</div>
+             <div className="mt-1 font-bold">Principal</div>
+           </div>
+         </div>
+ 
+         <div className="flex flex-col justify-center gap-12">
+           {/* Nível 2: Pais */}
+           <div className="relative flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
+               <div className="text-[10px] uppercase text-muted-foreground">Pai</div>
+               <div className="mt-1 font-semibold">{genealogy.pai || "Não informado"}</div>
+             </div>
+           </div>
+           <div className="relative flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
+               <div className="text-[10px] uppercase text-muted-foreground">Mãe</div>
+               <div className="mt-1 font-semibold">{genealogy.mae || "Não informado"}</div>
+             </div>
+           </div>
+         </div>
+ 
+         <div className="flex flex-col justify-center gap-4">
+           {/* Nível 3: Avós */}
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avô Paterno</div>
+               <div className="mt-0.5 font-medium">{genealogy.avo_paterno || "—"}</div>
+             </div>
+           </div>
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avó Paterna</div>
+               <div className="mt-0.5 font-medium">{genealogy.ava_paterna || "—"}</div>
+             </div>
+           </div>
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avô Materno</div>
+               <div className="mt-0.5 font-medium">{genealogy.avo_materno || "—"}</div>
+             </div>
+           </div>
+           <div className="flex items-center">
+             <div className="h-0.5 w-8 bg-border" />
+             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
+               <div className="text-[9px] uppercase text-muted-foreground">Avó Materna</div>
+               <div className="mt-0.5 font-medium">{genealogy.ava_materna || "—"}</div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   );
+ }
  
  function LotDetail() {
    const { lot: initialLot } = Route.useLoaderData();
@@ -98,6 +168,8 @@
  
    const currentPrice = lot.current_price || lot.starting_price;
    const nextBid = currentPrice + lot.bid_increment;
+  const installments = 30; // Exemplo de 30 parcelas
+  const installmentValue = currentPrice / installments;
  
    return (
      <div className="container mx-auto px-4 py-8">
@@ -114,27 +186,135 @@
        <div className="mt-4 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
          {/* Galeria */}
          <div>
-           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
-             <img 
-               src={lot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-               alt={lot.animal?.name} 
-               className="h-full w-full object-cover" 
-             />
-             <div className="absolute left-4 top-4 flex gap-2">
-               <StatusBadge status={lot.status as any} />
-               <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-bold backdrop-blur">
-                 LOTE {String(lot.lot_number).padStart(2, "0")}
-               </span>
-             </div>
-           </div>
-           <div className="mt-3 grid grid-cols-4 gap-3">
-             {lot.animal?.photos?.map((src, i) => (
-               <button key={i} className="aspect-square overflow-hidden rounded-lg border border-border opacity-70 transition hover:opacity-100">
-                 <img src={src} alt="" className="h-full w-full object-cover" />
-               </button>
-             ))}
-           </div>
-         </div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
+            <img 
+              src={lot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+              alt={lot.animal?.name} 
+              className="h-full w-full object-cover" 
+            />
+            <div className="absolute left-4 top-4 flex gap-2">
+              <StatusBadge status={lot.status as any} />
+              <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-bold backdrop-blur">
+                LOTE {String(lot.lot_number).padStart(2, "0")}
+              </span>
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-3">
+            {lot.animal?.photos?.map((src, i) => (
+              <button key={i} className="aspect-square overflow-hidden rounded-lg border border-border opacity-70 transition hover:opacity-100 focus:ring-2 focus:ring-gold outline-none">
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <Tabs defaultValue="detalhes" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5">
+                <TabsTrigger value="detalhes">Descrição</TabsTrigger>
+                <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
+                <TabsTrigger value="saude">Saúde</TabsTrigger>
+                <TabsTrigger value="videos">Vídeos</TabsTrigger>
+                <TabsTrigger value="documentos" className="hidden lg:inline-flex">Documentos</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="detalhes" className="mt-6">
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <p className="text-muted-foreground leading-relaxed">
+                    {"Este exemplar apresenta características excepcionais da raça, com excelente conformação e temperamento. Ideal para quem busca genética de ponta e resultados comprovados em pista ou reprodução."}
+                  </p>
+                  <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-[10px] uppercase text-muted-foreground">Raça</div>
+                        <div className="font-semibold">{lot.animal?.breed}</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-[10px] uppercase text-muted-foreground">Sexo</div>
+                        <div className="font-semibold">{lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea'}</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-[10px] uppercase text-muted-foreground">Localização</div>
+                        <div className="font-semibold">{lot.animal?.location || "Não informada"}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="genealogia" className="mt-6">
+                <GenealogyTree genealogy={lot.animal?.genealogy} />
+              </TabsContent>
+
+              <TabsContent value="saude" className="mt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Card>
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className="rounded-full bg-emerald/10 p-2">
+                        <Stethoscope className="h-5 w-5 text-emerald-bright" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Exames Veterinários</div>
+                        <div className="font-semibold">Aprovado e Regularizado</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className="rounded-full bg-emerald/10 p-2">
+                        <Award className="h-5 w-5 text-emerald-bright" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Vacinação</div>
+                        <div className="font-semibold">Plano Sanitário em Dia</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  Todos os animais possuem atestado negativo para Anemia Infecciosa Equina (AIE) e Mormo, além de estarem com a vacinação de Influenza e Encefalomielite atualizadas.
+                </div>
+              </TabsContent>
+
+              <TabsContent value="videos" className="mt-6">
+                <div className="grid gap-4">
+                  {lot.animal?.videos && lot.animal.videos.length > 0 ? (
+                    lot.animal.videos.map((url: string, i: number) => (
+                      <div key={i} className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
+                        <video src={url} controls className="h-full w-full" />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex aspect-video flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 text-muted-foreground">
+                      <Video className="mb-2 h-10 w-10 opacity-20" />
+                      <p>Vídeo de apresentação em processamento</p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="documentos" className="mt-6">
+                <div className="space-y-3">
+                  <Button variant="outline" className="w-full justify-between" asChild>
+                    <a href="#" target="_blank">
+                      <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Registro Genealógico</span>
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </a>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-between" asChild>
+                    <a href="#" target="_blank">
+                      <span className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Laudo Veterinário</span>
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </a>
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
  
          {/* Info + Lance */}
          <div className="space-y-6">
@@ -147,46 +327,74 @@
              </div>
            </div>
  
-           <div className="rounded-2xl border border-gold/30 bg-card p-6 shadow-gold">
-             <div className="flex items-end justify-between">
-               <div>
-                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lance atual</div>
-                 <div className="text-4xl font-bold text-gradient-gold">{formatBRL(currentPrice)}</div>
-               </div>
-               {lot.end_date && (
-                 <div className="text-right">
-                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-                   <Countdown endsAt={lot.end_date} className="font-mono text-xl font-bold text-foreground" />
-                 </div>
-               )}
-             </div>
- 
-             <div className="mt-6 grid grid-cols-3 gap-2">
-               {[1, 5, 10].map((m) => (
-                 <Button 
-                   key={m} 
-                   variant="outline" 
-                   className="border-gold/30 hover:bg-gold/10"
-                   disabled={isBidding || lot.status !== "active"}
-                   onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}
-                 >
-                   +{formatBRL(lot.bid_increment * m)}
-                 </Button>
-               ))}
-             </div>
-             <Button 
-               size="lg" 
-               className="mt-3 w-full bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold"
-               disabled={isBidding || lot.status !== "active"}
-               onClick={() => placeBid(nextBid)}
-             >
-               {isBidding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-               Dar lance de {formatBRL(nextBid)}
-             </Button>
-             <p className="mt-2 text-center text-xs text-muted-foreground">
-               Incremento mínimo: {formatBRL(lot.bid_increment)}
-             </p>
-           </div>
+            <Card className="border-gold/30 shadow-gold overflow-hidden">
+              <div className="bg-emerald-deep p-4 text-white flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Gavel className="h-4 w-4 text-gold" />
+                  <span className="text-xs font-bold uppercase tracking-widest">Oferta Atual</span>
+                </div>
+                {lot.end_date && (
+                  <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-medium opacity-80">Faltam:</span>
+                    <Countdown endsAt={lot.end_date as string} className="font-mono text-sm font-bold text-gold-bright" />
+                  </div>
+                )}
+              </div>
+              <CardContent className="p-6">
+                <div className="flex flex-col gap-1">
+                  <div className="text-4xl font-black text-gradient-gold tracking-tighter">
+                    {formatBRL(currentPrice)}
+                  </div>
+                  <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    ou {installments}x de <span className="text-foreground font-bold">{formatBRL(installmentValue)}</span>
+                  </div>
+                </div>
+
+                <div className="mt-8 space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 5].map((m) => (
+                      <Button 
+                        key={m} 
+                        variant="outline" 
+                        size="sm"
+                        className="border-gold/20 hover:bg-gold/5 h-12 flex flex-col"
+                        disabled={isBidding || lot.status !== "active"}
+                        onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}
+                      >
+                        <span className="text-[10px] opacity-60">+{m} inc.</span>
+                        <span className="font-bold">+{formatBRL(lot.bid_increment * m)}</span>
+                      </Button>
+                    ))}
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
+                    <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-card px-2 text-muted-foreground">Lance Personalizado</span></div>
+                  </div>
+
+                  <Button 
+                    size="lg" 
+                    className="w-full h-14 bg-gold-gradient text-emerald-deep font-bold text-lg hover:opacity-90 shadow-gold transition-all active:scale-[0.98]"
+                    disabled={isBidding || lot.status !== "active"}
+                    onClick={() => placeBid(nextBid)}
+                  >
+                    {isBidding ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Gavel className="mr-2 h-5 w-5" />}
+                    Dar lance de {formatBRL(nextBid)}
+                  </Button>
+                  
+                  <p className="text-center text-[10px] text-muted-foreground">
+                    {!user ? (
+                      <Link to="/login" className="text-gold hover:underline font-bold">Faça login para dar lances</Link>
+                    ) : !profile?.is_approved ? (
+                      <span className="text-destructive font-semibold">Conta aguardando aprovação administrativa</span>
+                    ) : (
+                      "Ao confirmar, você concorda com os termos de uso e condições do leilão."
+                    )}
+                    <br />Incremento mínimo: {formatBRL(lot.bid_increment)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
  
            <div className="flex gap-2">
              <Button variant="outline" className="flex-1"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
