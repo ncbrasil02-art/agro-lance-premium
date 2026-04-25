@@ -105,10 +105,28 @@ import { Link } from "@tanstack/react-router";
     }
   };
 
-      useEffect(() => {
-        setSelectedEventId(initialEventId);
-        fetchData();
-      }, [initialEventId]);
+  useEffect(() => {
+    setSelectedEventId(initialEventId);
+  }, [initialEventId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, searchQuery, selectedEventId, sortColumn, sortDirection]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      onSortChange(column, "asc");
+    }
+  };
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
+    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
+  };
 
       const resetForm = () => {
         setEditingLot(null);
