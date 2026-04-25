@@ -410,6 +410,7 @@ export type Database = {
           end_date: string | null
           event_id: string | null
           id: string
+          is_featured: boolean | null
           lot_number: number
           payment_methods: string[] | null
           reserve_price: number | null
@@ -429,6 +430,7 @@ export type Database = {
           end_date?: string | null
           event_id?: string | null
           id?: string
+          is_featured?: boolean | null
           lot_number: number
           payment_methods?: string[] | null
           reserve_price?: number | null
@@ -448,6 +450,7 @@ export type Database = {
           end_date?: string | null
           event_id?: string | null
           id?: string
+          is_featured?: boolean | null
           lot_number?: number
           payment_methods?: string[] | null
           reserve_price?: number | null
