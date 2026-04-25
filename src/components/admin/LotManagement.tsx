@@ -284,10 +284,16 @@ import { Link } from "@tanstack/react-router";
                            <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Carregando...
                          </div>
                        ) : events.length === 0 ? (
-                         <div className="p-2 text-xs text-center text-muted-foreground">
-                           Nenhum evento cadastrado. <br/> 
-                           Crie um evento na aba "Eventos" primeiro.
-                         </div>
+                          <div className="p-2 text-xs text-center text-muted-foreground">
+                            Nenhum evento cadastrado. <br/> 
+                            {onNavigateToEvents ? (
+                              <Button variant="link" className="text-[10px] p-0 h-auto text-gold" onClick={() => { setIsDialogOpen(false); onNavigateToEvents(); }}>
+                                Crie um evento na aba "Eventos" primeiro.
+                              </Button>
+                            ) : (
+                              "Crie um evento na aba \"Eventos\" primeiro."
+                            )}
+                          </div>
                        ) : (
                          events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
                        )}
