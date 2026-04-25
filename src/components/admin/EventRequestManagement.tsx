@@ -116,7 +116,12 @@ export function EventRequestManagement() {
                       </TableCell>
                       <TableCell className="text-xs">
                         <div>{req.category}</div>
-                        <div className="text-muted-foreground">{req.location}</div>
+                        <div className="text-muted-foreground font-medium">{req.location}</div>
+                        {req.additional_info && (
+                          <div className="mt-1 text-[10px] text-muted-foreground italic border-l-2 border-gold/30 pl-2">
+                            {req.additional_info}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="text-xs">
                         <div>{req.estimated_animals || '--'}</div>
