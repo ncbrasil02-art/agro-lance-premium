@@ -278,16 +278,27 @@
                   )}
                   <p className="text-[10px] text-muted-foreground">Esta imagem aparece na página inicial e no topo do evento.</p>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="date">Data e Hora de Início (Clique para selecionar)</Label>
-                  <Input 
-                    type="datetime-local" 
-                    step="1"
-                    value={formData.start_date} 
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
-                  />
-                  <p className="text-[10px] text-muted-foreground">O leilão iniciará automaticamente nesta data/hora. Certifique-se de definir também os segundos para maior precisão.</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="date">Data/Hora Início</Label>
+                    <Input 
+                      type="datetime-local" 
+                      step="1"
+                      value={formData.start_date} 
+                      onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="end_date">Data/Hora Fim</Label>
+                    <Input 
+                      type="datetime-local" 
+                      step="1"
+                      value={formData.end_date} 
+                      onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} 
+                    />
+                  </div>
                 </div>
+                <p className="text-[10px] text-muted-foreground">O leilão iniciará e encerrará automaticamente nestas datas. Certifique-se de definir também os segundos.</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="promoter">Empresa Promotora</Label>
@@ -413,6 +424,24 @@
                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            {event.status !== 'finished' && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 px-2 border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10"
+                                onClick={async () => {
+                                  if (!confirm("Deseja finalizar este evento agora? Todos os lotes serão marcados como encerrados.")) return;
+                                  const { error } = await supabase.from("events").update({ status: 'finished', end_date: new Date().toISOString() }).eq("id", event.id);
+                                  if (error) toast.error("Erro ao finalizar: " + error.message);
+                                  else {
+                                    toast.success("Evento finalizado!");
+                                    fetchEvents();
+                                  }
+                                }}
+                              >
+                                Finalizar
+                              </Button>
+                            )}
                             {onManageLots && (
                               <Button 
                                 variant="outline" 
