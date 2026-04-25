@@ -40,7 +40,7 @@ export function LotCard({ lot }: { lot: Lot }) {
           </div>
           <div className="text-right">
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-            <Countdown endsAt={lot.endsAt} className="font-mono text-sm font-semibold text-foreground" />
+            <Countdown endsAt={lot.endsAt} className="font-mono text-sm font-semibold text-foreground" suppressHydrationWarning />
           </div>
         </div>
       </div>

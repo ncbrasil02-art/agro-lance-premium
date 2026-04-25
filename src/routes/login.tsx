@@ -29,12 +29,12 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Tentativa de login iniciada para:", email);
+    console.log("Tentativa de login iniciada para:", email.trim());
     setIsLoading(true);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -43,12 +43,19 @@ function LoginPage() {
         throw error;
       }
 
-      console.log("Login realizado com sucesso no Supabase");
+      console.log("Login realizado com sucesso no Supabase para:", email.trim());
       toast.success("Login realizado com sucesso!");
       navigate({ to: "/" });
     } catch (error: any) {
       console.error("Erro capturado no handleSubmit:", error);
-      toast.error(error.message || "Erro ao entrar");
+      // Traduzir mensagens comuns
+      let message = error.message;
+      if (message === "Invalid login credentials") {
+        message = "E-mail ou senha incorretos.";
+      } else if (message === "Email not confirmed") {
+        message = "Por favor, confirme seu e-mail antes de entrar.";
+      }
+      toast.error(message || "Erro ao entrar");
     } finally {
       setIsLoading(false);
     }
