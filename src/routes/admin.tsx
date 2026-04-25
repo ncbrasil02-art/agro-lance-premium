@@ -322,6 +322,8 @@ function AdminLayout() {
             <UserManagement 
               searchQuery={search.q || ""}
               onSearchChange={onSearchChange}
+              currentPage={search.page || 1}
+              onPageChange={onPageChange}
             />
           )}
            {activeTab === "settings" && (
