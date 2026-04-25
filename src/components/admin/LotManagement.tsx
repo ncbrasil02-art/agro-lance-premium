@@ -10,16 +10,46 @@
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-  export function LotManagement() {
-    const [isAllocating, setIsAllocating] = useState(false);
-    const [newLot, setNewLot] = useState({
-      event_id: "",
-      animal_id: "",
-      lot_number: 1,
-      starting_price: 0,
-      bid_increment: 1000,
-      status: "active"
-    });
+   export function LotManagement() {
+     const [isDialogOpen, setIsDialogOpen] = useState(false);
+     const [editingLot, setEditingLot] = useState<any>(null);
+     const [formData, setFormData] = useState({
+       event_id: "",
+       animal_id: "",
+       lot_number: 1,
+       starting_price: 0,
+       bid_increment: 1000,
+       status: "active",
+       allows_pre_bidding: true
+     });
+
+     const resetForm = () => {
+       setEditingLot(null);
+       setFormData({
+         event_id: "",
+         animal_id: "",
+         lot_number: 1,
+         starting_price: 0,
+         bid_increment: 1000,
+         status: "active",
+         allows_pre_bidding: true
+       });
+     };
+
+     const handleEdit = (lot: any) => {
+       setEditingLot(lot);
+       setFormData({
+         event_id: lot.event_id || "",
+         animal_id: lot.animal_id || "",
+         lot_number: lot.lot_number || 1,
+         starting_price: lot.starting_price || 0,
+         bid_increment: lot.bid_increment || 1000,
+         status: lot.status || "active",
+         allows_pre_bidding: lot.allows_pre_bidding !== false
+       });
+       setIsDialogOpen(true);
+     };
+
     const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
   
     const fetchAvailableAnimals = async () => {
@@ -30,30 +60,49 @@
       if (!error) setAvailableAnimals(data || []);
     };
   
-    const handleAllocate = async () => {
-      if (!newLot.event_id || !newLot.animal_id || !newLot.lot_number) {
+     const handleSave = async () => {
+       if (!formData.event_id || !formData.animal_id || !formData.lot_number) {
         toast.error("Preencha todos os campos obrigatórios");
         return;
       }
   
       try {
-        const { error } = await supabase.from("lots").insert({
-          event_id: newLot.event_id,
-          animal_id: newLot.animal_id,
-          lot_number: newLot.lot_number,
-          starting_price: newLot.starting_price,
-          current_price: newLot.starting_price,
-          bid_increment: newLot.bid_increment,
-          status: newLot.status,
-          end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Default 1 week
-        });
+         if (editingLot) {
+           const { error } = await supabase
+             .from("lots")
+             .update({
+               event_id: formData.event_id,
+               animal_id: formData.animal_id,
+               lot_number: formData.lot_number,
+               starting_price: formData.starting_price,
+               bid_increment: formData.bid_increment,
+               status: formData.status,
+               allows_pre_bidding: formData.allows_pre_bidding
+             })
+             .eq("id", editingLot.id);
+           if (error) throw error;
+           toast.success("Lote atualizado com sucesso");
+         } else {
+           const { error } = await supabase.from("lots").insert({
+             event_id: formData.event_id,
+             animal_id: formData.animal_id,
+             lot_number: formData.lot_number,
+             starting_price: formData.starting_price,
+             current_price: formData.starting_price,
+             bid_increment: formData.bid_increment,
+             status: formData.status,
+             allows_pre_bidding: formData.allows_pre_bidding,
+             end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+           });
+           if (error) throw error;
+           toast.success("Lote alocado com sucesso");
+         }
   
-        if (error) throw error;
-        toast.success("Lote alocado com sucesso");
-        setIsAllocating(false);
+         setIsDialogOpen(false);
+         resetForm();
         fetchData();
       } catch (error: any) {
-        toast.error("Erro ao alocar lote: " + error.message);
+         toast.error("Erro ao salvar lote: " + error.message);
       }
     };
    const [lots, setLots] = useState<any[]>([]);
@@ -137,28 +186,32 @@
              </SelectContent>
            </Select>
          </div>
-         <Dialog open={isAllocating} onOpenChange={(open) => {
-           setIsAllocating(open);
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) resetForm();
            if (open) fetchAvailableAnimals();
          }}>
            <DialogTrigger asChild>
-             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+              <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => {
+                resetForm();
+                setIsDialogOpen(true);
+              }}>
                <PlusCircle className="mr-2 h-4 w-4" /> Alocar Lote
              </Button>
            </DialogTrigger>
-           <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[450px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
-               <DialogTitle>Alocar Animal em Evento</DialogTitle>
+                <DialogTitle>{editingLot ? "Editar Lote" : "Alocar Animal em Evento"}</DialogTitle>
                <DialogDescription>
-                 Selecione um animal e um evento para criar um novo lote.
+                  Defina as regras do animal neste evento.
                </DialogDescription>
              </DialogHeader>
              <div className="grid gap-4 py-4">
                <div className="grid gap-2">
                  <Label htmlFor="event">Evento</Label>
-                 <Select onValueChange={(v) => setNewLot({ ...newLot, event_id: v })}>
+                  <Select onValueChange={(v) => setFormData({ ...formData, event_id: v })} value={formData.event_id}>
                    <SelectTrigger>
-                     <SelectValue placeholder="Selecione o evento" />
+                      <SelectValue placeholder="Selecione o evento" />
                    </SelectTrigger>
                    <SelectContent>
                      {events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
@@ -167,13 +220,13 @@
                </div>
                <div className="grid gap-2">
                  <Label htmlFor="animal">Animal</Label>
-                 <Select onValueChange={(v) => setNewLot({ ...newLot, animal_id: v })}>
+                  <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
                    <SelectTrigger>
-                     <SelectValue placeholder="Selecione o animal" />
+                      <SelectValue placeholder="Selecione o animal" />
                    </SelectTrigger>
                    <SelectContent>
-                     {availableAnimals.map(a => (
-                       <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code})</SelectItem>
+                      {(editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
+                        <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
                      ))}
                    </SelectContent>
                  </Select>
@@ -183,16 +236,16 @@
                    <Label htmlFor="number">Nº Lote</Label>
                    <Input 
                      type="number" 
-                     value={newLot.lot_number} 
-                     onChange={(e) => setNewLot({ ...newLot, lot_number: parseInt(e.target.value) })} 
+                      value={formData.lot_number} 
+                      onChange={(e) => setFormData({ ...formData, lot_number: parseInt(e.target.value) })} 
                    />
                  </div>
                  <div className="grid gap-2">
                    <Label htmlFor="increment">Incremento (R$)</Label>
                    <Input 
                      type="number" 
-                     value={newLot.bid_increment} 
-                     onChange={(e) => setNewLot({ ...newLot, bid_increment: parseFloat(e.target.value) })} 
+                      value={formData.bid_increment} 
+                      onChange={(e) => setFormData({ ...formData, bid_increment: parseFloat(e.target.value) })} 
                    />
                  </div>
                </div>
@@ -200,15 +253,25 @@
                  <Label htmlFor="price">Preço Inicial (R$)</Label>
                  <Input 
                    type="number" 
-                   value={newLot.starting_price} 
-                   onChange={(e) => setNewLot({ ...newLot, starting_price: parseFloat(e.target.value) })} 
+                    value={formData.starting_price} 
+                    onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
                  />
                </div>
+                <div className="flex items-center space-x-2 py-2">
+                  <input 
+                    type="checkbox" 
+                    id="pre_bidding_lot" 
+                    checked={formData.allows_pre_bidding} 
+                    onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
+                    className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                  />
+                  <Label htmlFor="pre_bidding_lot">Permitir Lances Antecipados</Label>
+                </div>
              </div>
              <DialogFooter>
-               <Button variant="outline" onClick={() => setIsAllocating(false)}>Cancelar</Button>
-               <Button className="bg-gold text-emerald-deep" onClick={handleAllocate}>
-                 Confirmar Alocação
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+                <Button className="bg-gold text-emerald-deep" onClick={handleSave}>
+                  {editingLot ? "Salvar Alterações" : "Confirmar Alocação"}
                </Button>
              </DialogFooter>
            </DialogContent>
@@ -264,16 +327,16 @@
                            {lot.status === 'active' ? 'Ativo' : 'Pausado'}
                          </span>
                        </TableCell>
-                       <TableCell className="text-right">
-                         <div className="flex justify-end gap-2">
-                           <Button variant="ghost" size="icon">
-                             <Pencil className="h-4 w-4" />
-                           </Button>
-                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(lot.id)}>
-                             <Trash2 className="h-4 w-4" />
-                           </Button>
-                         </div>
-                       </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(lot)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(lot.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                      </TableRow>
                    ))
                  )}
