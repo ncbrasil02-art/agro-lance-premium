@@ -34,7 +34,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
     const [lotRes, bidsRes] = await Promise.all([
       supabase
         .from("lots")
-        .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+        .select("*, animal:animals(*), event:events(*)")
         .eq("id", lotId)
         .maybeSingle(),
       supabase
