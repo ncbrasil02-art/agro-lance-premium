@@ -103,8 +103,9 @@
        return;
      }
  
-     try {
-        if (editingEvent) {
+      console.log("Saving event...", formData);
+      try {
+         if (editingEvent) {
            const { error } = await supabase
              .from("events")
              .update({
