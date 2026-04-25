@@ -16,6 +16,15 @@
    const [events, setEvents] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [searchQuery, setSearchQuery] = useState("");
+   const [isCreating, setIsCreating] = useState(false);
+   const [newEvent, setNewEvent] = useState({
+     name: "",
+     description: "",
+     start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+     location: "",
+     status: "scheduled",
+     event_type: "online"
+   });
  
    const fetchEvents = async () => {
      setIsLoading(true);
@@ -37,6 +46,32 @@
    useEffect(() => {
      fetchEvents();
    }, []);
+ 
+   const handleCreate = async () => {
+     if (!newEvent.name || !newEvent.start_date) {
+       toast.error("Preencha o nome e a data");
+       return;
+     }
+ 
+     try {
+       const { error } = await supabase.from("events").insert({
+         name: newEvent.name,
+         description: newEvent.description,
+         start_date: new Date(newEvent.start_date).toISOString(),
+         location: newEvent.location,
+         status: newEvent.status,
+         event_type: newEvent.event_type,
+         slug: newEvent.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
+       });
+ 
+       if (error) throw error;
+       toast.success("Evento criado com sucesso");
+       setIsCreating(false);
+       fetchEvents();
+     } catch (error: any) {
+       toast.error("Erro ao criar evento: " + error.message);
+     }
+   };
  
    const filteredEvents = events.filter(event => 
      event.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -72,7 +107,6 @@
        default: return status;
      }
    };
- 
    return (
      <div className="space-y-6">
        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
