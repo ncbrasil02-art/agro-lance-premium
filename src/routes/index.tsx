@@ -252,19 +252,6 @@ function Home() {
         </div>
       </section>
 
-      {/* EVENTOS PASSADOS */}
-      {mappedPastEvents.length > 0 && (
-        <section className="container mx-auto px-4 py-16 border-t border-border/40">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl text-muted-foreground">Leilões encerrados</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
-            {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
-          </div>
-        </section>
-      )}
-
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
         <section className="container mx-auto px-4 py-16">
@@ -285,6 +272,17 @@ function Home() {
         </section>
       )}
 
+      {/* EVENTOS FUTUROS */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
+          <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+        </div>
+      </section>
+
       {/* LOTES DESTAQUE */}
       <section className="container mx-auto px-4 py-16">
         <div className="mb-8 flex items-end justify-between">
@@ -301,16 +299,18 @@ function Home() {
         </div>
       </section>
 
-      {/* EVENTOS FUTUROS */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
-          <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
-        </div>
-      </section>
+      {/* EVENTOS PASSADOS */}
+      {mappedPastEvents.length > 0 && (
+        <section className="container mx-auto px-4 py-16 border-t border-border/40">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl text-muted-foreground">Leilões encerrados</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
+            {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+          </div>
+        </section>
+      )}
 
       {/* DIFERENCIAIS */}
       <section className="border-y border-border/60 bg-card/40">
