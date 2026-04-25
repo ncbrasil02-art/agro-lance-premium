@@ -1,4 +1,5 @@
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ import { Link } from "@tanstack/react-router";
       const [isLoading, setIsLoading] = useState(true);
   const [lots, setLots] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
@@ -111,6 +113,7 @@ import { Link } from "@tanstack/react-router";
 
   useEffect(() => {
     fetchData();
+    setSelectedIds([]);
   }, [currentPage, searchQuery, selectedEventId, sortColumn, sortDirection]);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -127,6 +130,37 @@ import { Link } from "@tanstack/react-router";
     if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
     return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
   };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(lots.map(l => l.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Deseja remover permanentemente os ${selectedIds.length} lotes selecionados? Os animais ficarão disponíveis novamente.`)) return;
+    
+    try {
+      const { error } = await supabase.from("lots").delete().in("id", selectedIds);
+      if (error) throw error;
+      toast.success(`${selectedIds.length} lotes removidos com sucesso`);
+      setSelectedIds([]);
+      fetchData();
+    } catch (error: any) {
+      toast.error("Erro ao remover em lote: " + error.message);
+    }
+  };
+
 
       const resetForm = () => {
         setEditingLot(null);
@@ -229,8 +263,32 @@ import { Link } from "@tanstack/react-router";
    };
  
    return (
-     <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="space-y-6">
+         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative">
+           {selectedIds.length > 0 && (
+             <div className="absolute inset-0 bg-emerald-deep/95 z-20 rounded-lg flex items-center px-4 animate-in fade-in slide-in-from-top-2 border border-gold/30">
+               <div className="flex items-center gap-3">
+                 <span className="text-xs font-black text-white uppercase tracking-widest">{selectedIds.length} selecionados</span>
+                 <div className="h-4 w-px bg-white/20" />
+                 <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   className="h-8 text-destructive hover:bg-destructive/10 text-[10px] font-bold"
+                   onClick={handleBulkDelete}
+                 >
+                   <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir em Lote
+                 </Button>
+               </div>
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 className="ml-auto text-white/60 hover:text-white text-[10px] font-bold"
+                 onClick={() => setSelectedIds([])}
+               >
+                 Cancelar
+               </Button>
+             </div>
+           )}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={fetchData} disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
