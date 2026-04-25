@@ -4,7 +4,46 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+ import { Label } from "@/components/ui/label";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+   const [isCreating, setIsCreating] = useState(false);
+   const [newEvent, setNewEvent] = useState({
+     name: "",
+     description: "",
+     start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+     location: "",
+     status: "scheduled",
+     event_type: "online"
+   });
+ 
+   const handleCreate = async () => {
+     if (!newEvent.name || !newEvent.start_date) {
+       toast.error("Preencha o nome e a data");
+       return;
+     }
+ 
+     try {
+       const { error } = await supabase.from("events").insert({
+         name: newEvent.name,
+         description: newEvent.description,
+         start_date: new Date(newEvent.start_date).toISOString(),
+         location: newEvent.location,
+         status: newEvent.status,
+         event_type: newEvent.event_type,
+         slug: newEvent.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
+       });
+ 
+       if (error) throw error;
+       toast.success("Evento criado com sucesso");
+       setIsCreating(false);
+       fetchEvents();
+     } catch (error: any) {
+       toast.error("Erro ao criar evento: " + error.message);
+     }
+   };
+ 
  import { toast } from "sonner";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
@@ -82,9 +121,68 @@
              onChange={(e) => setSearchQuery(e.target.value)}
            />
          </div>
-         <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
-           <Plus className="mr-2 h-4 w-4" /> Novo Evento
-         </Button>
+         <Dialog open={isCreating} onOpenChange={setIsCreating}>
+           <DialogTrigger asChild>
+             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+               <PlusCircle className="mr-2 h-4 w-4" /> Novo Evento
+             </Button>
+           </DialogTrigger>
+           <DialogContent className="sm:max-w-[425px]">
+             <DialogHeader>
+               <DialogTitle>Criar Novo Evento</DialogTitle>
+               <DialogDescription>
+                 Defina as configurações básicas do leilão.
+               </DialogDescription>
+             </DialogHeader>
+             <div className="grid gap-4 py-4">
+               <div className="grid gap-2">
+                 <Label htmlFor="name">Nome do Evento</Label>
+                 <Input value={newEvent.name} onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })} />
+               </div>
+               <div className="grid gap-2">
+                 <Label htmlFor="date">Data e Hora de Início</Label>
+                 <Input 
+                   type="datetime-local" 
+                   value={newEvent.start_date} 
+                   onChange={(e) => setNewEvent({ ...newEvent, start_date: e.target.value })} 
+                 />
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="grid gap-2">
+                   <Label htmlFor="type">Tipo</Label>
+                   <Select onValueChange={(v) => setNewEvent({ ...newEvent, event_type: v })} defaultValue={newEvent.event_type}>
+                     <SelectTrigger><SelectValue /></SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="online">Online</SelectItem>
+                       <SelectItem value="presencial">Presencial</SelectItem>
+                       <SelectItem value="hibrido">Híbrido</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="status">Status Inicial</Label>
+                   <Select onValueChange={(v) => setNewEvent({ ...newEvent, status: v })} defaultValue={newEvent.status}>
+                     <SelectTrigger><SelectValue /></SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="scheduled">Agendado</SelectItem>
+                       <SelectItem value="active">Ao Vivo (Ativo)</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+               </div>
+               <div className="grid gap-2">
+                 <Label htmlFor="location">Localização</Label>
+                 <Input value={newEvent.location} onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
+               </div>
+             </div>
+             <DialogFooter>
+               <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
+               <Button className="bg-gold text-emerald-deep" onClick={handleCreate}>
+                 Criar Evento
+               </Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
        </div>
  
        <Card>
