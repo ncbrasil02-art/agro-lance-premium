@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { EventStatus } from "@/lib/mock-data";
 
 const map: Record<EventStatus | "open" | "scheduled" | "sold", { label: string; cls: string; dot?: boolean }> = {
-  live: { label: "AO VIVO", cls: "bg-live/15 text-live border-live/30", dot: true },
+   live: { label: "AO VIVO", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
   open: { label: "EM LEILÃO", cls: "bg-emerald/15 text-emerald-bright border-emerald/30" },
   upcoming: { label: "EM BREVE", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
   scheduled: { label: "AGENDADO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
