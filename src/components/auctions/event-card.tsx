@@ -20,12 +20,19 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
        className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
       aria-labelledby={`event-title-${event.id}`}
     >
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative aspect-video overflow-hidden bg-emerald-deep/20">
+        {/* Background Blur */}
+        <img 
+          src={event?.cover || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+          alt="" 
+          className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
+        />
+        {/* Main Image Contained */}
         <img 
           src={event?.cover || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
           alt={event?.name || "Evento"} 
           loading="lazy" 
-          className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
+          className="relative h-full w-full object-contain transition-smooth group-hover:scale-[1.02]" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
         <div className="absolute left-4 top-4 z-10 flex flex-col gap-2 items-start">
