@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle } from "lucide-react";
 import { useEffectiveLotStatus } from "@/utils/auction-status";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
@@ -420,7 +420,24 @@ function LotDetail() {
                   </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4" id="bidding-panel">
+                    {lot.animal?.youtube_url && (
+                      <Button 
+                        variant="ghost" 
+                        className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
+                        onClick={() => {
+                          const tabs = document.querySelector('[role="tablist"]');
+                          const videoTab = document.querySelector('[value="videos"]') as HTMLElement;
+                          if (videoTab) {
+                            videoTab.click();
+                            videoTab.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }
+                        }}
+                      >
+                        <PlayCircle className="h-4 w-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
+                      </Button>
+                    )}
                     {dynamicStatus === 'loteamento' && (
                       <div className="p-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                         <Info className="h-5 w-5 text-gold shrink-0 mt-0.5" />
