@@ -322,15 +322,29 @@ function LotDetail() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="documentos" className="mt-6 space-y-3">
-                {lot.animal?.pedigree_url && (
-                  <Button variant="outline" className="w-full h-14 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
-                    <a href={lot.animal.pedigree_url} target="_blank">
-                      <span className="flex items-center font-bold"><FileText className="mr-3" /> VER PEDIGREE COMPLETO</span>
-                      <ChevronRight />
-                    </a>
+              <TabsContent value="documentos" className="mt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {lot.animal?.pedigree_url && (
+                    <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
+                      <a href={lot.animal.pedigree_url} target="_blank">
+                        <span className="flex items-center font-bold"><FileText className="mr-3 h-6 w-6 text-gold" /> PEDIGREE COMPLETO</span>
+                        <Download className="h-5 w-5" />
+                      </a>
+                    </Button>
+                  )}
+                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando encarte do lote...")}>
+                    <span className="flex items-center font-bold"><Download className="mr-3 h-6 w-6 text-gold" /> ENCARTE DO LOTE (PDF)</span>
+                    <Download className="h-5 w-5" />
                   </Button>
-                )}
+                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando exames laboratoriais...")}>
+                    <span className="flex items-center font-bold"><Stethoscope className="mr-3 h-6 w-6 text-gold" /> LAUDOS & EXAMES</span>
+                    <Download className="h-5 w-5" />
+                  </Button>
+                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Visualizando histórico reprodutivo...")}>
+                    <span className="flex items-center font-bold"><Fingerprint className="mr-3 h-6 w-6 text-gold" /> HISTÓRICO REPRODUTIVO</span>
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
