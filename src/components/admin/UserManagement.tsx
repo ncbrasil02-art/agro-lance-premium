@@ -195,8 +195,14 @@ export function UserManagement({
           ) : (
             <>
               <Table>
-                <TableHeader className="bg-muted/50">
+                <TableHeader className="bg-muted/50 select-none">
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox 
+                        checked={users.length > 0 && selectedIds.length === users.length}
+                        onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                      />
+                    </TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('full_name')}>
                       <div className="flex items-center">Nome <SortIndicator column="full_name" /></div>
                     </TableHead>
@@ -216,7 +222,13 @@ export function UserManagement({
                     </TableRow>
                   ) : (
                   users.map((user) => (
-                      <TableRow key={user.id}>
+                      <TableRow key={user.id} className={selectedIds.includes(user.id) ? "bg-gold/5" : ""}>
+                        <TableCell>
+                          <Checkbox 
+                            checked={selectedIds.includes(user.id)}
+                            onCheckedChange={(checked) => handleSelectOne(user.id, !!checked)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
