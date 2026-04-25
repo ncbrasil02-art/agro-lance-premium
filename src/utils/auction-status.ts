@@ -60,6 +60,13 @@ export function getEffectiveEventStatus(event: {
 
   if (event.status === 'finished') return 'finished';
   if (end && now >= end) return 'finished';
+  
+  // Safeguard: Se começou há mais de 48h e não tem data de fim nem status manual "live", 
+  // assumimos que encerrou para evitar eventos zumbis na home.
+  if (now.getTime() - start.getTime() > 48 * 60 * 60 * 1000 && event.status !== 'live') {
+    return 'finished';
+  }
+
   if (now >= start && (!end || now < end)) return 'live';
   return 'scheduled';
 }
