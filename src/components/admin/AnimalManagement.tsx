@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -170,13 +170,26 @@
       }
     };
  
+   const ITEMS_PER_PAGE = 8;
+   const [currentPage, setCurrentPage] = useState(1);
+
    useEffect(() => {
      fetchAnimals();
    }, []);
+
+   useEffect(() => {
+     setCurrentPage(1);
+   }, [searchQuery]);
  
    const filteredAnimals = animals.filter(animal => 
      animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
      animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase())
+   );
+
+   const totalPages = Math.ceil(filteredAnimals.length / ITEMS_PER_PAGE);
+   const paginatedAnimals = filteredAnimals.slice(
+     (currentPage - 1) * ITEMS_PER_PAGE,
+     currentPage * ITEMS_PER_PAGE
    );
  
    const handleDelete = async (id: string) => {
@@ -463,14 +476,14 @@
                  </TableRow>
                </TableHeader>
                <TableBody>
-                 {filteredAnimals.length === 0 ? (
+                  {paginatedAnimals.length === 0 ? (
                    <TableRow>
                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                        Nenhum animal encontrado.
                      </TableCell>
                    </TableRow>
                  ) : (
-                   filteredAnimals.map((animal) => (
+                    paginatedAnimals.map((animal) => (
                       <TableRow key={animal.id}>
                         <TableCell>
                           {animal.photos && animal.photos.length > 0 ? (
@@ -502,8 +515,25 @@
                      </TableRow>
                    ))
                  )}
-               </TableBody>
-             </Table>
+                </TableBody>
+              </Table>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-4 border-t">
+                  <div className="text-xs text-muted-foreground">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredAnimals.length)} de {filteredAnimals.length} registros
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
            )}
          </CardContent>
        </Card>
