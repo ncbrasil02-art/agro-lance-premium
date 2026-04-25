@@ -10,13 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
-import { Route as LotesRouteImport } from './routes/lotes'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AoVivoRouteImport } from './routes/ao-vivo'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LotesIndexRouteImport } from './routes/lotes.index'
+import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
 
@@ -25,19 +25,9 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LotesRoute = LotesRouteImport.update({
-  id: '/lotes',
-  path: '/lotes',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventosRoute = EventosRouteImport.update({
-  id: '/eventos',
-  path: '/eventos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CadastroRoute = CadastroRouteImport.update({
@@ -60,6 +50,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LotesIndexRoute = LotesIndexRouteImport.update({
+  id: '/lotes/',
+  path: '/lotes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventosIndexRoute = EventosIndexRouteImport.update({
+  id: '/eventos/',
+  path: '/eventos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LotesLotIdRoute = LotesLotIdRouteImport.update({
   id: '/$lotId',
   path: '/$lotId',
@@ -76,24 +76,24 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
-  '/lotes': typeof LotesRouteWithChildren
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
+  '/eventos/': typeof EventosIndexRoute
+  '/lotes/': typeof LotesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
-  '/lotes': typeof LotesRouteWithChildren
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
+  '/eventos': typeof EventosIndexRoute
+  '/lotes': typeof LotesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,12 +101,12 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
-  '/lotes': typeof LotesRouteWithChildren
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
+  '/eventos/': typeof EventosIndexRoute
+  '/lotes/': typeof LotesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,36 +115,36 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ao-vivo'
     | '/cadastro'
-    | '/eventos'
     | '/login'
-    | '/lotes'
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
+    | '/eventos/'
+    | '/lotes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/ao-vivo'
     | '/cadastro'
-    | '/eventos'
     | '/login'
-    | '/lotes'
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
+    | '/eventos'
+    | '/lotes'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/ao-vivo'
     | '/cadastro'
-    | '/eventos'
     | '/login'
-    | '/lotes'
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
+    | '/eventos/'
+    | '/lotes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,10 +152,10 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AoVivoRoute: typeof AoVivoRoute
   CadastroRoute: typeof CadastroRoute
-  EventosRoute: typeof EventosRouteWithChildren
   LoginRoute: typeof LoginRoute
-  LotesRoute: typeof LotesRouteWithChildren
   SobreRoute: typeof SobreRoute
+  EventosIndexRoute: typeof EventosIndexRoute
+  LotesIndexRoute: typeof LotesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -167,25 +167,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lotes': {
-      id: '/lotes'
-      path: '/lotes'
-      fullPath: '/lotes'
-      preLoaderRoute: typeof LotesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/eventos': {
-      id: '/eventos'
-      path: '/eventos'
-      fullPath: '/eventos'
-      preLoaderRoute: typeof EventosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cadastro': {
@@ -216,6 +202,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lotes/': {
+      id: '/lotes/'
+      path: '/lotes'
+      fullPath: '/lotes/'
+      preLoaderRoute: typeof LotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventos/': {
+      id: '/eventos/'
+      path: '/eventos'
+      fullPath: '/eventos/'
+      preLoaderRoute: typeof EventosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lotes/$lotId': {
       id: '/lotes/$lotId'
       path: '/$lotId'
@@ -233,37 +233,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface EventosRouteChildren {
-  EventosEventSlugRoute: typeof EventosEventSlugRoute
-}
-
-const EventosRouteChildren: EventosRouteChildren = {
-  EventosEventSlugRoute: EventosEventSlugRoute,
-}
-
-const EventosRouteWithChildren =
-  EventosRoute._addFileChildren(EventosRouteChildren)
-
-interface LotesRouteChildren {
-  LotesLotIdRoute: typeof LotesLotIdRoute
-}
-
-const LotesRouteChildren: LotesRouteChildren = {
-  LotesLotIdRoute: LotesLotIdRoute,
-}
-
-const LotesRouteWithChildren = LotesRoute._addFileChildren(LotesRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AoVivoRoute: AoVivoRoute,
   CadastroRoute: CadastroRoute,
-  EventosRoute: EventosRouteWithChildren,
   LoginRoute: LoginRoute,
-  LotesRoute: LotesRouteWithChildren,
   SobreRoute: SobreRoute,
+  EventosIndexRoute: EventosIndexRoute,
+  LotesIndexRoute: LotesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
