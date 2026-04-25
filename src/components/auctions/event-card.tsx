@@ -26,7 +26,7 @@ export function EventCard({ event }: { event: AuctionEvent }) {
       <div className="grid grid-cols-2 gap-3 p-4 text-xs">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Calendar className="h-3.5 w-3.5 text-gold" />
-          <span>{formatDateBR(event.date)}</span>
+          <span suppressHydrationWarning>{formatDateBR(event.date)}</span>
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
           <MapPin className="h-3.5 w-3.5 text-gold" />
