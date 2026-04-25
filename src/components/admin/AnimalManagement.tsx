@@ -308,15 +308,55 @@
                   Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
-             <Tabs defaultValue="geral" className="w-full">
-               <TabsList className="grid w-full grid-cols-4">
-                 <TabsTrigger value="geral">Geral</TabsTrigger>
-                 <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
-                 <TabsTrigger value="saude">Saúde</TabsTrigger>
-                 <TabsTrigger value="midia">Mídia</TabsTrigger>
-               </TabsList>
+              <Tabs defaultValue="geral" className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="geral">Geral</TabsTrigger>
+                  <TabsTrigger value="registros">Registros</TabsTrigger>
+                  <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
+                  <TabsTrigger value="saude">Saúde</TabsTrigger>
+                  <TabsTrigger value="midia">Mídia</TabsTrigger>
+                </TabsList>
                
-               <TabsContent value="geral" className="space-y-4 pt-4">
+                <TabsContent value="registros" className="space-y-4 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="reg_main">Registro Principal</Label>
+                      <Input id="reg_main" value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="reg1cc">Registro 1cc</Label>
+                      <Input id="reg1cc" value={formData.registration_1cc} onChange={(e) => setFormData({ ...formData, registration_1cc: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="reg2">Registro 2</Label>
+                      <Input id="reg2" value={formData.registration_2} onChange={(e) => setFormData({ ...formData, registration_2: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="chip">Informe o Chip</Label>
+                      <Input id="chip" value={formData.chip_number} onChange={(e) => setFormData({ ...formData, chip_number: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="livro">Livro</Label>
+                      <Input id="livro" value={formData.book} onChange={(e) => setFormData({ ...formData, book: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="tipagem">Tipagem</Label>
+                      <Input id="tipagem" value={formData.blood_typing} onChange={(e) => setFormData({ ...formData, blood_typing: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="grau">Grau Sangue</Label>
+                      <Input id="grau" value={formData.blood_percentage} onChange={(e) => setFormData({ ...formData, blood_percentage: e.target.value })} />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="geral" className="space-y-4 pt-4">
                  <div className="grid gap-2">
                    <Label htmlFor="name">Nome</Label>
                    <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
