@@ -26,7 +26,8 @@
         starting_price: 0,
         bid_increment: 1000,
         status: "active",
-        allows_pre_bidding: true
+        allows_pre_bidding: true,
+        payment_methods: ""
       });
 
      const resetForm = () => {
@@ -36,9 +37,10 @@
          animal_id: "",
          lot_number: 1,
          starting_price: 0,
-         bid_increment: 1000,
-         status: "active",
-         allows_pre_bidding: true
+          bid_increment: 1000,
+          status: "active",
+          allows_pre_bidding: true,
+          payment_methods: ""
        });
      };
 
@@ -50,8 +52,9 @@
          lot_number: lot.lot_number || 1,
          starting_price: lot.starting_price || 0,
          bid_increment: lot.bid_increment || 1000,
-         status: lot.status || "active",
-         allows_pre_bidding: lot.allows_pre_bidding !== false
+          status: lot.status || "active",
+          allows_pre_bidding: lot.allows_pre_bidding !== false,
+          payment_methods: lot.payment_methods?.join(", ") || ""
        });
        setIsDialogOpen(true);
      };
@@ -82,8 +85,9 @@
                lot_number: formData.lot_number,
                starting_price: formData.starting_price,
                bid_increment: formData.bid_increment,
-               status: formData.status,
-               allows_pre_bidding: formData.allows_pre_bidding
+                status: formData.status,
+                allows_pre_bidding: formData.allows_pre_bidding,
+                payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : []
              })
              .eq("id", editingLot.id);
            if (error) throw error;
@@ -96,8 +100,9 @@
              starting_price: formData.starting_price,
              current_price: formData.starting_price,
              bid_increment: formData.bid_increment,
-             status: formData.status,
-             allows_pre_bidding: formData.allows_pre_bidding,
+              status: formData.status,
+              allows_pre_bidding: formData.allows_pre_bidding,
+              payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
              end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
            });
            if (error) throw error;
@@ -300,6 +305,14 @@
                     onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
                  />
                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="payments">Condições de Pagamento / Parcelamento</Label>
+                  <Input 
+                    value={formData.payment_methods} 
+                    onChange={(e) => setFormData({ ...formData, payment_methods: e.target.value })} 
+                    placeholder="Ex: 30 parcelas (2+2+26), À vista com 10% desc"
+                  />
+                </div>
                 <div className="flex items-center space-x-2 py-2">
                   <input 
                     type="checkbox" 
