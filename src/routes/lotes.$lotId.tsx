@@ -244,13 +244,13 @@
    return (
      <div className="container mx-auto px-4 py-8">
        {lot.event && (
-         <Link 
-           to="/eventos/$eventSlug" 
-           params={{ eventSlug: lot.event.slug || "" }} 
-           className="text-sm text-muted-foreground hover:text-gold"
-         >
-           ← {lot.event.name}
-         </Link>
+        <Link 
+            to="/eventos/$eventSlug" 
+            params={{ eventSlug: lot.event?.slug || "" }} 
+            className="text-sm text-muted-foreground hover:text-gold"
+          >
+            ← {lot.event?.name}
+          </Link>
        )}
  
        <div className="mt-4 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
@@ -351,8 +351,8 @@
 
               <TabsContent value="videos" className="mt-6">
                 <div className="grid gap-4">
-                  {lot.animal?.videos && lot.animal.videos.length > 0 ? (
-                    lot.animal.videos.map((url: string, i: number) => (
+                  {lot.animal?.videos && (lot.animal.videos as string[]).length > 0 ? (
+                    (lot.animal.videos as string[]).map((url: string, i: number) => (
                       <div key={i} className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
                         <video src={url} controls className="h-full w-full" />
                       </div>
