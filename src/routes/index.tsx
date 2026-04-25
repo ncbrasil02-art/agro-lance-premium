@@ -200,13 +200,8 @@ function Home() {
                     <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
                     Oportunidade Imperdível: {nextEvent.name}
                  </div>
-                  <div className="mt-1 flex items-center gap-6">
-                    <div className="flex flex-col">
-                      <div className="text-4xl font-black text-white md:text-5xl tabular-nums tracking-tighter">
-                        <Countdown endsAt={nextEvent.date} className="font-mono bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
-                      </div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-white/40">Faltam para o início</div>
-                    </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-6">
+                    <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
                     <div className="h-10 w-px bg-white/10" />
                     <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }} className="group/btn flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
                       Garantir Vaga

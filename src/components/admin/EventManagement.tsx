@@ -1,3 +1,4 @@
+import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
@@ -242,6 +243,15 @@
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome do Evento</Label>
                   <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Descrição do Evento</Label>
+                  <Textarea 
+                    value={formData.description} 
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                    placeholder="Fale um pouco sobre o evento, linhagens, etc."
+                    className="min-h-[100px]"
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="banner">Imagem de Destaque (Banner)</Label>

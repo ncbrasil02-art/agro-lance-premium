@@ -28,7 +28,7 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
           className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
-        <div className="absolute left-4 top-4 flex flex-col gap-2 items-start">
+        <div className="absolute left-4 top-4 z-10 flex flex-col gap-2 items-start">
           <StatusBadge status={effectiveStatus} />
           {effectiveStatus === 'scheduled' && event?.date && (
             <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg animate-in fade-in slide-in-from-left-2">
@@ -37,9 +37,11 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
             </div>
           )}
         </div>
-        <div className="absolute bottom-4 left-4 right-4">
-          <h3 id={`event-title-${event.id}`} className="text-xl font-bold text-white">{event?.name || "Evento sem nome"}</h3>
-          <p className="mt-1 text-sm text-white/80 line-clamp-2">{event?.description || ""}</p>
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent">
+          <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter mb-2 italic">
+            {event?.name || "Evento sem nome"}
+          </h3>
+          <p className="text-xs text-white/70 line-clamp-1 font-medium italic">{event?.description || ""}</p>
         </div>
       </div>
 
