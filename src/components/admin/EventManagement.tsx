@@ -23,7 +23,7 @@
        description: "",
        start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
        location: "",
-       status: "scheduled",
+        status: "scheduled",
        event_type: "online",
        allows_pre_bidding: true,
        show_countdown: true,
@@ -176,21 +176,21 @@
    };
  
    const getStatusColor = (status: string) => {
-     switch (status) {
-       case 'active': return 'text-emerald-500 bg-emerald-500/10';
-       case 'scheduled': return 'text-blue-500 bg-blue-500/10';
-       case 'finished': return 'text-muted-foreground bg-muted';
-       default: return 'text-muted-foreground bg-muted';
-     }
+      switch (status) {
+        case 'live': return 'text-emerald-500 bg-emerald-500/10';
+        case 'scheduled': return 'text-blue-500 bg-blue-500/10';
+        case 'finished': return 'text-muted-foreground bg-muted';
+        default: return 'text-muted-foreground bg-muted';
+      }
    };
  
    const getStatusLabel = (status: string) => {
-     switch (status) {
-       case 'active': return 'Ao Vivo';
-       case 'scheduled': return 'Agendado';
-       case 'finished': return 'Finalizado';
-       default: return status;
-     }
+      switch (status) {
+        case 'live': return 'Ao Vivo';
+        case 'scheduled': return 'Agendado';
+        case 'finished': return 'Finalizado';
+        default: return status;
+      }
    };
    return (
      <div className="space-y-6">
@@ -276,7 +276,7 @@
                      <SelectTrigger><SelectValue /></SelectTrigger>
                      <SelectContent>
                        <SelectItem value="scheduled">Agendado</SelectItem>
-                        <SelectItem value="active">Ao Vivo</SelectItem>
+                         <SelectItem value="live">Ao Vivo</SelectItem>
                      </SelectContent>
                    </Select>
                  </div>

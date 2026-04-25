@@ -24,7 +24,7 @@
       const [lotRes, bidsRes] = await Promise.all([
          supabase
            .from("lots")
-           .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+            .select("*, animal:animals(*), event:events!event_id(*)")
            .eq("id", params.lotId)
           .single(),
         supabase

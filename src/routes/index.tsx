@@ -13,7 +13,7 @@ import heroImage from "@/assets/hero-horse.jpg";
       const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
         supabase.from("events")
           .select("*")
-          .or("status.eq.active,status.eq.scheduled")
+          .or("status.eq.live,status.eq.scheduled")
           .order("start_date", { ascending: true })
           .limit(6),
         supabase.from("lots")
@@ -82,7 +82,7 @@ function Home() {
      status: l.status as any,
    }));
  
-     const liveEvents = mappedEvents.filter((e) => e.status === "active");
+     const liveEvents = mappedEvents.filter((e) => e.status === "live");
      const upcomingEvents = mappedEvents.filter((e) => e.status === "scheduled");
      
      // Find the closest upcoming event with countdown enabled
