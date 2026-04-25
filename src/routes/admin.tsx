@@ -1,7 +1,7 @@
  import { useState, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
- import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu } from "lucide-react";
+ import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
@@ -57,6 +57,11 @@ export const Route = createFileRoute("/admin")({
          ))}
        </nav>
        <div className="pt-4 border-t">
+         <Link to="/">
+           <Button variant="ghost" className="w-full justify-start gap-2">
+             <ExternalLink className="h-4 w-4" /> Ver Site
+           </Button>
+         </Link>
          <Button 
            variant="ghost" 
            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" 
