@@ -199,10 +199,10 @@
       setIsLoading(true);
       console.log("Fetching animals...");
       try {
-        const { data, error } = await supabase
-          .from("animals")
-          .select("*")
-          .order("created_at", { ascending: false });
+         const { data, error } = await supabase
+           .from("animals")
+           .select("*, categories(name)")
+           .order("created_at", { ascending: false });
 
         if (error) {
           console.error("Error fetching animals:", error);
@@ -617,7 +617,7 @@
                  <TableRow>
                     <TableHead className="w-[80px]">Foto</TableHead>
                     <TableHead>Nome</TableHead>
-                   <TableHead>Espécie/Raça</TableHead>
+                    <TableHead>Categoria/Raça</TableHead>
                    <TableHead>Registro</TableHead>
                    <TableHead>Sexo</TableHead>
                    <TableHead className="text-right">Ações</TableHead>
@@ -646,8 +646,13 @@
                             </div>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium">{animal.name}</TableCell>
-                       <TableCell>{animal.species} / {animal.breed}</TableCell>
+                         <TableCell className="font-medium">
+                           <div>{animal.name}</div>
+                           {animal.categories?.name && (
+                             <div className="text-[10px] text-muted-foreground uppercase">{animal.categories.name}</div>
+                           )}
+                         </TableCell>
+                        <TableCell>{animal.species} / {animal.breed}</TableCell>
                        <TableCell>{animal.registration_number}</TableCell>
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
                       <TableCell className="text-right">
