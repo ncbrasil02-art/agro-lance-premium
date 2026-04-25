@@ -98,7 +98,7 @@ function AdminLayout() {
           </div>
        </aside>
  
-       <main className="flex-1 p-8">
+        <main className="flex-1 p-8 pb-16">
          <header className="mb-8 flex items-center justify-between">
            <div>
              <h1 className="text-3xl font-bold">Painel Administrativo</h1>
@@ -213,12 +213,20 @@ function AdminLayout() {
               <CardContent><p className="text-muted-foreground">Módulo de gestão de usuários em desenvolvimento.</p></CardContent>
             </Card>
           )}
-          {activeTab === "settings" && (
-            <Card>
-              <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
-              <CardContent><p className="text-muted-foreground">Configurações da plataforma em desenvolvimento.</p></CardContent>
-            </Card>
-          )}
+           {activeTab === "settings" && (
+             <Card>
+               <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
+               <CardContent>
+                 <p className="text-muted-foreground">Configurações da plataforma em desenvolvimento.</p>
+                 <div className="mt-8 pt-8 border-t text-[10px] text-muted-foreground">
+                   <p>Debug Info:</p>
+                   <p>User ID: {profile?.id}</p>
+                   <p>Role: {profile?.role}</p>
+                   <p>Environment: {import.meta.env.MODE}</p>
+                 </div>
+               </CardContent>
+             </Card>
+           )}
        </main>
      </div>
    );

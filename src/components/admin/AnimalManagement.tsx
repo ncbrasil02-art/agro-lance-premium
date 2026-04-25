@@ -142,22 +142,28 @@
    const [isLoading, setIsLoading] = useState(true);
    const [searchQuery, setSearchQuery] = useState("");
  
-   const fetchAnimals = async () => {
-     setIsLoading(true);
-     try {
-       const { data, error } = await supabase
-         .from("animals")
-         .select("*")
-         .order("created_at", { ascending: false });
- 
-       if (error) throw error;
-       setAnimals(data || []);
-     } catch (error: any) {
-       toast.error("Erro ao carregar animais: " + error.message);
-     } finally {
-       setIsLoading(false);
-     }
-   };
+    const fetchAnimals = async () => {
+      setIsLoading(true);
+      console.log("Fetching animals...");
+      try {
+        const { data, error } = await supabase
+          .from("animals")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching animals:", error);
+          throw error;
+        }
+        console.log("Animals loaded:", data?.length || 0);
+        setAnimals(data || []);
+      } catch (error: any) {
+        console.error("Catch error fetching animals:", error);
+        toast.error("Erro ao carregar animais: " + error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
  
    useEffect(() => {
      fetchAnimals();
@@ -183,7 +189,12 @@
  
    return (
      <div className="space-y-6">
-       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={fetchAnimals} disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
+            </Button>
+          </div>
          <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input

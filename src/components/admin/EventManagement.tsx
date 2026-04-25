@@ -70,22 +70,28 @@
        setIsDialogOpen(true);
      };
  
-   const fetchEvents = async () => {
-     setIsLoading(true);
-     try {
-       const { data, error } = await supabase
-         .from("events")
-         .select("*")
-         .order("start_date", { ascending: false });
- 
-       if (error) throw error;
-       setEvents(data || []);
-     } catch (error: any) {
-       toast.error("Erro ao carregar eventos: " + error.message);
-     } finally {
-       setIsLoading(false);
-     }
-   };
+    const fetchEvents = async () => {
+      setIsLoading(true);
+      console.log("Fetching events...");
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .order("start_date", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching events:", error);
+          throw error;
+        }
+        console.log("Events loaded:", data?.length || 0);
+        setEvents(data || []);
+      } catch (error: any) {
+        console.error("Catch error fetching events:", error);
+        toast.error("Erro ao carregar eventos: " + error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
  
    useEffect(() => {
      fetchEvents();
@@ -97,8 +103,9 @@
        return;
      }
  
-     try {
-        if (editingEvent) {
+      console.log("Saving event...", formData);
+      try {
+         if (editingEvent) {
            const { error } = await supabase
              .from("events")
              .update({
@@ -119,21 +126,26 @@
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
         } else {
-           const { error } = await supabase.from("events").insert({
-             name: formData.name,
-             description: formData.description,
-             start_date: new Date(formData.start_date).toISOString(),
-             location: formData.location,
-             status: formData.status,
-             event_type: formData.event_type,
-             allows_pre_bidding: formData.allows_pre_bidding,
-             show_countdown: formData.show_countdown,
-             transmission_link: formData.transmission_link,
-             banner_url: formData.banner_url,
-             promoter_company: formData.promoter_company,
-             auctioneer_name: formData.auctioneer_name,
-             slug: formData.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
-           });
+          const baseSlug = formData.name.toLowerCase().trim()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+            .replace(/ /g, "-").replace(/[^\w-]+/g, "");
+          const slug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
+          
+          const { error } = await supabase.from("events").insert({
+            name: formData.name,
+            description: formData.description,
+            start_date: new Date(formData.start_date).toISOString(),
+            location: formData.location,
+            status: formData.status,
+            event_type: formData.event_type,
+            allows_pre_bidding: formData.allows_pre_bidding,
+            show_countdown: formData.show_countdown,
+            transmission_link: formData.transmission_link,
+            banner_url: formData.banner_url,
+            promoter_company: formData.promoter_company,
+            auctioneer_name: formData.auctioneer_name,
+            slug: slug
+          });
           if (error) throw error;
           toast.success("Evento criado com sucesso");
         }
@@ -182,7 +194,12 @@
    };
    return (
      <div className="space-y-6">
-       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
+            </Button>
+          </div>
          <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input

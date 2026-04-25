@@ -8,7 +8,9 @@ export function Countdown({ endsAt, className }: { endsAt: string; className?: s
     return () => clearInterval(id);
   }, []);
 
-  const diff = Math.max(0, new Date(endsAt).getTime() - now);
+  const endTime = new Date(endsAt).getTime();
+  if (isNaN(endTime)) return <span className={className}>Data inválida</span>;
+  const diff = Math.max(0, endTime - now);
   const d = Math.floor(diff / 86_400_000);
   const h = Math.floor((diff % 86_400_000) / 3_600_000);
   const m = Math.floor((diff % 3_600_000) / 60_000);

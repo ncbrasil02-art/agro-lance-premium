@@ -39,6 +39,7 @@
 
       const fetchData = async () => {
         setIsLoading(true);
+        console.log("Fetching lots, events and animals...");
         try {
           const [lotsRes, eventsRes, animalsRes] = await Promise.all([
             supabase
@@ -55,10 +56,25 @@
               .order("name")
           ]);
     
-          if (lotsRes.error) throw lotsRes.error;
-          if (eventsRes.error) throw eventsRes.error;
-          if (animalsRes.error) throw animalsRes.error;
+          if (lotsRes.error) {
+            console.error("Error fetching lots:", lotsRes.error);
+            throw lotsRes.error;
+          }
+          if (eventsRes.error) {
+            console.error("Error fetching events for lots:", eventsRes.error);
+            throw eventsRes.error;
+          }
+          if (animalsRes.error) {
+            console.error("Error fetching animals for lots:", animalsRes.error);
+            throw animalsRes.error;
+          }
     
+          console.log("Data loaded for Lots tab:", {
+            lots: lotsRes.data?.length || 0,
+            events: eventsRes.data?.length || 0,
+            animals: animalsRes.data?.length || 0
+          });
+
           setLots(lotsRes.data || []);
           setEvents(eventsRes.data || []);
           setAvailableAnimals(animalsRes.data || []);
@@ -67,6 +83,7 @@
             setFormData(prev => ({ ...prev, event_id: initialEventId }));
           }
         } catch (error: any) {
+          console.error("Catch error in fetchData (Lots):", error);
           toast.error("Erro ao carregar dados: " + error.message);
         } finally {
           setIsLoading(false);
@@ -182,7 +199,12 @@
  
    return (
      <div className="space-y-6">
-       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={fetchData} disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
+            </Button>
+          </div>
          <div className="flex flex-1 gap-4 max-w-2xl">
            <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
