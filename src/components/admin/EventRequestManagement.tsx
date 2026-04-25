@@ -78,8 +78,9 @@ export function EventRequestManagement() {
                 <TableRow>
                   <TableHead>Data</TableHead>
                   <TableHead>Nome / Empresa</TableHead>
-                  <TableHead>WhatsApp</TableHead>
-                  <TableHead>Categoria/Local</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Detalhes</TableHead>
+                  <TableHead>Qtd / Data</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -100,19 +101,26 @@ export function EventRequestManagement() {
                       <TableCell className="font-medium">
                         {req.name}
                       </TableCell>
-                      <TableCell>
-                        <a 
-                          href={`https://wa.me/${req.whatsapp.replace(/\D/g, '')}`} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="text-emerald-500 hover:underline font-bold"
-                        >
-                          {req.whatsapp}
-                        </a>
+                      <TableCell className="text-xs">
+                        <div className="font-bold">
+                          <a 
+                            href={`https://wa.me/${req.whatsapp.replace(/\D/g, '')}`} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="text-emerald-500 hover:underline"
+                          >
+                            {req.whatsapp}
+                          </a>
+                        </div>
+                        <div className="text-muted-foreground">{req.email}</div>
                       </TableCell>
                       <TableCell className="text-xs">
                         <div>{req.category}</div>
                         <div className="text-muted-foreground">{req.location}</div>
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        <div>{req.estimated_animals || '--'}</div>
+                        <div className="text-muted-foreground">{req.estimated_date || '--'}</div>
                       </TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
