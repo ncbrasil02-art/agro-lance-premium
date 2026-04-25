@@ -38,11 +38,13 @@ import { Link } from "@tanstack/react-router";
   }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
-      const [lots, setLots] = useState<any[]>([]);
-      const [events, setEvents] = useState<any[]>([]);
-      const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
-      const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
-      const [editingLot, setEditingLot] = useState<any>(null);
+  const [lots, setLots] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [events, setEvents] = useState<any[]>([]);
+  const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+  const [editingLot, setEditingLot] = useState<any>(null);
+  const ITEMS_PER_PAGE = 8;
       
       const [formData, setFormData] = useState({
         event_id: "",
@@ -56,60 +58,52 @@ import { Link } from "@tanstack/react-router";
         payment_methods: ""
       });
 
-   const ITEMS_PER_PAGE = 8;
-      const fetchData = async () => {
-        setIsLoading(true);
-        console.log("Fetching lots, events and animals...");
-        try {
-          const [lotsRes, eventsRes, animalsRes] = await Promise.all([
-            supabase
-              .from("lots")
-              .select("*, event:events!event_id(name), animal:animals(name, internal_code)")
-              .order("is_featured", { ascending: false })
-              .order("lot_number", { ascending: true }),
-            supabase
-              .from("events")
-              .select("id, name")
-              .order("name"),
-            supabase
-              .from("animals")
-              .select("id, name, internal_code")
-              .order("name")
-          ]);
-    
-          if (lotsRes.error) {
-            console.error("Error fetching lots:", lotsRes.error);
-            throw lotsRes.error;
-          }
-          if (eventsRes.error) {
-            console.error("Error fetching events for lots:", eventsRes.error);
-            throw eventsRes.error;
-          }
-          if (animalsRes.error) {
-            console.error("Error fetching animals for lots:", animalsRes.error);
-            throw animalsRes.error;
-          }
-    
-          console.log("Data loaded for Lots tab:", {
-            lots: lotsRes.data?.length || 0,
-            events: eventsRes.data?.length || 0,
-            animals: animalsRes.data?.length || 0
-          });
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [eventsRes, animalsRes] = await Promise.all([
+        supabase.from("events").select("id, name").order("name"),
+        supabase.from("animals").select("id, name, internal_code, photos").order("name"),
+      ]);
 
-          setLots(lotsRes.data || []);
-          setEvents(eventsRes.data || []);
-          setAvailableAnimals(animalsRes.data || []);
-          
-          if (initialEventId !== "all") {
-            setFormData(prev => ({ ...prev, event_id: initialEventId }));
-          }
-        } catch (error: any) {
-          console.error("Catch error in fetchData (Lots):", error);
-          toast.error("Erro ao carregar dados: " + error.message);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      if (eventsRes.error) throw eventsRes.error;
+      if (animalsRes.error) throw animalsRes.error;
+
+      setEvents(eventsRes.data || []);
+      setAvailableAnimals(animalsRes.data || []);
+
+      let query = supabase
+        .from("lots")
+        .select("*, event:events!event_id(name), animal:animals(name, internal_code, photos)", { count: "exact" });
+
+      if (selectedEventId !== "all") {
+        query = query.eq("event_id", selectedEventId);
+      }
+
+      if (searchQuery) {
+        query = query.ilike("animal.name", `%${searchQuery}%`);
+      }
+
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
+      const { data, error, count } = await query
+        .order(sortColumn, { ascending: sortDirection === "asc" })
+        .range(from, to);
+
+      if (error) throw error;
+      setLots(data || []);
+      setTotalCount(count || 0);
+
+      if (initialEventId !== "all") {
+        setFormData(prev => ({ ...prev, event_id: initialEventId }));
+      }
+    } catch (error: any) {
+      toast.error("Erro ao carregar lotes: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
       useEffect(() => {
         setSelectedEventId(initialEventId);
