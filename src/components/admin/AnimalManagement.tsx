@@ -263,171 +263,242 @@
                   Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
-             <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Nome</Label>
-                   <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Descrição / Bio</Label>
-                  <textarea 
-                    id="description"
-                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={formData.description} 
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
-                    placeholder="Fale um pouco sobre as qualidades do animal..."
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="species">Espécie</Label>
-                    <Select onValueChange={(v) => setFormData({ ...formData, species: v })} value={formData.species}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Equino">Equino</SelectItem>
-                        <SelectItem value="Bovino">Bovino</SelectItem>
-                        <SelectItem value="Ovino">Ovino</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="breed">Raça</Label>
-                    <Input value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
-                  </div>
-               </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="sex">Sexo</Label>
-                    <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="M">Macho</SelectItem>
-                        <SelectItem value="F">Fêmea</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="reg">Registro</Label>
-                    <Input value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
-                  </div>
-               </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="birth_date">Data de Nascimento</Label>
-                    <Input type="date" value={formData.birth_date} onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })} />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="color">Pelagem/Cor</Label>
-                    <Input value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="youtube">Link do Vídeo (YouTube)</Label>
-                  <Input value={formData.youtube_url} onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="pedigree">Link da Genealogia (PDF ou Imagem)</Label>
-                  <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="https://..." />
-                </div>
+             <Tabs defaultValue="geral" className="w-full">
+               <TabsList className="grid w-full grid-cols-4">
+                 <TabsTrigger value="geral">Geral</TabsTrigger>
+                 <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
+                 <TabsTrigger value="saude">Saúde</TabsTrigger>
+                 <TabsTrigger value="midia">Mídia</TabsTrigger>
+               </TabsList>
+               
+               <TabsContent value="geral" className="space-y-4 pt-4">
+                 <div className="grid gap-2">
+                   <Label htmlFor="name">Nome</Label>
+                   <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="description">Descrição / Bio</Label>
+                   <textarea 
+                     id="description"
+                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                     value={formData.description} 
+                     onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                     placeholder="Fale um pouco sobre as qualidades do animal..."
+                   />
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="species">Espécie</Label>
+                     <Select onValueChange={(v) => setFormData({ ...formData, species: v })} value={formData.species}>
+                       <SelectTrigger id="species"><SelectValue /></SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="Equino">Equino</SelectItem>
+                         <SelectItem value="Bovino">Bovino</SelectItem>
+                         <SelectItem value="Ovino">Ovino</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="breed">Raça</Label>
+                     <Input id="breed" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
+                   </div>
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="sex">Sexo</Label>
+                     <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
+                       <SelectTrigger id="sex"><SelectValue /></SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="M">Macho</SelectItem>
+                         <SelectItem value="F">Fêmea</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="reg">Registro</Label>
+                     <Input id="reg" value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
+                   </div>
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="birth_date">Data de Nascimento</Label>
+                     <Input id="birth_date" type="date" value={formData.birth_date} onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })} />
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="color">Pelagem/Cor</Label>
+                     <Input id="color" value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
+                   </div>
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="location">Localização</Label>
+                     <Input id="location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Fazenda, Cidade - UF" />
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="seller">Vendedor</Label>
+                     <Select onValueChange={(v) => setFormData({ ...formData, seller_id: v })} value={formData.seller_id}>
+                       <SelectTrigger id="seller">
+                         <SelectValue placeholder="Selecione o vendedor" />
+                       </SelectTrigger>
+                       <SelectContent>
+                         {sellers.map((seller) => (
+                           <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
+                         ))}
+                       </SelectContent>
+                     </Select>
+                   </div>
+                 </div>
+               </TabsContent>
+               
+               <TabsContent value="genealogia" className="space-y-4 pt-4">
                  <div className="grid grid-cols-2 gap-4">
                    <div className="grid gap-2">
                      <Label htmlFor="father">Nome do Pai</Label>
-                     <Input value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
+                     <Input id="father" value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
                    </div>
                    <div className="grid gap-2">
                      <Label htmlFor="mother">Nome da Mãe</Label>
-                     <Input value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
+                     <Input id="mother" value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
                    </div>
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                    <div className="grid gap-2">
                      <Label htmlFor="weight">Peso (kg)</Label>
-                     <Input type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
+                     <Input id="weight" type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
                    </div>
                    <div className="grid gap-2">
                      <Label htmlFor="height">Altura (m)</Label>
-                     <Input type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
+                     <Input id="height" type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
                    </div>
                  </div>
+               </TabsContent>
+               
+               <TabsContent value="saude" className="space-y-4 pt-4">
+                 <div className="grid gap-4">
+                   <Label className="text-base font-bold">Histórico Veterinário</Label>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border rounded-md p-4 bg-muted/30">
+                     {VETERINARY_CHECKLIST.map((item) => (
+                       <div key={item.id} className="flex items-center space-x-2">
+                         <Checkbox 
+                           id={item.id} 
+                           checked={formData.veterinary_history?.[item.id] || false}
+                           onCheckedChange={(checked) => {
+                             setFormData({
+                               ...formData,
+                               veterinary_history: {
+                                 ...formData.veterinary_history,
+                                 [item.id]: !!checked
+                               }
+                             });
+                           }}
+                         />
+                         <Label htmlFor={item.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                           {item.label}
+                         </Label>
+                       </div>
+                     ))}
+                   </div>
+                   
+                   <div className="grid gap-2">
+                     <Label htmlFor="other_vet">Outras Observações Veterinárias</Label>
+                     <textarea 
+                       id="other_vet"
+                       className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       value={formData.other_veterinary_info} 
+                       onChange={(e) => setFormData({ ...formData, other_veterinary_info: e.target.value })} 
+                       placeholder="Adicione mais informações se necessário..."
+                     />
+                   </div>
+                   
+                   <div className="grid gap-2">
+                     <Label htmlFor="vaccination">Vacinas Realizadas (separadas por vírgula)</Label>
+                     <Input id="vaccination" value={formData.vaccination_records} onChange={(e) => setFormData({ ...formData, vaccination_records: e.target.value })} placeholder="Gripe, Tétano, etc" />
+                   </div>
+                 </div>
+               </TabsContent>
+               
+               <TabsContent value="midia" className="space-y-4 pt-4">
                  <div className="grid gap-2">
-                   <Label htmlFor="vaccination">Registro de Vacinação (separados por vírgula)</Label>
-                   <Input value={formData.vaccination_records} onChange={(e) => setFormData({ ...formData, vaccination_records: e.target.value })} placeholder="Gripe, Tétano, etc" />
+                   <Label htmlFor="youtube">Link do Vídeo (YouTube)</Label>
+                   <Input id="youtube" value={formData.youtube_url} onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
                  </div>
-                  <div className="grid gap-4 pt-4 border-t">
-                    <Label className="text-base font-bold">Galeria de Fotos</Label>
-                    {formData.photos_urls && (
-                      <div className="grid grid-cols-4 gap-2 mb-2">
-                         {formData.photos_urls.split(",").map((url: string, i: number) => (
-                          <div key={i} className="relative aspect-square group">
-                            <img src={url.trim()} className="h-full w-full object-cover rounded-md border" alt="" />
-                            <button 
-                              type="button"
-                              onClick={() => {
-                                 const urls = formData.photos_urls.split(",").map((u: string) => u.trim()).filter(Boolean);
-                                urls.splice(i, 1);
-                                setFormData({ ...formData, photos_urls: urls.join(", ") });
-                              }}
-                              className="absolute top-1 right-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex flex-col gap-2">
-                     <div className="flex gap-2">
-                       <Input 
-                         type="file" 
-                         multiple 
-                         accept="image/*" 
-                         className="hidden" 
-                         id="photo-upload" 
-                         onChange={async (e) => {
-                           const files = e.target.files;
-                           if (!files) return;
-                           const toastId = toast.loading("Enviando fotos...");
-                           const uploadedUrls = [];
-                           for (let i = 0; i < files.length; i++) {
-                             const file = files[i];
-                             const fileExt = file.name.split('.').pop();
-                             const fileName = `${Math.random()}.${fileExt}`;
-                             const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
-                             if (error) {
-                               toast.error(`Erro no upload: ${error.message}`);
-                               continue;
-                             }
-                             const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
-                             uploadedUrls.push(publicUrl);
-                           }
-                            const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-                           setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
-                           toast.dismiss(toastId);
-                           toast.success(`${uploadedUrls.length} fotos enviadas!`);
-                         }}
-                       />
-                       <Button 
-                         type="button" 
-                         variant="outline" 
-                         className="flex-1 border-dashed" 
-                         onClick={() => document.getElementById('photo-upload')?.click()}
-                       >
-                         <Upload className="mr-2 h-4 w-4" /> Upload de Fotos
-                       </Button>
-                       <Button 
-                         type="button" 
-                         variant="ghost" 
-                         size="sm"
-                         onClick={() => setFormData({ ...formData, photos_urls: "" })}
-                         className="text-[10px]"
-                       >
-                         Limpar
-                       </Button>
+                 
+                 <div className="grid gap-4 pt-2">
+                   <Label className="text-base font-bold">Galeria de Fotos</Label>
+                   {formData.photos_urls && (
+                     <div className="grid grid-cols-4 gap-2 mb-2">
+                        {formData.photos_urls.split(",").map((url: string, i: number) => (
+                         <div key={i} className="relative aspect-square group">
+                           <img src={url.trim()} className="h-full w-full object-cover rounded-md border" alt="" />
+                           <button 
+                             type="button"
+                             onClick={() => {
+                                const urls = formData.photos_urls.split(",").map((u: string) => u.trim()).filter(Boolean);
+                               urls.splice(i, 1);
+                               setFormData({ ...formData, photos_urls: urls.join(", ") });
+                             }}
+                             className="absolute top-1 right-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                           >
+                             <Trash2 className="h-3 w-3" />
+                           </button>
+                         </div>
+                       ))}
                      </div>
-                   </div>
+                   )}
+                   <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        className="hidden" 
+                        id="photo-upload" 
+                        onChange={async (e) => {
+                          const files = e.target.files;
+                          if (!files) return;
+                          const toastId = toast.loading("Enviando fotos...");
+                          const uploadedUrls = [];
+                          for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${Math.random()}.${fileExt}`;
+                            const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+                            if (error) {
+                              toast.error(`Erro no upload: ${error.message}`);
+                              continue;
+                            }
+                            const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+                            uploadedUrls.push(publicUrl);
+                          }
+                           const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+                          setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
+                          toast.dismiss(toastId);
+                          toast.success(`${uploadedUrls.length} fotos enviadas!`);
+                        }}
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="flex-1 border-dashed" 
+                        onClick={() => document.getElementById('photo-upload')?.click()}
+                      >
+                        <Upload className="mr-2 h-4 w-4" /> Upload de Fotos
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setFormData({ ...formData, photos_urls: "" })}
+                        className="text-[10px]"
+                      >
+                        Limpar
+                      </Button>
+                    </div>
+                  </div>
                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="docs">Documentos / Pedigree (Upload)</Label>
+                 
+                 <div className="grid gap-2 pt-2">
+                   <Label htmlFor="docs">Documentos / Pedigree</Label>
                    <div className="flex gap-2">
                      <Input 
                        type="file" 
@@ -459,28 +530,15 @@
                      >
                        <Upload className="mr-2 h-4 w-4" /> Upload Documento
                      </Button>
+                     {formData.pedigree_url && (
+                       <Button variant="ghost" size="sm" asChild>
+                         <a href={formData.pedigree_url} target="_blank" rel="noreferrer">Ver</a>
+                       </Button>
+                     )}
                    </div>
-                  </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="location">Localização</Label>
-                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Fazenda, Cidade - UF" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="seller">Vendedor</Label>
-                    <Select onValueChange={(v) => setFormData({ ...formData, seller_id: v })} value={formData.seller_id}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o vendedor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sellers.map((seller) => (
-                          <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
+                 </div>
+               </TabsContent>
+             </Tabs>
              <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
                 <Button className="bg-gold text-emerald-deep" onClick={handleSave}>
