@@ -10,7 +10,13 @@
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-   export function LotManagement() {
+   export function LotManagement({ 
+     initialEventId = "all", 
+     onEventChange 
+   }: { 
+     initialEventId?: string; 
+     onEventChange?: (id: string) => void;
+   }) {
      const [isDialogOpen, setIsDialogOpen] = useState(false);
      const [editingLot, setEditingLot] = useState<any>(null);
      const [formData, setFormData] = useState({
@@ -107,7 +113,16 @@
     };
    const [lots, setLots] = useState<any[]>([]);
    const [events, setEvents] = useState<any[]>([]);
-   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+    const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+
+    useEffect(() => {
+      setSelectedEventId(initialEventId);
+    }, [initialEventId]);
+
+    const handleEventSelectChange = (val: string) => {
+      setSelectedEventId(val);
+      if (onEventChange) onEventChange(val);
+    };
    const [isLoading, setIsLoading] = useState(true);
    const [searchQuery, setSearchQuery] = useState("");
  
@@ -174,7 +189,7 @@
                onChange={(e) => setSearchQuery(e.target.value)}
              />
            </div>
-           <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+            <Select value={selectedEventId} onValueChange={handleEventSelectChange}>
              <SelectTrigger className="w-[200px]">
                <SelectValue placeholder="Filtrar por Evento" />
              </SelectTrigger>
@@ -218,19 +233,28 @@
                    </SelectContent>
                  </Select>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="animal">Animal</Label>
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="animal">Animal</Label>
+                    <span className="text-[10px] text-muted-foreground italic">
+                      * O animal deve estar cadastrado na aba "Animais"
+                    </span>
+                  </div>
                   <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
-                   <SelectTrigger>
+                    <SelectTrigger>
                       <SelectValue placeholder="Selecione o animal" />
-                   </SelectTrigger>
-                   <SelectContent>
-                      {(editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
-                        <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableAnimals.length === 0 ? (
+                        <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
+                      ) : (
+                        (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
+                          <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">
                    <Label htmlFor="number">Nº Lote</Label>
