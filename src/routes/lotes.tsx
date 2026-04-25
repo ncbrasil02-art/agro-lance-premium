@@ -52,7 +52,7 @@ function LotsPage() {
          <p className="mt-2 text-muted-foreground">{mappedLots.length} animais disponíveis nos leilões ativos.</p>
       </header>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-         {mappedLots.map((l) => <LotCard key={l.id} lot={l as any} />)}
+          {mappedLots?.map((l: any) => <LotCard key={l.id} lot={l as any} />)}
       </div>
     </div>
   );
