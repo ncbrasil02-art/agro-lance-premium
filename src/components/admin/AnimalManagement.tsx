@@ -44,10 +44,12 @@
        photos_urls: "",
        weight: "",
        height: "",
-        vaccination_records: "",
-        genealogy_father: "",
-        genealogy_mother: "",
-        description: ""
+         vaccination_records: "",
+         veterinary_history: {},
+         other_veterinary_info: "",
+         genealogy_father: "",
+         genealogy_mother: "",
+         description: ""
     });
 
     const resetForm = () => {
@@ -67,10 +69,12 @@
         photos_urls: "",
         weight: "",
         height: "",
-        vaccination_records: "",
-        genealogy_father: "",
-        genealogy_mother: "",
-        description: ""
+         vaccination_records: "",
+         veterinary_history: {},
+         other_veterinary_info: "",
+         genealogy_father: "",
+         genealogy_mother: "",
+         description: ""
       });
     };
 
@@ -91,7 +95,9 @@
         photos_urls: animal.photos ? animal.photos.join(", ") : "",
         weight: animal.weight || "",
         height: animal.height || "",
-        vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
+         vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
+         veterinary_history: animal.veterinary_history || {},
+         other_veterinary_info: animal.veterinary_history?.other_info || "",
         genealogy_father: animal.genealogy?.father || "",
         genealogy_mother: animal.genealogy?.mother || "",
         description: animal.description || ""
