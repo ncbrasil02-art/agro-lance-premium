@@ -4,7 +4,55 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle } from "lucide-react";
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+ import { Label } from "@/components/ui/label";
+   const [isAllocating, setIsAllocating] = useState(false);
+   const [newLot, setNewLot] = useState({
+     event_id: "",
+     animal_id: "",
+     lot_number: 1,
+     starting_price: 0,
+     bid_increment: 1000,
+     status: "active"
+   });
+   const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
+ 
+   const fetchAvailableAnimals = async () => {
+     const { data, error } = await supabase
+       .from("animals")
+       .select("id, name, internal_code");
+     
+     if (!error) setAvailableAnimals(data || []);
+   };
+ 
+   const handleAllocate = async () => {
+     if (!newLot.event_id || !newLot.animal_id || !newLot.lot_number) {
+       toast.error("Preencha todos os campos obrigatórios");
+       return;
+     }
+ 
+     try {
+       const { error } = await supabase.from("lots").insert({
+         event_id: newLot.event_id,
+         animal_id: newLot.animal_id,
+         lot_number: newLot.lot_number,
+         starting_price: newLot.starting_price,
+         current_price: newLot.starting_price,
+         bid_increment: newLot.bid_increment,
+         status: newLot.status,
+         end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Default 1 week
+       });
+ 
+       if (error) throw error;
+       toast.success("Lote alocado com sucesso");
+       setIsAllocating(false);
+       fetchData();
+     } catch (error: any) {
+       toast.error("Erro ao alocar lote: " + error.message);
+     }
+   };
+ 
  import { toast } from "sonner";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
@@ -90,9 +138,82 @@
              </SelectContent>
            </Select>
          </div>
-         <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
-           <LinkIcon className="mr-2 h-4 w-4" /> Alocar Lote
-         </Button>
+         <Dialog open={isAllocating} onOpenChange={(open) => {
+           setIsAllocating(open);
+           if (open) fetchAvailableAnimals();
+         }}>
+           <DialogTrigger asChild>
+             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+               <PlusCircle className="mr-2 h-4 w-4" /> Alocar Lote
+             </Button>
+           </DialogTrigger>
+           <DialogContent className="sm:max-w-[425px]">
+             <DialogHeader>
+               <DialogTitle>Alocar Animal em Evento</DialogTitle>
+               <DialogDescription>
+                 Selecione um animal e um evento para criar um novo lote.
+               </DialogDescription>
+             </DialogHeader>
+             <div className="grid gap-4 py-4">
+               <div className="grid gap-2">
+                 <Label htmlFor="event">Evento</Label>
+                 <Select onValueChange={(v) => setNewLot({ ...newLot, event_id: v })}>
+                   <SelectTrigger>
+                     <SelectValue placeholder="Selecione o evento" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div className="grid gap-2">
+                 <Label htmlFor="animal">Animal</Label>
+                 <Select onValueChange={(v) => setNewLot({ ...newLot, animal_id: v })}>
+                   <SelectTrigger>
+                     <SelectValue placeholder="Selecione o animal" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {availableAnimals.map(a => (
+                       <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code})</SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="grid gap-2">
+                   <Label htmlFor="number">Nº Lote</Label>
+                   <Input 
+                     type="number" 
+                     value={newLot.lot_number} 
+                     onChange={(e) => setNewLot({ ...newLot, lot_number: parseInt(e.target.value) })} 
+                   />
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="increment">Incremento (R$)</Label>
+                   <Input 
+                     type="number" 
+                     value={newLot.bid_increment} 
+                     onChange={(e) => setNewLot({ ...newLot, bid_increment: parseFloat(e.target.value) })} 
+                   />
+                 </div>
+               </div>
+               <div className="grid gap-2">
+                 <Label htmlFor="price">Preço Inicial (R$)</Label>
+                 <Input 
+                   type="number" 
+                   value={newLot.starting_price} 
+                   onChange={(e) => setNewLot({ ...newLot, starting_price: parseFloat(e.target.value) })} 
+                 />
+               </div>
+             </div>
+             <DialogFooter>
+               <Button variant="outline" onClick={() => setIsAllocating(false)}>Cancelar</Button>
+               <Button className="bg-gold text-emerald-deep" onClick={handleAllocate}>
+                 Confirmar Alocação
+               </Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
        </div>
  
        <Card>
