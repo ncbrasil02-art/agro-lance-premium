@@ -247,11 +247,11 @@
                         const toastId = toast.loading("Enviando banner...");
                         const fileExt = file.name.split('.').pop();
                         const fileName = `${Math.random()}.${fileExt}`;
-                        const { data, error } = await supabase.storage.from('events').upload(fileName, file);
+                        const { data, error } = await supabase.storage.from('banners').upload(fileName, file);
                         if (error) {
                           toast.error(`Erro no upload: ${error.message}`);
                         } else {
-                          const { data: { publicUrl } } = supabase.storage.from('events').getPublicUrl(data.path);
+                          const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(data.path);
                           setFormData({ ...formData, banner_url: publicUrl });
                           toast.success("Banner enviado!");
                         }
