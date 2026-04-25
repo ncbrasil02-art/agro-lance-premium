@@ -1,5 +1,5 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
- import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar } from "lucide-react";
+import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from "lucide-react";
  import { Countdown } from "@/components/auctions/countdown";
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
@@ -10,7 +10,7 @@ import heroImage from "@/assets/hero-horse.jpg";
 
   export const Route = createFileRoute("/")({
     loader: async () => {
-      const [eventsRes, lotsRes, pastEventsRes] = await Promise.all([
+      const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
         supabase.from("events")
           .select("*")
           .or("status.eq.active,status.eq.scheduled")
@@ -25,19 +25,24 @@ import heroImage from "@/assets/hero-horse.jpg";
           .eq("status", "finished")
           .order("start_date", { ascending: false })
           .limit(3)
+        supabase.from("site_settings")
+          .select("*")
+          .eq("key", "announcement")
+          .single()
       ]);
 
       return {
         events: eventsRes.data || [],
         lots: lotsRes.data || [],
-        pastEvents: pastEventsRes.data || []
+        pastEvents: pastEventsRes.data || [],
+        announcement: settingsRes.data?.value || null
       };
     },
     component: Home,
   });
 
 function Home() {
-    const { events, lots, pastEvents } = Route.useLoaderData();
+    const { events, lots, pastEvents, announcement } = Route.useLoaderData();
  
     const mapEvent = (e: any) => ({
      id: e.id,
@@ -90,6 +95,19 @@ function Home() {
 
   return (
     <>
+      {/* ANNOUNCEMENT BANNER */}
+      {announcement && announcement.active && (
+        <div className="bg-gold py-2 px-4 text-emerald-deep">
+          <div className="container mx-auto flex items-center justify-center gap-2 text-sm font-bold">
+            <Bell className="h-4 w-4" />
+            {announcement.text}
+            {announcement.link && (
+              <Link to={announcement.link} className="underline ml-2">Saiba mais</Link>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
