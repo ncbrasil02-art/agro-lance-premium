@@ -51,64 +51,60 @@
    if (!genealogy) return <div className="py-10 text-center text-muted-foreground">Informação de genealogia não disponível.</div>;
  
    return (
-     <div className="relative overflow-x-auto py-8">
-       <div className="flex min-w-[600px] justify-center gap-8">
+     <div className="relative overflow-x-auto py-10 bg-muted/20 rounded-2xl border border-border/40">
+       <div className="flex min-w-[800px] justify-center gap-12 px-8">
          {/* Nível 1: Animal */}
          <div className="flex flex-col justify-center">
-           <div className="rounded-lg border-2 border-gold bg-card p-4 text-center shadow-gold">
-             <div className="text-xs font-bold uppercase text-gold">Animal</div>
-             <div className="mt-1 font-bold">Principal</div>
+           <div className="group relative">
+             <div className="absolute -inset-1 rounded-xl bg-gold/20 blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+             <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-gold/50 bg-card p-5 text-center shadow-lg w-40">
+               <Award className="h-6 w-6 text-gold mb-2" />
+               <div className="text-[10px] font-bold uppercase tracking-widest text-gold/80">Animal</div>
+               <div className="mt-1 font-bold text-sm">Principal</div>
+             </div>
            </div>
          </div>
  
-         <div className="flex flex-col justify-center gap-12">
+         <div className="flex flex-col justify-center gap-16 relative">
+           {/* Linhas conectoras Pais */}
+           <div className="absolute -left-6 top-1/2 h-24 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-xl"></div>
+           
            {/* Nível 2: Pais */}
-           <div className="relative flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
-               <div className="text-[10px] uppercase text-muted-foreground">Pai</div>
-               <div className="mt-1 font-semibold">{genealogy.pai || "Não informado"}</div>
+           <div className="relative flex items-center group">
+             <div className="absolute -inset-0.5 rounded-lg bg-border/20 blur-sm opacity-0 group-hover:opacity-100 transition"></div>
+             <div className="relative rounded-lg border border-border bg-card p-4 text-center w-48 shadow-sm group-hover:border-gold/30 transition-smooth">
+               <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">Pai (Sire)</div>
+               <div className="font-bold text-foreground leading-tight">{genealogy.pai || "Não informado"}</div>
              </div>
            </div>
-           <div className="relative flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-4 text-center min-w-[150px]">
-               <div className="text-[10px] uppercase text-muted-foreground">Mãe</div>
-               <div className="mt-1 font-semibold">{genealogy.mae || "Não informado"}</div>
+           <div className="relative flex items-center group">
+             <div className="absolute -inset-0.5 rounded-lg bg-border/20 blur-sm opacity-0 group-hover:opacity-100 transition"></div>
+             <div className="relative rounded-lg border border-border bg-card p-4 text-center w-48 shadow-sm group-hover:border-gold/30 transition-smooth">
+               <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">Mãe (Dam)</div>
+               <div className="font-bold text-foreground leading-tight">{genealogy.mae || "Não informado"}</div>
              </div>
            </div>
          </div>
  
-         <div className="flex flex-col justify-center gap-4">
+         <div className="flex flex-col justify-center gap-6 relative">
+           {/* Linhas conectoras Avós */}
+           <div className="absolute -left-6 top-[25%] h-12 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-lg"></div>
+           <div className="absolute -left-6 top-[75%] h-12 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-lg"></div>
+ 
            {/* Nível 3: Avós */}
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avô Paterno</div>
-               <div className="mt-0.5 font-medium">{genealogy.avo_paterno || "—"}</div>
+           {[
+             { label: "Avô Paterno", val: genealogy.avo_paterno },
+             { label: "Avó Paterna", val: genealogy.ava_paterna },
+             { label: "Avô Materno", val: genealogy.avo_materno },
+             { label: "Avó Materna", val: genealogy.ava_materna }
+           ].map((avo, i) => (
+             <div key={i} className="relative group">
+               <div className="relative rounded-lg border border-border/60 bg-card/60 p-3 text-center text-xs w-44 shadow-xs group-hover:border-gold/20 transition-smooth">
+                 <div className="text-[9px] uppercase font-medium text-muted-foreground tracking-tight mb-0.5">{avo.label}</div>
+                 <div className="font-semibold text-foreground/90">{avo.val || "—"}</div>
+               </div>
              </div>
-           </div>
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avó Paterna</div>
-               <div className="mt-0.5 font-medium">{genealogy.ava_paterna || "—"}</div>
-             </div>
-           </div>
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avô Materno</div>
-               <div className="mt-0.5 font-medium">{genealogy.avo_materno || "—"}</div>
-             </div>
-           </div>
-           <div className="flex items-center">
-             <div className="h-0.5 w-8 bg-border" />
-             <div className="rounded-lg border border-border bg-card p-3 text-center text-sm min-w-[140px]">
-               <div className="text-[9px] uppercase text-muted-foreground">Avó Materna</div>
-               <div className="mt-0.5 font-medium">{genealogy.ava_materna || "—"}</div>
-             </div>
-           </div>
+           ))}
          </div>
        </div>
      </div>
