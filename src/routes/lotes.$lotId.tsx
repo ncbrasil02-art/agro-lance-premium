@@ -129,7 +129,7 @@ function LotDetail() {
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lot.id}` },
-        (payload) => { setLot((prev: any) => ({ ...prev: any, ...payload.new })); }
+        (payload) => { setLot((prev: any) => ({ ...prev, ...payload.new })); }
       )
       .subscribe();
 
@@ -140,7 +140,7 @@ function LotDetail() {
         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lot.id}` },
         async (payload) => {
           const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
-          setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev: any].slice(0, 5));
+          setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev].slice(0, 5));
         }
       )
       .subscribe();
