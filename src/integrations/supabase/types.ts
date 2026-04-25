@@ -17,8 +17,12 @@ export type Database = {
       animals: {
         Row: {
           birth_date: string | null
+          blood_percentage: string | null
+          blood_typing: string | null
+          book: string | null
           breed: string | null
           category_id: string | null
+          chip_number: string | null
           color: string | null
           created_at: string
           description: string | null
@@ -31,6 +35,8 @@ export type Database = {
           name: string
           pedigree_url: string | null
           photos: string[] | null
+          registration_1cc: string | null
+          registration_2: string | null
           registration_number: string | null
           seller_id: string | null
           sex: string | null
@@ -44,8 +50,12 @@ export type Database = {
         }
         Insert: {
           birth_date?: string | null
+          blood_percentage?: string | null
+          blood_typing?: string | null
+          book?: string | null
           breed?: string | null
           category_id?: string | null
+          chip_number?: string | null
           color?: string | null
           created_at?: string
           description?: string | null
@@ -58,6 +68,8 @@ export type Database = {
           name: string
           pedigree_url?: string | null
           photos?: string[] | null
+          registration_1cc?: string | null
+          registration_2?: string | null
           registration_number?: string | null
           seller_id?: string | null
           sex?: string | null
@@ -71,8 +83,12 @@ export type Database = {
         }
         Update: {
           birth_date?: string | null
+          blood_percentage?: string | null
+          blood_typing?: string | null
+          book?: string | null
           breed?: string | null
           category_id?: string | null
+          chip_number?: string | null
           color?: string | null
           created_at?: string
           description?: string | null
@@ -85,6 +101,8 @@ export type Database = {
           name?: string
           pedigree_url?: string | null
           photos?: string[] | null
+          registration_1cc?: string | null
+          registration_2?: string | null
           registration_number?: string | null
           seller_id?: string | null
           sex?: string | null
