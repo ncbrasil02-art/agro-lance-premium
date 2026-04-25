@@ -51,7 +51,8 @@
         height: "",
         vaccination_records: "",
         genealogy_father: "",
-        genealogy_mother: ""
+        genealogy_mother: "",
+        description: ""
       });
     };
 
@@ -73,7 +74,8 @@
         height: animal.height || "",
         vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
         genealogy_father: animal.genealogy?.father || "",
-        genealogy_mother: animal.genealogy?.mother || ""
+        genealogy_mother: animal.genealogy?.mother || "",
+        description: animal.description || ""
       });
       setIsDialogOpen(true);
     };
@@ -103,7 +105,8 @@
               height: formData.height ? parseFloat(formData.height as string) : null,
                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
               genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
-              photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
+              photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [],
+              description: formData.description
             })
             .eq("id", editingAnimal.id);
           if (error) throw error;
@@ -125,7 +128,8 @@
              vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
             genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
             internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
-            photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
+            photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [],
+            description: formData.description
           });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
@@ -224,10 +228,20 @@
                </DialogDescription>
              </DialogHeader>
              <div className="grid gap-4 py-4">
-               <div className="grid gap-2">
-                 <Label htmlFor="name">Nome</Label>
-                  <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-               </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Nome</Label>
+                   <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Descrição / Bio</Label>
+                  <textarea 
+                    id="description"
+                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={formData.description} 
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                    placeholder="Fale um pouco sobre as qualidades do animal..."
+                  />
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="species">Espécie</Label>

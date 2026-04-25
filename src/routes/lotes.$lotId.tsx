@@ -228,8 +228,8 @@ function LotDetail() {
               
               <TabsContent value="detalhes" className="mt-6 space-y-6">
                 <Card className="bg-card/50 border-white/5 p-6 rounded-3xl">
-                  <p className="text-white/80 leading-relaxed italic">
-                    "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."
+                  <p className="text-white/80 leading-relaxed italic whitespace-pre-wrap">
+                    {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada. Uma oportunidade única para investidores exigentes."}
                   </p>
                   <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
