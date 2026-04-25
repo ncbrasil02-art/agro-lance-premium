@@ -82,19 +82,19 @@
              <div className="absolute -inset-0.5 rounded-lg bg-border/20 blur-sm opacity-0 group-hover:opacity-100 transition"></div>
              <div className="relative rounded-lg border border-border bg-card p-4 text-center w-48 shadow-sm group-hover:border-gold/30 transition-smooth">
                <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">Pai (Sire)</div>
-               <div className="font-bold text-foreground leading-tight">{genealogy.pai || "Não informado"}</div>
+                <div className="font-bold text-foreground leading-tight">{genealogy.pai || genealogy.father || "Não informado"}</div>
              </div>
            </div>
            <div className="relative flex items-center group">
              <div className="absolute -inset-0.5 rounded-lg bg-border/20 blur-sm opacity-0 group-hover:opacity-100 transition"></div>
              <div className="relative rounded-lg border border-border bg-card p-4 text-center w-48 shadow-sm group-hover:border-gold/30 transition-smooth">
                <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">Mãe (Dam)</div>
-               <div className="font-bold text-foreground leading-tight">{genealogy.mae || "Não informado"}</div>
+                <div className="font-bold text-foreground leading-tight">{genealogy.mae || genealogy.mother || "Não informado"}</div>
              </div>
            </div>
          </div>
  
-         <div className="flex flex-col justify-center gap-6 relative">
+          <div className="flex flex-col justify-center gap-6 relative">
            {/* Linhas conectoras Avós */}
            <div className="absolute -left-6 top-[25%] h-12 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-lg"></div>
            <div className="absolute -left-6 top-[75%] h-12 w-6 border-y border-r border-border/60 -translate-y-1/2 rounded-r-lg"></div>
@@ -241,19 +241,41 @@
   const installments = 30; // Exemplo de 30 parcelas
   const installmentValue = currentPrice / installments;
  
-   return (
-     <div className="container mx-auto px-4 py-8">
-       {lot.event && (
-        <Link 
-            to="/eventos/$eventSlug" 
-            params={{ eventSlug: lot.event?.slug || "" }} 
-            className="text-sm text-muted-foreground hover:text-gold"
-          >
-            ← {lot.event?.name}
-          </Link>
-       )}
- 
-       <div className="mt-4 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Header Auditor de Lances */}
+        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50">
+          <div className="container mx-auto px-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link 
+                to="/eventos/$eventSlug" 
+                params={{ eventSlug: lot.event?.slug || "" }} 
+                className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-gold hover:text-emerald-deep transition-all"
+              >
+                ←
+              </Link>
+              <div>
+                <h1 className="text-white font-bold tracking-tight text-lg">Auditor de Lances</h1>
+                <p className="text-gold/80 text-[10px] uppercase font-bold tracking-widest">{lot.event?.name}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {lot.status === 'active' && (
+                <div className="flex items-center gap-2 bg-live/20 border border-live/30 px-3 py-1 rounded-full">
+                  <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse" />
+                  <span className="text-live text-[10px] font-bold">AO VIVO</span>
+                </div>
+              )}
+              <div className="hidden md:flex flex-col text-right">
+                <span className="text-white/60 text-[9px] uppercase tracking-wider">Lote</span>
+                <span className="text-white font-black text-xl">#{String(lot.lot_number).padStart(2, "0")}</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
          {/* Galeria */}
          <div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
