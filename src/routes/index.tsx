@@ -301,8 +301,12 @@ function Home() {
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
           <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
+        <div className="flex overflow-x-auto pb-6 gap-6 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3">
+          {upcomingEvents.map((e: any) => (
+            <div key={e.id} className="min-w-[280px] sm:min-w-[320px] md:min-w-0">
+              <EventCard event={e} />
+            </div>
+          ))}
         </div>
       </section>
 
