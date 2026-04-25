@@ -1,6 +1,8 @@
  import { createFileRoute } from "@tanstack/react-router";
  import { LotCard } from "@/components/auctions/lot-card";
- import { supabase } from "@/integrations/supabase/client";
+  import { supabase } from "@/integrations/supabase/client";
+  import { lotSchema } from "@/lib/schemas";
+  import { z } from "zod";
  import { useQuery } from "@tanstack/react-query";
   import { Loader2 } from "lucide-react";
   import { logger } from "@/utils/logger";
@@ -28,8 +30,9 @@ export const Route = createFileRoute("/lotes")({
           throw error;
         }
 
-        logger.info("Lotes carregados com sucesso", { count: lots?.length || 0 });
-        return { lots };
+        const validatedLots = z.array(lotSchema).parse(lots || []);
+        logger.info("Lotes carregados e validados com sucesso", { count: validatedLots.length });
+        return { lots: validatedLots };
       } catch (error) {
         logger.error("Erro ao carregar página de Lotes", { error });
         throw error;

@@ -5,8 +5,10 @@ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
  import { LotCard } from "@/components/auctions/lot-card";
- import { supabase } from "@/integrations/supabase/client";
- import { formatBRL } from "@/utils/format";
+  import { supabase } from "@/integrations/supabase/client";
+  import { formatBRL } from "@/utils/format";
+  import { eventSchema, lotSchema, announcementSchema, ValidatedEvent, ValidatedLot } from "@/lib/schemas";
+  import { z } from "zod";
 import heroImage from "@/assets/hero-horse.jpg";
 
   export const Route = createFileRoute("/")({
@@ -40,11 +42,24 @@ import heroImage from "@/assets/hero-horse.jpg";
           lotsCount: lotsRes.data?.length || 0
         });
 
+        const validatedEvents = z.array(eventSchema).parse(eventsRes.data || []);
+        const validatedLots = z.array(lotSchema).parse(lotsRes.data || []);
+        const validatedPastEvents = z.array(eventSchema).parse(pastEventsRes.data || []);
+
+        let validatedAnnouncement = null;
+        if (settingsRes.data?.value) {
+          try {
+            validatedAnnouncement = announcementSchema.parse(settingsRes.data.value);
+          } catch (e) {
+            logger.warn("Anúncio com formato inválido no banco de dados", { error: e });
+          }
+        }
+
         return {
-          events: eventsRes.data || [],
-          lots: lotsRes.data || [],
-          pastEvents: pastEventsRes.data || [],
-          announcement: settingsRes.data?.value || null
+          events: validatedEvents,
+          lots: validatedLots,
+          pastEvents: validatedPastEvents,
+          announcement: validatedAnnouncement
         };
       } catch (error) {
         logger.error("Erro ao carregar dados da Home", { error });
@@ -57,7 +72,7 @@ import heroImage from "@/assets/hero-horse.jpg";
 function Home() {
     const { events, lots, pastEvents, announcement } = Route.useLoaderData();
  
-    const mapEvent = (e: any) => ({
+    const mapEvent = (e: ValidatedEvent) => ({
      id: e.id,
      slug: e.slug || "",
      name: e.name,
@@ -78,7 +93,7 @@ function Home() {
     const mappedEvents = events.map(mapEvent);
     const mappedPastEvents = pastEvents.map(mapEvent);
  
-   const mappedLots = lots.map((l: any) => ({
+    const mappedLots = lots.map((l: ValidatedLot) => ({
      id: l.id,
      number: l.lot_number,
      eventId: l.event_id,
@@ -94,13 +109,13 @@ function Home() {
      status: l.status as any,
    }));
  
-     const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
-     const upcomingEvents = mappedEvents.filter((e: any) => e.status === "scheduled");
+      const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
+      const upcomingEvents = mappedEvents.filter((e: any) => e.status === "scheduled");
      
      // Find the closest upcoming event with countdown enabled
-     const nextEvent = mappedEvents
-       .filter((e: any) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
-       .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+      const nextEvent = mappedEvents
+        .filter((e: any) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
+        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {

@@ -1,7 +1,9 @@
  import { createFileRoute } from "@tanstack/react-router";
   import { EventCard } from "@/components/auctions/event-card";
   import { logger } from "@/utils/logger";
- import { supabase } from "@/integrations/supabase/client";
+  import { supabase } from "@/integrations/supabase/client";
+  import { eventSchema } from "@/lib/schemas";
+  import { z } from "zod";
 
 export const Route = createFileRoute("/eventos")({
   head: () => ({
@@ -25,8 +27,9 @@ export const Route = createFileRoute("/eventos")({
           throw error;
         }
 
-        logger.info("Eventos carregados com sucesso", { count: events?.length || 0 });
-        return { events };
+        const validatedEvents = z.array(eventSchema).parse(events || []);
+        logger.info("Eventos carregados e validados com sucesso", { count: validatedEvents.length });
+        return { events: validatedEvents };
       } catch (error) {
         logger.error("Erro ao carregar página de Eventos", { error });
         throw error;
