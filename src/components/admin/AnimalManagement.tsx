@@ -108,9 +108,9 @@
               birth_date: formData.birth_date || null,
               weight: formData.weight ? parseFloat(formData.weight as string) : null,
               height: formData.height ? parseFloat(formData.height as string) : null,
-               vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
+                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
               genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
-              photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [],
+                photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
               description: formData.description
             })
             .eq("id", editingAnimal.id);
@@ -131,10 +131,10 @@
             birth_date: formData.birth_date || null,
             weight: formData.weight ? parseFloat(formData.weight as string) : null,
             height: formData.height ? parseFloat(formData.height as string) : null,
-             vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
+              vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
             genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
             internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
-            photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [],
+             photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
             description: formData.description
           });
           if (error) throw error;
@@ -334,13 +334,13 @@
                     <Label className="text-base font-bold">Galeria de Fotos</Label>
                     {formData.photos_urls && (
                       <div className="grid grid-cols-4 gap-2 mb-2">
-                        {formData.photos_urls.split(",").map((url, i) => (
+                         {formData.photos_urls.split(",").map((url: string, i: number) => (
                           <div key={i} className="relative aspect-square group">
                             <img src={url.trim()} className="h-full w-full object-cover rounded-md border" alt="" />
                             <button 
                               type="button"
                               onClick={() => {
-                                const urls = formData.photos_urls.split(",").map(u => u.trim()).filter(Boolean);
+                                 const urls = formData.photos_urls.split(",").map((u: string) => u.trim()).filter(Boolean);
                                 urls.splice(i, 1);
                                 setFormData({ ...formData, photos_urls: urls.join(", ") });
                               }}
@@ -377,7 +377,7 @@
                              const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
                              uploadedUrls.push(publicUrl);
                            }
-                           const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [];
+                            const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
                            setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
                            toast.dismiss(toastId);
                            toast.success(`${uploadedUrls.length} fotos enviadas!`);
