@@ -65,11 +65,18 @@ function EventDetail() {
             {/* Main Rectangular Banner */}
             <div className="relative group mx-auto w-full max-w-md lg:max-w-none">
               <div className="absolute -inset-2 bg-gold/10 blur-3xl rounded-[2.5rem] opacity-30 group-hover:opacity-50 transition-opacity" />
-              <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30">
+              <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30 group/banner">
+                {/* Blurred background to fill gaps */}
+                <img 
+                  src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+                  alt="" 
+                  className="absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-110" 
+                />
+                {/* Main contained image to see everything */}
                 <img 
                   src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
                   alt={event.name} 
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  className="relative h-full w-full object-contain transition-transform duration-700 group-hover/banner:scale-[1.03]" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
