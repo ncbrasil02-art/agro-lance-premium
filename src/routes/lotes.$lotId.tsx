@@ -129,7 +129,7 @@ function LotDetail() {
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lot.id}` },
-        (payload) => { setLot((prev) => ({ ...prev, ...payload.new })); }
+        (payload) => { setLot((prev: any) => ({ ...prev: any, ...payload.new })); }
       )
       .subscribe();
 
@@ -140,7 +140,7 @@ function LotDetail() {
         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lot.id}` },
         async (payload) => {
           const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
-          setRecentBids((prev) => [{ ...payload.new, profile }, ...prev].slice(0, 5));
+          setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev: any].slice(0, 5));
         }
       )
       .subscribe();
@@ -209,8 +209,8 @@ function LotDetail() {
                 </div>
               </div>
               <div className="grid grid-cols-5 gap-3">
-                {lot.animal?.photos?.map((src, i) => (
-                  <button key={i} onClick={() => setActivePhoto(i)} className={`aspect-square overflow-hidden rounded-xl border-2 transition-all \${activePhoto === i ? 'border-gold shadow-gold/20' : 'border-transparent opacity-60 hover:opacity-100'}`}>
+                {lot.animal?.photos?.map((src: string, i: number) => (
+                  <button key={i} onClick={() => setActivePhoto(i)} className={`aspect-square overflow-hidden rounded-xl border-2 transition-all ${activePhoto === i ? 'border-gold shadow-gold/20' : 'border-transparent opacity-60 hover:opacity-100'}`}>
                     <img src={src} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
@@ -358,15 +358,15 @@ function LotDetail() {
               </div>
               <div className="p-6 space-y-4">
                 {recentBids.length > 0 ? recentBids.map((bid: any, i: number) => (
-                  <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl \${i === 0 ? 'bg-gold/10 border border-gold/20' : 'bg-white/5'}`}>
+                  <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl ${i === 0 ? 'bg-gold/10 border border-gold/20' : 'bg-white/5'}`}>
                     <div className="flex items-center gap-3">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black text-sm \${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-emerald-deep text-white/40'}`}> {bid.profile?.full_name?.charAt(0) || "P"} </div>
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black text-sm ${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-emerald-deep text-white/40'}`}> {bid.profile?.full_name?.charAt(0) || "P"} </div>
                       <div>
                         <div className="text-sm font-bold text-white">{bid.profile?.full_name || "Licitante"}</div>
                         <div className="text-[10px] text-white/40 font-bold">{new Date(bid.created_at).toLocaleTimeString()}</div>
                       </div>
                     </div>
-                    <div className={`font-black tracking-tight \${i === 0 ? 'text-gold text-lg' : 'text-white'}`}> {formatBRL(bid.amount)} </div>
+                    <div className={`font-black tracking-tight ${i === 0 ? 'text-gold text-lg' : 'text-white'}`}> {formatBRL(bid.amount)} </div>
                   </div>
                 )) : <div className="text-center py-6 text-white/20 text-xs font-bold uppercase">Nenhum lance ainda</div>}
               </div>
