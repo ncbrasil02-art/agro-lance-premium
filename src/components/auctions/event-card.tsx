@@ -23,7 +23,7 @@ export function EventCard({ event }: { event: AuctionEvent }) {
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
         <div className="absolute left-4 top-4 flex flex-col gap-2 items-start">
           <StatusBadge status={event?.status} />
-          {event?.status === 'scheduled' && event?.date && (
+          {(event?.status === 'scheduled' as any || event?.status === 'upcoming' as any) && event?.date && (
             <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg animate-in fade-in slide-in-from-left-2">
               <Timer className="h-3 w-3" />
               <Countdown endsAt={event.date} className="font-mono" />
