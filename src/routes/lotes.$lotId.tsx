@@ -19,23 +19,37 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const Route = createFileRoute("/lotes/$lotId")({
   loader: async ({ params }) => {
+    const { lotId } = params;
+    
+    // Validação de UUID para evitar erro 500 do banco de dados
+    if (!lotId || !UUID_REGEX.test(lotId)) {
+      console.error("ID de lote inválido:", lotId);
+      throw notFound();
+    }
+
     const [lotRes, bidsRes] = await Promise.all([
       supabase
         .from("lots")
         .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
-        .eq("id", params.lotId)
-        .single(),
+        .eq("id", lotId)
+        .maybeSingle(),
       supabase
         .from("bids")
         .select("*, profile:profiles(full_name)")
-        .eq("lot_id", params.lotId)
+        .eq("lot_id", lotId)
         .order("created_at", { ascending: false })
         .limit(5)
     ]);
 
-    if (lotRes.error || !lotRes.data) throw notFound();
+    if (lotRes.error || !lotRes.data) {
+      console.error("Lote não encontrado ou erro:", lotRes.error);
+      throw notFound();
+    }
+    
     return { lot: lotRes.data, initialBids: bidsRes.data || [] };
   },
   head: ({ loaderData }) => ({
