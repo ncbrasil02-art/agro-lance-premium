@@ -14,8 +14,11 @@ export function EventRequestDialog() {
   const [formData, setFormData] = useState({
     name: "",
     whatsapp: "",
+    email: "",
     category: "",
     location: "",
+    estimated_date: "",
+    estimated_animals: "",
     additional_info: "",
   });
 
@@ -36,8 +39,11 @@ export function EventRequestDialog() {
       setFormData({
         name: "",
         whatsapp: "",
+        email: "",
         category: "",
         location: "",
+        estimated_date: "",
+        estimated_animals: "",
         additional_info: "",
       });
     } catch (error: any) {
@@ -73,15 +79,50 @@ export function EventRequestDialog() {
               className="bg-white/5 border-white/10"
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="whatsapp">WhatsApp para Contato</Label>
-            <Input 
-              id="whatsapp" 
-              value={formData.whatsapp} 
-              onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} 
-              placeholder="(00) 00000-0000"
-              className="bg-white/5 border-white/10"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Input 
+                id="whatsapp" 
+                value={formData.whatsapp} 
+                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} 
+                placeholder="(00) 00000-0000"
+                className="bg-white/5 border-white/10"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input 
+                id="email" 
+                type="email"
+                value={formData.email} 
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+                placeholder="seu@email.com"
+                className="bg-white/5 border-white/10"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="date">Data Prevista</Label>
+              <Input 
+                id="date" 
+                value={formData.estimated_date} 
+                onChange={(e) => setFormData({ ...formData, estimated_date: e.target.value })} 
+                placeholder="Ex: Julho/2024"
+                className="bg-white/5 border-white/10"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="animals">Qtd. Animais (estimativa)</Label>
+              <Input 
+                id="animals" 
+                value={formData.estimated_animals} 
+                onChange={(e) => setFormData({ ...formData, estimated_animals: e.target.value })} 
+                placeholder="Ex: 50 lotes"
+                className="bg-white/5 border-white/10"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
