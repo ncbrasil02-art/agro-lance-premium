@@ -7,54 +7,55 @@
  import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
-   const [isAllocating, setIsAllocating] = useState(false);
-   const [newLot, setNewLot] = useState({
-     event_id: "",
-     animal_id: "",
-     lot_number: 1,
-     starting_price: 0,
-     bid_increment: 1000,
-     status: "active"
-   });
-   const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
+  import { toast } from "sonner";
+  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-   const fetchAvailableAnimals = async () => {
-     const { data, error } = await supabase
-       .from("animals")
-       .select("id, name, internal_code");
-     
-     if (!error) setAvailableAnimals(data || []);
-   };
- 
-   const handleAllocate = async () => {
-     if (!newLot.event_id || !newLot.animal_id || !newLot.lot_number) {
-       toast.error("Preencha todos os campos obrigatórios");
-       return;
-     }
- 
-     try {
-       const { error } = await supabase.from("lots").insert({
-         event_id: newLot.event_id,
-         animal_id: newLot.animal_id,
-         lot_number: newLot.lot_number,
-         starting_price: newLot.starting_price,
-         current_price: newLot.starting_price,
-         bid_increment: newLot.bid_increment,
-         status: newLot.status,
-         end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Default 1 week
-       });
- 
-       if (error) throw error;
-       toast.success("Lote alocado com sucesso");
-       setIsAllocating(false);
-       fetchData();
-     } catch (error: any) {
-       toast.error("Erro ao alocar lote: " + error.message);
-     }
-   };
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
- 
- export function LotManagement() {
+  export function LotManagement() {
+    const [isAllocating, setIsAllocating] = useState(false);
+    const [newLot, setNewLot] = useState({
+      event_id: "",
+      animal_id: "",
+      lot_number: 1,
+      starting_price: 0,
+      bid_increment: 1000,
+      status: "active"
+    });
+    const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
+  
+    const fetchAvailableAnimals = async () => {
+      const { data, error } = await supabase
+        .from("animals")
+        .select("id, name, internal_code");
+      
+      if (!error) setAvailableAnimals(data || []);
+    };
+  
+    const handleAllocate = async () => {
+      if (!newLot.event_id || !newLot.animal_id || !newLot.lot_number) {
+        toast.error("Preencha todos os campos obrigatórios");
+        return;
+      }
+  
+      try {
+        const { error } = await supabase.from("lots").insert({
+          event_id: newLot.event_id,
+          animal_id: newLot.animal_id,
+          lot_number: newLot.lot_number,
+          starting_price: newLot.starting_price,
+          current_price: newLot.starting_price,
+          bid_increment: newLot.bid_increment,
+          status: newLot.status,
+          end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Default 1 week
+        });
+  
+        if (error) throw error;
+        toast.success("Lote alocado com sucesso");
+        setIsAllocating(false);
+        fetchData();
+      } catch (error: any) {
+        toast.error("Erro ao alocar lote: " + error.message);
+      }
+    };
    const [lots, setLots] = useState<any[]>([]);
    const [events, setEvents] = useState<any[]>([]);
    const [selectedEventId, setSelectedEventId] = useState<string>("all");
