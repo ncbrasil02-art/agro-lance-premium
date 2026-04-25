@@ -10,8 +10,7 @@ export function EventCard({ event }: { event: AuctionEvent }) {
       to="/eventos/$eventSlug"
        params={{ eventSlug: event.slug }}
        className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-       aria-labelledby={`event-title-${event.id}`}
-     >
+      aria-labelledby={`event-title-${event.id}`}
     >
       <div className="relative aspect-video overflow-hidden">
         <img 
@@ -25,7 +24,7 @@ export function EventCard({ event }: { event: AuctionEvent }) {
           <StatusBadge status={event?.status} />
         </div>
         <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-xl font-bold text-white">{event?.name || "Evento sem nome"}</h3>
+          <h3 id={`event-title-${event.id}`} className="text-xl font-bold text-white">{event?.name || "Evento sem nome"}</h3>
           <p className="mt-1 text-sm text-white/80 line-clamp-2">{event?.description || ""}</p>
         </div>
       </div>
