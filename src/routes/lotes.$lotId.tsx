@@ -220,7 +220,7 @@
               <TabsContent value="detalhes" className="mt-6">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   <p className="text-muted-foreground leading-relaxed">
-                    {lot.animal?.description || "Este exemplar apresenta características excepcionais da raça, com excelente conformação e temperamento. Ideal para quem busca genética de ponta e resultados comprovados em pista ou reprodução."}
+                    {"Este exemplar apresenta características excepcionais da raça, com excelente conformação e temperamento. Ideal para quem busca genética de ponta e resultados comprovados em pista ou reprodução."}
                   </p>
                   <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
                     <Card>
