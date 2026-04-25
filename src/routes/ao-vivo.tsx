@@ -45,7 +45,7 @@ export const Route = createFileRoute("/ao-vivo")({
    component: LivePage,
 });
 
-function LivePage() {
+ function LivePage() {
    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
@@ -55,13 +55,12 @@ function LivePage() {
    useEffect(() => {
      if (!liveEvent) return;
  
-     // Realtime for event (active lot changes)
      const eventChannel = supabase
        .channel(`live-event-${liveEvent.id}`)
        .on(
          "postgres_changes",
          { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${liveEvent.id}` },
-         async (payload) => {
+         async () => {
            const { data } = await supabase
              .from("events")
              .select("*, active_lot:lots(*, animal:animals(*))")
@@ -72,7 +71,6 @@ function LivePage() {
        )
        .subscribe();
  
-     // Realtime for bids
      const bidsChannel = supabase
        .channel(`live-bids-${liveEvent.active_lot_id}`)
        .on(
@@ -91,7 +89,35 @@ function LivePage() {
    }, [liveEvent?.id, liveEvent?.active_lot_id]);
  
    const liveLot = liveEvent?.active_lot;
-
+ 
+   const placeBid = async (amount: number) => {
+     if (!user) {
+       toast.error("Você precisa estar logado para dar lances.");
+       return;
+     }
+     if (!profile?.is_approved) {
+       toast.error("Sua conta ainda não foi aprovada para dar lances.");
+       return;
+     }
+     setIsBidding(true);
+     try {
+       const { error } = await supabase.from("bids").insert({
+         lot_id: liveLot.id,
+         user_id: user.id,
+         amount,
+         bid_type: "online",
+       });
+       if (error) throw error;
+       toast.success("Lance efetuado com sucesso!");
+     } catch (error: any) {
+       toast.error(error.message || "Erro ao efetuar lance.");
+     } finally {
+       setIsBidding(false);
+     }
+   };
+ 
+   const currentPrice = liveLot?.current_price || liveLot?.starting_price || 0;
+ 
   if (!liveEvent || !liveLot) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
@@ -146,37 +172,10 @@ function LivePage() {
                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
                    <Countdown endsAt={liveLot.end_date} className="font-mono text-2xl font-bold text-live" />
                  </div>
-               )}
-             </div>
- 
-             const placeBid = async (amount: number) => {
-               if (!user) {
-                 toast.error("Você precisa estar logado para dar lances.");
-                 return;
-               }
-               if (!profile?.is_approved) {
-                 toast.error("Sua conta ainda não foi aprovada para dar lances.");
-                 return;
-               }
-               setIsBidding(true);
-               try {
-                 const { error } = await supabase.from("bids").insert({
-                   lot_id: liveLot.id,
-                   user_id: user.id,
-                   amount,
-                   bid_type: "online",
-                 });
-                 if (error) throw error;
-                 toast.success("Lance efetuado com sucesso!");
-               } catch (error: any) {
-                 toast.error(error.message || "Erro ao efetuar lance.");
-               } finally {
-                 setIsBidding(false);
-               }
-             };
-             const currentPrice = liveLot.current_price || liveLot.starting_price;
- 
-            <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
+                )}
+              </div>
+
+             <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lance atual</div>
                <div className="text-4xl font-bold text-gradient-gold">{formatBRL(currentPrice)}</div>
               <div className="mt-3 grid grid-cols-3 gap-2">
