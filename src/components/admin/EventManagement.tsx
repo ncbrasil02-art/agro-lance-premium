@@ -1,11 +1,12 @@
 import { Textarea } from "@/components/ui/textarea";
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "@tanstack/react-router";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Eye, ChevronLeft, ChevronRight } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -74,6 +75,13 @@ import { Textarea } from "@/components/ui/textarea";
        setIsDialogOpen(true);
      };
  
+   const ITEMS_PER_PAGE = 8;
+   const [currentPage, setCurrentPage] = useState(1);
+
+   useEffect(() => {
+     setCurrentPage(1);
+   }, [searchQuery]);
+
     const fetchEvents = async () => {
       setIsLoading(true);
       console.log("Fetching events...");
@@ -171,6 +179,12 @@ import { Textarea } from "@/components/ui/textarea";
  
    const filteredEvents = events.filter(event => 
      event.name?.toLowerCase().includes(searchQuery.toLowerCase())
+   );
+
+   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+   const paginatedEvents = filteredEvents.slice(
+     (currentPage - 1) * ITEMS_PER_PAGE,
+     currentPage * ITEMS_PER_PAGE
    );
  
    const handleDelete = async (id: string) => {
@@ -393,30 +407,31 @@ import { Textarea } from "@/components/ui/textarea";
            <CardTitle>Eventos de Leilão</CardTitle>
          </CardHeader>
          <CardContent>
-           {isLoading ? (
-             <div className="flex justify-center py-8">
-               <Loader2 className="h-8 w-8 animate-spin text-gold" />
-             </div>
-           ) : (
-             <Table>
-               <TableHeader>
-                 <TableRow>
-                   <TableHead>Evento</TableHead>
-                   <TableHead>Data de Início</TableHead>
-                   <TableHead>Local/Promotor</TableHead>
-                   <TableHead>Status</TableHead>
-                   <TableHead className="text-right">Ações</TableHead>
-                 </TableRow>
-               </TableHeader>
-               <TableBody>
-                 {filteredEvents.length === 0 ? (
-                   <TableRow>
-                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                       Nenhum evento encontrado.
-                     </TableCell>
-                   </TableRow>
-                 ) : (
-                   filteredEvents.map((event) => (
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-gold" />
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Evento</TableHead>
+                      <TableHead>Data de Início</TableHead>
+                      <TableHead>Local/Promotor</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedEvents.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          Nenhum evento encontrado.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      paginatedEvents.map((event) => (
                      <TableRow key={event.id}>
                        <TableCell className="font-medium">
                          <div>{event.name}</div>
@@ -438,7 +453,21 @@ import { Textarea } from "@/components/ui/textarea";
                          </span>
                        </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-1 md:gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              asChild
+                              title="Visualizar Página Pública"
+                            >
+                              <Link 
+                                to="/eventos/$eventSlug" 
+                                params={{ eventSlug: event.slug || "" }} 
+                                target="_blank"
+                              >
+                                <Eye className="h-4 w-4 text-gold" />
+                              </Link>
+                            </Button>
                             {event.status !== 'finished' && (
                               <Button 
                                 variant="outline" 
@@ -478,10 +507,28 @@ import { Textarea } from "@/components/ui/textarea";
                      </TableRow>
                    ))
                  )}
-               </TableBody>
-             </Table>
-           )}
-         </CardContent>
+                </TableBody>
+              </Table>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-4 border-t">
+                  <div className="text-xs text-muted-foreground">
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredEvents.length)} de {filteredEvents.length} registros
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
        </Card>
      </div>
    );
