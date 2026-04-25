@@ -17,7 +17,7 @@ import heroImage from "@/assets/hero-horse.jpg";
           .order("start_date", { ascending: true })
           .limit(6),
         supabase.from("lots")
-          .select("*, animal:animals(*), event:events(*)")
+          .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
           .limit(6)
           .order("created_at", { ascending: false }),
         supabase.from("events")
