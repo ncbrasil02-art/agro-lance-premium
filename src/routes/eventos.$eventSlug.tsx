@@ -78,11 +78,11 @@ function EventDetail() {
                   alt={event.name} 
                   className="relative h-full w-full object-contain transition-transform duration-700 group-hover/banner:scale-[1.03]" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
-                    <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em]">Flyer Oficial</span>
+                {/* Clean overlay for the badge only */}
+                <div className="absolute top-6 right-6 z-20">
+                  <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-xl">
+                    <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
+                    <span className="text-[9px] font-black text-gold uppercase tracking-[0.2em]">Flyer Oficial</span>
                   </div>
                 </div>
               </div>
