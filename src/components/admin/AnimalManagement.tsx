@@ -378,8 +378,8 @@
                <TabsContent value="saude" className="space-y-4 pt-4">
                  <div className="grid gap-4">
                    <Label className="text-base font-bold">Histórico Veterinário</Label>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border rounded-md p-4 bg-muted/30">
-                     {VETERINARY_CHECKLIST.map((item) => (
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3 border rounded-md p-4 bg-muted/30">
+                     {[...VETERINARY_CHECKLIST, ...Object.keys(formData.veterinary_history || {}).filter(k => k !== 'other_info' && !VETERINARY_CHECKLIST.find(i => i.id === k)).map(k => ({ id: k, label: k }))].map((item) => (
                        <div key={item.id} className="flex items-center space-x-2">
                          <Checkbox 
                            id={item.id} 
@@ -401,6 +401,33 @@
                      ))}
                    </div>
                    
+                   <div className="flex gap-2">
+                     <Input 
+                       placeholder="Adicionar outro item (ex: Anemia)" 
+                       value={customHealthItem} 
+                       onChange={(e) => setCustomHealthItem(e.target.value)}
+                       className="flex-1"
+                     />
+                     <Button 
+                       type="button" 
+                       variant="outline" 
+                       size="sm"
+                       onClick={() => {
+                         if (!customHealthItem) return;
+                         setFormData({
+                           ...formData,
+                           veterinary_history: {
+                             ...formData.veterinary_history,
+                             [customHealthItem]: true
+                           }
+                         });
+                         setCustomHealthItem("");
+                       }}
+                     >
+                       <Plus className="h-4 w-4 mr-1" /> Adicionar
+                     </Button>
+                   </div>
+
                    <div className="grid gap-2">
                      <Label htmlFor="other_vet">Outras Observações Veterinárias</Label>
                      <textarea 
