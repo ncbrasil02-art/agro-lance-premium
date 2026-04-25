@@ -452,7 +452,21 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                          </span>
                        </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-1 md:gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              asChild
+                              title="Visualizar Página Pública"
+                            >
+                              <Link 
+                                to="/eventos/$eventSlug" 
+                                params={{ eventSlug: event.slug || "" }} 
+                                target="_blank"
+                              >
+                                <Eye className="h-4 w-4 text-gold" />
+                              </Link>
+                            </Button>
                             {event.status !== 'finished' && (
                               <Button 
                                 variant="outline" 
