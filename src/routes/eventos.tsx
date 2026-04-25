@@ -1,5 +1,6 @@
  import { createFileRoute } from "@tanstack/react-router";
- import { EventCard } from "@/components/auctions/event-card";
+  import { EventCard } from "@/components/auctions/event-card";
+  import { logger } from "@/utils/logger";
  import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/eventos")({
@@ -12,13 +13,24 @@ export const Route = createFileRoute("/eventos")({
     ],
   }),
     loader: async () => {
-      const { data: events, error } = await supabase
-        .from("events")
-        .select("*, lots!lots_event_id_fkey(id)")
-        .order("start_date");
- 
-      if (error) throw error;
-      return { events };
+      logger.info("Iniciando carregamento da página de Eventos");
+      try {
+        const { data: events, error } = await supabase
+          .from("events")
+          .select("*, lots!lots_event_id_fkey(id)")
+          .order("start_date");
+   
+        if (error) {
+          logger.error("Erro Supabase ao carregar eventos", { error });
+          throw error;
+        }
+
+        logger.info("Eventos carregados com sucesso", { count: events?.length || 0 });
+        return { events };
+      } catch (error) {
+        logger.error("Erro ao carregar página de Eventos", { error });
+        throw error;
+      }
     },
    component: EventsPage,
 });
