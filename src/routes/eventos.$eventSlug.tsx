@@ -120,16 +120,23 @@ function EventDetail() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-4">
-                {event.status === "live" && (
-                  <Link to="/ao-vivo" className="w-full sm:w-auto">
-                    <Button size="lg" className="w-full h-16 px-10 bg-gold-gradient text-emerald-deep font-black text-xl shadow-gold hover:scale-105 active:scale-95 transition-all rounded-2xl">
-                      ASSISTIR AO VIVO
+              <div className="flex flex-col sm:flex-row gap-4">
+                {event.status === "live" ? (
+                  <Link to="/ao-vivo" className="flex-1">
+                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl shadow-[0_10px_40px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all rounded-[1.5rem] tracking-tighter italic">
+                      ASSISTIR AGORA
                     </Button>
                   </Link>
+                ) : (
+                  <div className="flex-1">
+                    <div className="flex flex-col h-20 justify-center p-6 rounded-[1.5rem] border border-gold/20 bg-gold/5">
+                      <div className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">Faltam para o início</div>
+                      <Countdown endsAt={event.start_date} variant="segmented" className="text-white" />
+                    </div>
+                  </div>
                 )}
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-16 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-2xl">
-                  Saber mais detalhes
+                <Button variant="outline" size="lg" className="h-20 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs">
+                  Contatar Assessoria
                 </Button>
               </div>
             </div>
