@@ -399,22 +399,16 @@
                       <Input id="breed" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} />
                     </div>
                   </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="sex">Sexo</Label>
-                     <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
-                       <SelectTrigger id="sex"><SelectValue /></SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="M">Macho</SelectItem>
-                         <SelectItem value="F">Fêmea</SelectItem>
-                       </SelectContent>
-                     </Select>
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="reg">Registro</Label>
-                     <Input id="reg" value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
-                   </div>
-                 </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="sex">Sexo</Label>
+                    <Select onValueChange={(v) => setFormData({ ...formData, sex: v })} value={formData.sex}>
+                      <SelectTrigger id="sex"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="M">Macho</SelectItem>
+                        <SelectItem value="F">Fêmea</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    <div className="grid gap-2">
                      <Label htmlFor="birth_date">Data de Nascimento</Label>
