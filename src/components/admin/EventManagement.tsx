@@ -1,11 +1,12 @@
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
+ import { Link } from "@tanstack/react-router";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Eye } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -211,7 +212,7 @@ import { Textarea } from "@/components/ui/textarea";
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
             </Button>
           </div>
-         <div className="relative flex-1 max-w-sm">
+         <div className="relative flex-1 max-w-sm w-full">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input
              placeholder="Buscar eventos..."
@@ -438,7 +439,21 @@ import { Textarea } from "@/components/ui/textarea";
                          </span>
                        </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-1 md:gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              asChild
+                              title="Visualizar Página Pública"
+                            >
+                              <Link 
+                                to="/eventos/$eventSlug" 
+                                params={{ eventSlug: event.slug || "" }} 
+                                target="_blank"
+                              >
+                                <Eye className="h-4 w-4 text-gold" />
+                              </Link>
+                            </Button>
                             {event.status !== 'finished' && (
                               <Button 
                                 variant="outline" 
