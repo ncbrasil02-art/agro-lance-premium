@@ -303,8 +303,8 @@
                    <Label htmlFor="vaccination">Registro de Vacinação (separados por vírgula)</Label>
                    <Input value={formData.vaccination_records} onChange={(e) => setFormData({ ...formData, vaccination_records: e.target.value })} placeholder="Gripe, Tétano, etc" />
                  </div>
-                 <div className="grid gap-2">
-                   <Label htmlFor="photos">Fotos do Animal (Clique para upload ou cole as URLs)</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="photos">Fotos do Animal (Upload)</Label>
                    <div className="flex flex-col gap-2">
                      <div className="flex gap-2">
                        <Input 
@@ -354,11 +354,10 @@
                          Limpar
                        </Button>
                      </div>
-                     <Input value={formData.photos_urls} onChange={(e) => setFormData({ ...formData, photos_urls: e.target.value })} placeholder="URLs separadas por vírgula" />
                    </div>
                  </div>
-                 <div className="grid gap-2">
-                   <Label htmlFor="docs">Documentos / Pedigree (Upload PDF/Imagem)</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="docs">Documentos / Pedigree (Upload)</Label>
                    <div className="flex gap-2">
                      <Input 
                        type="file" 
@@ -391,8 +390,7 @@
                        <Upload className="mr-2 h-4 w-4" /> Upload Documento
                      </Button>
                    </div>
-                   <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="URL do documento" />
-                 </div>
+                  </div>
                 <div className="grid gap-2">
                   <Label htmlFor="location">Localização</Label>
                   <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />

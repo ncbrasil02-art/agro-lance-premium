@@ -11,15 +11,15 @@ export const Route = createFileRoute("/eventos")({
       { property: "og:description", content: "Próximos leilões agropecuários premium do Brasil." },
     ],
   }),
-   loader: async () => {
-     const { data: events, error } = await supabase
-       .from("events")
-       .select("*")
-       .order("start_date");
+    loader: async () => {
+      const { data: events, error } = await supabase
+        .from("events")
+        .select("*, lots!lots_event_id_fkey(id)")
+        .order("start_date");
  
-     if (error) throw error;
-     return { events };
-   },
+      if (error) throw error;
+      return { events };
+    },
    component: EventsPage,
 });
 
@@ -36,7 +36,7 @@ function EventsPage() {
      state: e.location?.split("-")?.[1]?.trim() || "",
      cover: e.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
      status: e.status as any,
-     lotsCount: 0, // Would need another query or join
+      lotsCount: e.lots?.length || 0,
      viewers: e.viewers || 0,
      bidsCount: 0,
      auctioneer: e.auctioneer_name || "",

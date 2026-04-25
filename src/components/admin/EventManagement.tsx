@@ -234,8 +234,43 @@
                   <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="banner">URL da Imagem de Destaque (Banner)</Label>
-                  <Input value={formData.banner_url} onChange={(e) => setFormData({ ...formData, banner_url: e.target.value })} placeholder="https://imagem-do-evento.jpg" />
+                  <Label htmlFor="banner">Imagem de Destaque (Banner)</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      id="banner-upload" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const toastId = toast.loading("Enviando banner...");
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${Math.random()}.${fileExt}`;
+                        const { data, error } = await supabase.storage.from('banners').upload(fileName, file);
+                        if (error) {
+                          toast.error(`Erro no upload: ${error.message}`);
+                        } else {
+                          const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(data.path);
+                          setFormData({ ...formData, banner_url: publicUrl });
+                          toast.success("Banner enviado!");
+                        }
+                        toast.dismiss(toastId);
+                      }}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="flex-1 border-dashed" 
+                      onClick={() => document.getElementById('banner-upload')?.click()}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" /> 
+                      {formData.banner_url ? "Trocar Banner" : "Upload Banner"}
+                    </Button>
+                  </div>
+                  {formData.banner_url && (
+                    <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
+                  )}
                   <p className="text-[10px] text-muted-foreground">Esta imagem aparece na página inicial e no topo do evento.</p>
                 </div>
                 <div className="grid gap-2">

@@ -12,7 +12,7 @@ import heroImage from "@/assets/hero-horse.jpg";
     loader: async () => {
       const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
         supabase.from("events")
-          .select("*")
+          .select("*, lots!lots_event_id_fkey(id)")
           .or("status.eq.live,status.eq.scheduled")
           .order("start_date", { ascending: true })
           .limit(6),
@@ -22,7 +22,7 @@ import heroImage from "@/assets/hero-horse.jpg";
           .order("created_at", { ascending: false })
           .limit(6),
         supabase.from("events")
-          .select("*")
+          .select("*, lots!lots_event_id_fkey(id)")
           .eq("status", "finished")
           .order("start_date", { ascending: false })
           .limit(3),
@@ -55,7 +55,7 @@ function Home() {
      state: e.location?.split("-")?.[1]?.trim() || "",
      cover: e.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
      status: e.status as any,
-     lotsCount: 0,
+      lotsCount: e.lots?.length || 0,
      viewers: e.viewers || 0,
      bidsCount: 0,
      auctioneer: e.auctioneer_name || "",
