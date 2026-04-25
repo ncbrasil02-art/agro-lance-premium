@@ -7,7 +7,7 @@
   import { Loader2 } from "lucide-react";
   import { logger } from "@/utils/logger";
 
-export const Route = createFileRoute("/lotes/")({
+export const Route = createFileRoute("/lotes")({
   head: () => ({
     meta: [
       { title: "Lotes — Premium Agro Leilões" },

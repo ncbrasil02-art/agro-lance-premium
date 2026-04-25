@@ -5,7 +5,7 @@
   import { eventSchema } from "@/lib/schemas";
   import { z } from "zod";
 
-export const Route = createFileRoute("/eventos/")({
+export const Route = createFileRoute("/eventos")({
   head: () => ({
     meta: [
       { title: "Eventos — Premium Agro Leilões" },
