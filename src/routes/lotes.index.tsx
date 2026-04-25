@@ -21,7 +21,7 @@ export const Route = createFileRoute("/lotes/")({
       try {
         const { data: lots, error } = await supabase
           .from("lots")
-          .select("*, animal:animals(*), event:events!lots_event_id_fkey(*)")
+           .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
           .order("is_featured", { ascending: false })
           .order("lot_number", { ascending: true });
        
@@ -62,6 +62,13 @@ function LotsPage() {
       eventStartDate: l.event?.start_date,
       eventEndDate: l.event?.end_date,
       allowsPreBidding: l.event?.allows_pre_bidding,
+      father: l.animal?.genealogy?.father,
+      mother: l.animal?.genealogy?.mother,
+      sex: l.animal?.sex,
+      color: l.animal?.color,
+      birthDate: l.animal?.birth_date,
+      seller: l.animal?.seller?.name,
+      location: l.animal?.location,
     }));
  
   return (
