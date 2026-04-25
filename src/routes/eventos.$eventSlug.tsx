@@ -81,40 +81,41 @@ function EventDetail() {
             </div>
 
             {/* Event Header Info */}
-            <div className="flex flex-col">
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <StatusBadge status={event.status} />
-                {event.event_type && (
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white/60">
-                    {event.event_type}
-                  </span>
-                )}
+            <div className="flex flex-col lg:pt-12">
+              <div className="flex flex-wrap items-center gap-3 mb-8">
+                <StatusBadge status={event.status} className="scale-110" />
+                <div className="h-4 w-px bg-white/10" />
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-white/40">{event.event_type || 'Leilão Premium'}</span>
               </div>
               
-              <h1 className="text-4xl md:text-7xl font-black tracking-tight text-white mb-6 uppercase leading-[0.9] italic">
+              <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.85] italic">
                 {event.name}
               </h1>
               
-              <div className="relative mb-8">
-                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gold rounded-full" />
-                <p className="text-lg md:text-xl text-white/90 leading-relaxed font-medium italic pl-4">
-                  {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium."}
-                </p>
+              <div className="relative mb-12 max-w-2xl">
+                <div className="absolute -left-6 top-0 bottom-0 w-1.5 bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full" />
+                <div className="bg-white/5 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white/5 shadow-2xl">
+                  <p className="text-lg md:text-2xl text-white/90 leading-relaxed font-medium italic">
+                    {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium selecionados cuidadosamente por nossa curadoria genética."}
+                  </p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-12">
                 {[
-                  { icon: Calendar, label: "Data/Hora", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
-                  { icon: MapPin, label: "Localização", value: event.location || "Online" },
-                  { icon: Gavel, label: "Leiloeiro", value: event.auctioneer_name || "Convidado" },
-                  { icon: Trophy, label: "Promotor", value: event.promoter_company || "Elite" },
+                  { icon: Calendar, label: "Cronograma", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
+                  { icon: MapPin, label: "Recinto/Local", value: event.location || "Arena Digital" },
+                  { icon: Gavel, label: "Martelo", value: event.auctioneer_name || "Convidado Especial" },
+                  { icon: Trophy, label: "Fomento", value: event.promoter_company || "Premium Agro" },
                 ].map((m) => (
-                  <div key={m.label} className="p-4 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm group hover:bg-gold/5 hover:border-gold/20 transition-all">
-                    <div className="flex items-center gap-2 mb-2">
-                      <m.icon className="h-3.5 w-3.5 text-gold" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-gold/60">{m.label}</span>
+                  <div key={m.label} className="p-5 md:p-6 rounded-[2rem] bg-emerald-deep/40 border border-white/5 backdrop-blur-xl group hover:bg-gold/5 hover:border-gold/20 transition-all flex flex-col justify-center">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-8 w-8 rounded-full bg-gold/10 flex items-center justify-center">
+                        <m.icon className="h-4 w-4 text-gold" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60">{m.label}</span>
                     </div>
-                    <div className="text-sm font-bold text-white leading-snug line-clamp-1">{m.value}</div>
+                    <div className="text-base md:text-lg font-black text-white leading-tight uppercase tracking-tight">{m.value}</div>
                   </div>
                 ))}
               </div>
