@@ -1,19 +1,73 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Gavel, Radio, ShieldCheck, Sparkles, TrendingUp, Trophy, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { events, lots, stats, formatBRL } from "@/lib/mock-data";
-import { EventCard } from "@/components/auctions/event-card";
-import { LotCard } from "@/components/auctions/lot-card";
+ import { createFileRoute, Link } from "@tanstack/react-router";
+ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+ import { Button } from "@/components/ui/button";
+ import { EventCard } from "@/components/auctions/event-card";
+ import { LotCard } from "@/components/auctions/lot-card";
+ import { supabase } from "@/integrations/supabase/client";
+ import { formatBRL } from "@/utils/format";
 import heroImage from "@/assets/hero-horse.jpg";
 
 export const Route = createFileRoute("/")({
-  component: Home,
+   loader: async () => {
+     const [eventsRes, lotsRes] = await Promise.all([
+       supabase.from("events").select("*").limit(6).order("start_date", { ascending: true }),
+       supabase.from("lots").select("*, animal:animals(*), event:events(*)").limit(6).order("created_at", { ascending: false })
+     ]);
+ 
+     return {
+       events: eventsRes.data || [],
+       lots: lotsRes.data || []
+     };
+   },
+   component: Home,
 });
 
 function Home() {
-  const liveEvents = events.filter((e) => e.status === "live");
-  const upcomingEvents = events.filter((e) => e.status === "upcoming").slice(0, 3);
-  const featuredLots = lots.slice(0, 6);
+   const { events, lots } = Route.useLoaderData();
+ 
+   const mappedEvents = events.map((e: any) => ({
+     id: e.id,
+     slug: e.slug || "",
+     name: e.name,
+     description: e.description || "",
+     date: e.start_date,
+     city: e.location?.split("-")?.[0]?.trim() || "Brasil",
+     state: e.location?.split("-")?.[1]?.trim() || "",
+     cover: e.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
+     status: e.status as any,
+     lotsCount: 0,
+     viewers: e.viewers || 0,
+     bidsCount: 0,
+     auctioneer: e.auctioneer_name || "",
+     promoter: e.promoter_company || "",
+   }));
+ 
+   const mappedLots = lots.map((l: any) => ({
+     id: l.id,
+     number: l.lot_number,
+     eventId: l.event_id,
+     name: l.animal?.name || "Sem nome",
+     breed: l.animal?.breed || "",
+     category: l.animal?.species as any,
+     cover: l.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
+     currentBid: l.current_price || l.starting_price,
+     minIncrement: l.bid_increment,
+     bidsCount: l.bids_count || 0,
+     viewers: l.viewers || 0,
+     endsAt: l.end_date || "",
+     status: l.status as any,
+   }));
+ 
+   const liveEvents = mappedEvents.filter((e) => e.status === "live");
+   const upcomingEvents = mappedEvents.filter((e) => e.status === "upcoming" || e.status === "scheduled").slice(0, 3);
+   const featuredLots = mappedLots.slice(0, 6);
+ 
+   const stats = {
+     totalSold: 184500000,
+     totalAnimals: 12847,
+     totalUsers: 38420,
+     activeEvents: 14,
+   };
 
   return (
     <>
