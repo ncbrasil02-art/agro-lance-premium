@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
+ import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
 import { useAuth } from "../auth/auth-provider";
+ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -107,38 +108,57 @@ export function Header() {
             </>
           )}
 
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+           {!user && (
+             <Sheet open={open} onOpenChange={setOpen}>
+               <SheetTrigger asChild>
+                 <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
+                   <Menu className="h-5 w-5" />
+                 </Button>
+               </SheetTrigger>
+               <SheetContent side="right" className="w-[80%] p-0">
+                 <SheetHeader className="p-6 border-b">
+                   <SheetTitle className="text-left flex items-center gap-2">
+                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold-gradient">
+                       <Gavel className="h-4 w-4 text-emerald-deep" />
+                     </span>
+                     Premium Agro
+                   </SheetTitle>
+                 </SheetHeader>
+                 <div className="flex flex-col p-6 gap-4">
+                   <div className="grid gap-2">
+                     <p className="text-sm font-medium text-muted-foreground px-2">Acesso</p>
+                     <Link to="/login" onClick={() => setOpen(false)}>
+                       <Button variant="ghost" className="w-full justify-start gap-2">
+                         <LogIn className="h-4 w-4" /> Entrar
+                       </Button>
+                     </Link>
+                     <Link to="/cadastro" onClick={() => setOpen(false)}>
+                       <Button className="w-full justify-start gap-2 bg-gold-gradient text-emerald-deep">
+                         <UserPlus className="h-4 w-4" /> Criar Conta
+                       </Button>
+                     </Link>
+                   </div>
+                   
+                   <div className="grid gap-2 mt-4">
+                     <p className="text-sm font-medium text-muted-foreground px-2">Navegação</p>
+                     {nav.map((item) => (
+                       <Link
+                         key={item.to}
+                         to={item.to}
+                         onClick={() => setOpen(false)}
+                         className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                         activeProps={{ className: "bg-secondary text-foreground" }}
+                       >
+                         {item.label}
+                       </Link>
+                     ))}
+                   </div>
+                 </div>
+               </SheetContent>
+             </Sheet>
+           )}
         </div>
       </div>
-
-      {open && (
-        <div className="border-t border-border/60 bg-background md:hidden">
-          <nav className="container mx-auto flex flex-col gap-1 px-4 py-3">
-            {nav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
-                activeProps={{ className: "bg-secondary text-foreground" }}
-                activeOptions={{ exact: item.to === "/" }}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <div className="mt-2 flex gap-2">
-              <Link to="/login" className="flex-1" onClick={() => setOpen(false)}>
-                <Button variant="outline" className="w-full">Entrar</Button>
-              </Link>
-              <Link to="/cadastro" className="flex-1" onClick={() => setOpen(false)}>
-                <Button className="w-full bg-gold-gradient text-emerald-deep">Cadastre-se</Button>
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
     </header>
   );
 }

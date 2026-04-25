@@ -1,13 +1,11 @@
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useEffect } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "@tanstack/react-router";
+ import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Eye, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,110 +13,10 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  
-  export function EventManagement({ 
-    onManageLots, 
-    onNavigate,
-    searchQuery,
-    onSearchChange,
-    currentPage,
-    onPageChange,
-    sortColumn,
-    sortDirection,
-    onSortChange
-  }: { 
-    onManageLots?: (id: string) => void; 
-    onNavigate?: () => void;
-    searchQuery: string;
-    onSearchChange: (val: string) => void;
-    currentPage: number;
-    onPageChange: (val: number) => void;
-    sortColumn: string;
-    sortDirection: "asc" | "desc";
-    onSortChange: (col: string, dir: "asc" | "desc") => void;
-  }) {
-  const [events, setEvents] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const ITEMS_PER_PAGE = 8;
-
-  const fetchEvents = async () => {
-    setIsLoading(true);
-    try {
-      let query = supabase
-        .from("events")
-        .select("*", { count: "exact" });
-
-      if (searchQuery) {
-        query = query.ilike("name", `%${searchQuery}%`);
-      }
-
-      const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-
-      const { data, error, count } = await query
-        .order(sortColumn, { ascending: sortDirection === "asc" })
-        .range(from, to);
-
-      if (error) throw error;
-      setEvents(data || []);
-      setTotalCount(count || 0);
-    } catch (error: any) {
-      toast.error("Erro ao carregar eventos: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-    setSelectedIds([]);
-  }, [currentPage, searchQuery, sortColumn, sortDirection]);
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(events.map(e => e.id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (id: string, checked: boolean) => {
-    if (checked) {
-      setSelectedIds(prev => [...prev, id]);
-    } else {
-      setSelectedIds(prev => prev.filter(i => i !== id));
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (!confirm(`Deseja excluir permanentemente os ${selectedIds.length} eventos selecionados? Todos os lotes associados serão removidos.`)) return;
-    
-    try {
-      const { error } = await supabase.from("events").delete().in("id", selectedIds);
-      if (error) throw error;
-      toast.success(`${selectedIds.length} eventos excluídos com sucesso`);
-      setSelectedIds([]);
-      fetchEvents();
-    } catch (error: any) {
-      toast.error("Erro ao excluir em lote: " + error.message);
-    }
-  };
-
-
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
-
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      onSortChange(column, "asc");
-    }
-  };
-
-  const SortIndicator = ({ column }: { column: string }) => {
-    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
-    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
-  };
+  export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
+    const [events, setEvents] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<any>(null);
      const [formData, setFormData] = useState({
@@ -175,6 +73,33 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
        });
        setIsDialogOpen(true);
      };
+ 
+    const fetchEvents = async () => {
+      setIsLoading(true);
+      console.log("Fetching events...");
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .order("start_date", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching events:", error);
+          throw error;
+        }
+        console.log("Events loaded:", data?.length || 0);
+        setEvents(data || []);
+      } catch (error: any) {
+        console.error("Catch error fetching events:", error);
+        toast.error("Erro ao carregar eventos: " + error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+ 
+   useEffect(() => {
+     fetchEvents();
+   }, []);
  
     const handleSave = async () => {
       if (!formData.name || !formData.start_date) {
@@ -244,6 +169,9 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
      }
    };
  
+   const filteredEvents = events.filter(event => 
+     event.name?.toLowerCase().includes(searchQuery.toLowerCase())
+   );
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este evento? Todos os lotes associados também serão afetados.")) return;
@@ -276,32 +204,8 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
       }
    };
    return (
-    <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative">
-           {selectedIds.length > 0 && (
-             <div className="absolute inset-0 bg-emerald-deep/95 z-20 rounded-lg flex items-center px-4 animate-in fade-in slide-in-from-top-2 border border-gold/30">
-               <div className="flex items-center gap-3">
-                 <span className="text-xs font-black text-white uppercase tracking-widest">{selectedIds.length} selecionados</span>
-                 <div className="h-4 w-px bg-white/20" />
-                 <Button 
-                   variant="ghost" 
-                   size="sm" 
-                   className="h-8 text-destructive hover:bg-destructive/10 text-[10px] font-bold"
-                   onClick={handleBulkDelete}
-                 >
-                   <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir em Lote
-                 </Button>
-               </div>
-               <Button 
-                 variant="ghost" 
-                 size="sm" 
-                 className="ml-auto text-white/60 hover:text-white text-[10px] font-bold"
-                 onClick={() => setSelectedIds([])}
-               >
-                 Cancelar
-               </Button>
-             </div>
-           )}
+     <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
@@ -309,12 +213,12 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
           </div>
          <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar eventos..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
+           <Input
+             placeholder="Buscar eventos..."
+             className="pl-10"
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+           />
          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
@@ -335,32 +239,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                   Defina as configurações do leilão.
                </DialogDescription>
              </DialogHeader>
-              <div className="grid gap-6 py-4">
-                {/* Fixed Image Preview */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border-2 border-white/5 bg-black/40 group">
-                  <img 
-                    src={formData.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
-                    alt="Banner Preview" 
-                    className={`h-full w-full object-cover transition-all duration-700 ${!formData.banner_url ? 'opacity-20 grayscale' : ''}`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                    <div>
-                      <p className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Flyer do Evento</p>
-                      <p className="text-sm font-bold text-white uppercase italic">{formData.name || "Nome do Evento"}</p>
-                    </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 bg-white/10 hover:bg-gold hover:text-emerald-deep text-white text-[10px] font-bold rounded-lg border border-white/10 backdrop-blur-md"
-                      onClick={() => document.getElementById('banner-upload')?.click()}
-                    >
-                      <PlusCircle className="mr-2 h-3.5 w-3.5" /> Upload Flyer
-                    </Button>
-                  </div>
-                </div>
-
+              <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome do Evento</Label>
                   <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
@@ -514,53 +393,32 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
            <CardTitle>Eventos de Leilão</CardTitle>
          </CardHeader>
          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-gold" />
-              </div>
-            ) : (
-              <>
-                <Table>
-                  <TableHeader className="bg-muted/50 select-none">
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <Checkbox 
-                          checked={events.length > 0 && selectedIds.length === events.length}
-                          onCheckedChange={(checked) => handleSelectAll(!!checked)}
-                        />
-                      </TableHead>
-                      <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
-                      <div className="flex items-center">Evento <SortIndicator column="name" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('start_date')}>
-                      <div className="flex items-center">Início <SortIndicator column="start_date" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('location')}>
-                      <div className="flex items-center">Local/Promotor <SortIndicator column="location" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('status')}>
-                      <div className="flex items-center">Status <SortIndicator column="status" /></div>
-                    </TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {events.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                          Nenhum evento encontrado.
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                    events.map((event) => (
-                      <TableRow key={event.id} className={selectedIds.includes(event.id) ? "bg-gold/5" : ""}>
-                        <TableCell>
-                          <Checkbox 
-                            checked={selectedIds.includes(event.id)}
-                            onCheckedChange={(checked) => handleSelectOne(event.id, !!checked)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
+           {isLoading ? (
+             <div className="flex justify-center py-8">
+               <Loader2 className="h-8 w-8 animate-spin text-gold" />
+             </div>
+           ) : (
+             <Table>
+               <TableHeader>
+                 <TableRow>
+                   <TableHead>Evento</TableHead>
+                   <TableHead>Data de Início</TableHead>
+                   <TableHead>Local/Promotor</TableHead>
+                   <TableHead>Status</TableHead>
+                   <TableHead className="text-right">Ações</TableHead>
+                 </TableRow>
+               </TableHeader>
+               <TableBody>
+                 {filteredEvents.length === 0 ? (
+                   <TableRow>
+                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                       Nenhum evento encontrado.
+                     </TableCell>
+                   </TableRow>
+                 ) : (
+                   filteredEvents.map((event) => (
+                     <TableRow key={event.id}>
+                       <TableCell className="font-medium">
                          <div>{event.name}</div>
                          <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Presencial'}</div>
                        </TableCell>
@@ -580,21 +438,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                          </span>
                        </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-1 md:gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              asChild
-                              title="Visualizar Página Pública"
-                            >
-                              <Link 
-                                to="/eventos/$eventSlug" 
-                                params={{ eventSlug: event.slug || "" }} 
-                                target="_blank"
-                              >
-                                <Eye className="h-4 w-4 text-gold" />
-                              </Link>
-                            </Button>
+                          <div className="flex justify-end gap-2">
                             {event.status !== 'finished' && (
                               <Button 
                                 variant="outline" 
@@ -634,28 +478,10 @@ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCi
                      </TableRow>
                    ))
                  )}
-                </TableBody>
-              </Table>
-
-              {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
-                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
-                  </div>
-                  <div className="flex items-center gap-2 order-1 sm:order-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
+               </TableBody>
+             </Table>
+           )}
+         </CardContent>
        </Card>
      </div>
    );

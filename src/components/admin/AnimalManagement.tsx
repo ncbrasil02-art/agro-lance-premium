@@ -5,33 +5,13 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
   import { toast } from "sonner";
  
-  import { Checkbox } from "@/components/ui/checkbox";
-
-  export function AnimalManagement({ 
-    onNavigateToLots,
-    searchQuery,
-    onSearchChange,
-    currentPage,
-    onPageChange,
-    sortColumn,
-    sortDirection,
-    onSortChange
-  }: { 
-    onNavigateToLots?: () => void;
-    searchQuery: string;
-    onSearchChange: (val: string) => void;
-    currentPage: number;
-    onPageChange: (val: number) => void;
-    sortColumn: string;
-    sortDirection: "asc" | "desc";
-    onSortChange: (col: string, dir: "asc" | "desc") => void;
-  }) {
+  export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
     const [formData, setFormData] = useState({
@@ -156,100 +136,48 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
           toast.success("Animal cadastrado com sucesso");
         }
  
-         setIsDialogOpen(false);
-         const isNew = !editingAnimal;
-         resetForm();
-         fetchAnimals();
-         if (isNew && onNavigateToLots && confirm("Animal cadastrado! Deseja ir para a aba de Lotes para alocá-lo em um evento?")) {
-           onNavigateToLots();
-         }
+        setIsDialogOpen(false);
+        resetForm();
+        fetchAnimals();
       } catch (error: any) {
         toast.error("Erro ao salvar animal: " + error.message);
       }
     };
-  const [animals, setAnimals] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const ITEMS_PER_PAGE = 8;
+   const [animals, setAnimals] = useState<any[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
+   const [searchQuery, setSearchQuery] = useState("");
+ 
+    const fetchAnimals = async () => {
+      setIsLoading(true);
+      console.log("Fetching animals...");
+      try {
+        const { data, error } = await supabase
+          .from("animals")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-  const fetchAnimals = async () => {
-    setIsLoading(true);
-    try {
-      let query = supabase
-        .from("animals")
-        .select("*", { count: "exact" });
-
-      if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,registration_number.ilike.%${searchQuery}%`);
+        if (error) {
+          console.error("Error fetching animals:", error);
+          throw error;
+        }
+        console.log("Animals loaded:", data?.length || 0);
+        setAnimals(data || []);
+      } catch (error: any) {
+        console.error("Catch error fetching animals:", error);
+        toast.error("Erro ao carregar animais: " + error.message);
+      } finally {
+        setIsLoading(false);
       }
-
-      const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-
-      const { data, error, count } = await query
-        .order(sortColumn, { ascending: sortDirection === "asc" })
-        .range(from, to);
-
-      if (error) throw error;
-      setAnimals(data || []);
-      setTotalCount(count || 0);
-    } catch (error: any) {
-      toast.error("Erro ao carregar animais: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAnimals();
-    setSelectedIds([]); // Clear selection on table change
-  }, [currentPage, searchQuery, sortColumn, sortDirection]);
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(animals.map(a => a.id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (id: string, checked: boolean) => {
-    if (checked) {
-      setSelectedIds(prev => [...prev, id]);
-    } else {
-      setSelectedIds(prev => prev.filter(i => i !== id));
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (!confirm(`Deseja excluir permanentemente os ${selectedIds.length} animais selecionados?`)) return;
-    
-    try {
-      const { error } = await supabase.from("animals").delete().in("id", selectedIds);
-      if (error) throw error;
-      toast.success(`${selectedIds.length} animais excluídos com sucesso`);
-      setSelectedIds([]);
-      fetchAnimals();
-    } catch (error: any) {
-      toast.error("Erro ao excluir em lote: " + error.message);
-    }
-  };
-
-
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
-
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      onSortChange(column, sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      onSortChange(column, "asc");
-    }
-  };
-
-  const SortIndicator = ({ column }: { column: string }) => {
-    if (sortColumn !== column) return <ArrowUpDown className="ml-2 h-3 w-3 opacity-30" />;
-    return sortDirection === "asc" ? <ChevronUp className="ml-2 h-3 w-3" /> : <ChevronDown className="ml-2 h-3 w-3" />;
-  };
+    };
+ 
+   useEffect(() => {
+     fetchAnimals();
+   }, []);
+ 
+   const filteredAnimals = animals.filter(animal => 
+     animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase())
+   );
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este animal?")) return;
@@ -266,31 +194,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
  
    return (
      <div className="space-y-6">
-         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative">
-           {selectedIds.length > 0 && (
-             <div className="absolute inset-0 bg-emerald-deep/95 z-20 rounded-lg flex items-center px-4 animate-in fade-in slide-in-from-top-2 border border-gold/30">
-               <div className="flex items-center gap-3">
-                 <span className="text-xs font-black text-white uppercase tracking-widest">{selectedIds.length} selecionados</span>
-                 <div className="h-4 w-px bg-white/20" />
-                 <Button 
-                   variant="ghost" 
-                   size="sm" 
-                   className="h-8 text-destructive hover:bg-destructive/10 text-[10px] font-bold"
-                   onClick={handleBulkDelete}
-                 >
-                   <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir em Lote
-                 </Button>
-               </div>
-               <Button 
-                 variant="ghost" 
-                 size="sm" 
-                 className="ml-auto text-white/60 hover:text-white text-[10px] font-bold"
-                 onClick={() => setSelectedIds([])}
-               >
-                 Cancelar
-               </Button>
-             </div>
-           )}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={fetchAnimals} disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
@@ -298,12 +202,12 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
           </div>
          <div className="relative flex-1 max-w-sm">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nome ou registro..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
+           <Input
+             placeholder="Buscar por nome ou registro..."
+             className="pl-10"
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+           />
          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
@@ -324,32 +228,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                   Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
-             <div className="grid gap-6 py-4">
-                {/* Fixed Image Preview */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border-2 border-white/5 bg-black/40 group">
-                  <img 
-                    src={formData.photos_urls?.split(",")[0]?.trim() || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-                    alt="Preview" 
-                    className={`h-full w-full object-cover transition-all duration-700 ${!formData.photos_urls ? 'opacity-20 grayscale' : ''}`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                    <div>
-                      <p className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Capa do Perfil</p>
-                      <p className="text-sm font-bold text-white uppercase italic">{formData.name || "Nome do Animal"}</p>
-                    </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 bg-white/10 hover:bg-gold hover:text-emerald-deep text-white text-[10px] font-bold rounded-lg border border-white/10 backdrop-blur-md"
-                      onClick={() => document.getElementById('photo-upload')?.click()}
-                    >
-                      <Upload className="mr-2 h-3.5 w-3.5" /> Trocar Capa
-                    </Button>
-                  </div>
-                </div>
-
+             <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome</Label>
                    <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
@@ -571,50 +450,29 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
              <div className="flex justify-center py-8">
                <Loader2 className="h-8 w-8 animate-spin text-gold" />
              </div>
-            ) : (
-              <>
-                <Table>
-                <TableHeader className="bg-muted/50 select-none">
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Checkbox 
-                        checked={animals.length > 0 && selectedIds.length === animals.length}
-                        onCheckedChange={(checked) => handleSelectAll(!!checked)}
-                      />
-                    </TableHead>
+           ) : (
+             <Table>
+               <TableHeader>
+                 <TableRow>
                     <TableHead className="w-[80px]">Foto</TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('name')}>
-                      <div className="flex items-center">Nome <SortIndicator column="name" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('species')}>
-                      <div className="flex items-center">Espécie/Raça <SortIndicator column="species" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('registration_number')}>
-                      <div className="flex items-center">Registro <SortIndicator column="registration_number" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('sex')}>
-                      <div className="flex items-center">Sexo <SortIndicator column="sex" /></div>
-                    </TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                   {animals.length === 0 ? (
+                    <TableHead>Nome</TableHead>
+                   <TableHead>Espécie/Raça</TableHead>
+                   <TableHead>Registro</TableHead>
+                   <TableHead>Sexo</TableHead>
+                   <TableHead className="text-right">Ações</TableHead>
+                 </TableRow>
+               </TableHeader>
+               <TableBody>
+                 {filteredAnimals.length === 0 ? (
                    <TableRow>
                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                        Nenhum animal encontrado.
                      </TableCell>
                    </TableRow>
-                  ) : (
-                     animals.map((animal) => (
-                       <TableRow key={animal.id} className={selectedIds.includes(animal.id) ? "bg-gold/5" : ""}>
-                         <TableCell>
-                           <Checkbox 
-                             checked={selectedIds.includes(animal.id)}
-                             onCheckedChange={(checked) => handleSelectOne(animal.id, !!checked)}
-                           />
-                         </TableCell>
-                         <TableCell>
+                 ) : (
+                   filteredAnimals.map((animal) => (
+                      <TableRow key={animal.id}>
+                        <TableCell>
                           {animal.photos && animal.photos.length > 0 ? (
                             <img 
                               src={animal.photos[0]} 
@@ -644,28 +502,10 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                      </TableRow>
                    ))
                  )}
-                </TableBody>
-              </Table>
-
-              {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t gap-4">
-                  <div className="text-xs text-muted-foreground order-2 sm:order-1">
-                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de {totalCount} registros
-                  </div>
-                  <div className="flex items-center gap-2 order-1 sm:order-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
+               </TableBody>
+             </Table>
+           )}
+         </CardContent>
        </Card>
      </div>
    );

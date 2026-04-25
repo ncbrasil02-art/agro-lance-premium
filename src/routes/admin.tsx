@@ -1,73 +1,88 @@
-import { useState, useEffect } from "react";
-import { createFileRoute, Navigate, Link, useNavigate, useSearch } from "@tanstack/react-router";
+ import { useState, ReactNode } from "react";
+ import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
- import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap } from "lucide-react";
+ import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+export const Route = createFileRoute("/admin")({
+  component: AdminLayout,
+});
 
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
-import { UserManagement } from "@/components/admin/UserManagement";
  
-type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
-
-interface AdminSearch {
-  tab?: AdminTab;
-  eventId?: string;
-  q?: string;
-  page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
-}
-
-export const Route = createFileRoute("/admin")({
-  validateSearch: (search: Record<string, unknown>): AdminSearch => {
-    return {
-      tab: (search.tab as AdminTab) || "dashboard",
-      eventId: (search.eventId as string) || "all",
-      q: (search.q as string) || "",
-      page: (search.page as number) || 1,
-      sort: (search.sort as string) || "created_at",
-      order: (search.order as "asc" | "desc") || "desc",
-    };
-  },
-  component: AdminLayout,
-});
-
+ type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
+ 
+ interface SidebarProps {
+   activeTab: AdminTab;
+   setActiveTab: (tab: AdminTab) => void;
+   signOut: () => void;
+   onItemClick?: () => void;
+ }
+ 
+ function AdminSidebar({ activeTab, setActiveTab, signOut, onItemClick }: SidebarProps) {
+   const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
+     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+     { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
+     { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
+     { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+     { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+     { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
+   ];
+ 
+   return (
+     <div className="flex h-full flex-col py-4">
+       <div className="mb-8 flex items-center gap-2 px-2 font-bold text-xl text-gold">
+         <Gavel className="h-6 w-6" />
+         <span>Elite Admin</span>
+       </div>
+       <nav className="flex-1 space-y-2">
+         {menuItems.map((item) => (
+           <Button 
+             key={item.id}
+             variant="ghost" 
+             className={`w-full justify-start ${activeTab === item.id ? "text-gold bg-gold/5" : ""}`}
+             onClick={() => {
+               setActiveTab(item.id);
+               onItemClick?.();
+             }}
+           >
+             {item.icon} {item.label}
+           </Button>
+         ))}
+       </nav>
+       <div className="pt-4 border-t">
+         <Link to="/">
+           <Button variant="ghost" className="w-full justify-start gap-2">
+             <ExternalLink className="h-4 w-4" /> Ver Site
+           </Button>
+         </Link>
+         <Button 
+           variant="ghost" 
+           className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" 
+           onClick={signOut}
+         >
+           <LogOut className="mr-2 h-4 w-4" /> Sair
+         </Button>
+       </div>
+     </div>
+   );
+ }
+ 
 function AdminLayout() {
-  const { profile, isLoading, signOut } = useAuth();
-  const search = useSearch({ from: "/admin" });
-  const navigate = useNavigate({ from: "/admin" });
+   const { profile, isLoading, signOut } = useAuth();
+   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+   const [selectedEventId, setSelectedEventId] = useState<string>("all");
 
-  const activeTab = search.tab || "dashboard";
-  const selectedEventId = search.eventId || "all";
-
-  const setActiveTab = (tab: AdminTab) => {
-    navigate({ search: (prev) => ({ ...prev, tab, q: "", page: 1, sort: undefined, order: undefined }) });
-  };
-
-  const setSelectedEventId = (eventId: string) => {
-    navigate({ search: (prev) => ({ ...prev, eventId, page: 1 }) });
-  };
-
-  const handleManageLots = (eventId: string) => {
-    navigate({ search: (prev) => ({ ...prev, tab: "lots", eventId, q: "", page: 1, sort: undefined, order: undefined }) });
-  };
-
-  const onSearchChange = (q: string) => {
-    navigate({ search: (prev) => ({ ...prev, q, page: 1 }), replace: true });
-  };
-
-  const onPageChange = (page: number) => {
-    navigate({ search: (prev) => ({ ...prev, page }) });
-  };
-
-  const onSortChange = (sort: string, order: "asc" | "desc") => {
-    navigate({ search: (prev) => ({ ...prev, sort, order, page: 1 }) });
-  };
+   const handleManageLots = (eventId: string) => {
+     setSelectedEventId(eventId);
+     setActiveTab("lots");
+   };
 
   if (isLoading) {
     return (
@@ -81,121 +96,52 @@ function AdminLayout() {
     return <Navigate to="/" />;
   }
 
-   return (
-     <div className="flex min-h-screen bg-muted/30">
-       {/* Sidebar Sidebar */}
-       <aside className="w-64 border-r bg-card p-6 hidden md:block">
-         <div className="mb-8 flex items-center gap-2 font-bold text-xl text-gold">
-           <Gavel className="h-6 w-6" />
-           <span>Elite Admin</span>
-         </div>
-          <nav className="flex-1 space-y-2">
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "dashboard" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("dashboard")}
-            >
-              <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "events" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("events")}
-            >
-              <Calendar className="mr-2 h-4 w-4" /> Eventos
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "lots" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("lots")}
-            >
-              <Gavel className="mr-2 h-4 w-4" /> Lotes
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "animals" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("animals")}
-            >
-              <Package className="mr-2 h-4 w-4" /> Animais
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "users" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("users")}
-            >
-              <Users className="mr-2 h-4 w-4" /> Usuários
-            </Button>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activeTab === "settings" ? "text-gold bg-gold/5" : ""}`}
-              onClick={() => setActiveTab("settings")}
-            >
-              <Settings className="mr-2 h-4 w-4" /> Configurações
-            </Button>
-          </nav>
-          <div className="pt-4 border-t">
-            <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" /> Sair
-            </Button>
-          </div>
-       </aside>
- 
-         <main className="flex-1 p-4 md:p-8 pb-16">
-          <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
-                <Gavel className="h-5 w-5 text-emerald-deep" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Painel Administrativo</h1>
-                <p className="text-xs md:text-sm text-muted-foreground">Bem-vindo, {profile?.full_name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" asChild className="hidden md:flex">
-                <Link to="/">Ver Site Público</Link>
-              </Button>
-              <Button variant="ghost" size="icon" className="md:hidden ml-auto text-destructive" onClick={signOut}>
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </div>
-          </header>
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-          {/* Quick Navigation Mobile */}
-          <div className="flex md:hidden overflow-x-auto pb-4 gap-2 mb-6 scrollbar-hide">
-            <Button 
-              variant={activeTab === "dashboard" ? "default" : "outline"} 
-              size="sm" 
-              className={`rounded-full whitespace-nowrap ${activeTab === "dashboard" ? "bg-gold text-emerald-deep" : ""}`}
-              onClick={() => setActiveTab("dashboard")}
-            >
-              Dashboard
+  return (
+    <div className="flex min-h-screen bg-muted/30 flex-col md:flex-row">
+      {/* Mobile Top Header */}
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-card px-4 md:hidden">
+        <div className="flex items-center gap-2 font-bold text-lg text-gold">
+          <Gavel className="h-5 w-5" />
+          <span>Elite Admin</span>
+        </div>
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-5 w-5" />
             </Button>
-            <Button 
-              variant={activeTab === "events" ? "default" : "outline"} 
-              size="sm" 
-              className={`rounded-full whitespace-nowrap ${activeTab === "events" ? "bg-gold text-emerald-deep" : ""}`}
-              onClick={() => setActiveTab("events")}
-            >
-              Eventos
-            </Button>
-            <Button 
-              variant={activeTab === "lots" ? "default" : "outline"} 
-              size="sm" 
-              className={`rounded-full whitespace-nowrap ${activeTab === "lots" ? "bg-gold text-emerald-deep" : ""}`}
-              onClick={() => setActiveTab("lots")}
-            >
-              Lotes
-            </Button>
-            <Button 
-              variant={activeTab === "animals" ? "default" : "outline"} 
-              size="sm" 
-              className={`rounded-full whitespace-nowrap ${activeTab === "animals" ? "bg-gold text-emerald-deep" : ""}`}
-              onClick={() => setActiveTab("animals")}
-            >
-              Animais
-            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-4">
+            <AdminSidebar 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+              signOut={signOut} 
+              onItemClick={() => setIsMobileMenuOpen(false)}
+            />
+          </SheetContent>
+        </Sheet>
+      </header>
+
+      {/* Desktop Sidebar */}
+      <aside className="w-64 border-r bg-card p-6 hidden md:block">
+        <AdminSidebar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          signOut={signOut} 
+        />
+      </aside>
+
+      <main className="flex-1 p-4 md:p-8 pb-16">
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:mb-8">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">Painel Administrativo</h1>
+            <p className="text-sm text-muted-foreground md:text-base">Bem-vindo de volta, {profile?.full_name}</p>
           </div>
+          <Button variant="outline" size="sm" asChild className="w-fit">
+            <Link to="/">Ver Site</Link>
+          </Button>
+        </header>
 
           {activeTab === "dashboard" && (
             <>
@@ -287,56 +233,19 @@ function AdminLayout() {
             </>
           )}
 
-          {activeTab === "events" && (
-            <EventManagement 
-              onManageLots={handleManageLots} 
-              onNavigate={() => setActiveTab("animals")} 
-              searchQuery={search.q || ""}
-              onSearchChange={onSearchChange}
-              currentPage={search.page || 1}
-              onPageChange={onPageChange}
-              sortColumn={search.sort || "start_date"}
-              sortDirection={search.order || "desc"}
-              onSortChange={onSortChange}
-            />
-          )}
+          {activeTab === "events" && <EventManagement onManageLots={handleManageLots} />}
           {activeTab === "lots" && (
             <LotManagement 
               initialEventId={selectedEventId} 
               onEventChange={setSelectedEventId} 
-              onNavigateToAnimals={() => setActiveTab("animals")}
-              onNavigateToEvents={() => setActiveTab("events")}
-              searchQuery={search.q || ""}
-              onSearchChange={onSearchChange}
-              currentPage={search.page || 1}
-              onPageChange={onPageChange}
-              sortColumn={search.sort || "lot_number"}
-              sortDirection={search.order || "asc"}
-              onSortChange={onSortChange}
             />
           )}
-          {activeTab === "animals" && (
-            <AnimalManagement 
-              onNavigateToLots={() => setActiveTab("lots")} 
-              searchQuery={search.q || ""}
-              onSearchChange={onSearchChange}
-              currentPage={search.page || 1}
-              onPageChange={onPageChange}
-              sortColumn={search.sort || "name"}
-              sortDirection={search.order || "asc"}
-              onSortChange={onSortChange}
-            />
-          )}
+          {activeTab === "animals" && <AnimalManagement />}
           {activeTab === "users" && (
-            <UserManagement 
-              searchQuery={search.q || ""}
-              onSearchChange={onSearchChange}
-              currentPage={search.page || 1}
-              onPageChange={onPageChange}
-              sortColumn={search.sort || "full_name"}
-              sortDirection={search.order || "asc"}
-              onSortChange={onSortChange}
-            />
+            <Card>
+              <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
+              <CardContent><p className="text-muted-foreground">Módulo de gestão de usuários em desenvolvimento.</p></CardContent>
+            </Card>
           )}
            {activeTab === "settings" && (
              <Card>
