@@ -1,5 +1,5 @@
  import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap } from "lucide-react";
  import { formatBRL } from "@/utils/format";
  import { Button } from "@/components/ui/button";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -20,16 +20,24 @@
  } from "@/components/ui/dialog";
  
  export const Route = createFileRoute("/lotes/$lotId")({
-   loader: async ({ params }) => {
-     const { data: lot, error } = await supabase
-       .from("lots")
-       .select("*, animal:animals(*), event:events(*)")
-       .eq("id", params.lotId)
-       .single();
- 
-     if (error || !lot) throw notFound();
-     return { lot };
-   },
+    loader: async ({ params }) => {
+      const [lotRes, bidsRes] = await Promise.all([
+        supabase
+          .from("lots")
+          .select("*, animal:animals(*), event:events(*)")
+          .eq("id", params.lotId)
+          .single(),
+        supabase
+          .from("bids")
+          .select("*, profile:profiles(full_name)")
+          .eq("lot_id", params.lotId)
+          .order("created_at", { ascending: false })
+          .limit(5)
+      ]);
+  
+      if (lotRes.error || !lotRes.data) throw notFound();
+      return { lot: lotRes.data, initialBids: bidsRes.data || [] };
+    },
    head: ({ loaderData }) => ({
      meta: loaderData ? [
        { title: `Lote ${loaderData.lot.lot_number} — ${loaderData.lot.animal?.name} — Elite Agro` },
@@ -144,33 +152,58 @@
    );
  }
  
- function LotDetail() {
-   const { lot: initialLot } = Route.useLoaderData();
-   const { user, profile } = useAuth();
-   const [lot, setLot] = useState(initialLot);
-   const [isBidding, setIsBidding] = useState(false);
+  function LotDetail() {
+    const { lot: initialLot, initialBids } = Route.useLoaderData();
+    const { user, profile } = useAuth();
+    const [lot, setLot] = useState(initialLot);
+    const [recentBids, setRecentBids] = useState<any[]>(initialBids);
+    const [isBidding, setIsBidding] = useState(false);
+  
+    useEffect(() => {
+      const lotChannel = supabase
+        .channel(`lot-${lot.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "lots",
+            filter: `id=eq.${lot.id}`,
+          },
+          (payload) => {
+            setLot((prev) => ({ ...prev, ...payload.new }));
+          }
+        )
+        .subscribe();
  
-   useEffect(() => {
-     const channel = supabase
-       .channel(`lot-${lot.id}`)
-       .on(
-         "postgres_changes",
-         {
-           event: "UPDATE",
-           schema: "public",
-           table: "lots",
-           filter: `id=eq.${lot.id}`,
-         },
-         (payload) => {
-           setLot((prev) => ({ ...prev, ...payload.new }));
-         }
-       )
-       .subscribe();
- 
-     return () => {
-       supabase.removeChannel(channel);
-     };
-   }, [lot.id]);
+      const bidsChannel = supabase
+        .channel(`bids-${lot.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "bids",
+            filter: `lot_id=eq.${lot.id}`,
+          },
+          async (payload) => {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("id", payload.new.user_id)
+              .single();
+            
+            const newBidWithProfile = { ...payload.new, profile };
+            setRecentBids((prev) => [newBidWithProfile, ...prev].slice(0, 5));
+          }
+        )
+        .subscribe();
+  
+      return () => {
+        supabase.removeChannel(lotChannel);
+        supabase.removeChannel(bidsChannel);
+      };
+    }, [lot.id]);
  
    const placeBid = async (amount: number) => {
      if (!user) {
@@ -211,13 +244,13 @@
    return (
      <div className="container mx-auto px-4 py-8">
        {lot.event && (
-         <Link 
-           to="/eventos/$eventSlug" 
-           params={{ eventSlug: lot.event.slug || "" }} 
-           className="text-sm text-muted-foreground hover:text-gold"
-         >
-           ← {lot.event.name}
-         </Link>
+        <Link 
+            to="/eventos/$eventSlug" 
+            params={{ eventSlug: lot.event?.slug || "" }} 
+            className="text-sm text-muted-foreground hover:text-gold"
+          >
+            ← {lot.event?.name}
+          </Link>
        )}
  
        <div className="mt-4 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
@@ -318,8 +351,8 @@
 
               <TabsContent value="videos" className="mt-6">
                 <div className="grid gap-4">
-                  {lot.animal?.videos && lot.animal.videos.length > 0 ? (
-                    lot.animal.videos.map((url: string, i: number) => (
+                  {lot.animal?.videos && (lot.animal.videos as string[]).length > 0 ? (
+                    (lot.animal.videos as string[]).map((url: string, i: number) => (
                       <div key={i} className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
                         <video src={url} controls className="h-full w-full" />
                       </div>
@@ -437,27 +470,47 @@
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" size="lg" className="border-border hover:bg-secondary"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
               <Button variant="outline" size="lg" className="border-border hover:bg-secondary"><Share2 className="mr-2 h-4 w-4" /> Compartilhar</Button>
-              <Button variant="outline" size="lg" className="col-span-2 border-emerald/30 text-emerald-bright hover:bg-emerald/5" asChild>
-                <a href={`https://wa.me/5511999999999?text=Olá, gostaria de mais informações sobre o Lote ${lot.lot_number}: ${lot.animal?.name}`} target="_blank">
-                  <MessageSquare className="mr-2 h-4 w-4" /> Dúvidas? Fale no WhatsApp
-                </a>
-              </Button>
-            </div>
+               <Button variant="outline" size="lg" className="col-span-2 border-emerald/30 text-emerald-bright hover:bg-emerald/5" asChild>
+                 <a href={`https://wa.me/5511999999999?text=Olá, gostaria de mais informações sobre o Lote ${lot.lot_number}: ${lot.animal?.name}`} target="_blank">
+                   <MessageSquare className="mr-2 h-4 w-4" /> Dúvidas? Fale no WhatsApp
+                 </a>
+               </Button>
+             </div>
  
-           <div className="rounded-2xl border border-border bg-card p-6">
-             <h2 className="font-semibold">Pagamento</h2>
-             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-               {lot.payment_methods && lot.payment_methods.length > 0 ? (
-                 lot.payment_methods.map((method, i) => <li key={i}>• {method}</li>)
-               ) : (
-                 <>
-                   <li>• À vista no PIX (5% desconto)</li>
-                   <li>• Entrada de 30% + 20 parcelas mensais</li>
-                   <li>• Boleto ou transferência bancária</li>
-                 </>
-               )}
-             </ul>
-           </div>
+             {/* Histórico de Lances */}
+             <div className="rounded-2xl border border-border bg-card p-6">
+               <h2 className="flex items-center gap-2 font-semibold"><Zap className="h-4 w-4 text-gold" /> Lances recentes</h2>
+               <div className="mt-4 space-y-3">
+                 {recentBids.length > 0 ? (
+                   recentBids.map((bid: any) => (
+                     <div key={bid.id} className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0 last:pb-0">
+                       <div>
+                         <div className="text-sm font-bold">{bid.profile?.full_name || "Participante"}</div>
+                         <div className="text-[10px] text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString()}</div>
+                       </div>
+                       <div className="text-sm font-black text-gold-bright">{formatBRL(bid.amount)}</div>
+                     </div>
+                   ))
+                 ) : (
+                   <div className="text-center py-4 text-xs text-muted-foreground">Nenhum lance efetuado ainda.</div>
+                 )}
+               </div>
+             </div>
+  
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-semibold">Pagamento</h2>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                {lot.payment_methods && lot.payment_methods.length > 0 ? (
+                  lot.payment_methods.map((method: string, i: number) => <li key={i}>• {method}</li>)
+                ) : (
+                  <>
+                    <li>• À vista no PIX (5% desconto)</li>
+                    <li>• Entrada de 30% + 20 parcelas mensais</li>
+                    <li>• Boleto ou transferência bancária</li>
+                  </>
+                )}
+              </ul>
+            </div>
  
            <div className="rounded-2xl border border-border bg-card p-6">
              <h2 className="flex items-center gap-2 font-semibold"><Award className="h-4 w-4 text-gold" /> Genealogia & saúde</h2>
