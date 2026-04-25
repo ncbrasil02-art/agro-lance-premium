@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { EventStatus } from "@/lib/mock-data";
+import { logger } from "@/utils/logger";
 
 const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
   live: { label: "AO VIVO", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
@@ -16,16 +16,15 @@ const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
 
   export function StatusBadge({ status, className }: { status: string | null | undefined; className?: string }) {
     const safeStatus = (status || "").toLowerCase();
-    const isKnownStatus = status ? safeStatus in map : true; // null/undefined are "known" as Pending
 
     if (status && !map[safeStatus]) {
-      console.warn(`[StatusBadge] Unknown status received: "${status}". Falling back to default styling.`);
+      logger.warn(`Status desconhecido recebido: "${status}". Usando estilo padrão.`, { status });
     }
 
-   const s = map[safeStatus] || { 
-     label: status || "Pendente", 
-     cls: "bg-muted text-muted-foreground border-border" 
-   };
+    const s = map[safeStatus] || { 
+      label: status || "PENDENTE", 
+      cls: "bg-muted text-muted-foreground border-border" 
+    };
  
     return (
       <span 
