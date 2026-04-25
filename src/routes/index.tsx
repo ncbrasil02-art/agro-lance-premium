@@ -24,7 +24,7 @@ import heroImage from "@/assets/hero-horse.jpg";
           .select("*")
           .eq("status", "finished")
           .order("start_date", { ascending: false })
-          .limit(3)
+          .limit(3),
         supabase.from("site_settings")
           .select("*")
           .eq("key", "announcement")
