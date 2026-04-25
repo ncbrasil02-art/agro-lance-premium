@@ -1,5 +1,5 @@
  import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare } from "lucide-react";
  import { formatBRL } from "@/utils/format";
  import { Button } from "@/components/ui/button";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -434,10 +434,15 @@
               </CardContent>
             </Card>
  
-           <div className="flex gap-2">
-             <Button variant="outline" className="flex-1"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
-             <Button variant="outline" className="flex-1"><Share2 className="mr-2 h-4 w-4" /> Compartilhar</Button>
-           </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="lg" className="border-border hover:bg-secondary"><Heart className="mr-2 h-4 w-4" /> Acompanhar</Button>
+              <Button variant="outline" size="lg" className="border-border hover:bg-secondary"><Share2 className="mr-2 h-4 w-4" /> Compartilhar</Button>
+              <Button variant="outline" size="lg" className="col-span-2 border-emerald/30 text-emerald-bright hover:bg-emerald/5" asChild>
+                <a href={`https://wa.me/5511999999999?text=Olá, gostaria de mais informações sobre o Lote ${lot.lot_number}: ${lot.animal?.name}`} target="_blank">
+                  <MessageSquare className="mr-2 h-4 w-4" /> Dúvidas? Fale no WhatsApp
+                </a>
+              </Button>
+            </div>
  
            <div className="rounded-2xl border border-border bg-card p-6">
              <h2 className="font-semibold">Pagamento</h2>
