@@ -245,11 +245,18 @@ function AdminLayout() {
             </>
           )}
 
-          {activeTab === "events" && <EventManagement onManageLots={handleManageLots} />}
+          {activeTab === "events" && (
+            <EventManagement 
+              onManageLots={handleManageLots} 
+              onNavigate={() => setActiveTab("animals")} 
+            />
+          )}
           {activeTab === "lots" && (
             <LotManagement 
               initialEventId={selectedEventId} 
               onEventChange={setSelectedEventId} 
+              onNavigateToAnimals={() => setActiveTab("animals")}
+              onNavigateToEvents={() => setActiveTab("events")}
             />
           )}
           {activeTab === "animals" && <AnimalManagement />}
