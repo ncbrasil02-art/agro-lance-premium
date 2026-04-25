@@ -36,6 +36,7 @@ export type Database = {
           species: string | null
           updated_at: string
           vaccination_records: Json | null
+          veterinary_history: Json | null
           videos: string[] | null
           weight: number | null
           youtube_url: string | null
@@ -61,6 +62,7 @@ export type Database = {
           species?: string | null
           updated_at?: string
           vaccination_records?: Json | null
+          veterinary_history?: Json | null
           videos?: string[] | null
           weight?: number | null
           youtube_url?: string | null
@@ -86,6 +88,7 @@ export type Database = {
           species?: string | null
           updated_at?: string
           vaccination_records?: Json | null
+          veterinary_history?: Json | null
           videos?: string[] | null
           weight?: number | null
           youtube_url?: string | null
