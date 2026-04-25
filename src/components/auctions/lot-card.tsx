@@ -5,20 +5,22 @@ import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
 
-export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string } }) {
+export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEndDate?: string; allowsPreBidding?: boolean } }) {
   const getDynamicStatus = () => {
     const now = new Date();
     const eventStart = lot.eventStartDate ? new Date(lot.eventStartDate) : null;
+    const eventEnd = lot.eventEndDate ? new Date(lot.eventEndDate) : null;
     
     if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+    if (eventEnd && now >= eventEnd) return 'finished';
     if (lot.status === 'active') return 'recebendo_lances';
     
     if (eventStart && now < eventStart) {
-      return 'loteamento';
+      return lot.allowsPreBidding ? 'pre_lance' : 'loteamento';
     }
-    
-    if (lot.status === 'upcoming' || lot.status === 'open') {
-      return 'pre_lance';
+
+    if (eventStart && now >= eventStart && (!eventEnd || now < eventEnd)) {
+      return 'recebendo_lances';
     }
     
     return lot.status;

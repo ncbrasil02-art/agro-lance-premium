@@ -194,16 +194,18 @@ function LotDetail() {
   const getLotStatus = () => {
     const now = new Date();
     const eventStart = lot.event?.start_date ? new Date(lot.event.start_date) : null;
+    const eventEnd = lot.event?.end_date ? new Date(lot.event.end_date) : null;
     
     if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+    if (eventEnd && now >= eventEnd) return 'finished';
     if (lot.status === 'active') return 'recebendo_lances';
     
     if (eventStart && now < eventStart) {
-      return 'loteamento';
+      return lot.event?.allows_pre_bidding ? 'pre_lance' : 'loteamento';
     }
     
-    if (lot.status === 'upcoming' || lot.status === 'open') {
-      return 'pre_lance';
+    if (eventStart && now >= eventStart && (!eventEnd || now < eventEnd)) {
+      return 'recebendo_lances';
     }
     
     return lot.status;
