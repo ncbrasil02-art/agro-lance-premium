@@ -1,3 +1,14 @@
+ 
+ export const siteSettingsSchema = z.object({
+   key: z.string(),
+   value: z.any(),
+ });
+ 
+ export const announcementSchema = z.object({
+   active: z.boolean().default(false),
+   text: z.string().default(""),
+   link: z.string().nullable().optional(),
+ });
  import { z } from "zod";
  
  export const eventSchema = z.object({
