@@ -8,8 +8,10 @@ export function EventCard({ event }: { event: AuctionEvent }) {
   return (
     <Link
       to="/eventos/$eventSlug"
-      params={{ eventSlug: event.slug }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant"
+       params={{ eventSlug: event.slug }}
+       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+       aria-labelledby={`event-title-${event.id}`}
+     >
     >
       <div className="relative aspect-video overflow-hidden">
         <img 
@@ -29,20 +31,20 @@ export function EventCard({ event }: { event: AuctionEvent }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 p-4 text-xs">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="h-3.5 w-3.5 text-gold" />
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Data do evento: ${event?.date ? formatDateBR(event.date) : "--"}`}>
+           <Calendar className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
           <span suppressHydrationWarning>{event?.date ? formatDateBR(event.date) : "--"}</span>
         </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5 text-gold" />
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Localização: ${event?.city || ""}/${event?.state || ""}`}>
+           <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
           <span>{event?.city || ""}/{event?.state || ""}</span>
         </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Gavel className="h-3.5 w-3.5 text-gold" />
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Total de lotes: ${event?.lotsCount || 0}`}>
+           <Gavel className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
           <span>{event?.lotsCount || 0} lotes</span>
         </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Users className="h-3.5 w-3.5 text-gold" />
+         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`${(event?.viewers || 0).toLocaleString("pt-BR")} visualizações`}>
+           <Users className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
           <span>{(event?.viewers || 0).toLocaleString("pt-BR")} visualizações</span>
         </div>
       </div>
