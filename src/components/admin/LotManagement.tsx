@@ -214,18 +214,6 @@ import { Link } from "@tanstack/react-router";
        if (onEventChange) onEventChange(val);
      };
  
-   const filteredLots = lots.filter(lot => {
-     const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          lot.lot_number?.toString().includes(searchQuery);
-     const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
-     return matchesSearch && matchesEvent;
-   });
- 
-   const totalPages = Math.ceil(filteredLots.length / ITEMS_PER_PAGE);
-   const paginatedLots = filteredLots.slice(
-     (currentPage - 1) * ITEMS_PER_PAGE,
-     currentPage * ITEMS_PER_PAGE
-   );
 
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja remover este lote? O animal voltará a ficar disponível para outros eventos.")) return;
