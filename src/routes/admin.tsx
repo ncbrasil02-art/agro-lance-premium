@@ -1,7 +1,7 @@
  import { useState, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
- import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink } from "lucide-react";
+ import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2 } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
@@ -14,9 +14,10 @@ export const Route = createFileRoute("/admin")({
 
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
- import { AnimalManagement } from "@/components/admin/AnimalManagement";
+  import { AnimalManagement } from "@/components/admin/AnimalManagement";
+  import { SellerManagement } from "@/components/admin/SellerManagement";
  
- type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
+  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "users" | "settings";
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -29,8 +30,9 @@ export const Route = createFileRoute("/admin")({
    const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
      { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
      { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
-     { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
-     { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+      { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
+      { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+      { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
      { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
    ];
@@ -241,6 +243,7 @@ function AdminLayout() {
             />
           )}
           {activeTab === "animals" && <AnimalManagement />}
+          {activeTab === "sellers" && <SellerManagement />}
           {activeTab === "users" && (
             <Card>
               <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
