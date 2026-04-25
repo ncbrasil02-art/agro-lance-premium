@@ -1,6 +1,8 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from "lucide-react";
-  import { Countdown } from "@/components/auctions/countdown";
+import { Countdown } from "@/components/auctions/countdown";
+import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
+import { useEffect, useState } from "react";
   import { logger } from "@/utils/logger";
  import { Button } from "@/components/ui/button";
  import { EventCard } from "@/components/auctions/event-card";
@@ -71,7 +73,13 @@ import heroImage from "@/assets/hero-horse.jpg";
 
 function Home() {
     const { events, lots, pastEvents, announcement } = Route.useLoaderData();
- 
+    const [now, setNow] = useState(Date.now());
+
+    useEffect(() => {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
+    }, []);
+
     const mapEvent = (e: ValidatedEvent) => ({
      id: e.id,
      slug: e.slug || "",
@@ -114,12 +122,34 @@ function Home() {
       allowsPreBidding: (l as any).event?.allows_pre_bidding,
     }));
  
-      const liveEvents = mappedEvents.filter((e: any) => e.status === "live");
-      const upcomingEvents = mappedEvents.filter((e: any) => e.status === "scheduled");
+      const liveEvents = mappedEvents.filter((e: any) => {
+        const status = getEffectiveEventStatus({ 
+          status: e.status, 
+          start_date: e.date, 
+          end_date: e.end_date 
+        });
+        return status === "live";
+      });
+
+      const upcomingEvents = mappedEvents.filter((e: any) => {
+        const status = getEffectiveEventStatus({ 
+          status: e.status, 
+          start_date: e.date, 
+          end_date: e.end_date 
+        });
+        return status === "scheduled";
+      });
      
      // Find the closest upcoming event with countdown enabled
       const nextEvent = mappedEvents
-        .filter((e: any) => e.status !== 'finished' && e.show_countdown && new Date(e.date) > new Date())
+        .filter((e: any) => {
+          const status = getEffectiveEventStatus({ 
+            status: e.status, 
+            start_date: e.date, 
+            end_date: e.end_date 
+          });
+          return status === 'scheduled' && e.show_countdown;
+        })
         .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
  
