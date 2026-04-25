@@ -12,7 +12,7 @@
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  
-  export function EventManagement() {
+  export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -322,8 +322,18 @@
                            {getStatusLabel(event.status)}
                          </span>
                        </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            {onManageLots && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 px-2"
+                                onClick={() => onManageLots(event.id)}
+                              >
+                                <Plus className="mr-1 h-3 w-3" /> Lotes
+                              </Button>
+                            )}
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
                             <Pencil className="h-4 w-4" />
                           </Button>

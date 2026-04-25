@@ -15,11 +15,17 @@ export const Route = createFileRoute("/admin")({
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
  
- type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
+  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "users" | "settings";
  
 function AdminLayout() {
    const { profile, isLoading, signOut } = useAuth();
    const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+
+   const handleManageLots = (eventId: string) => {
+     setSelectedEventId(eventId);
+     setActiveTab("lots");
+   };
 
   if (isLoading) {
     return (
@@ -155,7 +161,8 @@ function AdminLayout() {
                     <CardDescription>Gerencie o conteúdo principal do seu leilão.</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-4 md:grid-cols-3">
-                    <Button className="w-full bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => setActiveTab("events")}>Criar Novo Evento</Button>
+                     <Button className="w-full bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => setActiveTab("events")}>Criar Novo Evento</Button>
+                     <Button variant="outline" className="w-full" onClick={() => setActiveTab("lots")}>Alocar Animais (Lotes)</Button>
                      <Button 
                        variant="outline" 
                        className="w-full"
@@ -185,8 +192,13 @@ function AdminLayout() {
             </>
           )}
 
-          {activeTab === "events" && <EventManagement />}
-          {activeTab === "lots" && <LotManagement />}
+          {activeTab === "events" && <EventManagement onManageLots={handleManageLots} />}
+          {activeTab === "lots" && (
+            <LotManagement 
+              initialEventId={selectedEventId} 
+              onEventChange={setSelectedEventId} 
+            />
+          )}
           {activeTab === "animals" && <AnimalManagement />}
           {activeTab === "users" && (
             <Card>

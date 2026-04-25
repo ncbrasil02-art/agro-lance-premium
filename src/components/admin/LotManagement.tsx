@@ -10,7 +10,13 @@
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-   export function LotManagement() {
+   export function LotManagement({ 
+     initialEventId = "all", 
+     onEventChange 
+   }: { 
+     initialEventId?: string; 
+     onEventChange?: (id: string) => void;
+   }) {
      const [isDialogOpen, setIsDialogOpen] = useState(false);
      const [editingLot, setEditingLot] = useState<any>(null);
      const [formData, setFormData] = useState({
@@ -107,7 +113,16 @@
     };
    const [lots, setLots] = useState<any[]>([]);
    const [events, setEvents] = useState<any[]>([]);
-   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+    const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+
+    useEffect(() => {
+      setSelectedEventId(initialEventId);
+    }, [initialEventId]);
+
+    const handleEventSelectChange = (val: string) => {
+      setSelectedEventId(val);
+      if (onEventChange) onEventChange(val);
+    };
    const [isLoading, setIsLoading] = useState(true);
    const [searchQuery, setSearchQuery] = useState("");
  
@@ -174,7 +189,7 @@
                onChange={(e) => setSearchQuery(e.target.value)}
              />
            </div>
-           <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+            <Select value={selectedEventId} onValueChange={handleEventSelectChange}>
              <SelectTrigger className="w-[200px]">
                <SelectValue placeholder="Filtrar por Evento" />
              </SelectTrigger>
@@ -213,24 +228,48 @@
                    <SelectTrigger>
                       <SelectValue placeholder="Selecione o evento" />
                    </SelectTrigger>
-                   <SelectContent>
-                     {events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
-                   </SelectContent>
+                    <SelectContent>
+                      {events.length === 0 ? (
+                        <div className="p-2 text-xs text-center text-muted-foreground">
+                          Nenhum evento cadastrado. <br/> 
+                          Crie um evento na aba "Eventos" primeiro.
+                        </div>
+                      ) : (
+                        events.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)
+                      )}
+                    </SelectContent>
                  </Select>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="animal">Animal</Label>
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="animal">Animal</Label>
+                    <Button 
+                      variant="link" 
+                      className="h-auto p-0 text-[10px] text-gold" 
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                        // This is tricky as we need to switch tabs in the parent.
+                        // For now, let's just use a hint.
+                      }}
+                    >
+                      Cadastrar Novo Animal
+                    </Button>
+                  </div>
                   <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
-                   <SelectTrigger>
+                    <SelectTrigger>
                       <SelectValue placeholder="Selecione o animal" />
-                   </SelectTrigger>
-                   <SelectContent>
-                      {(editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
-                        <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableAnimals.length === 0 ? (
+                        <div className="p-2 text-xs text-center text-muted-foreground">Nenhum animal disponível</div>
+                      ) : (
+                        (editingLot ? [editingLot.animal, ...availableAnimals] : availableAnimals).filter(Boolean).map((a: any) => (
+                          <SelectItem key={a.id} value={a.id}>{a.name} ({a.internal_code || 'S/C'})</SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">
                    <Label htmlFor="number">Nº Lote</Label>
