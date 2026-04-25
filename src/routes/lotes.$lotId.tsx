@@ -241,43 +241,43 @@
   const installments = 30; // Exemplo de 30 parcelas
   const installmentValue = currentPrice / installments;
  
-    return (
-      <div className="min-h-screen bg-background">
-        {/* Header Auditor de Lances */}
-        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50">
-          <div className="container mx-auto px-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link 
-                to="/eventos/$eventSlug" 
-                params={{ eventSlug: lot.event?.slug || "" }} 
-                className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-gold hover:text-emerald-deep transition-all"
-              >
-                ←
-              </Link>
-              <div>
-                <h1 className="text-white font-bold tracking-tight text-lg">Auditor de Lances</h1>
-                <p className="text-gold/80 text-[10px] uppercase font-bold tracking-widest">{lot.event?.name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {lot.status === 'active' && (
-                <div className="flex items-center gap-2 bg-live/20 border border-live/30 px-3 py-1 rounded-full">
-                  <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse" />
-                  <span className="text-live text-[10px] font-bold">AO VIVO</span>
-                </div>
-              )}
-              <div className="hidden md:flex flex-col text-right">
-                <span className="text-white/60 text-[9px] uppercase tracking-wider">Lote</span>
-                <span className="text-white font-black text-xl">#{String(lot.lot_number).padStart(2, "0")}</span>
-              </div>
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header Auditor de Lances */}
+      <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link 
+              to="/eventos/$eventSlug" 
+              params={{ eventSlug: lot.event?.slug || "" }} 
+              className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-gold hover:text-emerald-deep transition-all"
+            >
+              ←
+            </Link>
+            <div>
+              <h1 className="text-white font-bold tracking-tight text-lg md:text-xl">Auditor de Lances</h1>
+              <p className="text-gold/80 text-[10px] uppercase font-bold tracking-widest">{lot.event?.name}</p>
             </div>
           </div>
-        </header>
+          <div className="flex items-center gap-3">
+            {lot.status === 'active' && (
+              <div className="flex items-center gap-2 bg-live/20 border border-live/30 px-3 py-1 rounded-full">
+                <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse" />
+                <span className="text-live text-[10px] font-bold tracking-tighter">AO VIVO</span>
+              </div>
+            )}
+            <div className="flex flex-col text-right">
+              <span className="text-white/60 text-[9px] uppercase tracking-wider">Lote</span>
+              <span className="text-white font-black text-xl md:text-2xl">#{String(lot.lot_number).padStart(2, "0")}</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
-         {/* Galeria */}
-         <div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+          {/* Galeria e Detalhes */}
+          <div className="space-y-8">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
             <img 
               src={lot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
@@ -416,13 +416,194 @@
                 </div>
               </TabsContent>
             </Tabs>
+            </div>
+          </div>
+
+          {/* Painel de Lances (Auditor) */}
+          <div className="space-y-6">
+            <div className="p-1 rounded-3xl bg-gold-gradient shadow-gold">
+              <Card className="border-0 shadow-none overflow-hidden rounded-[22px] bg-card/95 backdrop-blur-md">
+                <div className="bg-emerald-deep p-4 text-white flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Gavel className="h-4 w-4 text-gold" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Painel de Lances</span>
+                  </div>
+                  {lot.end_date && (
+                    <div className="flex items-center gap-2 bg-black/30 px-3 py-1 rounded-full border border-white/10">
+                      <span className="text-[10px] font-medium text-white/70">Faltam:</span>
+                      <Countdown endsAt={lot.end_date as string} className="font-mono text-sm font-bold text-gold" />
+                    </div>
+                  )}
+                </div>
+                <CardContent className="p-6">
+                  <div className="space-y-1">
+                    <h1 className="text-3xl font-bold tracking-tight">{lot.animal?.name}</h1>
+                    <p className="text-sm text-muted-foreground">{lot.animal?.breed} · {lot.animal?.species}</p>
+                  </div>
+
+                  <div className="mt-8 p-6 rounded-2xl bg-secondary/50 border border-border/50">
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Oferta Atual</div>
+                        <div className="text-5xl font-black text-gradient-gold tracking-tighter leading-none">
+                          {formatBRL(currentPrice)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Entrada + Parcelas</div>
+                        <div className="text-lg font-bold text-foreground">
+                          {installments}x de {formatBRL(installmentValue)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-border/30">
+                      <InstallmentSimulator price={currentPrice} />
+                    </div>
+                  </div>
+
+                  <div className="mt-8 space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      {[1, 2, 5].map((m) => (
+                        <Button 
+                          key={m} 
+                          variant="outline" 
+                          className="border-gold/20 hover:bg-gold/5 h-14 flex flex-col group transition-all"
+                          disabled={isBidding || lot.status !== "active"}
+                          onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}
+                        >
+                          <span className="text-[9px] uppercase tracking-tighter text-muted-foreground group-hover:text-gold transition-colors">+{m} incremento{m > 1 ? 's' : ''}</span>
+                          <span className="font-bold text-sm text-foreground group-hover:scale-105 transition-transform">+{formatBRL(lot.bid_increment * m)}</span>
+                        </Button>
+                      ))}
+                    </div>
+
+                    <div className="relative py-2">
+                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
+                      <div className="relative flex justify-center text-[10px] uppercase tracking-widest"><span className="bg-card px-3 text-muted-foreground font-bold">Lance Rápido</span></div>
+                    </div>
+
+                    <Button 
+                      size="lg" 
+                      className="w-full h-16 bg-gold-gradient text-emerald-deep font-black text-xl hover:opacity-90 shadow-gold transition-all active:scale-[0.97]"
+                      disabled={isBidding || lot.status !== "active"}
+                      onClick={() => placeBid(nextBid)}
+                    >
+                      {isBidding ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Gavel className="mr-2 h-6 w-6" />}
+                      CONFIRMAR LANCE DE {formatBRL(nextBid)}
+                    </Button>
+                    
+                    <div className="p-4 rounded-xl bg-gold/5 border border-gold/10 text-center">
+                      <p className="text-[11px] text-muted-foreground leading-tight">
+                        {!user ? (
+                          <Link to="/login" className="text-gold hover:underline font-bold uppercase tracking-wider">Faça login para dar lances</Link>
+                        ) : !profile?.is_approved ? (
+                          <span className="text-destructive font-bold uppercase tracking-wider">Conta aguardando aprovação administrativa</span>
+                        ) : (
+                          "Lances confirmados são irrevogáveis. Verifique o incremento mínimo: " + formatBRL(lot.bid_increment)
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="outline" size="lg" className="rounded-2xl border-border hover:bg-secondary h-12">
+                <Heart className="mr-2 h-4 w-4" /> Favoritar
+              </Button>
+              <Button variant="outline" size="lg" className="rounded-2xl border-border hover:bg-secondary h-12">
+                <Share2 className="mr-2 h-4 w-4" /> Compartilhar
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="col-span-2 rounded-2xl border-emerald/30 text-emerald-bright hover:bg-emerald/5 h-12" 
+                asChild
+              >
+                <a href={`https://wa.me/5511999999999?text=Olá, gostaria de mais informações sobre o Lote ${lot.lot_number}: ${lot.animal?.name}`} target="_blank">
+                  <MessageSquare className="mr-2 h-4 w-4" /> Dúvidas? Fale com a equipe no WhatsApp
+                </a>
+              </Button>
+            </div>
+
+            {/* Histórico de Lances */}
+            <Card className="rounded-3xl border border-border bg-card overflow-hidden">
+              <CardHeader className="bg-secondary/30 pb-4 border-b border-border/50">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-gold" />
+                  Lances Recentes no Lote
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  {recentBids.length > 0 ? (
+                    recentBids.map((bid: any, i: number) => (
+                      <div 
+                        key={bid.id} 
+                        className={`flex items-center justify-between p-3 rounded-xl transition-all ${i === 0 ? 'bg-gold/10 border border-gold/20 scale-[1.02]' : 'border border-transparent'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs ${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-secondary text-muted-foreground'}`}>
+                            {bid.profile?.full_name?.charAt(0) || "P"}
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold">{bid.profile?.full_name || "Participante"}</div>
+                            <div className="text-[10px] text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString()}</div>
+                          </div>
+                        </div>
+                        <div className={`font-black tracking-tight ${i === 0 ? 'text-gold-bright text-lg' : 'text-foreground'}`}>
+                          {formatBRL(bid.amount)}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Gavel className="h-8 w-8 text-muted-foreground/20 mx-auto mb-2" />
+                      <p className="text-xs text-muted-foreground">Nenhum lance efetuado ainda.</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="rounded-3xl border border-border bg-card p-6">
+              <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
+                <Info className="h-5 w-5 text-gold" />
+                Condições de Pagamento
+              </h2>
+              <ul className="space-y-3">
+                {lot.payment_methods && lot.payment_methods.length > 0 ? (
+                  lot.payment_methods.map((method: string, i: number) => (
+                    <li key={i} className="flex gap-3 text-sm text-muted-foreground">
+                      <span className="text-gold font-bold text-lg leading-none mt-1">•</span>
+                      {method}
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li className="flex gap-3 text-sm text-muted-foreground">
+                      <span className="text-gold font-bold text-lg leading-none mt-1">•</span>
+                      À vista no PIX com 5% de desconto direto.
+                    </li>
+                    <li className="flex gap-3 text-sm text-muted-foreground">
+                      <span className="text-gold font-bold text-lg leading-none mt-1">•</span>
+                      Plano Ouro: Entrada de 30% + 20 parcelas fixas mensais.
+                    </li>
+                    <li className="flex gap-3 text-sm text-muted-foreground">
+                      <span className="text-gold font-bold text-lg leading-none mt-1">•</span>
+                      Boleto Bancário ou TED mediante aprovação cadastral.
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
           </div>
         </div>
- 
-         {/* Info + Lance */}
-         <div className="space-y-6">
-           <div>
-             <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{lot.animal?.name}</h1>
+      </div>
+    </div>
+  );
+}
              <p className="mt-1 text-muted-foreground">{lot.animal?.breed} · {lot.animal?.species}</p>
              <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {lot.viewers || 0} acompanhando</span>
