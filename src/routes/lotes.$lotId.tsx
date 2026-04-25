@@ -415,7 +415,12 @@ function LotDetail() {
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-gold uppercase tracking-wider">Lances em breve</p>
                           <p className="text-[11px] text-white/70 leading-relaxed">
-                            Este lote está em fase de loteamento. Os lances serão liberados assim que o evento for iniciado ou o pré-lance for autorizado pelo administrador.
+                            Este lote está em fase de loteamento. 
+                            {lot.event?.start_date ? (
+                              <> Os lances abrem automaticamente em <b>{new Date(lot.event.start_date).toLocaleDateString('pt-BR')} às {new Date(lot.event.start_date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</b>.</>
+                            ) : (
+                              <> Os lances serão liberados assim que o evento for iniciado ou o pré-lance for autorizado.</>
+                            )}
                           </p>
                         </div>
                       </div>
