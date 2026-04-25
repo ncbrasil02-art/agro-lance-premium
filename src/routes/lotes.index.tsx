@@ -56,9 +56,10 @@ function LotsPage() {
      minIncrement: l.bid_increment,
      bidsCount: l.bids_count || 0,
      viewers: l.viewers || 0,
-     endsAt: l.end_date || "",
-     status: l.status as any,
-   }));
+      endsAt: l.end_date || "",
+      status: l.status as any,
+      eventStartDate: l.event?.start_date,
+    }));
  
   return (
     <div className="container mx-auto px-4 py-12">
