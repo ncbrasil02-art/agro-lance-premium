@@ -7,7 +7,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Loader2, CheckCircle, XCircle, Shield, User } from "lucide-react";
 import { toast } from "sonner";
 
-export function UserManagement({ searchQuery, onSearchChange }: { searchQuery: string; onSearchChange: (val: string) => void }) {
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+export function UserManagement({ 
+  searchQuery, 
+  onSearchChange,
+  currentPage,
+  onPageChange
+}: { 
+  searchQuery: string; 
+  onSearchChange: (val: string) => void;
+  currentPage: number;
+  onPageChange: (val: number) => void;
+}) {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,10 +60,18 @@ export function UserManagement({ searchQuery, onSearchChange }: { searchQuery: s
     }
   };
 
+  const ITEMS_PER_PAGE = 8;
+
   const filteredUsers = users.filter(user => 
     user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.cpf?.includes(searchQuery) ||
     user.phone?.includes(searchQuery)
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
   );
 
   return (
@@ -91,14 +111,14 @@ export function UserManagement({ searchQuery, onSearchChange }: { searchQuery: s
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.length === 0 ? (
+                {paginatedUsers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                       Nenhum usuário encontrado.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredUsers.map((user) => (
+                  paginatedUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -144,6 +164,27 @@ export function UserManagement({ searchQuery, onSearchChange }: { searchQuery: s
                 )}
               </TableBody>
             </Table>
+            <TableBody>
+            </TableBody>
+          </Table>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-4 border-t">
+              <div className="text-xs text-muted-foreground">
+                Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} até {Math.min(currentPage * ITEMS_PER_PAGE, filteredUsers.length)} de {filteredUsers.length} registros
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <div className="text-xs font-medium">Página {currentPage} de {totalPages}</div>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          </>
           )}
         </CardContent>
       </Card>
