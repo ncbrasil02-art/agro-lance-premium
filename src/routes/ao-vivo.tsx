@@ -71,7 +71,7 @@ export const Route = createFileRoute("/ao-vivo")({
               .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
               .eq("id", liveEvent.id)
              .single();
-           if (data) setLiveEvent(data);
+            if (data) setLiveEvent(data as any);
          }
        )
        .subscribe();
