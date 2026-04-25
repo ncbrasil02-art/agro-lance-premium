@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/lotes/\$lotId")({
+export const Route = createFileRoute("/lotes.$lotId")({
   loader: async ({ params }) => {
     const [lotRes, bidsRes] = await Promise.all([
       supabase
@@ -176,7 +176,7 @@ function LotDetail() {
       <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/eventos/\$eventSlug" params={{ eventSlug: lot.event?.slug || "" }} className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-gold hover:text-emerald-deep transition-all"> ← </Link>
+            <Link to="/eventos/$eventSlug" params={{ eventSlug: lot.event?.slug || "" }} className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-gold hover:text-emerald-deep transition-all"> ← </Link>
             <div>
               <h1 className="text-white font-bold tracking-tight text-lg md:text-xl uppercase">Auditor de Lances</h1>
               <p className="text-gold/80 text-[10px] uppercase font-bold tracking-widest">{lot.event?.name}</p>
