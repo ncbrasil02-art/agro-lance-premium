@@ -380,6 +380,9 @@ export type Database = {
           additional_info: string | null
           category: string | null
           created_at: string
+          email: string | null
+          estimated_animals: string | null
+          estimated_date: string | null
           id: string
           location: string | null
           name: string
@@ -391,6 +394,9 @@ export type Database = {
           additional_info?: string | null
           category?: string | null
           created_at?: string
+          email?: string | null
+          estimated_animals?: string | null
+          estimated_date?: string | null
           id?: string
           location?: string | null
           name: string
@@ -402,6 +408,9 @@ export type Database = {
           additional_info?: string | null
           category?: string | null
           created_at?: string
+          email?: string | null
+          estimated_animals?: string | null
+          estimated_date?: string | null
           id?: string
           location?: string | null
           name?: string
