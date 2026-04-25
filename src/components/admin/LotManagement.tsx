@@ -4,32 +4,38 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Eye, ChevronLeft, ChevronRight, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { Link } from "@tanstack/react-router";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  
-    export function LotManagement({ 
-      initialEventId = "all", 
-      onEventChange,
-      onNavigateToAnimals,
-      onNavigateToEvents,
-      searchQuery,
-      onSearchChange,
-      currentPage,
-      onPageChange
-    }: { 
-      initialEventId?: string; 
-      onEventChange?: (id: string) => void;
-      onNavigateToAnimals?: () => void;
-      onNavigateToEvents?: () => void;
-      searchQuery: string;
-      onSearchChange: (val: string) => void;
-      currentPage: number;
-      onPageChange: (val: number) => void;
-    }) {
+  export function LotManagement({ 
+    initialEventId = "all", 
+    onEventChange,
+    onNavigateToAnimals,
+    onNavigateToEvents,
+    searchQuery,
+    onSearchChange,
+    currentPage,
+    onPageChange,
+    sortColumn,
+    sortDirection,
+    onSortChange
+  }: { 
+    initialEventId?: string; 
+    onEventChange?: (id: string) => void;
+    onNavigateToAnimals?: () => void;
+    onNavigateToEvents?: () => void;
+    searchQuery: string;
+    onSearchChange: (val: string) => void;
+    currentPage: number;
+    onPageChange: (val: number) => void;
+    sortColumn: string;
+    sortDirection: "asc" | "desc";
+    onSortChange: (col: string, dir: "asc" | "desc") => void;
+  }) {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const [isLoading, setIsLoading] = useState(true);
       const [lots, setLots] = useState<any[]>([]);
