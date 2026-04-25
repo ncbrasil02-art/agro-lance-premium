@@ -20,6 +20,7 @@ export type Database = {
           breed: string | null
           color: string | null
           created_at: string
+          description: string | null
           genealogy: Json | null
           health_info: Json | null
           height: number | null
@@ -43,6 +44,7 @@ export type Database = {
           breed?: string | null
           color?: string | null
           created_at?: string
+          description?: string | null
           genealogy?: Json | null
           health_info?: Json | null
           height?: number | null
@@ -66,6 +68,7 @@ export type Database = {
           breed?: string | null
           color?: string | null
           created_at?: string
+          description?: string | null
           genealogy?: Json | null
           health_info?: Json | null
           height?: number | null
