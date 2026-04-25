@@ -4,7 +4,8 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Eye } from "lucide-react";
+import { Link } from "@tanstack/react-router";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
@@ -436,8 +437,18 @@
                            {lot.status === 'active' ? 'Ativo' : 'Pausado'}
                          </span>
                        </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                       <TableCell className="text-right">
+                         <div className="flex justify-end gap-1 md:gap-2">
+                           <Button 
+                             variant="ghost" 
+                             size="icon" 
+                             asChild
+                             title="Visualizar Lote"
+                           >
+                             <Link to={`/lotes/${lot.id}`} target="_blank">
+                               <Eye className="h-4 w-4 text-gold" />
+                             </Link>
+                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(lot)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
