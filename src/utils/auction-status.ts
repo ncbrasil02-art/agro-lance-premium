@@ -1,4 +1,53 @@
+import { useState, useEffect } from 'react';
+
 export type AuctionStatus = 'loteamento' | 'pre_lance' | 'recebendo_lances' | 'sold' | 'finished' | 'scheduled' | 'live';
+
+export function useEffectiveLotStatus(lot: {
+  status: string;
+  event_status?: string;
+  event_start_date?: string | null;
+  event_end_date?: string | null;
+  allows_pre_bidding?: boolean;
+}) {
+  const [status, setStatus] = useState(() => getEffectiveLotStatus(lot));
+
+  useEffect(() => {
+    const updateStatus = () => {
+      const nextStatus = getEffectiveLotStatus(lot);
+      setStatus(prev => prev !== nextStatus ? nextStatus : prev);
+    };
+
+    // Update every second to ensure smooth transition
+    const interval = setInterval(updateStatus, 1000);
+    updateStatus(); // Initial check
+
+    return () => clearInterval(interval);
+  }, [lot.status, lot.event_status, lot.event_start_date, lot.event_end_date, lot.allows_pre_bidding]);
+
+  return status;
+}
+
+export function useEffectiveEventStatus(event: {
+  status: string;
+  start_date: string;
+  end_date?: string | null;
+}) {
+  const [status, setStatus] = useState(() => getEffectiveEventStatus(event));
+
+  useEffect(() => {
+    const updateStatus = () => {
+      const nextStatus = getEffectiveEventStatus(event);
+      setStatus(prev => prev !== nextStatus ? nextStatus : prev);
+    };
+
+    const interval = setInterval(updateStatus, 1000);
+    updateStatus();
+
+    return () => clearInterval(interval);
+  }, [event.status, event.start_date, event.end_date]);
+
+  return status;
+}
 
 export function getEffectiveEventStatus(event: {
   status: string;
