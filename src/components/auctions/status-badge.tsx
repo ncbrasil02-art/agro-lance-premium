@@ -8,7 +8,7 @@ const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
   upcoming: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
   scheduled: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
   loteamento: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30" },
-  pre_lance: { label: "ACEITA PRÉ-LANCE", cls: "bg-emerald/15 text-emerald-bright border-emerald/30" },
+  pre_lance: { label: "PRÉ-LANCE ABERTO", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]", dot: true },
   recebendo_lances: { label: "RECEBENDO LANCES", cls: "bg-live/15 text-live border-live/50 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse", dot: true },
   closed: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   finished: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
