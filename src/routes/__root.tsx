@@ -3,6 +3,7 @@ import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/site/theme-provider";
 import { SiteShell } from "@/components/site/site-shell";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -67,6 +68,7 @@ function RootComponent() {
         <SiteShell>
           <Outlet />
         </SiteShell>
+        <Toaster />
       </ThemeProvider>
     </AuthProvider>
   );

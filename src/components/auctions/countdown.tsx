@@ -14,10 +14,10 @@ export function Countdown({ endsAt, className }: { endsAt: string; className?: s
   const m = Math.floor((diff % 3_600_000) / 60_000);
   const s = Math.floor((diff % 60_000) / 1000);
 
-  if (diff === 0) return <span className={className}>Encerrado</span>;
+  if (diff === 0) return <span className={className} suppressHydrationWarning>Encerrado</span>;
 
   return (
-    <span className={className}>
+    <span className={className} suppressHydrationWarning>
       {d > 0 ? `${d}d ` : ""}
       {String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
     </span>

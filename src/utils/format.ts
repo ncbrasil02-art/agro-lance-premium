@@ -7,6 +7,7 @@
  }
  
  export function formatDateBR(iso: string) {
+  if (!iso) return "";
   return new Date(iso).toLocaleString("pt-BR", {
     day: "2-digit",
     month: "long",
