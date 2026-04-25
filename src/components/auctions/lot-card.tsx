@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Eye, Gavel } from "lucide-react";
+import { Eye, Gavel, Info } from "lucide-react";
 import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
@@ -30,8 +30,19 @@ export function LotCard({ lot }: { lot: Lot & { eventStartDate?: string; eventEn
           className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
-        <div className="absolute left-3 top-3 flex flex-col gap-2">
+        <div className="absolute left-3 top-3 flex flex-col gap-2 items-start">
           <StatusBadge status={dynamicStatus} />
+          {dynamicStatus === 'loteamento' && (
+            <div className="group/info relative">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-gold backdrop-blur-md border border-gold/30 cursor-help">
+                <Info className="h-3.5 w-3.5" />
+              </div>
+              <div className="absolute left-0 top-8 z-50 hidden w-48 rounded-xl bg-emerald-deep p-3 text-[10px] text-white/90 shadow-2xl border border-white/10 group-hover:block animate-in fade-in zoom-in-95">
+                <p className="font-bold text-gold uppercase mb-1">Em Loteamento</p>
+                Lances ainda não abertos. Aguarde o início do evento ou liberação do pré-lance.
+              </div>
+            </div>
+          )}
         </div>
         <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur">
           LOTE {lot?.number ? String(lot.number).padStart(2, "0") : "--"}
