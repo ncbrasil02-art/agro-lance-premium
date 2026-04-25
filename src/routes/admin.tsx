@@ -160,9 +160,16 @@ function AdminLayout() {
                     <CardTitle>Ações Rápidas</CardTitle>
                     <CardDescription>Gerencie o conteúdo principal do seu leilão.</CardDescription>
                   </CardHeader>
-                  <CardContent className="grid gap-4 md:grid-cols-3">
-                     <Button className="w-full bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => setActiveTab("events")}>Criar Novo Evento</Button>
-                     <Button variant="outline" className="w-full" onClick={() => setActiveTab("lots")}>Alocar Animais (Lotes)</Button>
+                   <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                      <Button className="w-full bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => setActiveTab("events")}>
+                        <Calendar className="mr-2 h-4 w-4" /> Gerenciar Eventos
+                      </Button>
+                      <Button variant="outline" className="w-full" onClick={() => setActiveTab("animals")}>
+                        <Package className="mr-2 h-4 w-4" /> Cadastrar Animais
+                      </Button>
+                      <Button variant="outline" className="w-full" onClick={() => setActiveTab("lots")}>
+                        <Gavel className="mr-2 h-4 w-4" /> Alocar Lotes
+                      </Button>
                      <Button 
                        variant="outline" 
                        className="w-full"

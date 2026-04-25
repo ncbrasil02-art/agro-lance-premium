@@ -1,3 +1,4 @@
+ import { Upload } from "lucide-react";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
@@ -13,18 +14,23 @@
   export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
-   const [formData, setFormData] = useState({
-      name: "",
-      species: "Equino",
-      breed: "",
-      registration_number: "",
-      sex: "M",
-      location: "",
-      youtube_url: "",
-      pedigree_url: "",
+    const [formData, setFormData] = useState({
+       name: "",
+       species: "Equino",
+       breed: "",
+       registration_number: "",
+       sex: "M",
+       location: "",
+       youtube_url: "",
+       pedigree_url: "",
        color: "",
        birth_date: "",
-       photos_urls: ""
+       photos_urls: "",
+       weight: "",
+       height: "",
+       vaccination_records: "",
+       genealogy_father: "",
+       genealogy_mother: ""
     });
 
     const resetForm = () => {
@@ -40,7 +46,12 @@
         pedigree_url: "",
         color: "",
         birth_date: "",
-        photos_urls: ""
+        photos_urls: "",
+        weight: "",
+        height: "",
+        vaccination_records: "",
+        genealogy_father: "",
+        genealogy_mother: ""
       });
     };
 
@@ -57,7 +68,12 @@
         pedigree_url: animal.pedigree_url || "",
         color: animal.color || "",
         birth_date: animal.birth_date || "",
-        photos_urls: animal.photos ? animal.photos.join(", ") : ""
+        photos_urls: animal.photos ? animal.photos.join(", ") : "",
+        weight: animal.weight || "",
+        height: animal.height || "",
+        vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
+        genealogy_father: animal.genealogy?.father || "",
+        genealogy_mother: animal.genealogy?.mother || ""
       });
       setIsDialogOpen(true);
     };
@@ -83,6 +99,10 @@
               pedigree_url: formData.pedigree_url,
               color: formData.color,
               birth_date: formData.birth_date || null,
+              weight: formData.weight ? parseFloat(formData.weight as string) : null,
+              height: formData.height ? parseFloat(formData.height as string) : null,
+               vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
+              genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
               photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
             })
             .eq("id", editingAnimal.id);
@@ -100,6 +120,10 @@
             pedigree_url: formData.pedigree_url,
             color: formData.color,
             birth_date: formData.birth_date || null,
+            weight: formData.weight ? parseFloat(formData.weight as string) : null,
+            height: formData.height ? parseFloat(formData.height as string) : null,
+             vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map(s => s.trim()).filter(Boolean) : [],
+            genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
             internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
             photos: formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : []
           });
@@ -244,10 +268,120 @@
                   <Label htmlFor="pedigree">Link da Genealogia (PDF ou Imagem)</Label>
                   <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="https://..." />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="photos">URLs das Fotos (separadas por vírgula)</Label>
-                  <Input value={formData.photos_urls} onChange={(e) => setFormData({ ...formData, photos_urls: e.target.value })} placeholder="https://link1.com, https://link2.com" />
-                </div>
+                 <div className="grid grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="father">Nome do Pai</Label>
+                     <Input value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="mother">Nome da Mãe</Label>
+                     <Input value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
+                   </div>
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="weight">Peso (kg)</Label>
+                     <Input type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="height">Altura (m)</Label>
+                     <Input type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
+                   </div>
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="vaccination">Registro de Vacinação (separados por vírgula)</Label>
+                   <Input value={formData.vaccination_records} onChange={(e) => setFormData({ ...formData, vaccination_records: e.target.value })} placeholder="Gripe, Tétano, etc" />
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="photos">Fotos do Animal (Clique para upload ou cole as URLs)</Label>
+                   <div className="flex flex-col gap-2">
+                     <div className="flex gap-2">
+                       <Input 
+                         type="file" 
+                         multiple 
+                         accept="image/*" 
+                         className="hidden" 
+                         id="photo-upload" 
+                         onChange={async (e) => {
+                           const files = e.target.files;
+                           if (!files) return;
+                           const toastId = toast.loading("Enviando fotos...");
+                           const uploadedUrls = [];
+                           for (let i = 0; i < files.length; i++) {
+                             const file = files[i];
+                             const fileExt = file.name.split('.').pop();
+                             const fileName = `${Math.random()}.${fileExt}`;
+                             const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+                             if (error) {
+                               toast.error(`Erro no upload: ${error.message}`);
+                               continue;
+                             }
+                             const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+                             uploadedUrls.push(publicUrl);
+                           }
+                           const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map(s => s.trim()).filter(Boolean) : [];
+                           setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
+                           toast.dismiss(toastId);
+                           toast.success(`${uploadedUrls.length} fotos enviadas!`);
+                         }}
+                       />
+                       <Button 
+                         type="button" 
+                         variant="outline" 
+                         className="flex-1 border-dashed" 
+                         onClick={() => document.getElementById('photo-upload')?.click()}
+                       >
+                         <Upload className="mr-2 h-4 w-4" /> Upload de Fotos
+                       </Button>
+                       <Button 
+                         type="button" 
+                         variant="ghost" 
+                         size="sm"
+                         onClick={() => setFormData({ ...formData, photos_urls: "" })}
+                         className="text-[10px]"
+                       >
+                         Limpar
+                       </Button>
+                     </div>
+                     <Input value={formData.photos_urls} onChange={(e) => setFormData({ ...formData, photos_urls: e.target.value })} placeholder="URLs separadas por vírgula" />
+                   </div>
+                 </div>
+                 <div className="grid gap-2">
+                   <Label htmlFor="docs">Documentos / Pedigree (Upload PDF/Imagem)</Label>
+                   <div className="flex gap-2">
+                     <Input 
+                       type="file" 
+                       accept=".pdf,image/*" 
+                       className="hidden" 
+                       id="doc-upload" 
+                       onChange={async (e) => {
+                         const file = e.target.files?.[0];
+                         if (!file) return;
+                         const toastId = toast.loading("Enviando documento...");
+                         const fileExt = file.name.split('.').pop();
+                         const fileName = `${Math.random()}.${fileExt}`;
+                         const { data, error } = await supabase.storage.from('documents').upload(fileName, file);
+                         if (error) {
+                           toast.error(`Erro no upload: ${error.message}`);
+                         } else {
+                           const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(data.path);
+                           setFormData({ ...formData, pedigree_url: publicUrl });
+                           toast.success("Documento enviado!");
+                         }
+                         toast.dismiss(toastId);
+                       }}
+                     />
+                     <Button 
+                       type="button" 
+                       variant="outline" 
+                       className="flex-1 border-dashed" 
+                       onClick={() => document.getElementById('doc-upload')?.click()}
+                     >
+                       <Upload className="mr-2 h-4 w-4" /> Upload Documento
+                     </Button>
+                   </div>
+                   <Input value={formData.pedigree_url} onChange={(e) => setFormData({ ...formData, pedigree_url: e.target.value })} placeholder="URL do documento" />
+                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="location">Localização</Label>
                   <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />

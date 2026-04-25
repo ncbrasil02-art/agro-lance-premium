@@ -18,48 +18,57 @@
     const [searchQuery, setSearchQuery] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<any>(null);
-    const [formData, setFormData] = useState({
-      name: "",
-      description: "",
-      start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-      location: "",
-      status: "scheduled",
-      event_type: "online",
-      allows_pre_bidding: true,
-      show_countdown: true,
-      transmission_link: ""
-    });
+     const [formData, setFormData] = useState({
+       name: "",
+       description: "",
+       start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+       location: "",
+       status: "scheduled",
+       event_type: "online",
+       allows_pre_bidding: true,
+       show_countdown: true,
+       transmission_link: "",
+       banner_url: "",
+       promoter_company: "",
+       auctioneer_name: ""
+     });
 
-    const resetForm = () => {
-      setEditingEvent(null);
-      setFormData({
-        name: "",
-        description: "",
-        start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-        location: "",
-        status: "scheduled",
-        event_type: "online",
-        allows_pre_bidding: true,
-        show_countdown: true,
-        transmission_link: ""
-      });
-    };
+     const resetForm = () => {
+       setEditingEvent(null);
+       setFormData({
+         name: "",
+         description: "",
+         start_date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+         location: "",
+         status: "scheduled",
+         event_type: "online",
+         allows_pre_bidding: true,
+         show_countdown: true,
+         transmission_link: "",
+         banner_url: "",
+         promoter_company: "",
+         auctioneer_name: ""
+       });
+     };
 
-    const handleEdit = (event: any) => {
-      setEditingEvent(event);
-      setFormData({
-        name: event.name || "",
-        description: event.description || "",
-        start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm") : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-        location: event.location || "",
-        status: event.status || "scheduled",
-        event_type: event.event_type || "online",
-        allows_pre_bidding: event.allows_pre_bidding !== false,
-        show_countdown: event.show_countdown !== false,
-        transmission_link: event.transmission_link || ""
-      });
-      setIsDialogOpen(true);
-    };
+     const handleEdit = (event: any) => {
+       setEditingEvent(event);
+       setFormData({
+         name: event.name || "",
+         description: event.description || "",
+         start_date: event.start_date ? format(new Date(event.start_date), "yyyy-MM-dd'T'HH:mm") : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+         location: event.location || "",
+         status: event.status || "scheduled",
+         event_type: event.event_type || "online",
+         allows_pre_bidding: event.allows_pre_bidding !== false,
+         show_countdown: event.show_countdown !== false,
+         transmission_link: event.transmission_link || "",
+         banner_url: event.banner_url || "",
+         promoter_company: event.promoter_company || "",
+         auctioneer_name: event.auctioneer_name || ""
+       });
+       setIsDialogOpen(true);
+     };
  
    const fetchEvents = async () => {
      setIsLoading(true);
@@ -90,35 +99,41 @@
  
      try {
         if (editingEvent) {
-          const { error } = await supabase
-            .from("events")
-            .update({
-              name: formData.name,
-              description: formData.description,
-              start_date: new Date(formData.start_date).toISOString(),
-              location: formData.location,
-              status: formData.status,
-              event_type: formData.event_type,
-              allows_pre_bidding: formData.allows_pre_bidding,
-              show_countdown: formData.show_countdown,
-              transmission_link: formData.transmission_link
-            })
-            .eq("id", editingEvent.id);
+           const { error } = await supabase
+             .from("events")
+             .update({
+               name: formData.name,
+               description: formData.description,
+               start_date: new Date(formData.start_date).toISOString(),
+               location: formData.location,
+               status: formData.status,
+               event_type: formData.event_type,
+               allows_pre_bidding: formData.allows_pre_bidding,
+               show_countdown: formData.show_countdown,
+               transmission_link: formData.transmission_link,
+               banner_url: formData.banner_url,
+               promoter_company: formData.promoter_company,
+               auctioneer_name: formData.auctioneer_name
+             })
+             .eq("id", editingEvent.id);
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
         } else {
-          const { error } = await supabase.from("events").insert({
-            name: formData.name,
-            description: formData.description,
-            start_date: new Date(formData.start_date).toISOString(),
-            location: formData.location,
-            status: formData.status,
-            event_type: formData.event_type,
-            allows_pre_bidding: formData.allows_pre_bidding,
-            show_countdown: formData.show_countdown,
-            transmission_link: formData.transmission_link,
-            slug: formData.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
-          });
+           const { error } = await supabase.from("events").insert({
+             name: formData.name,
+             description: formData.description,
+             start_date: new Date(formData.start_date).toISOString(),
+             location: formData.location,
+             status: formData.status,
+             event_type: formData.event_type,
+             allows_pre_bidding: formData.allows_pre_bidding,
+             show_countdown: formData.show_countdown,
+             transmission_link: formData.transmission_link,
+             banner_url: formData.banner_url,
+             promoter_company: formData.promoter_company,
+             auctioneer_name: formData.auctioneer_name,
+             slug: formData.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
+           });
           if (error) throw error;
           toast.success("Evento criado com sucesso");
         }
@@ -196,19 +211,36 @@
                   Defina as configurações do leilão.
                </DialogDescription>
              </DialogHeader>
-             <div className="grid gap-4 py-4">
-               <div className="grid gap-2">
-                 <Label htmlFor="name">Nome do Evento</Label>
-                  <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-               </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="date">Data e Hora de Início</Label>
-                 <Input 
-                   type="datetime-local" 
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Nome do Evento</Label>
+                  <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="banner">URL da Imagem de Destaque (Banner)</Label>
+                  <Input value={formData.banner_url} onChange={(e) => setFormData({ ...formData, banner_url: e.target.value })} placeholder="https://imagem-do-evento.jpg" />
+                  <p className="text-[10px] text-muted-foreground">Esta imagem aparece na página inicial e no topo do evento.</p>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="date">Data e Hora de Início (Clique para selecionar)</Label>
+                  <Input 
+                    type="datetime-local" 
+                    step="1"
                     value={formData.start_date} 
                     onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
-                 />
-               </div>
+                  />
+                  <p className="text-[10px] text-muted-foreground">O leilão iniciará automaticamente nesta data/hora.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="promoter">Empresa Promotora</Label>
+                    <Input value={formData.promoter_company} onChange={(e) => setFormData({ ...formData, promoter_company: e.target.value })} placeholder="Nome da Fazenda/Empresa" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="auctioneer">Leiloeiro</Label>
+                    <Input value={formData.auctioneer_name} onChange={(e) => setFormData({ ...formData, auctioneer_name: e.target.value })} placeholder="Nome do Leiloeiro" />
+                  </div>
+                </div>
                <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-2">
                    <Label htmlFor="type">Tipo</Label>
