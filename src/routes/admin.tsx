@@ -98,16 +98,62 @@ function AdminLayout() {
           </div>
        </aside>
  
-        <main className="flex-1 p-8 pb-16">
-         <header className="mb-8 flex items-center justify-between">
-           <div>
-             <h1 className="text-3xl font-bold">Painel Administrativo</h1>
-             <p className="text-muted-foreground">Bem-vindo de volta, {profile?.full_name}</p>
-           </div>
-           <Button variant="outline" asChild>
-             <Link to="/">Ver Site</Link>
-           </Button>
+         <main className="flex-1 p-4 md:p-8 pb-16">
+          <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
+                <Gavel className="h-5 w-5 text-emerald-deep" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">Painel Administrativo</h1>
+                <p className="text-xs md:text-sm text-muted-foreground">Bem-vindo, {profile?.full_name}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild className="hidden md:flex">
+                <Link to="/">Ver Site Público</Link>
+              </Button>
+              <Button variant="ghost" size="icon" className="md:hidden ml-auto text-destructive" onClick={signOut}>
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
           </header>
+
+          {/* Quick Navigation Mobile */}
+          <div className="flex md:hidden overflow-x-auto pb-4 gap-2 mb-6 scrollbar-hide">
+            <Button 
+              variant={activeTab === "dashboard" ? "default" : "outline"} 
+              size="sm" 
+              className={`rounded-full whitespace-nowrap ${activeTab === "dashboard" ? "bg-gold text-emerald-deep" : ""}`}
+              onClick={() => setActiveTab("dashboard")}
+            >
+              Dashboard
+            </Button>
+            <Button 
+              variant={activeTab === "events" ? "default" : "outline"} 
+              size="sm" 
+              className={`rounded-full whitespace-nowrap ${activeTab === "events" ? "bg-gold text-emerald-deep" : ""}`}
+              onClick={() => setActiveTab("events")}
+            >
+              Eventos
+            </Button>
+            <Button 
+              variant={activeTab === "lots" ? "default" : "outline"} 
+              size="sm" 
+              className={`rounded-full whitespace-nowrap ${activeTab === "lots" ? "bg-gold text-emerald-deep" : ""}`}
+              onClick={() => setActiveTab("lots")}
+            >
+              Lotes
+            </Button>
+            <Button 
+              variant={activeTab === "animals" ? "default" : "outline"} 
+              size="sm" 
+              className={`rounded-full whitespace-nowrap ${activeTab === "animals" ? "bg-gold text-emerald-deep" : ""}`}
+              onClick={() => setActiveTab("animals")}
+            >
+              Animais
+            </Button>
+          </div>
 
           {activeTab === "dashboard" && (
             <>
@@ -199,14 +245,23 @@ function AdminLayout() {
             </>
           )}
 
-          {activeTab === "events" && <EventManagement onManageLots={handleManageLots} />}
+          {activeTab === "events" && (
+            <EventManagement 
+              onManageLots={handleManageLots} 
+              onNavigate={() => setActiveTab("animals")} 
+            />
+          )}
           {activeTab === "lots" && (
             <LotManagement 
               initialEventId={selectedEventId} 
               onEventChange={setSelectedEventId} 
+              onNavigateToAnimals={() => setActiveTab("animals")}
+              onNavigateToEvents={() => setActiveTab("events")}
             />
           )}
-          {activeTab === "animals" && <AnimalManagement />}
+          {activeTab === "animals" && (
+            <AnimalManagement onNavigateToLots={() => setActiveTab("lots")} />
+          )}
           {activeTab === "users" && (
             <Card>
               <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>

@@ -11,7 +11,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
   import { toast } from "sonner";
  
-  export function AnimalManagement() {
+  export function AnimalManagement({ onNavigateToLots }: { onNavigateToLots?: () => void }) {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
     const [formData, setFormData] = useState({
@@ -136,9 +136,13 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
           toast.success("Animal cadastrado com sucesso");
         }
  
-        setIsDialogOpen(false);
-        resetForm();
-        fetchAnimals();
+         setIsDialogOpen(false);
+         const isNew = !editingAnimal;
+         resetForm();
+         fetchAnimals();
+         if (isNew && onNavigateToLots && confirm("Animal cadastrado! Deseja ir para a aba de Lotes para alocá-lo em um evento?")) {
+           onNavigateToLots();
+         }
       } catch (error: any) {
         toast.error("Erro ao salvar animal: " + error.message);
       }
@@ -241,7 +245,32 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                   Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
-             <div className="grid gap-4 py-4">
+             <div className="grid gap-6 py-4">
+                {/* Fixed Image Preview */}
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border-2 border-white/5 bg-black/40 group">
+                  <img 
+                    src={formData.photos_urls?.split(",")[0]?.trim() || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+                    alt="Preview" 
+                    className={`h-full w-full object-cover transition-all duration-700 ${!formData.photos_urls ? 'opacity-20 grayscale' : ''}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                    <div>
+                      <p className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Capa do Perfil</p>
+                      <p className="text-sm font-bold text-white uppercase italic">{formData.name || "Nome do Animal"}</p>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 bg-white/10 hover:bg-gold hover:text-emerald-deep text-white text-[10px] font-bold rounded-lg border border-white/10 backdrop-blur-md"
+                      onClick={() => document.getElementById('photo-upload')?.click()}
+                    >
+                      <Upload className="mr-2 h-3.5 w-3.5" /> Trocar Capa
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome</Label>
                    <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
