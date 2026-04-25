@@ -7,6 +7,7 @@ import { useState, useMemo } from "react";
   import { z } from "zod";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getEffectiveEventStatus } from "@/utils/auction-status";
+import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
 export const Route = createFileRoute("/eventos/")({
   head: () => ({
@@ -64,8 +65,7 @@ function EventsPage() {
    }));
  
   const filteredEvents = useMemo(() => {
-    if (filter === "all") return mappedEvents;
-    return mappedEvents.filter((e: any) => {
+    const result = filter === "all" ? mappedEvents : mappedEvents.filter((e: any) => {
       const effectiveStatus = getEffectiveEventStatus({
         status: e.status,
         start_date: e.date,
@@ -73,14 +73,34 @@ function EventsPage() {
       });
       return effectiveStatus === filter;
     });
+
+    return result.sort((a, b) => {
+      const statusA = getEffectiveEventStatus({ status: a.status, start_date: a.date, end_date: a.end_date });
+      const statusB = getEffectiveEventStatus({ status: b.status, start_date: b.date, end_date: b.end_date });
+
+      const priority: Record<string, number> = { live: 0, scheduled: 1, finished: 2 };
+      
+      if (priority[statusA] !== priority[statusB]) {
+        return priority[statusA] - priority[statusB];
+      }
+
+      if (statusA === 'finished') {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
   }, [mappedEvents, filter]);
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <header className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Calendário de eventos</h1>
-        <p className="mt-2 text-muted-foreground">Acompanhe todos os leilões em andamento e agendados.</p>
-      </header>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <header>
+          <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Calendário de eventos</h1>
+          <p className="mt-2 text-muted-foreground">Acompanhe todos os leilões em andamento e agendados.</p>
+        </header>
+        <EventRequestDialog />
+      </div>
 
       <div className="mb-8 overflow-x-auto scrollbar-hide pb-2">
         <Tabs defaultValue="all" value={filter} onValueChange={setFilter} className="w-full">
