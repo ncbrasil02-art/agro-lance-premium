@@ -533,9 +533,8 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, ChevronLeft, Chevron
                     </Button>
                   </div>
                 </div>
-              )}
-           )}
-         </CardContent>
+               )}
+          </CardContent>
        </Card>
      </div>
    );
