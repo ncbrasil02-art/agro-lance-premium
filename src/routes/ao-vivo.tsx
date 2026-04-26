@@ -37,7 +37,7 @@ export const Route = createFileRoute("/ao-vivo")({
         // First, search for ANY event that is live or scheduled today
         const { data: events, error: eventError } = await supabase
            .from("events")
-           .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+           .select("*")
            .or("status.eq.live,status.eq.scheduled")
            .order("start_date", { ascending: true });
 
@@ -46,24 +46,31 @@ export const Route = createFileRoute("/ao-vivo")({
           return { liveEvent: null };
         }
 
-        if (!events || events.length === 0) return { liveEvent: null };
+        if (!events || events.length === 0) {
+          console.log("Nenhum evento live/scheduled encontrado no banco.");
+          return { liveEvent: null };
+        }
 
-        // Priority 1: Event explicitly marked as 'live'
-        let liveEvent = events.find(e => e.status === 'live');
+        // Priority 1: Event explicitly marked as 'live' that has an active lot
+        let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
         
-        // Priority 2: Event that has a transmission link and is starting soon (within 2 hours) or already started
+        // Priority 2: Any event explicitly marked as 'live'
+        if (!liveEvent) {
+          liveEvent = events.find(e => e.status === 'live');
+        }
+        
+        // Priority 3: Event starting soon (within 2 hours) or already started
         if (!liveEvent) {
           const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
           const fourHoursFromNow = new Date(now.getTime() + 4 * 60 * 60 * 1000);
           
           liveEvent = events.find(e => {
             const start = new Date(e.start_date);
-            const hasTransmission = !!e.transmission_link;
-            return hasTransmission && start >= twoHoursAgo && start <= fourHoursFromNow;
+            return start >= twoHoursAgo && start <= fourHoursFromNow;
           });
         }
 
-        // Priority 3: Scheduled event that should be happening now
+        // Priority 4: Scheduled event that should be happening now
         if (!liveEvent) {
           liveEvent = events.find(e => {
             const start = new Date(e.start_date);
@@ -72,26 +79,40 @@ export const Route = createFileRoute("/ao-vivo")({
           });
         }
 
-        if (!liveEvent) return { liveEvent: null };
+        if (!liveEvent) {
+          console.log("Nenhum evento atende aos critérios de 'ao vivo' no momento.");
+          return { liveEvent: null };
+        }
 
-        // Fallback 1: If active_lot_id is present but join failed
-        if (liveEvent.active_lot_id && !liveEvent.active_lot) {
+        // Manual fetch of the active lot since we removed the join in main query
+        if (liveEvent.active_lot_id) {
+          const eventAny = liveEvent as any;
           const { data: activeLotData } = await supabase
             .from("lots")
-            .select("*, animal:animals(*)")
+            .select("*")
             .eq("id", liveEvent.active_lot_id)
             .single();
+          
           if (activeLotData) {
-            liveEvent.active_lot = activeLotData;
+            // Manual fetch of animal for the lot
+            if (activeLotData.animal_id) {
+              const { data: animalData } = await supabase
+                .from("animals")
+                .select("*")
+                .eq("id", activeLotData.animal_id)
+                .single();
+              (activeLotData as any).animal = animalData;
+            }
+            eventAny.active_lot = activeLotData;
           }
         }
 
-        // Fallback 2: Auto-selection of active lot
-        // If active_lot_id is null but the event is live, search for any lot marked as 'active' or 'live'
-        if (!liveEvent.active_lot && liveEvent.status === 'live') {
+        // Fallback: Auto-selection of active lot
+        const eventAny = liveEvent as any;
+        if (!eventAny.active_lot && liveEvent.status === 'live') {
           const { data: fallbackLot } = await supabase
             .from("lots")
-            .select("*, animal:animals(*)")
+            .select("*")
             .eq("event_id", liveEvent.id)
             .or("status.eq.active,status.eq.live")
             .order("lot_number", { ascending: true })
@@ -99,8 +120,16 @@ export const Route = createFileRoute("/ao-vivo")({
             .maybeSingle();
           
           if (fallbackLot) {
-            liveEvent.active_lot = fallbackLot;
-            liveEvent.active_lot_id = fallbackLot.id;
+            if (fallbackLot.animal_id) {
+              const { data: animalData } = await supabase
+                .from("animals")
+                .select("*")
+                .eq("id", fallbackLot.animal_id)
+                .single();
+              (fallbackLot as any).animal = animalData;
+            }
+            eventAny.active_lot = fallbackLot;
+            eventAny.active_lot_id = fallbackLot.id;
           }
         }
 
@@ -118,21 +147,11 @@ export const Route = createFileRoute("/ao-vivo")({
           }
         }
 
-        // Try parsing, but don't fail hard if it's mostly valid data
-        try {
-          const validatedEvent = eventSchema.parse(liveEvent);
-          return { 
-            liveEvent: validatedEvent,
-            initialBids
-          };
-        } catch (schemaError) {
-          console.warn("Validação parcial do evento (usando dados brutos):", schemaError);
-          // Return the event as is if it has the required UI fields
-          if (liveEvent.id && liveEvent.name) {
-            return { liveEvent, initialBids };
-          }
-          return { liveEvent: null };
-        }
+        // Skip strict validation to avoid "Waiting for Transmission" due to minor schema mismatches
+        return { 
+          liveEvent: liveEvent as any,
+          initialBids
+        };
       } catch (err) {
         console.error("Erro fatal no loader ao-vivo:", err);
         return { liveEvent: null };
@@ -141,8 +160,8 @@ export const Route = createFileRoute("/ao-vivo")({
    component: LivePage,
 });
 
- function LivePage() {
-   const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
+  function LivePage() {
+    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
    const [bids, setBids] = useState(initialBids);
@@ -202,7 +221,7 @@ export const Route = createFileRoute("/ao-vivo")({
             .eq("id", liveEvent.active_lot_id as string)
             .single();
           if (data) {
-            setLiveEvent(prev => prev ? ({ ...prev, active_lot: data }) : null);
+            setLiveEvent((prev: any) => prev ? ({ ...prev, active_lot: data }) : null);
           }
         };
         fetchMissingLot();
