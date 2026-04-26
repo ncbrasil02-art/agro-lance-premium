@@ -632,7 +632,7 @@ function LotDetail() {
               </div>
                <div className="p-4 space-y-3">
                  {recentBids.length > 0 ? recentBids.slice(0, 5).map((bid: any, i: number) => (
-                  <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl ${i === 0 ? 'bg-gold/10 border border-gold/20' : 'bg-white/5'}`}>
+                  <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl ${i === 0 ? 'bg-gold/10 border border-gold/20 animate-bid-flash' : 'bg-white/5'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black text-sm ${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-emerald-deep text-white/40'}`}> {bid.profile?.full_name?.charAt(0) || "P"} </div>
                       <div>
