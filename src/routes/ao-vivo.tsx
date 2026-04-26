@@ -1,12 +1,5 @@
 import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
-    // Preload animal photos
-    useEffect(() => {
-      if (liveEvent?.active_lot?.animal?.photos) {
-        preloadImages(liveEvent.active_lot.animal.photos, { width: 1000 });
-      }
-    }, [liveEvent?.active_lot_id]);
-
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -183,6 +176,14 @@ export const Route = createFileRoute("/ao-vivo")({
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
+
+    // Preload animal photos
+    useEffect(() => {
+      if (liveEvent?.active_lot?.animal?.photos) {
+        preloadImages(liveEvent.active_lot.animal.photos, { width: 1000 });
+      }
+    }, [liveEvent?.active_lot_id]);
+
   const [bids, setBids] = useState<any[]>(initialBids || []);
   const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
     // Increment viewer count when page loads
