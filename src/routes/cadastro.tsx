@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+ import { useState } from "react";
+ import { maskCPF, maskPhone } from "@/utils/masks";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -71,25 +72,27 @@ function SignupPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="cpf">CPF</Label>
-              <Input 
-                id="cpf" 
-                placeholder="000.000.000-00" 
-                className="mt-1.5" 
-                value={formData.cpf}
-                onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                required
-              />
+               <Input 
+                 id="cpf" 
+                 placeholder="000.000.000-00" 
+                 className="mt-1.5" 
+                 value={formData.cpf}
+                 onChange={(e) => setFormData({ ...formData, cpf: maskCPF(e.target.value) })}
+                 required
+                 maxLength={14}
+               />
             </div>
             <div>
               <Label htmlFor="phone">Celular (WhatsApp)</Label>
-              <Input 
-                id="phone" 
-                placeholder="(00) 00000-0000" 
-                className="mt-1.5" 
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                required
-              />
+               <Input 
+                 id="phone" 
+                 placeholder="(00) 00000-0000" 
+                 className="mt-1.5" 
+                 value={formData.phone}
+                 onChange={(e) => setFormData({ ...formData, phone: maskPhone(e.target.value) })}
+                 required
+                 maxLength={15}
+               />
             </div>
           </div>
           <div>
