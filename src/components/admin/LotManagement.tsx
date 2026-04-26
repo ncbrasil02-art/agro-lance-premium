@@ -37,8 +37,11 @@ import {
       const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
        const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
        const [statusFilter, setStatusFilter] = useState<string>("all");
-       const [searchQuery, setSearchQuery] = useState("");
+      const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
+      const [selectedLotBids, setSelectedLotBids] = useState<any[]>([]);
+      const [isBidsDialogOpen, setIsBidsDialogOpen] = useState(false);
+      const [isBidsLoading, setIsBidsLoading] = useState(false);
       
       const [formData, setFormData] = useState({
         event_id: "",
