@@ -75,14 +75,21 @@ import { Countdown } from "@/components/auctions/countdown";
           category="event"
           className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
         />
-        {/* Main Image Contained - High quality */}
-        <OptimizedImage 
-          src={event?.cover || ""} 
-          alt={event?.name || "Evento"} 
-          width={800}
-          category="event"
-          className="relative h-full w-full object-contain transition-smooth group-hover:scale-[1.02]" 
-        />
+        {/* Main Image - Now filling the space correctly while allowing the flyer to be seen */}
+        <div className="relative h-full w-full overflow-hidden">
+          <OptimizedImage 
+            src={event?.cover || ""} 
+            alt={event?.name || "Evento"} 
+            width={800}
+            category="event"
+            className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
+          />
+          <div className="absolute top-4 right-4 z-20">
+            <div className="rounded-lg bg-black/30 backdrop-blur-md border border-white/10 px-2 py-1 text-[10px] font-bold text-white/90 uppercase tracking-wider group-hover:bg-black/50 transition-colors">
+              Ver foto do flyer
+            </div>
+          </div>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
         <div className="absolute left-4 top-4 z-10 flex flex-col gap-2 items-start">
            <StatusBadge status={effectiveStatus} urgent={isUrgent} />
