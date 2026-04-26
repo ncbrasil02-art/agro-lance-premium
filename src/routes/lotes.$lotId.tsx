@@ -415,26 +415,54 @@ function LotDetail() {
 
               <TabsContent value="documentos" className="mt-6">
                 <div className="grid gap-4 md:grid-cols-2">
-                  {lot.animal?.pedigree_url && (
-                    <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
-                      <a href={lot.animal.pedigree_url} target="_blank">
-                        <span className="flex items-center font-bold"><FileText className="mr-3 h-6 w-6 text-gold" /> PEDIGREE COMPLETO</span>
-                        <Download className="h-5 w-5" />
-                      </a>
-                    </Button>
-                  )}
-                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando encarte do lote...")}>
-                    <span className="flex items-center font-bold"><Download className="mr-3 h-6 w-6 text-gold" /> ENCARTE DO LOTE (PDF)</span>
-                    <Download className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando exames laboratoriais...")}>
-                    <span className="flex items-center font-bold"><Stethoscope className="mr-3 h-6 w-6 text-gold" /> LAUDOS & EXAMES</span>
-                    <Download className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Visualizando histórico reprodutivo...")}>
-                    <span className="flex items-center font-bold"><Fingerprint className="mr-3 h-6 w-6 text-gold" /> HISTÓRICO REPRODUTIVO</span>
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
+                   {lot.animal?.pedigree_url && (
+                     <TooltipProvider>
+                       <Tooltip>
+                         <TooltipTrigger asChild>
+                           <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
+                             <a href={lot.animal.pedigree_url} target="_blank">
+                               <span className="flex items-center font-bold"><FileText className="mr-3 h-6 w-6 text-gold" /> PEDIGREE COMPLETO</span>
+                               <Download className="h-5 w-5" />
+                             </a>
+                           </Button>
+                         </TooltipTrigger>
+                         <TooltipContent>Clique para visualizar o documento de pedigree original</TooltipContent>
+                       </Tooltip>
+                     </TooltipProvider>
+                   )}
+                   <TooltipProvider>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando encarte do lote...")}>
+                           <span className="flex items-center font-bold"><Download className="mr-3 h-6 w-6 text-gold" /> ENCARTE DO LOTE (PDF)</span>
+                           <Download className="h-5 w-5" />
+                         </Button>
+                       </TooltipTrigger>
+                       <TooltipContent>Baixar PDF com fotos e informações técnicas do lote</TooltipContent>
+                     </Tooltip>
+                   </TooltipProvider>
+                   <TooltipProvider>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando exames laboratoriais...")}>
+                           <span className="flex items-center font-bold"><Stethoscope className="mr-3 h-6 w-6 text-gold" /> LAUDOS & EXAMES</span>
+                           <Download className="h-5 w-5" />
+                         </Button>
+                       </TooltipTrigger>
+                       <TooltipContent>Acessar laudos veterinários e exames laboratoriais recentes</TooltipContent>
+                     </Tooltip>
+                   </TooltipProvider>
+                   <TooltipProvider>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Visualizando histórico reprodutivo...")}>
+                           <span className="flex items-center font-bold"><Fingerprint className="mr-3 h-6 w-6 text-gold" /> HISTÓRICO REPRODUTIVO</span>
+                           <ChevronRight className="h-5 w-5" />
+                         </Button>
+                       </TooltipTrigger>
+                       <TooltipContent>Ver informações de genealogia e desempenho reprodutivo</TooltipContent>
+                     </Tooltip>
+                   </TooltipProvider>
                 </div>
               </TabsContent>
             </Tabs>
