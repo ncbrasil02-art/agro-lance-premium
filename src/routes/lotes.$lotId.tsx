@@ -513,7 +513,12 @@ function LotDetail() {
                       ))}
                     </div>
 
-                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter" disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} onClick={() => placeBid(nextBid)}>
+                     <Button 
+                       size="lg" 
+                       className={`w-full h-20 text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter ${dynamicStatus === 'recebendo_lances' ? 'shimmer-button animate-blink-fast' : 'bg-gold-gradient'}`} 
+                       disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} 
+                       onClick={() => placeBid(nextBid)}
+                     >
                       {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
                     </Button>
                     
