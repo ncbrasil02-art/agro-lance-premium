@@ -164,7 +164,37 @@ export const Route = createFileRoute("/ao-vivo")({
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
-   const [bids, setBids] = useState(initialBids);
+  const [bids, setBids] = useState<any[]>(initialBids || []);
+  const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
+    // Increment viewer count when page loads
+    useEffect(() => {
+      if (liveEvent?.id) {
+        supabase.rpc("increment_viewer_count", {
+          p_entity_id: liveEvent.id,
+          p_entity_type: 'event'
+        }).then(() => console.log("Viewer count incremented"));
+      }
+    }, [liveEvent?.id]);
+
+    // Fetch profiles for initial bids
+    useEffect(() => {
+      if (initialBids && initialBids.length > 0) {
+        const userIds = [...new Set(initialBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
+        if (userIds.length > 0) {
+          supabase
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", userIds)
+            .then(({ data }) => {
+              if (data) {
+                const map = data.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
+                setBidderProfiles(prev => ({ ...prev, ...map }));
+              }
+            });
+        }
+      }
+    }, [initialBids]);
+
     const [isBidding, setIsBidding] = useState(false);
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
@@ -285,6 +315,38 @@ export const Route = createFileRoute("/ao-vivo")({
         )
         .subscribe();
 
+      // Specific channel for the active lot to catch price and bid count updates
+      let lotChannel: any = null;
+      if (liveEvent?.active_lot_id) {
+        lotChannel = supabase
+          .channel(`lot-updates-${liveEvent.active_lot_id}`)
+          .on(
+            "postgres_changes",
+            { 
+              event: "UPDATE", 
+              schema: "public", 
+              table: "lots", 
+              filter: `id=eq.${liveEvent.active_lot_id}` 
+            },
+            (payload) => {
+              console.log("Lote atualizado em tempo real:", payload.new);
+              setLiveEvent((prev: any) => {
+                if (!prev || !prev.active_lot) return prev;
+                return {
+                  ...prev,
+                  active_lot: {
+                    ...prev.active_lot,
+                    ...payload.new,
+                    // Preserve animal data which isn't in the lot update payload
+                    animal: prev.active_lot.animal
+                  }
+                };
+              });
+            }
+          )
+          .subscribe();
+      }
+
       // Specific bids channel for the active lot
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
@@ -293,8 +355,21 @@ export const Route = createFileRoute("/ao-vivo")({
           .on(
             "postgres_changes",
             { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
-            (payload) => {
-              setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
+            async (payload) => {
+              const newBid = payload.new;
+              setBids((prev: any) => [newBid, ...prev].slice(0, 10));
+              
+              // Fetch profile if not already loaded
+              if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
+                const { data } = await supabase
+                  .from("profiles")
+                  .select("id, full_name")
+                  .eq("id", newBid.user_id)
+                  .single();
+                if (data) {
+                  setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                }
+              }
             }
           )
           .subscribe();
@@ -302,9 +377,40 @@ export const Route = createFileRoute("/ao-vivo")({
 
       return () => {
         supabase.removeChannel(globalChannel);
+        if (lotChannel) supabase.removeChannel(lotChannel);
         if (bidsChannel) supabase.removeChannel(bidsChannel);
       };
     }, [liveEvent?.id, liveEvent?.active_lot_id]);
+
+    // Periodically refresh event data (viewers, etc)
+    useEffect(() => {
+      if (!liveEvent?.id) return;
+      
+      const interval = setInterval(async () => {
+        const { data } = await supabase
+          .from("events")
+          .select("viewers, active_lot:lots!active_lot_id(current_price, bids_count)")
+          .eq("id", liveEvent.id)
+          .single();
+        
+        if (data) {
+          setLiveEvent((prev: any) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              viewers: data.viewers,
+              active_lot: prev.active_lot ? {
+                ...prev.active_lot,
+                current_price: (data.active_lot as any)?.current_price ?? prev.active_lot.current_price,
+                bids_count: (data.active_lot as any)?.bids_count ?? prev.active_lot.bids_count,
+              } : null
+            };
+          });
+        }
+      }, 30000); // 30 seconds
+
+      return () => clearInterval(interval);
+    }, [liveEvent?.id]);
  
    const liveLot = liveEvent?.active_lot;
  
@@ -323,6 +429,17 @@ export const Route = createFileRoute("/ao-vivo")({
         const result = data as { success: boolean; message: string };
         if (result.success) {
           toast.success(result.message);
+          // Fetch latest lot data immediately after a successful bid
+          if (liveEvent?.active_lot_id) {
+            const { data: latestLot } = await supabase
+              .from("lots")
+              .select("*, animal:animals(*)")
+              .eq("id", liveEvent.active_lot_id)
+              .single();
+            if (latestLot) {
+              setLiveEvent((prev: any) => prev ? ({ ...prev, active_lot: latestLot }) : prev);
+            }
+          }
         } else {
           toast.error(result.message, {
             duration: 6000,
@@ -450,10 +567,22 @@ export const Route = createFileRoute("/ao-vivo")({
              <p className="text-xs text-gold/60 font-bold uppercase tracking-wider">Leiloeiro: {liveEvent.auctioneer_name || "A definir"} · {liveEvent.promoter_company || "A definir"}</p>
            </div>
         </div>
-        <div className="flex gap-4 text-sm">
-           <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="h-4 w-4 text-gold" /> {(liveEvent.viewers || 0).toLocaleString("pt-BR")} assistindo</span>
-           <span className="flex items-center gap-1.5 text-muted-foreground"><Gavel className="h-4 w-4 text-gold" /> {liveEvent.active_lot?.bids_count || 0} lances</span>
-        </div>
+         <div className="flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
+              <Users className="h-4 w-4 text-gold" /> 
+              <span className="font-bold">{(liveEvent.viewers || 0).toLocaleString("pt-BR")}</span> assistindo
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
+              <Gavel className="h-4 w-4 text-gold" /> 
+              <span className="font-bold">{liveEvent.active_lot?.bids_count || 0}</span> lances
+            </div>
+            {liveEvent.active_lot?.viewers !== undefined && (
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
+                <Radio className="h-4 w-4 text-gold" /> 
+                <span className="font-bold">{(liveEvent.active_lot.viewers || 0).toLocaleString("pt-BR")}</span> visualizações
+              </div>
+            )}
+         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
@@ -477,16 +606,23 @@ export const Route = createFileRoute("/ao-vivo")({
                </div>
              )}
              
-             {statusMessage && (
-               <div className="absolute bottom-4 left-4 right-4 z-20 animate-in fade-in slide-in-from-bottom-4">
-                 <div className="bg-gold/95 backdrop-blur-sm p-3 rounded-lg shadow-xl flex items-center gap-3 border border-emerald-deep/20">
-                   <div className="h-8 w-8 rounded-full bg-emerald-deep flex items-center justify-center">
-                     <MessageSquare className="h-4 w-4 text-gold" />
-                   </div>
-                   <p className="text-emerald-deep font-black text-sm uppercase tracking-tight">{statusMessage}</p>
-                 </div>
-               </div>
-             )}
+            {statusMessage && (
+              <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
+                <div className="bg-gold/95 backdrop-blur-md px-10 py-8 rounded-3xl shadow-[0_0_100px_rgba(212,175,55,0.6)] border-4 border-emerald-deep/20 animate-in zoom-in duration-300">
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="h-20 w-20 rounded-full bg-emerald-deep flex items-center justify-center shadow-inner">
+                      <Gavel className="h-10 w-10 text-gold animate-bounce" />
+                    </div>
+                    <div>
+                      <p className="text-emerald-deep font-black text-4xl uppercase tracking-tighter drop-shadow-sm">{statusMessage}</p>
+                      <div className="mt-2 h-1.5 w-full bg-emerald-deep/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-deep animate-progress-shrink" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
              
              <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur z-10">
                <Volume2 className="h-4 w-4" />
@@ -549,19 +685,36 @@ export const Route = createFileRoute("/ao-vivo")({
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
                    <div className="font-semibold flex items-center gap-2">
-                      {bid.is_phone_bid ? (
-                        <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
-                          <Phone className="h-2 w-2" /> Telefone
-                        </span>
-                      ) : bid.bid_type === 'security' ? (
-                        <span className="flex items-center gap-1 text-[10px] bg-emerald-deep/20 text-emerald-deep px-1.5 rounded uppercase font-black">
-                          <Gavel className="h-2 w-2" /> Auditório
-                        </span>
-                      ) : bid.user_id ? (
-                        <span>Comprador ...{bid.user_id.slice(-4)}</span>
-                      ) : (
-                        <span>Licitante</span>
-                      )}
+                       <div className="flex flex-col">
+                         <span className="text-sm font-bold">
+                           {bid.is_phone_bid ? (
+                             bid.phone_bidder_identifier || "Telefone"
+                           ) : bid.bid_type === 'security' ? (
+                             "Lance do Auditório"
+                           ) : bidderProfiles[bid.user_id]?.full_name ? (
+                             bidderProfiles[bid.user_id].full_name
+                           ) : bid.user_id ? (
+                             `Comprador ...${bid.user_id.slice(-4)}`
+                           ) : (
+                             "Licitante"
+                           )}
+                         </span>
+                         <div className="flex items-center gap-2 mt-0.5">
+                           {bid.is_phone_bid ? (
+                             <span className="flex items-center gap-1 text-[9px] bg-gold/20 text-gold px-1.5 py-0.5 rounded uppercase font-black">
+                               <Phone className="h-2 w-2" /> Telefone
+                             </span>
+                           ) : bid.bid_type === 'security' ? (
+                             <span className="flex items-center gap-1 text-[9px] bg-emerald-deep/20 text-emerald-deep px-1.5 py-0.5 rounded uppercase font-black">
+                               <Gavel className="h-2 w-2" /> Presencial
+                             </span>
+                           ) : (
+                             <span className="flex items-center gap-1 text-[9px] bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded uppercase font-black">
+                               <Users className="h-2 w-2" /> Online
+                             </span>
+                           )}
+                         </div>
+                       </div>
                    </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
                  </div>

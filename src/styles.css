@@ -259,6 +259,12 @@
   .shadow-live { box-shadow: var(--shadow-live); }
   .transition-smooth { transition: var(--transition-smooth); }
 
+  @keyframes progress-shrink {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+  .animate-progress-shrink { animation: progress-shrink 8s linear forwards; }
+
   @keyframes pulse-live {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.75; transform: scale(1.08); }
