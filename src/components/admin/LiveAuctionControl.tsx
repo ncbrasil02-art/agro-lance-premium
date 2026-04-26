@@ -277,8 +277,14 @@
          }).eq("id", latestBid.id);
        }
  
-       toast.success("Lance via telefone registrado!");
-       setPhoneBid({ amount: 0, identifier: "" });
+        if (latestBid && phoneBid.profileId) {
+          await supabase.from("bids").update({
+            user_id: phoneBid.profileId
+          }).eq("id", latestBid.id);
+        }
+
+        toast.success("Lance via telefone registrado!");
+        setPhoneBid({ amount: 0, identifier: "", profileId: "" });
        fetchEventDetails(selectedEventId);
      } catch (error: any) {
        toast.error(error.message);
@@ -584,25 +590,85 @@
                      </div>
                      
                      <div className="space-y-2">
-                       <Label className="text-white/80">Valor do Lance</Label>
-                       <Input 
-                         type="number" 
-                         className="bg-white/10 border-white/20 text-white" 
-                         placeholder="0,00"
-                         value={phoneBid.amount || ""}
-                         onChange={(e) => setPhoneBid({...phoneBid, amount: parseFloat(e.target.value)})}
-                       />
-                     </div>
-                     
-                     <div className="space-y-2">
-                       <Label className="text-white/80">Identificador (Nome/Tel)</Label>
-                       <Input 
-                         className="bg-white/10 border-white/20 text-white" 
-                         placeholder="Ex: João (WhatsApp)"
-                         value={phoneBid.identifier}
-                         onChange={(e) => setPhoneBid({...phoneBid, identifier: e.target.value})}
-                       />
-                     </div>
+                        <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Valor do Lance</Label>
+                        <div className="grid grid-cols-3 gap-2 mb-2">
+                          {[500, 1000, 2000, 5000].map((inc) => (
+                            <Button
+                              key={inc}
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
+                              onClick={() => {
+                                const current = activeLot.current_price || activeLot.starting_price;
+                                setPhoneBid({ ...phoneBid, amount: current + inc });
+                              }}
+                            >
+                              +{formatBRL(inc)}
+                            </Button>
+                          ))}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
+                            onClick={() => {
+                              const current = activeLot.current_price || activeLot.starting_price;
+                              setPhoneBid({ ...phoneBid, amount: current + activeLot.bid_increment });
+                            }}
+                          >
+                            +Inc ({formatBRL(activeLot.bid_increment)})
+                          </Button>
+                        </div>
+                        <Input 
+                          type="number" 
+                          className="bg-white/10 border-white/20 text-white text-lg font-bold" 
+                          placeholder="0,00"
+                          value={phoneBid.amount || ""}
+                          onChange={(e) => setPhoneBid({...phoneBid, amount: parseFloat(e.target.value)})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Identificação (Telefone/Plaqueta)</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            className="bg-white/10 border-white/20 text-white flex-1" 
+                            placeholder="Ex: Plaquetão 45 / João"
+                            value={phoneBid.identifier}
+                            onChange={(e) => setPhoneBid({...phoneBid, identifier: e.target.value})}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Vincular a Cadastro Real (Opcional)</Label>
+                        <Select 
+                          value={phoneBid.profileId} 
+                          onValueChange={(val) => setPhoneBid({...phoneBid, profileId: val})}
+                        >
+                          <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                            <SelectValue placeholder="Selecione um cliente..." />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            <div className="p-2 border-b">
+                              <Input 
+                                placeholder="Filtrar por nome..." 
+                                className="h-8"
+                                value={searchProfile}
+                                onChange={(e) => setSearchProfile(e.target.value)}
+                              />
+                            </div>
+                            {profiles
+                              .filter(p => p.full_name?.toLowerCase().includes(searchProfile.toLowerCase()) || p.phone?.includes(searchProfile))
+                              .slice(0, 10)
+                              .map(p => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.full_name} {p.phone ? `(${p.phone})` : ''}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[9px] text-white/40 italic">Vincular agora facilita a geração de contratos após o leilão.</p>
+                      </div>
  
                      <Button 
                        className="w-full bg-gold text-emerald-deep font-bold hover:bg-gold/90"
