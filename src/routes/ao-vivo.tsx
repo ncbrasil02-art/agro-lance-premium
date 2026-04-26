@@ -108,32 +108,6 @@ export const Route = createFileRoute("/ao-vivo")({
         return { liveEvent: null };
       }
     },
-
-      let initialBids: any[] = [];
-      if (liveEvent.active_lot_id) {
-        const { data: bids, error: bidsError } = await supabase
-          .from("bids")
-          .select("*")
-          .eq("lot_id", liveEvent.active_lot_id)
-          .order("created_at", { ascending: false })
-          .limit(10);
-        
-        if (!bidsError && bids) {
-          initialBids = bids;
-        }
-      }
- 
-      try {
-        const validatedEvent = eventSchema.parse(liveEvent);
-        return { 
-          liveEvent: validatedEvent,
-          initialBids
-        };
-      } catch (e) {
-        console.error("Erro de validação do evento ao vivo:", e);
-        return { liveEvent: null };
-      }
-   },
    component: LivePage,
 });
 
