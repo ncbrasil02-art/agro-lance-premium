@@ -46,24 +46,31 @@ export const Route = createFileRoute("/ao-vivo")({
           return { liveEvent: null };
         }
 
-        if (!events || events.length === 0) return { liveEvent: null };
+        if (!events || events.length === 0) {
+          console.log("Nenhum evento live/scheduled encontrado no banco.");
+          return { liveEvent: null };
+        }
 
-        // Priority 1: Event explicitly marked as 'live'
-        let liveEvent = events.find(e => e.status === 'live');
+        // Priority 1: Event explicitly marked as 'live' that has an active lot
+        let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
         
-        // Priority 2: Event that has a transmission link and is starting soon (within 2 hours) or already started
+        // Priority 2: Any event explicitly marked as 'live'
+        if (!liveEvent) {
+          liveEvent = events.find(e => e.status === 'live');
+        }
+        
+        // Priority 3: Event starting soon (within 2 hours) or already started
         if (!liveEvent) {
           const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
           const fourHoursFromNow = new Date(now.getTime() + 4 * 60 * 60 * 1000);
           
           liveEvent = events.find(e => {
             const start = new Date(e.start_date);
-            const hasTransmission = !!e.transmission_link;
-            return hasTransmission && start >= twoHoursAgo && start <= fourHoursFromNow;
+            return start >= twoHoursAgo && start <= fourHoursFromNow;
           });
         }
 
-        // Priority 3: Scheduled event that should be happening now
+        // Priority 4: Scheduled event that should be happening now
         if (!liveEvent) {
           liveEvent = events.find(e => {
             const start = new Date(e.start_date);
@@ -72,7 +79,12 @@ export const Route = createFileRoute("/ao-vivo")({
           });
         }
 
-        if (!liveEvent) return { liveEvent: null };
+        if (!liveEvent) {
+          console.log("Nenhum evento atende aos critérios de 'ao vivo' no momento.");
+          return { liveEvent: null };
+        }
+
+        console.log("Evento selecionado para Ao Vivo:", liveEvent.name, "ID:", liveEvent.id);
 
         // Fallback 1: If active_lot_id is present but join failed
         if (liveEvent.active_lot_id && !liveEvent.active_lot) {
