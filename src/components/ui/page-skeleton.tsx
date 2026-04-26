@@ -1,3 +1,59 @@
+export function LotDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-background animate-in fade-in duration-500">
+      <div className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50">
+        <div className="container mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-8 w-32 rounded-full" />
+            <Skeleton className="h-10 w-16" />
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="space-y-6">
+            <Skeleton className="aspect-square w-full rounded-[2.5rem]" />
+            <div className="flex gap-4">
+              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 w-20 rounded-xl" />)}
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-3/4" />
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-24 rounded-full" />
+                <Skeleton className="h-5 w-24 rounded-full" />
+              </div>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-muted/30 border border-white/5 space-y-4">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-48" />
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <Skeleton className="h-12 rounded-xl" />
+                <Skeleton className="h-12 rounded-xl" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full rounded-2xl" />
+              <Skeleton className="h-20 w-full rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 import { Skeleton } from "./skeleton";
 import { Loader2 } from "lucide-react";
 
