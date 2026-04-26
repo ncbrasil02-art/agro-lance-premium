@@ -5,7 +5,8 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-  import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign, Filter } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign, Filter } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Checkbox } from "@/components/ui/checkbox";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -778,9 +779,15 @@
                    {formData.photos_urls && (
                      <div className="grid grid-cols-4 gap-2 mb-2">
                         {formData.photos_urls.split(",").map((url: string, i: number) => (
-                         <div key={i} className="relative aspect-square group">
-                           <img src={url.trim()} className="h-full w-full object-cover rounded-md border" alt="" />
-                           <button 
+                          <div key={i} className="relative aspect-square group">
+                            <OptimizedImage 
+                              src={url.trim()} 
+                              alt="" 
+                              width={200}
+                              aspectRatio="square"
+                              className="h-full w-full rounded-md border" 
+                            />
+                            <button 
                              type="button"
                              onClick={() => {
                                 const urls = formData.photos_urls.split(",").map((u: string) => u.trim()).filter(Boolean);
@@ -931,14 +938,16 @@
                  ) : (
                     filteredAnimals.map((animal) => (
                        <TableRow key={animal.id} className={animal.sale_status === 'sold' ? "opacity-60 bg-muted/20" : ""}>
-                        <TableCell>
-                          {animal.photos && animal.photos.length > 0 ? (
-                            <img 
-                              src={animal.photos[0]} 
-                              alt={animal.name} 
-                              className="h-10 w-10 rounded-md object-cover border"
-                            />
-                          ) : (
+                         <TableCell>
+                           {animal.photos && animal.photos.length > 0 ? (
+                             <OptimizedImage 
+                               src={animal.photos[0]} 
+                               alt={animal.name} 
+                               width={80}
+                               aspectRatio="square"
+                               className="h-10 w-10 rounded-md border"
+                             />
+                           ) : (
                             <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-[10px] text-muted-foreground border border-dashed">
                               Sem foto
                             </div>

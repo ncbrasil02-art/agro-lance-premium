@@ -1,4 +1,5 @@
 import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
  import { Button } from "@/components/ui/button";
@@ -616,7 +617,12 @@ export const Route = createFileRoute("/ao-vivo")({
                />
              ) : (
                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent text-center">
-                 <img src={liveLot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={liveLot.animal?.name} className="absolute inset-0 h-full w-full object-cover opacity-30" />
+                 <OptimizedImage 
+                   src={liveLot.animal?.photos?.[0] || ""} 
+                   alt={liveLot.animal?.name || "Animal"} 
+                   width={1280}
+                   className="absolute inset-0 h-full w-full object-cover opacity-30" 
+                 />
                  <Radio className="h-12 w-12 text-gold animate-pulse-live relative z-10" />
                  <p className="mt-3 text-sm font-bold uppercase tracking-wider text-gold relative z-10">Aguardando Transmissão</p>
                  <p className="text-white/80 text-xs relative z-10">O vídeo será exibido assim que o leiloeiro iniciar.</p>
@@ -649,13 +655,14 @@ export const Route = createFileRoute("/ao-vivo")({
           {/* Lote em destaque - Otimizado */}
           <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500">
             <div className="grid md:grid-cols-[1fr_1.2fr]">
-              {/* Lado Esquerdo: Foto Grande */}
-              <div className="relative aspect-square md:aspect-auto h-full group">
-                <img 
-                  src={liveLot.animal?.photos?.[activePhotoIndex] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-                  alt={liveLot.animal?.name} 
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                />
+               {/* Lado Esquerdo: Foto Grande */}
+               <div className="relative aspect-square md:aspect-auto h-full group">
+                 <OptimizedImage 
+                   src={liveLot.animal?.photos?.[activePhotoIndex] || ""} 
+                   alt={liveLot.animal?.name || "Animal"} 
+                   width={800}
+                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 {liveLot.animal?.photos?.length > 1 && (
@@ -689,7 +696,12 @@ export const Route = createFileRoute("/ao-vivo")({
                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-1">
                          {liveLot.animal?.photos?.map((photo: string, idx: number) => (
                            <div key={idx} className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-gold transition-colors cursor-pointer" onClick={() => setActivePhotoIndex(idx)}>
-                             <img src={photo} className="h-full w-full object-cover" />
+                             <OptimizedImage 
+                               src={photo} 
+                               alt={`${liveLot.animal?.name} - Foto ${idx + 1}`} 
+                               width={300}
+                               aspectRatio="square"
+                             />
                            </div>
                          ))}
                        </div>
