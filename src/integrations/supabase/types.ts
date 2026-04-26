@@ -968,7 +968,7 @@ export type Database = {
         | {
             Args: {
               p_amount: number
-              p_bid_type: string
+              p_bid_type?: string
               p_lot_id: string
               p_session_id?: string
             }
