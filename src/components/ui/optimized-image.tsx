@@ -14,6 +14,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   loading?: "lazy" | "eager";
   fallbackSrc?: string;
   category?: keyof typeof IMAGE_FALLBACKS;
+  priority?: "high" | "medium" | "low";
 }
 
 export function OptimizedImage({
@@ -23,10 +24,11 @@ export function OptimizedImage({
   height,
   className,
   aspectRatio = "auto",
-  quality = 80,
-  loading = "lazy",
+  quality,
+  loading,
   fallbackSrc,
   category = "default",
+  priority = "medium",
   ...props
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,9 +37,23 @@ export function OptimizedImage({
     return fallbackSrc || IMAGE_FALLBACKS[category] || IMAGE_FALLBACKS.default;
   }, [fallbackSrc, category]);
 
+  const finalQuality = useMemo(() => {
+    if (quality) return quality;
+    switch (priority) {
+      case "high": return 90;
+      case "low": return 60;
+      default: return 80;
+    }
+  }, [quality, priority]);
+
+  const finalLoading = useMemo(() => {
+    if (loading) return loading;
+    return priority === "high" ? "eager" : "lazy";
+  }, [loading, priority]);
+
   const optimizedUrl = useMemo(() => {
-    return getOptimizedImageUrl(src, { width, height, quality }, finalFallback);
-  }, [src, width, height, quality, finalFallback]);
+    return getOptimizedImageUrl(src, { width, height, quality: finalQuality }, finalFallback);
+  }, [src, width, height, finalQuality, finalFallback]);
 
   const [currentSrc, setCurrentSrc] = useState(optimizedUrl);
 
@@ -82,7 +98,7 @@ export function OptimizedImage({
         alt={alt}
         width={width}
         height={height}
-        loading={loading}
+        loading={finalLoading}
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
