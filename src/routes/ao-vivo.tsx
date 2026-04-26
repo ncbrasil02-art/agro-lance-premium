@@ -32,34 +32,82 @@ export const Route = createFileRoute("/ao-vivo")({
     ],
   }),
    loader: async () => {
-     // Search for an event that is explicitly live OR scheduled but whose time has already arrived
-     const { data: events, error: eventError } = await supabase
-        .from("events")
-        .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
-        .or("status.eq.live,status.eq.scheduled")
-        .order("start_date", { ascending: true });
+      try {
+        const now = new Date();
+        // First, search for ANY event that is live or scheduled today
+        const { data: events, error: eventError } = await supabase
+           .from("events")
+           .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+           .or("status.eq.live,status.eq.scheduled")
+           .order("start_date", { ascending: true });
 
-     if (eventError || !events || events.length === 0) return { liveEvent: null };
+        if (eventError) {
+          console.error("Erro ao buscar eventos ao vivo:", eventError);
+          return { liveEvent: null };
+        }
 
-     const now = new Date();
-      // First, try to find an event that is explicitly 'live' AND has an active lot
-      let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
-      
-      // If not found, look for any 'live' event
-      if (!liveEvent) {
-        liveEvent = events.find(e => e.status === 'live');
+        if (!events || events.length === 0) return { liveEvent: null };
+
+        // Priority 1: Event explicitly marked as 'live'
+        let liveEvent = events.find(e => e.status === 'live');
+        
+        // Priority 2: Event that has a transmission link and is starting soon (within 2 hours) or already started
+        if (!liveEvent) {
+          const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+          const fourHoursFromNow = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+          
+          liveEvent = events.find(e => {
+            const start = new Date(e.start_date);
+            const hasTransmission = !!e.transmission_link;
+            return hasTransmission && start >= twoHoursAgo && start <= fourHoursFromNow;
+          });
+        }
+
+        // Priority 3: Scheduled event that should be happening now
+        if (!liveEvent) {
+          liveEvent = events.find(e => {
+            const start = new Date(e.start_date);
+            const end = e.end_date ? new Date(e.end_date) : null;
+            return now >= start && (!end || now < end);
+          });
+        }
+
+        if (!liveEvent) return { liveEvent: null };
+
+        let initialBids: any[] = [];
+        if (liveEvent.active_lot_id) {
+          const { data: bids, error: bidsError } = await supabase
+            .from("bids")
+            .select("*")
+            .eq("lot_id", liveEvent.active_lot_id)
+            .order("created_at", { ascending: false })
+            .limit(10);
+          
+          if (!bidsError && bids) {
+            initialBids = bids;
+          }
+        }
+
+        // Try parsing, but don't fail hard if it's mostly valid data
+        try {
+          const validatedEvent = eventSchema.parse(liveEvent);
+          return { 
+            liveEvent: validatedEvent,
+            initialBids
+          };
+        } catch (schemaError) {
+          console.warn("Validação parcial do evento (usando dados brutos):", schemaError);
+          // Return the event as is if it has the required UI fields
+          if (liveEvent.id && liveEvent.name) {
+            return { liveEvent, initialBids };
+          }
+          return { liveEvent: null };
+        }
+      } catch (err) {
+        console.error("Erro fatal no loader ao-vivo:", err);
+        return { liveEvent: null };
       }
-
-      // If still not found, look for a scheduled event that should be happening now
-      if (!liveEvent) {
-        liveEvent = events.find(e => {
-          const start = new Date(e.start_date);
-          const end = e.end_date ? new Date(e.end_date) : null;
-          return now >= start && (!end || now < end);
-        });
-      }
-
-      if (!liveEvent) return { liveEvent: null };
+    },
 
       let initialBids: any[] = [];
       if (liveEvent.active_lot_id) {
