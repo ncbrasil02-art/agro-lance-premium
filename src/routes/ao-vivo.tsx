@@ -1,6 +1,6 @@
-import { MessageSquare, Phone } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
+import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
  import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -12,6 +12,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
   import { supabase } from "@/integrations/supabase/client";
@@ -199,6 +206,15 @@ export const Route = createFileRoute("/ao-vivo")({
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+
+  const nextPhoto = (photos: string[]) => {
+    setActivePhotoIndex((prev) => (prev + 1) % photos.length);
+  };
+
+  const prevPhoto = (photos: string[]) => {
+    setActivePhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
  
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
@@ -293,9 +309,10 @@ export const Route = createFileRoute("/ao-vivo")({
                   setTimeout(() => setStatusMessage(null), 8000);
                 }
                 
-                // If active lot changed, fetch bids for the new lot
+                // If active lot changed, fetch bids for the new lot and reset state
                 if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
                   console.log("Lote alterado em tempo real:", payload.new.active_lot_id);
+                  setActivePhotoIndex(0);
                   const { data: newBids } = await supabase
                     .from("bids")
                     .select("*")
@@ -629,47 +646,236 @@ export const Route = createFileRoute("/ao-vivo")({
              </div>
            </div>
 
-          {/* Lote em destaque */}
-          <div className="rounded-2xl border border-gold/30 bg-card p-6 shadow-gold">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-gold">Lote em destaque</span>
-                 <h2 className="mt-1 text-2xl font-bold">#{String(liveLot.lot_number).padStart(2, "0")} — {liveLot.animal?.name}</h2>
-                 <p className="text-sm text-muted-foreground">{liveLot.animal?.breed} · {liveLot.animal?.species}</p>
-              </div>
-               {liveLot.end_date && (
-                 <div className="text-right">
-                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Encerra em</div>
-                    <Countdown endsAt={liveLot.end_date as string} className="font-mono text-2xl font-bold text-live" />
-                 </div>
+          {/* Lote em destaque - Otimizado */}
+          <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500">
+            <div className="grid md:grid-cols-[1fr_1.2fr]">
+              {/* Lado Esquerdo: Foto Grande */}
+              <div className="relative aspect-square md:aspect-auto h-full group">
+                <img 
+                  src={liveLot.animal?.photos?.[activePhotoIndex] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+                  alt={liveLot.animal?.name} 
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                {liveLot.animal?.photos?.length > 1 && (
+                  <>
+                    <button 
+                      onClick={() => prevPhoto(liveLot.animal.photos)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-gold/80 transition-colors backdrop-blur-sm"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button 
+                      onClick={() => nextPhoto(liveLot.animal.photos)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-gold/80 transition-colors backdrop-blur-sm"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </>
                 )}
+
+                <div className="absolute bottom-4 left-4 flex gap-2">
+                   <Dialog>
+                     <DialogTrigger asChild>
+                       <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm hover:bg-gold hover:text-white transition-all shadow-lg font-bold">
+                         <Expand className="mr-2 h-3.5 w-3.5" /> VER GALERIA
+                       </Button>
+                     </DialogTrigger>
+                     <DialogContent className="max-w-4xl bg-emerald-deep border-gold/20">
+                       <DialogHeader>
+                         <DialogTitle className="text-gold">Fotos — {liveLot.animal?.name}</DialogTitle>
+                       </DialogHeader>
+                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-1">
+                         {liveLot.animal?.photos?.map((photo: string, idx: number) => (
+                           <div key={idx} className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-gold transition-colors cursor-pointer" onClick={() => setActivePhotoIndex(idx)}>
+                             <img src={photo} className="h-full w-full object-cover" />
+                           </div>
+                         ))}
+                       </div>
+                     </DialogContent>
+                   </Dialog>
+                </div>
               </div>
 
-             <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lance atual</div>
-               <div className="text-4xl font-bold text-gradient-gold">{formatBRL(currentPrice)}</div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                 {[1, 5, 10].map((mult) => (
-                   <Button 
-                     key={mult} 
-                     variant="outline" 
-                     className="border-gold/30 hover:bg-gold/10"
-                     disabled={isBidding}
-                     onClick={() => placeBid(currentPrice + (liveLot.bid_increment * mult))}
-                   >
-                     +{formatBRL(liveLot.bid_increment * mult)}
-                   </Button>
-                 ))}
-               </div>
-               <Button 
-                 className="mt-3 w-full bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold" 
-                 size="lg"
-                 disabled={isBidding}
-                 onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
-               >
-                 {isBidding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                 Dar lance de {formatBRL(currentPrice + liveLot.bid_increment)}
-              </Button>
+              {/* Lado Direito: Info e Lances */}
+              <div className="p-6 flex flex-col">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">Lote #{String(liveLot.lot_number).padStart(2, "0")}</span>
+                      {liveLot.animal?.registration_number && (
+                        <span className="text-[10px] text-muted-foreground">REG: {liveLot.animal.registration_number}</span>
+                      )}
+                    </div>
+                    <h2 className="text-2xl font-black text-emerald-deep tracking-tighter leading-none">{liveLot.animal?.name}</h2>
+                    <p className="text-sm text-muted-foreground font-medium">{liveLot.animal?.breed} · {liveLot.animal?.species}</p>
+                  </div>
+                  {liveLot.end_date && (
+                    <div className="text-right">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Encerra em</div>
+                      <Countdown endsAt={liveLot.end_date as string} className="font-mono text-xl font-black text-live" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-auto pt-6 space-y-4">
+                  <div className="rounded-2xl bg-emerald-deep/5 border border-emerald-deep/10 p-5 relative overflow-hidden group/price">
+                    <div className="absolute top-0 right-0 p-3 opacity-20 group-hover/price:opacity-100 transition-opacity">
+                       <Gavel className="h-10 w-10 text-gold" />
+                    </div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
+                      <div className="h-2 w-2 rounded-full bg-live animate-pulse" /> Lance atual
+                    </div>
+                    <div className="text-4xl font-black text-gradient-gold tracking-tighter">{formatBRL(currentPrice)}</div>
+                    
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {[1, 5, 10].map((mult) => (
+                        <Button 
+                          key={mult} 
+                          variant="outline" 
+                          size="sm"
+                          className="border-gold/30 hover:bg-gold/10 h-8 text-[11px] font-bold"
+                          disabled={isBidding}
+                          onClick={() => placeBid(currentPrice + (liveLot.bid_increment * mult))}
+                        >
+                          +{formatBRL(liveLot.bid_increment * mult)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] gap-2">
+                    <Button 
+                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider" 
+                      disabled={isBidding}
+                      onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
+                    >
+                      {isBidding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
+                      DAR LANCE ({formatBRL(currentPrice + liveLot.bid_increment)})
+                    </Button>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
+                          <Info className="h-5 w-5" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
+                        <DialogHeader className="border-b pb-4">
+                          <DialogTitle className="flex items-center gap-2 text-2xl font-black text-emerald-deep tracking-tight">
+                             <BadgeCheck className="h-6 w-6 text-gold" /> Informações do Animal
+                          </DialogTitle>
+                        </DialogHeader>
+                        
+                        <div className="py-4 space-y-8">
+                          {/* Descrição */}
+                          {liveLot.animal?.description && (
+                            <section>
+                              <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gold mb-3">
+                                <FileText className="h-4 w-4" /> Descrição Completa
+                              </h3>
+                              <p className="text-sm text-muted-foreground leading-relaxed italic border-l-4 border-gold/20 pl-4 py-1">
+                                "{liveLot.animal.description}"
+                              </p>
+                            </section>
+                          )}
+
+                          <div className="grid sm:grid-cols-2 gap-6">
+                            {/* Ficha Técnica */}
+                            <section>
+                              <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gold mb-3">
+                                <Info className="h-4 w-4" /> Ficha Técnica
+                              </h3>
+                              <div className="space-y-2 text-sm">
+                                {liveLot.animal?.registration_number && (
+                                  <div className="flex justify-between border-b border-border/40 pb-1">
+                                    <span className="text-muted-foreground">Registro Principal</span>
+                                    <span className="font-bold">{liveLot.animal.registration_number}</span>
+                                  </div>
+                                )}
+                                {liveLot.animal?.registration_1cc && (
+                                  <div className="flex justify-between border-b border-border/40 pb-1">
+                                    <span className="text-muted-foreground">Registro 1CC</span>
+                                    <span className="font-bold">{liveLot.animal.registration_1cc}</span>
+                                  </div>
+                                )}
+                                {liveLot.animal?.registration_2 && (
+                                  <div className="flex justify-between border-b border-border/40 pb-1">
+                                    <span className="text-muted-foreground">Registro Secundário</span>
+                                    <span className="font-bold">{liveLot.animal.registration_2}</span>
+                                  </div>
+                                )}
+                                <div className="flex justify-between border-b border-border/40 pb-1">
+                                  <span className="text-muted-foreground">Sexo</span>
+                                  <span className="font-bold uppercase">{liveLot.animal?.sex === 'male' ? 'Macho' : 'Fêmea'}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-border/40 pb-1">
+                                  <span className="text-muted-foreground">Pelagem</span>
+                                  <span className="font-bold">{liveLot.animal?.color || "-"}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-border/40 pb-1">
+                                  <span className="text-muted-foreground">Localização</span>
+                                  <span className="font-bold">{liveLot.animal?.location || "-"}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-border/40 pb-1">
+                                  <span className="text-muted-foreground">Peso / Altura</span>
+                                  <span className="font-bold">{liveLot.animal?.weight ? `${liveLot.animal.weight}kg` : "-"} / {liveLot.animal?.height ? `${liveLot.animal.height}m` : "-"}</span>
+                                </div>
+                              </div>
+                            </section>
+
+                            {/* Saúde / Vacinação */}
+                            <section>
+                              <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gold mb-3">
+                                <Syringe className="h-4 w-4" /> Saúde e Vacinação
+                              </h3>
+                              {liveLot.animal?.vaccination_records ? (
+                                <div className="bg-emerald-deep/5 rounded-lg p-3 space-y-2">
+                                   {Array.isArray(liveLot.animal.vaccination_records) ? (
+                                     liveLot.animal.vaccination_records.map((v: any, i: number) => (
+                                       <div key={i} className="flex items-center gap-2 text-xs">
+                                         <BadgeCheck className="h-3 w-3 text-emerald-600" />
+                                         <span className="font-medium">{v.vaccine || v.name}</span>
+                                         <span className="text-muted-foreground ml-auto">{v.date}</span>
+                                       </div>
+                                     ))
+                                   ) : (
+                                     <p className="text-xs text-muted-foreground">Registros disponíveis no catálogo físico.</p>
+                                   )}
+                                </div>
+                              ) : (
+                                <div className="text-center py-4 border-2 border-dashed border-border rounded-lg">
+                                   <p className="text-xs text-muted-foreground">Nenhum registro de vacinação cadastrado.</p>
+                                </div>
+                              )}
+                            </section>
+                          </div>
+
+                          {/* Genealogia */}
+                          <section>
+                            <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gold mb-3">
+                              <TreePine className="h-4 w-4" /> Genealogia (Pedigree)
+                            </h3>
+                            <div className="rounded-xl border border-gold/20 p-4 bg-emerald-deep/5 overflow-x-auto">
+                               <div className="min-w-[400px] flex items-center justify-around gap-4 text-xs">
+                                 <div className="flex flex-col items-center gap-2">
+                                   <div className="px-3 py-1 bg-white border border-gold/30 rounded shadow-sm font-bold text-emerald-deep">{liveLot.animal?.name}</div>
+                                 </div>
+                                 <div className="h-12 w-px bg-gold/30" />
+                                 <div className="flex flex-col gap-4">
+                                   <div className="px-2 py-1 bg-white/80 border border-gold/20 rounded shadow-sm font-bold">Pai: {(liveLot.animal?.genealogy as any)?.father || "A definir"}</div>
+                                   <div className="px-2 py-1 bg-white/80 border border-gold/20 rounded shadow-sm font-bold">Mãe: {(liveLot.animal?.genealogy as any)?.mother || "A definir"}</div>
+                                 </div>
+                               </div>
+                            </div>
+                          </section>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
