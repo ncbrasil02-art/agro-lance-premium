@@ -83,7 +83,7 @@ import { Countdown } from "./countdown";
           src={lot?.cover || ""} 
           alt={lot?.name || "Animal"} 
           width={400}
-          aspectRatio="9/16"
+          aspectRatio="portrait"
           category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
           className="transition-smooth group-hover:scale-105" 
         />
