@@ -2,15 +2,22 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Trash2, CheckCircle, Clock } from "lucide-react";
+ import { Loader2, Trash2, CheckCircle, Clock, Filter } from "lucide-react";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function EventRequestManagement() {
-  const [requests, setRequests] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+   const [requests, setRequests] = useState<any[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
+   const [statusFilter, setStatusFilter] = useState("all");
+   const filteredRequests = requests.filter(req => {
+     if (statusFilter === "all") return true;
+     return req.status === statusFilter;
+   });
+ 
 
   const fetchRequests = async () => {
     setIsLoading(true);
@@ -58,14 +65,29 @@ export function EventRequestManagement() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          Pedidos de Realização de Eventos
-          <Button variant="outline" size="sm" onClick={fetchRequests} disabled={isLoading}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
-          </Button>
-        </CardTitle>
-      </CardHeader>
+       <CardHeader className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+         <div>
+           <CardTitle>Pedidos de Realização de Eventos</CardTitle>
+         </div>
+         <div className="flex items-center gap-4">
+           <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
+             <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
+             <Select value={statusFilter} onValueChange={setStatusFilter}>
+               <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[140px] text-xs">
+                 <SelectValue placeholder="Filtrar Status" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="all">Todos os Pedidos</SelectItem>
+                 <SelectItem value="pending">Pendentes</SelectItem>
+                 <SelectItem value="completed">Atendidos</SelectItem>
+               </SelectContent>
+             </Select>
+           </div>
+           <Button variant="outline" size="sm" onClick={fetchRequests} disabled={isLoading}>
+             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
+           </Button>
+         </div>
+       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-8">
@@ -86,14 +108,14 @@ export function EventRequestManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {requests.length === 0 ? (
+                 {filteredRequests.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       Nenhum pedido encontrado.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  requests.map((req) => (
+                   filteredRequests.map((req) => (
                     <TableRow key={req.id}>
                       <TableCell className="text-xs">
                         {format(new Date(req.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
