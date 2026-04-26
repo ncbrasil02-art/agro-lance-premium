@@ -300,7 +300,47 @@
              </Table>
            </div>
          </CardContent>
-       </Card>
-     </div>
-   );
- }
+        </Card>
+ 
+        <Dialog open={isLogsDialogOpen} onOpenChange={setIsLogsDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Histórico de Auditoria</DialogTitle>
+              <DialogDescription>
+                Ações realizadas neste perfil.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+              {isLoadingLogs ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-gold" />
+                </div>
+              ) : selectedUserLogs.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Nenhum registro encontrado.</p>
+              ) : (
+                selectedUserLogs.map((log) => (
+                  <div key={log.id} className="flex flex-col p-3 rounded-lg border bg-muted/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className={log.action === 'APPROVE_USER' ? 'text-emerald-500 border-emerald-500' : 'text-amber-500 border-amber-500'}>
+                        {log.action === 'APPROVE_USER' ? 'Aprovação' : 'Revogação'}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(log.created_at), "dd/MM/yy HH:mm:ss", { locale: ptBR })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <UserCheck className="h-4 w-4 text-gold" />
+                      <span className="font-medium">{log.admin?.full_name || 'Sistema'}</span>
+                    </div>
+                    {log.ip_address && (
+                      <span className="text-[10px] text-muted-foreground mt-1 italic">IP: {log.ip_address}</span>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
