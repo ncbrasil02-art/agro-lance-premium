@@ -46,7 +46,7 @@ export const Route = createFileRoute("/ao-vivo")({
       let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
       
       // If not found, look for any 'live' event
-   if (!liveEvent) {
+      if (!liveEvent) {
         liveEvent = events.find(e => e.status === 'live');
       }
 
@@ -59,20 +59,27 @@ export const Route = createFileRoute("/ao-vivo")({
         });
       }
 
-     if (!liveEvent) return { liveEvent: null };
- 
-     const { data: bids, error: bidsError } = await supabase
-       .from("bids")
-       .select("*")
-        .eq("lot_id", liveEvent.active_lot_id!)
-       .order("created_at", { ascending: false })
-       .limit(10);
+      if (!liveEvent) return { liveEvent: null };
+
+      let initialBids = [];
+      if (liveEvent.active_lot_id) {
+        const { data: bids, error: bidsError } = await supabase
+          .from("bids")
+          .select("*")
+          .eq("lot_id", liveEvent.active_lot_id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        
+        if (!bidsError && bids) {
+          initialBids = bids;
+        }
+      }
  
       try {
         const validatedEvent = eventSchema.parse(liveEvent);
         return { 
           liveEvent: validatedEvent,
-          initialBids: bids || []
+          initialBids
         };
       } catch (e) {
         console.error("Erro de validação do evento ao vivo:", e);
