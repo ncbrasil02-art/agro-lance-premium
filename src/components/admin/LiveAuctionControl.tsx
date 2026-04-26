@@ -53,14 +53,22 @@
      }
    }, [selectedEventId]);
  
-   const fetchEvents = async () => {
-     const { data } = await supabase
-       .from("events")
-       .select("id, name")
-       .or("status.eq.live,status.eq.scheduled")
-       .order("start_date", { ascending: false });
-     setEvents(data || []);
-   };
+    const fetchEvents = async () => {
+      const { data } = await supabase
+        .from("events")
+        .select("id, name")
+        .or("status.eq.live,status.eq.scheduled")
+        .order("start_date", { ascending: false });
+      setEvents(data || []);
+    };
+
+    const fetchProfiles = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone, cpf")
+        .order("full_name");
+      setProfiles(data || []);
+    };
  
    const fetchEventDetails = async (eventId: string) => {
      setIsLoading(true);
