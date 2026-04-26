@@ -485,29 +485,38 @@
                          )}
                        </div>
                        <h4 className="font-bold truncate">{lot.animal?.name}</h4>
-                       <div className="mt-4 flex gap-2">
-                         {lot.id !== liveEvent.active_lot_id && lot.status !== 'finished' && (
-                           <Button 
-                             size="sm" 
-                             className="w-full bg-gold/10 text-gold hover:bg-gold/20"
-                             onClick={() => activateLot(lot.id)}
-                             disabled={isActionLoading}
-                           >
-                             <Play className="mr-1 h-3 w-3" /> Entrar no Ar
-                           </Button>
-                         )}
-                         {lot.id === liveEvent.active_lot_id && (
-                           <Button 
-                             size="sm" 
-                             variant="destructive" 
-                             className="w-full"
-                             onClick={() => finalizeLot(lot.id)}
-                             disabled={isActionLoading}
-                           >
-                             <Square className="mr-1 h-3 w-3" /> Finalizar
-                           </Button>
-                         )}
-                       </div>
+                        <div className="mt-4 flex flex-col gap-2">
+                          {lot.id !== liveEvent.active_lot_id && lot.status !== 'sold' && lot.status !== 'passed' && lot.status !== 'finished' && (
+                            <Button 
+                              size="sm" 
+                              className="w-full bg-gold/10 text-gold hover:bg-gold/20"
+                              onClick={() => activateLot(lot.id)}
+                              disabled={isActionLoading}
+                            >
+                              <Play className="mr-1 h-3 w-3" /> Entrar no Ar
+                            </Button>
+                          )}
+                          {lot.id === liveEvent.active_lot_id && (
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button 
+                                size="sm" 
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                onClick={() => sellLot(lot.id)}
+                                disabled={isActionLoading}
+                              >
+                                <Check className="mr-1 h-3 w-3" /> Arrematar
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => passLot(lot.id)}
+                                disabled={isActionLoading}
+                              >
+                                <Ban className="mr-1 h-3 w-3" /> Passou
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                      </div>
                    ))}
                  </div>
