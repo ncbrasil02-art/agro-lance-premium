@@ -33,31 +33,57 @@ import { Countdown } from "./countdown";
    );
  };
  
-  export function LotCard({ lot }: { 
-    lot: Lot & { 
-      eventStartDate?: string; 
-      eventEndDate?: string; 
-      allowsPreBidding?: boolean; 
-      eventStatus?: string;
-      father?: string;
-      mother?: string;
-      sex?: string;
-      color?: string;
-      birthDate?: string;
-      seller?: string;
-      location?: string;
-    } 
-  }) {
+   import { supabase } from "@/integrations/supabase/client";
+
+   export function LotCard({ lot: initialLot }: { 
+     lot: Lot & { 
+       eventStartDate?: string; 
+       eventEndDate?: string; 
+       allowsPreBidding?: boolean; 
+       eventStatus?: string;
+       father?: string;
+       mother?: string;
+       sex?: string;
+       color?: string;
+       birthDate?: string;
+       seller?: string;
+       location?: string;
+     } 
+   }) {
+    const [lot, setLot] = useState(initialLot);
     const [urgencyLevel, setUrgencyLevel] = useState<'normal' | 'urgent' | 'critical'>('normal');
     const triggeredAlerts = useRef<Set<number>>(new Set());
    
-   const dynamicStatus = useEffectiveLotStatus({
-     status: lot.status,
-     event_status: lot.eventStatus,
-     event_start_date: lot.eventStartDate,
-     event_end_date: lot.eventEndDate,
-     allows_pre_bidding: lot.allowsPreBidding
-   });
+    const dynamicStatus = useEffectiveLotStatus({
+      status: lot.status,
+      event_status: lot.eventStatus,
+      event_start_date: lot.eventStartDate,
+      event_end_date: lot.eventEndDate,
+      allows_pre_bidding: lot.allowsPreBidding
+    });
+
+    useEffect(() => {
+      const channel = supabase
+        .channel(`lot-card-${lot.id}`)
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lot.id}` },
+          (payload) => {
+            setLot(prev => ({
+              ...prev,
+              currentBid: payload.new.current_price || payload.new.starting_price || prev.currentBid,
+              bidsCount: payload.new.bids_count ?? prev.bidsCount,
+              status: payload.new.status ?? prev.status,
+              endsAt: payload.new.end_date ?? prev.endsAt
+            }));
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, [lot.id]);
  
     useEffect(() => {
       const checkUrgency = () => {

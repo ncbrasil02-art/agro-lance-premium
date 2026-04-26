@@ -61,9 +61,25 @@
            });
          };
 
-         const monitor = setInterval(checkAllLotsUrgency, 1000);
-         return () => clearInterval(monitor);
-       }, [lots]);
+        const monitor = setInterval(checkAllLotsUrgency, 1000);
+
+        // Real-time subscription for automatic updates
+        const channel = supabase
+          .channel('admin-lots-live')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'lots' },
+            () => {
+              fetchData(); // Simplest way to keep all relations in sync
+            }
+          )
+          .subscribe();
+
+        return () => {
+          clearInterval(monitor);
+          supabase.removeChannel(channel);
+        };
+      }, [lots]);
 
        const [formData, setFormData] = useState({
         event_id: "",
