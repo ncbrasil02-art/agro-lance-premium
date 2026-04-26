@@ -204,7 +204,7 @@ export const Route = createFileRoute("/ao-vivo")({
             .eq("id", liveEvent.active_lot_id as string)
             .single();
           if (data) {
-            setLiveEvent(prev => prev ? ({ ...prev, active_lot: data }) : null);
+            setLiveEvent((prev: any) => prev ? ({ ...prev, active_lot: data }) : null);
           }
         };
         fetchMissingLot();
