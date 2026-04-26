@@ -516,6 +516,7 @@ export type Database = {
           location: string | null
           mode: string | null
           name: string
+          photos: string[] | null
           promoter_company: string | null
           show_countdown: boolean | null
           slug: string | null
@@ -543,6 +544,7 @@ export type Database = {
           location?: string | null
           mode?: string | null
           name: string
+          photos?: string[] | null
           promoter_company?: string | null
           show_countdown?: boolean | null
           slug?: string | null
@@ -570,6 +572,7 @@ export type Database = {
           location?: string | null
           mode?: string | null
           name?: string
+          photos?: string[] | null
           promoter_company?: string | null
           show_countdown?: boolean | null
           slug?: string | null
