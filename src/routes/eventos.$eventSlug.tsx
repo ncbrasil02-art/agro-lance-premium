@@ -1,3 +1,4 @@
+ import { logger } from "@/utils/logger";
  import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
  import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
