@@ -740,11 +740,27 @@
                     Lances manuais recebidos no local físico ou lances de segurança.
                   </p>
                   
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[500, 1000, 2000, 5000].map(inc => (
+                      <Button 
+                        key={inc}
+                        variant="outline" 
+                        size="sm"
+                        className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-8 font-bold text-[10px]"
+                        onClick={() => {
+                          if (!activeLot) return;
+                          const base = activeLot.current_price || activeLot.starting_price;
+                          setSecurityBidAmount(base + inc);
+                        }}
+                        disabled={!activeLot}
+                      >
+                        +{formatBRL(inc)}
+                      </Button>
+                    ))}
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-10 font-bold"
+                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-8 font-bold text-[10px]"
                       onClick={() => {
                         if (!activeLot) return;
                         const base = activeLot.current_price || activeLot.starting_price;
@@ -752,20 +768,7 @@
                       }}
                       disabled={!activeLot}
                     >
-                      +{activeLot ? formatBRL(activeLot.bid_increment) : "..."}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-10 font-bold"
-                      onClick={() => {
-                        if (!activeLot) return;
-                        const base = activeLot.current_price || activeLot.starting_price;
-                        setSecurityBidAmount(base + (activeLot.bid_increment * 2));
-                      }}
-                      disabled={!activeLot}
-                    >
-                      +{(activeLot?.bid_increment || 0) * 2 ? formatBRL(activeLot.bid_increment * 2) : "..."}
+                      +Inc ({activeLot ? formatBRL(activeLot.bid_increment) : "..."})
                     </Button>
                   </div>
 
