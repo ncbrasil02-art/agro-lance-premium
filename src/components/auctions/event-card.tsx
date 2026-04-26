@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, MapPin, Users, Gavel, Timer } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { AuctionEvent } from "@/lib/mock-data";
 import { formatDateBR } from "@/lib/mock-data";
 import { StatusBadge } from "@/components/auctions/status-badge";
@@ -65,17 +66,19 @@ import { Countdown } from "@/components/auctions/countdown";
       aria-labelledby={`event-title-${event.id}`}
     >
       <div className="relative aspect-video overflow-hidden bg-emerald-deep/20">
-        {/* Background Blur */}
-        <img 
-          src={event?.cover || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+        {/* Background Blur - Very low quality for background effect */}
+        <OptimizedImage 
+          src={event?.cover || ""} 
           alt="" 
+          width={50}
+          quality={10}
           className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
         />
-        {/* Main Image Contained */}
-        <img 
-          src={event?.cover || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+        {/* Main Image Contained - High quality */}
+        <OptimizedImage 
+          src={event?.cover || ""} 
           alt={event?.name || "Evento"} 
-          loading="lazy" 
+          width={800}
           className="relative h-full w-full object-contain transition-smooth group-hover:scale-[1.02]" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
