@@ -181,7 +181,7 @@ export const Route = createFileRoute("/ao-vivo")({
           const { data } = await supabase
             .from("lots")
             .select("*, animal:animals(*)")
-            .eq("id", liveEvent.active_lot_id)
+            .eq("id", liveEvent.active_lot_id as string)
             .single();
           if (data) {
             setLiveEvent(prev => prev ? ({ ...prev, active_lot: data }) : null);
