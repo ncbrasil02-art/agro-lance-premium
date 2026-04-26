@@ -31,8 +31,8 @@ import { logger } from "@/utils/logger";
 
     if (urgent && (safeStatus === 'recebendo_lances' || safeStatus === 'live' || safeStatus === 'active')) {
       s = { 
-        label: "ÚLTIMOS MINUTOS!", 
-        cls: "bg-live/20 text-live border-live shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-blink-fast", 
+        label: "ABERTO PARA LANCES", 
+        cls: "bg-live/20 text-live border-live shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-blink-fast", 
         dot: true 
       };
     }
