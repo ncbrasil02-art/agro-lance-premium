@@ -69,7 +69,9 @@
         event_id: "",
         animal_id: "",
         lot_number: 1,
-        starting_price: 0,
+         starting_price: 0,
+         reserve_price: 0,
+         safety_price: 0,
         bid_increment: 1000,
         status: "active",
         allows_pre_bidding: true,
@@ -84,7 +86,7 @@
           const [lotsRes, eventsRes, animalsRes] = await Promise.all([
             supabase
               .from("lots")
-               .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
+                .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
               .order("is_featured", { ascending: false })
               .order("lot_number", { ascending: true }),
             supabase
@@ -142,7 +144,9 @@
           event_id: initialEventId !== "all" ? initialEventId : "",
           animal_id: "",
           lot_number: 1,
-          starting_price: 0,
+           starting_price: 0,
+           reserve_price: 0,
+           safety_price: 0,
           bid_increment: 1000,
           status: "active",
           allows_pre_bidding: true,
@@ -157,7 +161,9 @@
           event_id: lot.event_id || "",
           animal_id: lot.animal_id || "",
           lot_number: lot.lot_number || 1,
-          starting_price: lot.starting_price || 0,
+           starting_price: lot.starting_price || 0,
+           reserve_price: lot.reserve_price || 0,
+           safety_price: lot.safety_price || 0,
           bid_increment: lot.bid_increment || 1000,
           status: lot.status || "active",
           allows_pre_bidding: lot.allows_pre_bidding !== false,
@@ -181,7 +187,9 @@
                 event_id: formData.event_id,
                 animal_id: formData.animal_id,
                 lot_number: formData.lot_number,
-                starting_price: formData.starting_price,
+                 starting_price: formData.starting_price,
+                 reserve_price: formData.reserve_price,
+                 safety_price: formData.safety_price,
                 bid_increment: formData.bid_increment,
                 status: formData.status,
                 allows_pre_bidding: formData.allows_pre_bidding,
@@ -196,8 +204,10 @@
               event_id: formData.event_id,
               animal_id: formData.animal_id,
               lot_number: formData.lot_number,
-              starting_price: formData.starting_price,
-              current_price: formData.starting_price,
+               starting_price: formData.starting_price,
+               current_price: formData.starting_price,
+               reserve_price: formData.reserve_price,
+               safety_price: formData.safety_price,
               bid_increment: formData.bid_increment,
               status: formData.status,
               allows_pre_bidding: formData.allows_pre_bidding,
@@ -367,14 +377,37 @@
                    />
                  </div>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="price">Preço Inicial (R$)</Label>
-                 <Input 
-                   type="number" 
-                    value={formData.starting_price} 
-                    onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
-                 />
-               </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="price">Preço Inicial (R$)</Label>
+                    <Input 
+                      type="number" 
+                      value={formData.starting_price} 
+                      onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="reserve_price">Preço Reserva (R$)</Label>
+                    <Input 
+                      type="number" 
+                      value={formData.reserve_price} 
+                      onChange={(e) => setFormData({ ...formData, reserve_price: parseFloat(e.target.value) })} 
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2 p-3 bg-gold/5 rounded-xl border border-gold/10">
+                  <Label htmlFor="safety_price" className="text-gold font-bold flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4" /> Alvo de Segurança (R$)
+                  </Label>
+                  <Input 
+                    type="number" 
+                    value={formData.safety_price} 
+                    onChange={(e) => setFormData({ ...formData, safety_price: parseFloat(e.target.value) })} 
+                    className="border-gold/30 focus-visible:ring-gold"
+                    placeholder="Valor máximo para lance automático de segurança"
+                  />
+                  <p className="text-[10px] text-muted-foreground italic">Define o valor que o botão "Segurança" tentará atingir.</p>
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="payments">Condições de Pagamento / Parcelamento</Label>
                   <Input 
@@ -452,8 +485,8 @@
                        const now = Date.now();
                        const isUrgent = endsAt && (endsAt - now > 0) && (endsAt - now < 600000);
                        const hasNoBids = (lot.bids_count || 0) === 0;
-                       const currentPrice = lot.current_price || lot.starting_price || 0;
-                       const isPriceLow = currentPrice <= lot.starting_price;
+                        const currentPrice = lot.current_price || lot.starting_price || 0;
+                        const isBelowReserve = lot.reserve_price && currentPrice < lot.reserve_price;
 
                        return (
                          <TableRow 
@@ -488,7 +521,18 @@
                                <span className="font-black text-sm text-emerald-deep">
                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
                                </span>
-                               <span className="text-[9px] text-muted-foreground italic">Início: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}</span>
+                               <div className="flex flex-col gap-0.5 mt-1">
+                                 <span className="text-[9px] text-muted-foreground">Início: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}</span>
+                                 {lot.reserve_price > 0 && (
+                                   <span className={`text-[9px] font-bold ${isBelowReserve ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                     Reserva: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.reserve_price)}
+                                     {isBelowReserve ? ' (Abaixo)' : ' (Atingida!)'}
+                                   </span>
+                                 )}
+                                 {lot.safety_price > 0 && (
+                                   <span className="text-[9px] text-gold font-medium">Alvo Seg.: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.safety_price)}</span>
+                                 )}
+                               </div>
                              </div>
                            </TableCell>
                            <TableCell>
@@ -521,7 +565,17 @@
                                    size="sm" 
                                    className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
                                    onClick={async () => {
-                                     const bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                     let bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                     
+                                     // Se houver um alvo de segurança e o valor atual estiver abaixo dele, 
+                                     // podemos sugerir ou aplicar o alvo se for o caso, 
+                                     // mas por regra de leilão geralmente subimos um incremento.
+                                     // Se o alvo for atingido, paramos.
+                                     if (lot.safety_price && currentPrice >= lot.safety_price) {
+                                       toast.info("Alvo de segurança já atingido para este lote.");
+                                       return;
+                                     }
+
                                      const { data: { user } } = await supabase.auth.getUser();
                                      if (!user) return;
                                      

@@ -594,6 +594,7 @@ export type Database = {
           lot_number: number
           payment_methods: string[] | null
           reserve_price: number | null
+          safety_price: number | null
           starting_price: number
           status: string | null
           updated_at: string
@@ -614,6 +615,7 @@ export type Database = {
           lot_number: number
           payment_methods?: string[] | null
           reserve_price?: number | null
+          safety_price?: number | null
           starting_price: number
           status?: string | null
           updated_at?: string
@@ -634,6 +636,7 @@ export type Database = {
           lot_number?: number
           payment_methods?: string[] | null
           reserve_price?: number | null
+          safety_price?: number | null
           starting_price?: number
           status?: string | null
           updated_at?: string
