@@ -83,8 +83,11 @@ export function getEffectiveLotStatus(lot: {
   const eventEnd = lot.event_end_date ? new Date(lot.event_end_date) : null;
 
   if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+  if (lot.status === 'passed') return 'passed';
   if (lot.event_status === 'finished' || (eventEnd && now >= eventEnd)) {
-    return lot.status === 'sold' ? 'sold' : 'finished';
+    if (lot.status === 'sold') return 'sold';
+    if (lot.status === 'passed') return 'passed';
+    return 'finished';
   }
 
   // Se a data de início do evento já passou há mais de 24h e não tem data de fim, 
