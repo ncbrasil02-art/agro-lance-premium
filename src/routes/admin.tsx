@@ -17,8 +17,9 @@ export const Route = createFileRoute("/admin")({
   import { AnimalManagement } from "@/components/admin/AnimalManagement";
   import { SellerManagement } from "@/components/admin/SellerManagement";
  import { CategoryManagement } from "@/components/admin/CategoryManagement";
-  import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
-  import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
+   import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
+   import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
+   import { UserManagement } from "@/components/admin/UserManagement";
  
   type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "settings";
  
@@ -154,7 +155,7 @@ function AdminLayout() {
           {activeTab === "dashboard" && (
             <>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                 <Card className="cursor-pointer hover:bg-muted/10 transition-colors" onClick={() => setActiveTab("users")}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total de Lances</CardTitle>
                     <Gavel className="h-4 w-4 text-muted-foreground" />
@@ -234,7 +235,10 @@ function AdminLayout() {
                       >
                         <ShieldCheck className="mr-2 h-4 w-4" /> Lance de Segurança
                       </Button>
-                     <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
+                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("users")}>
+                         <Users className="mr-2 h-4 w-4" /> Gestão de Usuários
+                       </Button>
+                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
                   </CardContent>
                 </Card>
               </div>
@@ -253,12 +257,7 @@ function AdminLayout() {
           {activeTab === "event_requests" && <EventRequestManagement />}
           {activeTab === "direct_sales" && <DirectSaleManagement />}
           {activeTab === "sellers" && <SellerManagement />}
-          {activeTab === "users" && (
-            <Card>
-              <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
-              <CardContent><p className="text-muted-foreground">Módulo de gestão de usuários em desenvolvimento.</p></CardContent>
-            </Card>
-          )}
+           {activeTab === "users" && <UserManagement />}
            {activeTab === "settings" && (
              <Card>
                <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
