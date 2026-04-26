@@ -513,9 +513,8 @@
                            </TableCell>
                          </TableRow>
                        );
-                     })
-                   )
-                 )}
+                      })}
+                  </TableBody>
                </TableBody>
              </Table>
            )}
