@@ -31,6 +31,7 @@ export type Database = {
           height: number | null
           id: string
           internal_code: string | null
+          is_direct_sale: boolean | null
           location: string | null
           name: string
           pedigree_url: string | null
@@ -38,6 +39,8 @@ export type Database = {
           registration_1cc: string | null
           registration_2: string | null
           registration_number: string | null
+          sale_price: number | null
+          sale_status: string | null
           seller_id: string | null
           sex: string | null
           species: string | null
@@ -64,6 +67,7 @@ export type Database = {
           height?: number | null
           id?: string
           internal_code?: string | null
+          is_direct_sale?: boolean | null
           location?: string | null
           name: string
           pedigree_url?: string | null
@@ -71,6 +75,8 @@ export type Database = {
           registration_1cc?: string | null
           registration_2?: string | null
           registration_number?: string | null
+          sale_price?: number | null
+          sale_status?: string | null
           seller_id?: string | null
           sex?: string | null
           species?: string | null
@@ -97,6 +103,7 @@ export type Database = {
           height?: number | null
           id?: string
           internal_code?: string | null
+          is_direct_sale?: boolean | null
           location?: string | null
           name?: string
           pedigree_url?: string | null
@@ -104,6 +111,8 @@ export type Database = {
           registration_1cc?: string | null
           registration_2?: string | null
           registration_number?: string | null
+          sale_price?: number | null
+          sale_status?: string | null
           seller_id?: string | null
           sex?: string | null
           species?: string | null
@@ -306,6 +315,63 @@ export type Database = {
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      direct_sales: {
+        Row: {
+          animal_id: string
+          buyer_email: string | null
+          buyer_id: string | null
+          buyer_name: string | null
+          buyer_phone: string | null
+          created_at: string | null
+          id: string
+          shipping_details: Json | null
+          status: string | null
+          total_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          animal_id: string
+          buyer_email?: string | null
+          buyer_id?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string | null
+          id?: string
+          shipping_details?: Json | null
+          status?: string | null
+          total_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          animal_id?: string
+          buyer_email?: string | null
+          buyer_id?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string | null
+          id?: string
+          shipping_details?: Json | null
+          status?: string | null
+          total_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_sales_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_sales_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
