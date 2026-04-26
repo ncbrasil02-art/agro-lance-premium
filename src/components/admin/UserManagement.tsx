@@ -93,7 +93,9 @@
          new_data: { is_blocked: newStatus }
        });
  
-       toast.success(newStatus ? "Usuário bloqueado" : "Usuário desbloqueado");
+        toast.success(newStatus ? "Conta Restrita" : "Conta Liberada", {
+          description: newStatus ? "O usuário não poderá dar lances até ser desbloqueado." : "O usuário agora pode navegar e participar normalmente.",
+        });
        fetchUsers();
      } catch (error: any) {
        toast.error("Erro ao atualizar status: " + error.message);
@@ -148,7 +150,9 @@
          new_data: { is_approved: newStatus }
        });
  
-       toast.success(newStatus ? "Usuário aprovado com sucesso" : "Aprovação removida");
+        toast.success(newStatus ? "Usuário Aprovado" : "Aprovação Revogada", {
+          description: newStatus ? "Cadastro validado. O licitante está habilitado para o leilão." : "O licitante não poderá mais realizar lances.",
+        });
        fetchUsers();
      } catch (error: any) {
        toast.error("Erro ao atualizar status: " + error.message);
