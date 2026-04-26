@@ -148,8 +148,11 @@ export const Route = createFileRoute("/ao-vivo")({
    component: LivePage,
 });
 
- function LivePage() {
-   const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
+  function LivePage() {
+    const loaderData = Route.useLoaderData() as any;
+    const initialEvent = loaderData?.liveEvent;
+    const initialBids = loaderData?.initialBids;
+    console.log("LivePage Render - initialEvent:", initialEvent?.name);
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
    const [bids, setBids] = useState(initialBids);
