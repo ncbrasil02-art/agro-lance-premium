@@ -1,44 +1,4 @@
  import { useState, useEffect, useRef } from "react";
-      const triggeredAlerts = useRef<Record<string, Set<number>>>({});
-
-      useEffect(() => {
-        const checkAllLotsUrgency = () => {
-          const now = Date.now();
-          lots.forEach(lot => {
-            if (lot.status !== 'active') return;
-            
-            const endsAt = lot.event?.end_date ? new Date(lot.event.end_date).getTime() : null;
-            if (!endsAt) return;
-            
-            const diff = endsAt - now;
-            if (diff <= 0) return;
-
-            const thresholds = [
-              { min: 5, ms: 300000 },
-              { min: 2, ms: 120000 },
-              { min: 1, ms: 60000 }
-            ];
-
-            if (!triggeredAlerts.current[lot.id]) {
-              triggeredAlerts.current[lot.id] = new Set();
-            }
-
-            thresholds.forEach(t => {
-              if (diff <= t.ms && diff > t.ms - 10000 && !triggeredAlerts.current[lot.id].has(t.min)) {
-                toast.error(`URGENTE: Lote ${lot.lot_number} encerra em ${t.min} min!`, {
-                  description: lot.animal?.name,
-                  duration: 10000,
-                });
-                triggeredAlerts.current[lot.id].add(t.min);
-              }
-            });
-          });
-        };
-
-        const monitor = setInterval(checkAllLotsUrgency, 1000);
-        return () => clearInterval(monitor);
-      }, [lots]);
-
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
