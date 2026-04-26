@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { FormSkeleton } from "@/components/ui/form-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar — Premium Agro Leilões" }] }),
   component: LoginPage,
+  pendingComponent: FormSkeleton,
 });
 
 function LoginPage() {
