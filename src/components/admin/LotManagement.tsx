@@ -485,7 +485,7 @@
                                   event_status: lot.event?.status,
                                   event_start_date: lot.event?.start_date,
                                   event_end_date: lot.event?.end_date,
-                                  allows_pre_bidding: lot.allows_pre_bidding
+                                   allows_pre_bidding: !!lot.allows_pre_bidding
                                  }) && (
                                    <span className="text-[9px] text-muted-foreground italic font-medium">Sync: {lot.status}</span>
                                  )}
