@@ -657,7 +657,10 @@ import {
                                                toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
                                                fetchData();
                                              } else {
-                                               toast.error(result.message);
+                                               toast.error("Não foi possível realizar o lance", {
+                                                 description: result.message,
+                                                 duration: 5000
+                                               });
                                              }
                                            } catch (error: any) {
                                              toast.error("Erro no lance: " + error.message);

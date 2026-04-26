@@ -121,14 +121,24 @@ export const Route = createFileRoute("/ao-vivo")({
     const executeBid = async (amount: number) => {
       setIsBidding(true);
       try {
-        const { error } = await supabase.from("bids").insert({
-          lot_id: (liveLot as any).id,
-          user_id: user?.id,
-          amount,
-          bid_type: "online",
+        const { data, error } = await supabase.rpc("place_bid_safe", {
+          p_lot_id: (liveLot as any).id,
+          p_amount: amount,
+          p_bid_type: "online",
+          p_session_id: "live-session",
         });
+
         if (error) throw error;
-        toast.success("Lance efetuado com sucesso!");
+
+        const result = data as { success: boolean; message: string };
+        if (result.success) {
+          toast.success(result.message);
+        } else {
+          toast.error(result.message, {
+            duration: 6000,
+            icon: <AlertTriangle className="h-4 w-4 text-destructive" />,
+          });
+        }
       } catch (error: any) {
         toast.error(error.message || "Erro ao efetuar lance.");
       } finally {

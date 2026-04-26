@@ -73,7 +73,10 @@ function LoginPage() {
       } else if (message === "Email not confirmed") {
         message = "Por favor, confirme seu e-mail. Verifique sua caixa de entrada e spam.";
       }
-      toast.error(message || "Erro ao entrar");
+      toast.error("Ops! Não foi possível entrar", {
+        description: message || "Ocorreu um erro inesperado ao tentar acessar sua conta. Tente novamente em alguns instantes.",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
