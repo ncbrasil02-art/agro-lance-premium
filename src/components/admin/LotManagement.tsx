@@ -5,7 +5,8 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-   import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info } from "lucide-react";
+ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
@@ -339,23 +340,47 @@
                       onChange={(e) => setFormData({ ...formData, lot_number: parseInt(e.target.value) })} 
                    />
                  </div>
-                 <div className="grid gap-2">
-                   <Label htmlFor="increment">Incremento (R$)</Label>
-                   <Input 
-                     type="number" 
-                      value={formData.bid_increment} 
-                      onChange={(e) => setFormData({ ...formData, bid_increment: parseFloat(e.target.value) })} 
-                   />
-                 </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-1">
+                      <Label htmlFor="increment">Incremento (R$)</Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Valor mínimo adicionado ao preço atual a cada novo lance.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input 
+                      type="number" 
+                       value={formData.bid_increment} 
+                       onChange={(e) => setFormData({ ...formData, bid_increment: parseFloat(e.target.value) })} 
+                    />
+                  </div>
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="price">Preço Inicial (R$)</Label>
-                 <Input 
-                   type="number" 
-                    value={formData.starting_price} 
-                    onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
-                 />
-               </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-1">
+                    <Label htmlFor="price">Preço Inicial (R$)</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Valor de abertura do leilão para este lote.
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <Input 
+                    type="number" 
+                     value={formData.starting_price} 
+                     onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
+                  />
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="payments">Condições de Pagamento / Parcelamento</Label>
                   <Input 
