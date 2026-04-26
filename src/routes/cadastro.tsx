@@ -43,10 +43,21 @@ function SignupPage() {
 
       if (error) throw error;
 
-      toast.success("Conta criada com sucesso! Você receberá um e-mail de confirmação. Lembre-se que sua conta passará por uma aprovação manual para liberar lances.");
+      toast.success("Conta criada com sucesso!", {
+        description: "Você receberá um e-mail de confirmação. Lembre-se que sua conta passará por uma aprovação manual por nossa equipe para que você possa dar lances.",
+        duration: 8000,
+      });
       navigate({ to: "/login" });
     } catch (error: any) {
-      toast.error(error.message || "Erro ao criar conta");
+      let message = error.message;
+      if (message === "User already registered") {
+        message = "Este e-mail já está cadastrado em nossa plataforma. Tente fazer login ou recuperar sua senha.";
+      }
+      
+      toast.error("Erro ao criar conta", {
+        description: message || "Verifique se todos os campos estão corretos e tente novamente.",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
