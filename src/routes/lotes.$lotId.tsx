@@ -220,18 +220,40 @@ function LotDetail() {
      allows_pre_bidding: lot.event?.allows_pre_bidding
    });
    
-   const [isUrgent, setIsUrgent] = useState(false);
+   const [urgencyLevel, setUrgencyLevel] = useState<'normal' | 'urgent' | 'critical'>('normal');
+   const triggeredAlerts = useRef<Set<number>>(new Set());
+
    useEffect(() => {
      const checkUrgency = () => {
        const endsAt = lot.end_date || lot.event?.end_date;
-       if (!endsAt) return;
+       if (!endsAt || (dynamicStatus !== 'recebendo_lances' && dynamicStatus !== 'pre_lance')) return;
+       
        const diff = new Date(endsAt).getTime() - Date.now();
-       setIsUrgent(diff > 0 && diff < 600000);
+       if (diff <= 0) return;
+
+       const thresholds = [
+         { min: 5, ms: 300000 },
+         { min: 2, ms: 120000 },
+         { min: 1, ms: 60000 }
+       ];
+
+       thresholds.forEach(t => {
+         if (diff <= t.ms && diff > t.ms - 5000 && !triggeredAlerts.current.has(t.min)) {
+           toast.warning(`Atenção: Faltam ${t.min} minuto${t.min > 1 ? 's' : ''} para este lote encerrar!`, {
+             duration: 10000,
+           });
+           triggeredAlerts.current.add(t.min);
+         }
+       });
+
+       if (diff < 120000) setUrgencyLevel('critical');
+       else if (diff < 600000) setUrgencyLevel('urgent');
+       else setUrgencyLevel('normal');
      };
-     const timer = setInterval(checkUrgency, 5000);
+     const timer = setInterval(checkUrgency, 1000);
      checkUrgency();
      return () => clearInterval(timer);
-   }, [lot.end_date, lot.event?.end_date]);
+   }, [lot.end_date, lot.event?.end_date, dynamicStatus]);
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
@@ -261,7 +283,7 @@ function LotDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-             <StatusBadge status={dynamicStatus} urgent={isUrgent} className="scale-90 md:scale-100 origin-right" />
+             <StatusBadge status={dynamicStatus} urgent={urgencyLevel !== 'normal'} className="scale-90 md:scale-100 origin-right" />
             {dynamicStatus === 'loteamento' && lot.event?.start_date && (
               <div className="hidden md:flex items-center gap-2 bg-black/20 border border-white/10 px-3 py-1 rounded-full text-[10px] font-mono text-white/60">
                 <Timer className="h-3 w-3" />
@@ -286,7 +308,7 @@ function LotDetail() {
                     <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                     <div className="absolute left-6 top-6 flex flex-col gap-2">
-                     <StatusBadge status={dynamicStatus} urgent={isUrgent} />
+                     <StatusBadge status={dynamicStatus} urgent={urgencyLevel !== 'normal'} />
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
                       <Eye className="h-10 w-10 text-white/50" />
