@@ -19,8 +19,9 @@
    const [liveEvent, setLiveEvent] = useState<any>(null);
    const [lots, setLots] = useState<any[]>([]);
    const [activeLot, setActiveLot] = useState<any>(null);
-   const [isLoading, setIsLoading] = useState(false);
-   const [isActionLoading, setIsActionLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isActionLoading, setIsActionLoading] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [transmissionLink, setTransmissionLink] = useState("");
    
     // Phone bid form
@@ -40,9 +41,11 @@
      "Lote em destaque na tela!"
    ];
  
-   useEffect(() => {
-     fetchEvents();
-   }, []);
+    useEffect(() => {
+      fetchEvents();
+      fetchProfiles();
+      supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null));
+    }, []);
  
    useEffect(() => {
      if (selectedEventId) {
@@ -155,32 +158,51 @@
      }
    };
  
-    const sellLot = async (lotId: string) => {
-      if (!confirm("Confirmar ARREMATE deste lote para o maior lance atual?")) return;
-      setIsActionLoading(true);
-      try {
-        // Find the winner (last bid)
-        const { data: lastBid } = await supabase
-          .from("bids")
-          .select("user_id")
-          .eq("lot_id", lotId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+     const sellLot = async (lotId: string) => {
+       // Find the winner (last bid)
+       const { data: lastBid } = await supabase
+         .from("bids")
+         .select("*, profile:profiles(full_name)")
+         .eq("lot_id", lotId)
+         .order("created_at", { ascending: false })
+         .limit(1)
+         .maybeSingle();
 
-        await supabase.from("lots").update({ 
-          status: 'sold', 
-          is_currently_live: false,
-          winner_id: lastBid?.user_id || null
-        }).eq("id", lotId);
-        
-        await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
-      } catch (error) {
-        toast.error("Erro ao arrematar lote");
-      } finally {
-        setIsActionLoading(false);
-      }
-    };
+       let finalWinnerId = lastBid?.user_id || null;
+       
+       // If it was a bid by the admin (phone/manual), or if we want to confirm/override
+       if (lastBid?.user_id === currentUserId || lastBid?.is_phone_bid) {
+         const promptText = lastBid?.is_phone_bid 
+           ? `Lote arrematado por lance de TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`
+           : `Lote arrematado por lance MANUAL no auditório.\n\nDeseja vincular este arremate a um cadastro real agora?`;
+           
+         if (confirm(promptText)) {
+            if (phoneBid.profileId) {
+              finalWinnerId = phoneBid.profileId;
+            } else {
+              toast.info("Por favor, selecione o 'Cadastro Real' no formulário lateral antes de clicar em Arrematar para vincular automaticamente.");
+              return;
+            }
+         }
+       } else {
+         if (!confirm(`Confirmar ARREMATE deste lote para ${lastBid?.profile?.full_name || 'o maior lance'} no valor de ${formatBRL(lastBid?.amount || 0)}?`)) return;
+       }
+
+       setIsActionLoading(true);
+       try {
+         await supabase.from("lots").update({ 
+           status: 'sold', 
+           is_currently_live: false,
+           winner_id: finalWinnerId
+         }).eq("id", lotId);
+         
+         await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
+       } catch (error) {
+         toast.error("Erro ao arrematar lote");
+       } finally {
+         setIsActionLoading(false);
+       }
+     };
 
     const passLot = async (lotId: string) => {
       if (!confirm("Finalizar lote sem venda? (Passou)")) return;
