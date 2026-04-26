@@ -55,7 +55,52 @@ export function LotDetailSkeleton() {
   );
 }
 import { Skeleton } from "./skeleton";
-import { Loader2 } from "lucide-react";
+import { Loader2, Calendar, MapPin, Gavel, Trophy } from "lucide-react";
+export function EventDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-500">
+      <div className="relative h-[40vh] md:h-[50vh] overflow-hidden bg-muted">
+        <Skeleton className="h-full w-full" />
+      </div>
+
+      <section className="relative -mt-40 md:-mt-60 z-10 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.8fr] items-start">
+            <div className="mx-auto w-full max-w-md lg:max-w-none">
+              <Skeleton className="aspect-[3/4] md:aspect-square lg:aspect-[4/5] w-full rounded-[2rem] md:rounded-[3rem]" />
+            </div>
+
+            <div className="flex flex-col lg:pt-12 space-y-8">
+              <div className="flex gap-4">
+                <Skeleton className="h-8 w-32 rounded-full" />
+                <Skeleton className="h-8 w-48 rounded-full" />
+              </div>
+              
+              <Skeleton className="h-20 w-full md:h-32" />
+              
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-5/6" />
+                <Skeleton className="h-6 w-2/3" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map(i => (
+                  <Skeleton key={i} className="h-24 rounded-[2rem]" />
+                ))}
+              </div>
+
+              <div className="flex gap-4">
+                <Skeleton className="h-20 flex-1 rounded-[1.5rem]" />
+                <Skeleton className="h-20 w-48 rounded-[1.5rem]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
 
 export function PageSkeleton() {
   return (
