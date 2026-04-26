@@ -4,8 +4,9 @@ import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
- import { useEffectiveLotStatus } from "@/utils/auction-status";
- import { useState, useEffect } from "react";
+  import { useEffectiveLotStatus } from "@/utils/auction-status";
+  import { useState, useEffect, useMemo } from "react";
+  import { useLotRealtime } from "@/hooks/useRealtimeEvent";
 
  const AnimalIcon = ({ breed }: { breed?: string }) => {
    const b = breed?.toLowerCase() || "";
@@ -32,8 +33,8 @@ import { Countdown } from "./countdown";
    );
  };
  
-  export function LotCard({ lot }: { 
-    lot: Lot & { 
+   export function LotCard({ lot: initialLot }: { 
+     lot: Lot & { 
       eventStartDate?: string; 
       eventEndDate?: string; 
       allowsPreBidding?: boolean; 
@@ -46,29 +47,46 @@ import { Countdown } from "./countdown";
       seller?: string;
       location?: string;
     } 
-  }) {
-   const [isUrgent, setIsUrgent] = useState(false);
-   
-   const dynamicStatus = useEffectiveLotStatus({
-     status: lot.status,
-     event_status: lot.eventStatus,
-     event_start_date: lot.eventStartDate,
-     event_end_date: lot.eventEndDate,
-     allows_pre_bidding: lot.allowsPreBidding
-   });
- 
-   useEffect(() => {
-     const checkUrgency = () => {
-       const endsAt = lot.endsAt || lot.eventEndDate;
-       if (!endsAt) return;
-       const diff = new Date(endsAt).getTime() - Date.now();
-       setIsUrgent(diff > 0 && diff < 600000); // 10 minutes
-     };
-     
-     const timer = setInterval(checkUrgency, 5000); // Check every 5s is enough
-     checkUrgency();
-     return () => clearInterval(timer);
-   }, [lot.endsAt, lot.eventEndDate]);
+   }) {
+    const [isUrgent, setIsUrgent] = useState(false);
+    
+    // Subscribe to realtime updates for this specific lot
+    const realtimeData = useLotRealtime(initialLot.id, initialLot);
+    
+    // Merge initial data with realtime updates, mapping DB fields to component fields
+    const lot = useMemo(() => {
+      return {
+        ...initialLot,
+        ...realtimeData,
+        // Map DB fields back to component fields if they were updated via realtime
+        currentBid: realtimeData.current_price !== undefined ? realtimeData.current_price : initialLot.currentBid,
+        bidsCount: realtimeData.bids_count !== undefined ? realtimeData.bids_count : initialLot.bidsCount,
+        status: realtimeData.status !== undefined ? realtimeData.status : initialLot.status,
+        viewers: realtimeData.viewers !== undefined ? realtimeData.viewers : initialLot.viewers,
+        endsAt: realtimeData.end_date !== undefined ? realtimeData.end_date : initialLot.endsAt,
+      };
+    }, [initialLot, realtimeData]);
+
+    const dynamicStatus = useEffectiveLotStatus({
+      status: lot.status,
+      event_status: lot.eventStatus,
+      event_start_date: lot.eventStartDate,
+      event_end_date: lot.eventEndDate,
+      allows_pre_bidding: lot.allowsPreBidding
+    });
+  
+    useEffect(() => {
+      const checkUrgency = () => {
+        const endsAt = lot.endsAt || lot.eventEndDate;
+        if (!endsAt) return;
+        const diff = new Date(endsAt).getTime() - Date.now();
+        setIsUrgent(diff > 0 && diff < 600000); // 10 minutes
+      };
+      
+      const timer = setInterval(checkUrgency, 5000);
+      checkUrgency();
+      return () => clearInterval(timer);
+    }, [lot.endsAt, lot.eventEndDate]);
 
   return (
     <Link
