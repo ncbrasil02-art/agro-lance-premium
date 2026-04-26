@@ -223,7 +223,9 @@ export type Database = {
           id: string
           ip_address: string | null
           is_manual: boolean | null
+          is_phone_bid: boolean | null
           lot_id: string | null
+          phone_bidder_identifier: string | null
           session_id: string | null
           user_id: string | null
         }
@@ -234,7 +236,9 @@ export type Database = {
           id?: string
           ip_address?: string | null
           is_manual?: boolean | null
+          is_phone_bid?: boolean | null
           lot_id?: string | null
+          phone_bidder_identifier?: string | null
           session_id?: string | null
           user_id?: string | null
         }
@@ -245,7 +249,9 @@ export type Database = {
           id?: string
           ip_address?: string | null
           is_manual?: boolean | null
+          is_phone_bid?: boolean | null
           lot_id?: string | null
+          phone_bidder_identifier?: string | null
           session_id?: string | null
           user_id?: string | null
         }
@@ -505,6 +511,8 @@ export type Database = {
           end_date: string | null
           event_type: string | null
           id: string
+          is_live_interactive: boolean | null
+          live_status_message: string | null
           location: string | null
           mode: string | null
           name: string
@@ -530,6 +538,8 @@ export type Database = {
           end_date?: string | null
           event_type?: string | null
           id?: string
+          is_live_interactive?: boolean | null
+          live_status_message?: string | null
           location?: string | null
           mode?: string | null
           name: string
@@ -555,6 +565,8 @@ export type Database = {
           end_date?: string | null
           event_type?: string | null
           id?: string
+          is_live_interactive?: boolean | null
+          live_status_message?: string | null
           location?: string | null
           mode?: string | null
           name?: string
@@ -596,7 +608,9 @@ export type Database = {
           end_date: string | null
           event_id: string | null
           id: string
+          is_currently_live: boolean | null
           is_featured: boolean | null
+          live_timer_seconds: number | null
           lot_number: number
           payment_methods: string[] | null
           reserve_price: number | null
@@ -617,7 +631,9 @@ export type Database = {
           end_date?: string | null
           event_id?: string | null
           id?: string
+          is_currently_live?: boolean | null
           is_featured?: boolean | null
+          live_timer_seconds?: number | null
           lot_number: number
           payment_methods?: string[] | null
           reserve_price?: number | null
@@ -638,7 +654,9 @@ export type Database = {
           end_date?: string | null
           event_id?: string | null
           id?: string
+          is_currently_live?: boolean | null
           is_featured?: boolean | null
+          live_timer_seconds?: number | null
           lot_number?: number
           payment_methods?: string[] | null
           reserve_price?: number | null
