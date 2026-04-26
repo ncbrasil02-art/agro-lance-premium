@@ -349,13 +349,17 @@ export const Route = createFileRoute("/ao-vivo")({
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
                    <div className="font-semibold flex items-center gap-2">
-                     {bid.is_phone_bid ? (
-                       <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
-                         <Phone className="h-2 w-2" /> Telefone
-                       </span>
-                     ) : (
-                       <span>Comprador ...{bid.user_id.slice(-4)}</span>
-                     )}
+                      {bid.is_phone_bid ? (
+                        <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
+                          <Phone className="h-2 w-2" /> Telefone
+                        </span>
+                      ) : bid.bid_type === 'security' ? (
+                        <span className="flex items-center gap-1 text-[10px] bg-emerald-deep/20 text-emerald-deep px-1.5 rounded uppercase font-black">
+                          <Gavel className="h-2 w-2" /> Auditório
+                        </span>
+                      ) : (
+                        <span>Comprador ...{bid.user_id.slice(-4)}</span>
+                      )}
                    </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
                  </div>
