@@ -614,8 +614,26 @@ import {
                                    <AlertDialogContent>
                                      <AlertDialogHeader>
                                        <AlertDialogTitle>Confirmar Lance de Segurança</AlertDialogTitle>
-                                       <AlertDialogDescription>
-                                         Deseja realmente efetuar um lance de segurança no valor de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice + (lot.bid_increment || 1000))} para este lote?
+                                       <AlertDialogDescription className="space-y-3">
+                                         <p>
+                                           Deseja realmente efetuar um lance de segurança no valor de <strong className="text-emerald-600">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice + (lot.bid_increment || 1000))}</strong> para este lote?
+                                         </p>
+                                         <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-800 space-y-2">
+                                           <p className="font-bold flex items-center gap-1">
+                                             <Info className="h-3 w-3" /> O que é um Lance de Segurança?
+                                           </p>
+                                           <p>
+                                             Este é um recurso administrativo para:
+                                           </p>
+                                           <ul className="list-disc pl-4 space-y-1">
+                                             <li>Registrar lances feitos via telefone ou presencial.</li>
+                                             <li>Garantir o movimento do leilão em lotes sem ofertas.</li>
+                                             <li>Corrigir sequências de lances manualmente.</li>
+                                           </ul>
+                                           <p className="italic">
+                                             * O lance será registrado em nome do sistema e atualizará o preço atual do lote.
+                                           </p>
+                                         </div>
                                        </AlertDialogDescription>
                                      </AlertDialogHeader>
                                      <AlertDialogFooter>
