@@ -348,30 +348,32 @@ export const Route = createFileRoute("/ao-vivo")({
       // Specific channel for the active lot to catch price and bid count updates
       let lotChannel: any = null;
       if (liveEvent?.active_lot_id) {
+        const currentActiveLotId = liveEvent.active_lot_id;
         lotChannel = supabase
-          .channel(`lot-updates-${liveEvent.active_lot_id}`)
+          .channel(`lot-updates-${currentActiveLotId}`)
           .on(
             "postgres_changes",
             { 
               event: "UPDATE", 
               schema: "public", 
-              table: "lots", 
-              filter: `id=eq.${liveEvent.active_lot_id}` 
+              table: "lots"
             },
             (payload) => {
-              console.log("Lote atualizado em tempo real:", payload.new);
-              setLiveEvent((prev: any) => {
-                if (!prev || !prev.active_lot) return prev;
-                return {
-                  ...prev,
-                  active_lot: {
-                    ...prev.active_lot,
-                    ...payload.new,
-                    // Preserve animal data which isn't in the lot update payload
-                    animal: prev.active_lot.animal
-                  }
-                };
-              });
+              if (payload.new.id === currentActiveLotId) {
+                console.log("Preço do lote atualizado em tempo real:", payload.new.current_price);
+                setLiveEvent((prev: any) => {
+                  if (!prev || !prev.active_lot) return prev;
+                  return {
+                    ...prev,
+                    active_lot: {
+                      ...prev.active_lot,
+                      ...payload.new,
+                      // Preserve animal data which isn't in the lot update payload
+                      animal: prev.active_lot.animal
+                    }
+                  };
+                });
+              }
             }
           )
           .subscribe();
