@@ -1,3 +1,18 @@
+  @keyframes neon-pulse-green {
+    0%, 100% {
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+  }
+
+  .animate-neon-green {
+    animation: neon-pulse-green 2.5s infinite ease-in-out;
+  }
+
   @keyframes neon-pulse-urgent {
     0%, 100% {
       box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
