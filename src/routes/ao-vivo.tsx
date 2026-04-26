@@ -179,7 +179,7 @@ export const Route = createFileRoute("/ao-vivo")({
     // Fetch profiles for initial bids
     useEffect(() => {
       if (initialBids && initialBids.length > 0) {
-        const userIds = [...new Set(initialBids.map((b: any) => b.user_id).filter(Boolean))];
+        const userIds = [...new Set(initialBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
         if (userIds.length > 0) {
           supabase
             .from("profiles")
@@ -553,16 +553,23 @@ export const Route = createFileRoute("/ao-vivo")({
                </div>
              )}
              
-             {statusMessage && (
-               <div className="absolute bottom-4 left-4 right-4 z-20 animate-in fade-in slide-in-from-bottom-4">
-                 <div className="bg-gold/95 backdrop-blur-sm p-3 rounded-lg shadow-xl flex items-center gap-3 border border-emerald-deep/20">
-                   <div className="h-8 w-8 rounded-full bg-emerald-deep flex items-center justify-center">
-                     <MessageSquare className="h-4 w-4 text-gold" />
-                   </div>
-                   <p className="text-emerald-deep font-black text-sm uppercase tracking-tight">{statusMessage}</p>
-                 </div>
-               </div>
-             )}
+            {statusMessage && (
+              <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
+                <div className="bg-gold/95 backdrop-blur-md px-10 py-8 rounded-3xl shadow-[0_0_100px_rgba(212,175,55,0.6)] border-4 border-emerald-deep/20 animate-in zoom-in duration-300">
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="h-20 w-20 rounded-full bg-emerald-deep flex items-center justify-center shadow-inner">
+                      <Gavel className="h-10 w-10 text-gold animate-bounce" />
+                    </div>
+                    <div>
+                      <p className="text-emerald-deep font-black text-4xl uppercase tracking-tighter drop-shadow-sm">{statusMessage}</p>
+                      <div className="mt-2 h-1.5 w-full bg-emerald-deep/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-deep animate-progress-shrink" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
              
              <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur z-10">
                <Volume2 className="h-4 w-4" />
@@ -625,19 +632,36 @@ export const Route = createFileRoute("/ao-vivo")({
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
                    <div className="font-semibold flex items-center gap-2">
-                      {bid.is_phone_bid ? (
-                        <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
-                          <Phone className="h-2 w-2" /> Telefone
-                        </span>
-                      ) : bid.bid_type === 'security' ? (
-                        <span className="flex items-center gap-1 text-[10px] bg-emerald-deep/20 text-emerald-deep px-1.5 rounded uppercase font-black">
-                          <Gavel className="h-2 w-2" /> Auditório
-                        </span>
-                      ) : bid.user_id ? (
-                        <span>Comprador ...{bid.user_id.slice(-4)}</span>
-                      ) : (
-                        <span>Licitante</span>
-                      )}
+                       <div className="flex flex-col">
+                         <span className="text-sm font-bold">
+                           {bid.is_phone_bid ? (
+                             bid.phone_bidder_identifier || "Telefone"
+                           ) : bid.bid_type === 'security' ? (
+                             "Lance do Auditório"
+                           ) : bidderProfiles[bid.user_id]?.full_name ? (
+                             bidderProfiles[bid.user_id].full_name
+                           ) : bid.user_id ? (
+                             `Comprador ...${bid.user_id.slice(-4)}`
+                           ) : (
+                             "Licitante"
+                           )}
+                         </span>
+                         <div className="flex items-center gap-2 mt-0.5">
+                           {bid.is_phone_bid ? (
+                             <span className="flex items-center gap-1 text-[9px] bg-gold/20 text-gold px-1.5 py-0.5 rounded uppercase font-black">
+                               <Phone className="h-2 w-2" /> Telefone
+                             </span>
+                           ) : bid.bid_type === 'security' ? (
+                             <span className="flex items-center gap-1 text-[9px] bg-emerald-deep/20 text-emerald-deep px-1.5 py-0.5 rounded uppercase font-black">
+                               <Gavel className="h-2 w-2" /> Presencial
+                             </span>
+                           ) : (
+                             <span className="flex items-center gap-1 text-[9px] bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded uppercase font-black">
+                               <Users className="h-2 w-2" /> Online
+                             </span>
+                           )}
+                         </div>
+                       </div>
                    </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
                  </div>
