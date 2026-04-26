@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle } from "lucide-react";
+ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEffectiveLotStatus } from "@/utils/auction-status";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
@@ -546,23 +547,96 @@ function LotDetail() {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-3 gap-3">
-                      {[1, 2, 5].map((m) => (
-                        <Button key={m} variant="outline" className="h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}>
-                          <span className="text-[8px] uppercase font-black text-gold/60 mb-1">+{m} inc.</span>
-                          <span className="font-bold">+{formatBRL(lot.bid_increment * m)}</span>
-                        </Button>
-                      ))}
+                    <div className="space-y-4">
+                      {user && (
+                        <div className={`p-4 rounded-2xl border flex items-start gap-3 transition-all ${
+                          profile?.is_blocked ? 'bg-destructive/10 border-destructive/20' :
+                          !profile?.is_approved ? 'bg-amber-500/10 border-amber-500/20' :
+                          'bg-emerald-500/10 border-emerald-500/20'
+                        }`}>
+                          {profile?.is_blocked ? (
+                            <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                          ) : !profile?.is_approved ? (
+                            <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                          ) : (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                          )}
+                          <div className="space-y-1">
+                            <p className={`text-xs font-bold uppercase tracking-wider ${
+                              profile?.is_blocked ? 'text-destructive' :
+                              !profile?.is_approved ? 'text-amber-500' :
+                              'text-emerald-500'
+                            }`}>
+                              {profile?.is_blocked ? 'Conta Bloqueada' :
+                               !profile?.is_approved ? 'Aprovação Pendente' :
+                               'Habilitado para Lances'}
+                            </p>
+                            <p className="text-[11px] text-white/70 leading-relaxed">
+                              {profile?.is_blocked ? (
+                                <>Sua conta foi restringida: <b>{profile.block_reason || "Verifique com o suporte."}</b></>
+                              ) : !profile?.is_approved ? (
+                                <>Sua conta está em análise. Você poderá dar lances assim que um administrador aprovar seu cadastro.</>
+                              ) : (
+                                <>Você está autorizado a participar deste leilão. Boas compras!</>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-3 gap-3">
+                        {[1, 2, 5].map((m) => (
+                          <TooltipProvider key={m}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="w-full">
+                                  <Button 
+                                    variant="outline" 
+                                    className="w-full h-16 flex flex-col rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold/20 hover:border-gold/50" 
+                                    disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance") || !profile?.is_approved || profile?.is_blocked} 
+                                    onClick={() => placeBid(currentPrice + (lot.bid_increment * m))}
+                                  >
+                                    <span className="text-[8px] uppercase font-black text-gold/60 mb-1">+{m} inc.</span>
+                                    <span className="font-bold">+{formatBRL(lot.bid_increment * m)}</span>
+                                  </Button>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" className="bg-emerald-deep border-gold/20 text-white text-[10px] max-w-[200px] text-center">
+                                {!user ? "Faça login para dar lances" :
+                                 profile?.is_blocked ? "Conta bloqueada" :
+                                 !profile?.is_approved ? "Aguardando aprovação" :
+                                 (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance") ? "Leilão não está recebendo lances" :
+                                 `Dê um lance de ${formatBRL(currentPrice + (lot.bid_increment * m))}`}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ))}
+                      </div>
                     </div>
 
-                     <Button 
-                       size="lg" 
-                       className={`w-full h-20 text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter ${dynamicStatus === 'recebendo_lances' ? 'shimmer-button animate-blink-fast' : 'bg-gold-gradient'}`} 
-                       disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} 
-                       onClick={() => placeBid(nextBid)}
-                     >
-                      {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
-                    </Button>
+                     <TooltipProvider>
+                       <Tooltip>
+                         <TooltipTrigger asChild>
+                           <div className="w-full">
+                             <Button 
+                               size="lg" 
+                               className={`w-full h-20 text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter ${dynamicStatus === 'recebendo_lances' ? 'shimmer-button animate-blink-fast' : 'bg-gold-gradient'}`} 
+                               disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance") || !profile?.is_approved || profile?.is_blocked} 
+                               onClick={() => placeBid(nextBid)}
+                             >
+                              {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
+                            </Button>
+                           </div>
+                         </TooltipTrigger>
+                         <TooltipContent side="top" className="bg-emerald-deep border-gold/20 text-white text-xs p-3">
+                            {!user ? "Faça login para dar lances" :
+                             profile?.is_blocked ? "Sua conta está bloqueada" :
+                             !profile?.is_approved ? "Aguardando aprovação de cadastro" :
+                             (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance") ? "Lances não permitidos agora" :
+                             `Dar lance de ${formatBRL(nextBid)}`}
+                         </TooltipContent>
+                       </Tooltip>
+                     </TooltipProvider>
                     
                     <p className="text-center text-[10px] text-white/40 font-bold uppercase tracking-widest">
                       Lances confirmados são irrevogáveis.
