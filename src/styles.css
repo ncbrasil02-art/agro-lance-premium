@@ -1,11 +1,11 @@
  @keyframes neon-pulse {
    0%, 100% {
-     box-shadow: 0 0 5px rgba(212, 175, 55, 0.2), 0 0 10px rgba(212, 175, 55, 0.2);
-     border-color: rgba(212, 175, 55, 0.4);
+     box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
+     border-color: rgba(212, 175, 55, 0.3);
    }
    50% {
-     box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), 0 0 40px rgba(212, 175, 55, 0.4);
-     border-color: rgba(212, 175, 55, 0.8);
+     box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+     border-color: rgba(212, 175, 55, 0.5);
    }
  }
  
@@ -34,9 +34,9 @@
  }
  
  .hover-neon:hover {
-   box-shadow: 0 0 15px rgba(212, 175, 55, 0.8), 0 0 30px rgba(212, 175, 55, 0.4);
-   border-color: #d4af37 !important;
-   transform: translateY(-4px);
+   box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+   border-color: rgba(212, 175, 55, 0.6) !important;
+   transform: translateY(-2px);
    transition: all 0.3s ease;
  }
  
@@ -145,7 +145,7 @@
   --emerald-deep: oklch(0.28 0.07 155);
 
   --live: oklch(0.62 0.24 25);
-  --upcoming: oklch(0.65 0.16 235);
+   --upcoming: oklch(0.82 0.18 90);
   --closed: oklch(0.55 0.02 150);
 
   --gradient-hero: linear-gradient(135deg, oklch(0.18 0.04 150) 0%, oklch(0.28 0.07 155) 50%, oklch(0.18 0.04 150) 100%);

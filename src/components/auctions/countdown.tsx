@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+ import { useEffect, useState } from "react";
+ import { cn } from "@/lib/utils";
 
 export function Countdown({ endsAt, className, variant = "default" }: { endsAt: string; className?: string; variant?: "default" | "segmented" }) {
   const [now, setNow] = useState(() => Date.now());
@@ -16,6 +17,8 @@ export function Countdown({ endsAt, className, variant = "default" }: { endsAt: 
   const m = Math.floor((diff % 3_600_000) / 60_000);
   const s = Math.floor((diff % 60_000) / 1000);
 
+   const isCritical = diff > 0 && diff < 600000; // Less than 10 minutes
+ 
    if (diff <= 0) return <span className={className} suppressHydrationWarning>{variant === 'segmented' ? '00:00:00' : 'Encerrado'}</span>;
 
   if (variant === "segmented") {
@@ -43,10 +46,16 @@ export function Countdown({ endsAt, className, variant = "default" }: { endsAt: 
     );
   }
 
-  return (
-    <span className={className} suppressHydrationWarning>
-      {d > 0 ? `${d}d ` : ""}
-      {String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
-    </span>
-  );
+   return (
+     <span 
+       className={cn(
+         className, 
+         isCritical && "text-live animate-blink-fast font-black shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+       )} 
+       suppressHydrationWarning
+     >
+       {d > 0 ? `${d}d ` : ""}
+       {String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
+     </span>
+   );
 }
