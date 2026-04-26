@@ -37,7 +37,7 @@ export const Route = createFileRoute("/ao-vivo")({
         // First, search for ANY event that is live or scheduled today
         const { data: events, error: eventError } = await supabase
            .from("events")
-           .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+           .select("*")
            .or("status.eq.live,status.eq.scheduled")
            .order("start_date", { ascending: true });
 
@@ -86,24 +86,33 @@ export const Route = createFileRoute("/ao-vivo")({
 
         console.log("Evento selecionado para Ao Vivo:", liveEvent.name, "ID:", liveEvent.id);
 
-        // Fallback 1: If active_lot_id is present but join failed
-        if (liveEvent.active_lot_id && !liveEvent.active_lot) {
+        // Manual fetch of the active lot since we removed the join in main query
+        if (liveEvent.active_lot_id) {
           const { data: activeLotData } = await supabase
             .from("lots")
-            .select("*, animal:animals(*)")
+            .select("*")
             .eq("id", liveEvent.active_lot_id)
             .single();
+          
           if (activeLotData) {
+            // Manual fetch of animal for the lot
+            if (activeLotData.animal_id) {
+              const { data: animalData } = await supabase
+                .from("animals")
+                .select("*")
+                .eq("id", activeLotData.animal_id)
+                .single();
+              activeLotData.animal = animalData;
+            }
             liveEvent.active_lot = activeLotData;
           }
         }
 
-        // Fallback 2: Auto-selection of active lot
-        // If active_lot_id is null but the event is live, search for any lot marked as 'active' or 'live'
+        // Fallback: Auto-selection of active lot
         if (!liveEvent.active_lot && liveEvent.status === 'live') {
           const { data: fallbackLot } = await supabase
             .from("lots")
-            .select("*, animal:animals(*)")
+            .select("*")
             .eq("event_id", liveEvent.id)
             .or("status.eq.active,status.eq.live")
             .order("lot_number", { ascending: true })
@@ -111,6 +120,14 @@ export const Route = createFileRoute("/ao-vivo")({
             .maybeSingle();
           
           if (fallbackLot) {
+            if (fallbackLot.animal_id) {
+              const { data: animalData } = await supabase
+                .from("animals")
+                .select("*")
+                .eq("id", fallbackLot.animal_id)
+                .single();
+              fallbackLot.animal = animalData;
+            }
             liveEvent.active_lot = fallbackLot;
             liveEvent.active_lot_id = fallbackLot.id;
           }
