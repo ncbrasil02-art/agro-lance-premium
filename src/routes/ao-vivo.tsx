@@ -170,10 +170,13 @@ export const Route = createFileRoute("/ao-vivo")({
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "events" },
           async (payload) => {
-            // If we don't have a live event, and an event just became 'live', refresh everything
-            if (!liveEvent && payload.new.status === 'live') {
-              window.location.reload(); // Hard refresh to trigger loader again if no event was active
-              return;
+            // If we don't have a live event, and an event just became 'live', or if a scheduled event updated
+            if (!liveEvent) {
+              if (payload.new.status === 'live' || payload.new.transmission_link) {
+                console.log("Detectado novo evento ao vivo ou link, recarregando...");
+                window.location.reload();
+                return;
+              }
             }
             
             // If it's our current event being updated
@@ -195,6 +198,7 @@ export const Route = createFileRoute("/ao-vivo")({
                 
                 // If active lot changed, fetch bids for the new lot
                 if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
+                  console.log("Lote alterado em tempo real:", payload.new.active_lot_id);
                   const { data: newBids } = await supabase
                     .from("bids")
                     .select("*")
@@ -202,6 +206,11 @@ export const Route = createFileRoute("/ao-vivo")({
                     .order("created_at", { ascending: false })
                     .limit(10);
                   if (newBids) setBids(newBids);
+                  
+                  toast.info("Próximo lote entrando no ar!", { 
+                    description: "A tela será atualizada automaticamente.",
+                    duration: 3000 
+                  });
                 }
               }
             }
