@@ -134,8 +134,32 @@ export const Route = createFileRoute("/admin")({
 
    if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gold" />
+      <div className="flex min-h-screen bg-muted/30 flex-col md:flex-row animate-in fade-in duration-500">
+        <aside className="w-64 border-r bg-card p-6 hidden md:block">
+          <div className="flex flex-col h-full py-4 space-y-8">
+            <div className="flex items-center gap-2 px-2">
+              <div className="h-8 w-8 rounded-lg bg-gold/20 animate-pulse" />
+              <div className="h-6 w-32 bg-gold/10 rounded animate-pulse" />
+            </div>
+            <nav className="flex-1 space-y-4">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="h-10 w-full bg-muted/50 rounded-lg animate-pulse" />
+              ))}
+            </nav>
+          </div>
+        </aside>
+        <main className="flex-1 p-4 md:p-8 space-y-8">
+          <div className="space-y-2">
+            <div className="h-10 w-64 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-48 bg-muted/60 rounded animate-pulse" />
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-32 bg-card border rounded-xl animate-pulse" />
+            ))}
+          </div>
+          <div className="h-64 bg-card border rounded-xl animate-pulse" />
+        </main>
       </div>
     );
   }
