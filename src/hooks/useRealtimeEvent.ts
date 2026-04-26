@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
+type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL';
+
 export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
-  const [status, setStatus] = useState<'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL'>('INITIAL');
+  const [status, setStatus] = useState<ChannelStatus>('INITIAL');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!eventId) return;
 
-    logger.info(`Configurando canal em tempo real para o evento: ${eventId}`);
+    logger.info(`Configurando canal em tempo real para o evento: ${eventId} (Tentativa: ${retryCount})`);
     
     const channel = supabase
       .channel(`event-updates-${eventId}`)
@@ -38,25 +41,39 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
           onUpdate();
         }
       )
-      .subscribe((status) => {
-        logger.info(`Status do canal em tempo real (${eventId}): ${status}`);
-        setStatus(status);
+      .subscribe((newStatus) => {
+        logger.info(`Status do canal em tempo real (${eventId}): ${newStatus}`);
         
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          logger.warn(`Problema na conexão em tempo real (${status}). Tentando reconectar em 5s...`);
-          setTimeout(() => {
-            channel.unsubscribe();
-            // The effect will re-run if we toggle a dependency or just let it be.
-            // Actually, Supabase handles reconnection, but we can log it.
+        // Se voltamos de um erro para inscrito, forçamos uma atualização para garantir que não perdemos nada
+        if (status !== 'INITIAL' && status !== 'SUBSCRIBED' && newStatus === 'SUBSCRIBED') {
+          logger.info('Conexão restabelecida, forçando atualização de dados');
+          onUpdate();
+        }
+        
+        setStatus(newStatus);
+        
+        if (newStatus === 'CHANNEL_ERROR' || newStatus === 'TIMED_OUT') {
+          const timer = setTimeout(() => {
+            setRetryCount(prev => prev + 1);
           }, 5000);
+          return () => clearTimeout(timer);
         }
       });
+
+    // Monitoramento de volta da internet
+    const handleOnline = () => {
+      logger.info('Internet detectada, forçando reconexão e atualização');
+      onUpdate();
+      setRetryCount(prev => prev + 1);
+    };
+
+    window.addEventListener('online', handleOnline);
 
     // Monitoramento de conexão global do Supabase
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         logger.info('Auth detectada, garantindo que o canal está ativo');
-        // Re-subscribe happens if necessary
+        setRetryCount(prev => prev + 1);
       }
     });
 
@@ -64,13 +81,16 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       logger.info(`Limpando canal em tempo real para o evento: ${eventId}`);
       supabase.removeChannel(channel);
       authSubscription.unsubscribe();
+      window.removeEventListener('online', handleOnline);
     };
-  }, [eventId, onUpdate]);
+  }, [eventId, onUpdate, retryCount]);
 
   return { status };
 }
 
 export function useRealtimeLots(onUpdate: () => void) {
+  const [retryCount, setRetryCount] = useState(0);
+
   useEffect(() => {
     const channel = supabase
       .channel('all-lots-updates')
@@ -82,10 +102,22 @@ export function useRealtimeLots(onUpdate: () => void) {
           onUpdate();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          setTimeout(() => setRetryCount(c => c + 1), 5000);
+        }
+      });
+
+    const handleOnline = () => {
+      onUpdate();
+      setRetryCount(c => c + 1);
+    };
+
+    window.addEventListener('online', handleOnline);
 
     return () => {
       supabase.removeChannel(channel);
+      window.removeEventListener('online', handleOnline);
     };
-  }, [onUpdate]);
+  }, [onUpdate, retryCount]);
 }
