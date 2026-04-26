@@ -129,7 +129,7 @@ import { Countdown } from "./countdown";
     <Link
       to="/lotes/$lotId"
       params={{ lotId: lot.id }}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${urgencyLevel === 'critical' ? 'animate-neon-critical border-live ring-2 ring-live/40 z-10' : urgencyLevel === 'urgent' ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
+        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${urgencyLevel === 'critical' ? 'animate-neon-critical border-live ring-2 ring-live/40 z-10' : urgencyLevel === 'urgent' ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon-green border-emerald-bright/30 ring-1 ring-emerald-bright/10' : ''}`}
       aria-labelledby={`lot-title-${lot.id}`}
     >
       <div className="relative aspect-[9/16] overflow-hidden bg-muted">
