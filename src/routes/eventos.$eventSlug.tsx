@@ -1,7 +1,5 @@
- import { logger } from "@/utils/logger";
  import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
- import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw, Circle } from "lucide-react";
- import { useEffectiveEventStatus } from "@/utils/auction-status";
+ import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,20 +49,8 @@ function EventDetail() {
    const router = useRouter();
   const eventLots = event.lots || [];
  
-   const dynamicStatus = useEffectiveEventStatus({
-     status: event.status,
-     start_date: event.start_date,
-     end_date: event.end_date
-   });
- 
-   const { status } = useRealtimeEvent(event.id, (type, payload) => {
-     // Only invalidate the full route if the event data changed,
-     // or if a lot was added/removed (structural change).
-     // Individual lot updates (bids, prices) are handled by LotCard internally.
-     if (type === 'event' || (payload && (payload.eventType === 'INSERT' || payload.eventType === 'DELETE'))) {
-       logger.info("Structural change detected, invalidating route", { type, eventType: payload?.eventType });
-       router.invalidate();
-     }
+   const { status } = useRealtimeEvent(event.id, () => {
+     router.invalidate();
    });
  
    const isConnected = status === 'SUBSCRIBED';
@@ -120,13 +106,7 @@ function EventDetail() {
             {/* Event Header Info */}
             <div className="flex flex-col lg:pt-12">
               <div className="flex flex-wrap items-center gap-3 mb-8">
-                 <StatusBadge status={dynamicStatus} className="scale-110" />
-                 {dynamicStatus === 'live' && (
-                   <div className="flex items-center gap-1.5 bg-live/10 px-3 py-1 rounded-full border border-live/30 animate-pulse">
-                     <Circle className="h-2 w-2 fill-live text-live" />
-                     <span className="text-[10px] font-black text-live uppercase tracking-widest">Ao Vivo</span>
-                   </div>
-                 )}
+                <StatusBadge status={event.status} className="scale-110" />
                 <div className="h-4 w-px bg-white/10" />
                  <span className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">{event.event_type || 'Leilão Premium'}</span>
               </div>

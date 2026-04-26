@@ -1,4 +1,4 @@
- import { useState, ReactNode } from "react";
+ import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
     import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart, ShieldCheck } from "lucide-react";
@@ -83,17 +83,52 @@ export const Route = createFileRoute("/admin")({
    );
  }
  
-function AdminLayout() {
-   const { profile, isLoading, signOut } = useAuth();
-   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
-   const [selectedEventId, setSelectedEventId] = useState<string>("all");
+ function AdminLayout() {
+    const { profile, isLoading: authLoading, signOut } = useAuth();
+    const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+    const [selectedEventId, setSelectedEventId] = useState<string>("all");
+    const [stats, setStats] = useState({
+      totalBids: 0,
+      pendingUsers: 0,
+      activeEvents: 0,
+      soldTotal: 0
+    });
+    const [isLoadingStats, setIsLoadingStats] = useState(false);
+ 
+    const fetchStats = async () => {
+      setIsLoadingStats(true);
+      try {
+        const [bidsRes, usersRes, eventsRes] = await Promise.all([
+          supabase.from("bids").select("id", { count: "exact", head: true }),
+          supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_approved", false),
+          supabase.from("events").select("id", { count: "exact", head: true }).eq("status", "active")
+        ]);
+ 
+        setStats({
+          totalBids: bidsRes.count || 0,
+          pendingUsers: usersRes.count || 0,
+          activeEvents: eventsRes.count || 0,
+          soldTotal: 0 // Simplificado para este exemplo
+        });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+ 
+    useEffect(() => {
+      if (activeTab === "dashboard") {
+        fetchStats();
+      }
+    }, [activeTab]);
 
    const handleManageLots = (eventId: string) => {
      setSelectedEventId(eventId);
      setActiveTab("lots");
    };
 
-  if (isLoading) {
+   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gold" />
@@ -155,35 +190,35 @@ function AdminLayout() {
           {activeTab === "dashboard" && (
             <>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                 <Card className="cursor-pointer hover:bg-muted/10 transition-colors" onClick={() => setActiveTab("users")}>
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total de Lances</CardTitle>
                     <Gavel className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">124</div>
-                    <p className="text-xs text-muted-foreground">+12% desde ontem</p>
-                  </CardContent>
+                   <CardContent>
+                     <div className="text-2xl font-bold">{isLoadingStats ? "..." : stats.totalBids}</div>
+                     <p className="text-xs text-muted-foreground">Total acumulado</p>
+                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Novos Usuários</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+12</div>
-                    <p className="text-xs text-muted-foreground">8 aguardando aprovação</p>
-                  </CardContent>
+                   <CardContent>
+                     <div className="text-2xl font-bold">{isLoadingStats ? "..." : stats.pendingUsers}</div>
+                     <p className="text-xs text-muted-foreground">aguardando aprovação</p>
+                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Leilões Ativos</CardTitle>
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">2</div>
-                    <p className="text-xs text-muted-foreground">Elite 2024, Fazenda Real</p>
-                  </CardContent>
+                   <CardContent>
+                     <div className="text-2xl font-bold">{isLoadingStats ? "..." : stats.activeEvents}</div>
+                     <p className="text-xs text-muted-foreground">em andamento</p>
+                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -235,10 +270,7 @@ function AdminLayout() {
                       >
                         <ShieldCheck className="mr-2 h-4 w-4" /> Lance de Segurança
                       </Button>
-                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("users")}>
-                         <Users className="mr-2 h-4 w-4" /> Gestão de Usuários
-                       </Button>
-                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
+                     <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
                   </CardContent>
                 </Card>
               </div>

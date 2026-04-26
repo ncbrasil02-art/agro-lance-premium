@@ -1,5 +1,3 @@
- import { StatusBadge } from "@/components/auctions/status-badge";
- import { getEffectiveLotStatus } from "@/utils/auction-status";
    import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
@@ -100,12 +98,8 @@
          fetchData();
        }, [initialEventId]);
  
-       useRealtimeLots((payload) => {
-         // In admin management, we usually want to see everything updated
-         // but we can still skip if the payload is empty or unknown.
-         if (!payload || payload.eventType !== 'SELECT') {
-           fetchData();
-         }
+       useRealtimeLots(() => {
+         fetchData();
        });
 
       const resetForm = () => {
@@ -471,26 +465,20 @@
                                {hasNoBids && <AlertTriangle className="h-3 w-3 text-destructive" />}
                              </div>
                            </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-1">
-                                <StatusBadge status={getEffectiveLotStatus({
-                                  status: lot.status,
-                                  event_status: lot.event?.status,
-                                  event_start_date: lot.event?.start_date,
-                                  event_end_date: lot.event?.end_date,
-                                  allows_pre_bidding: !!lot.allows_pre_bidding
-                                 })} urgent={!!isUrgent} className="scale-90 origin-left" />
-                                {lot.status !== getEffectiveLotStatus({
-                                  status: lot.status,
-                                  event_status: lot.event?.status,
-                                  event_start_date: lot.event?.start_date,
-                                  event_end_date: lot.event?.end_date,
-                                   allows_pre_bidding: !!lot.allows_pre_bidding
-                                 }) && (
-                                   <span className="text-[9px] text-muted-foreground italic font-medium">Sync: {lot.status}</span>
-                                 )}
-                              </div>
-                            </TableCell>
+                           <TableCell>
+                             <div className="flex flex-col gap-1">
+                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center ${
+                                 lot.status === 'active' ? 'text-emerald-bright bg-emerald-bright/10 border border-emerald-bright/20' : 'text-muted-foreground bg-muted border border-border'
+                               }`}>
+                                 {lot.status === 'active' ? 'No Ar' : 'Pausado'}
+                               </span>
+                               {isUrgent && (
+                                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center bg-live/10 text-live border border-live/20 animate-blink-fast">
+                                   Encerrando!
+                                 </span>
+                               )}
+                             </div>
+                           </TableCell>
                            <TableCell className="text-right">
                              <div className="flex justify-end gap-2">
                                {lot.status === 'active' && (

@@ -594,6 +594,7 @@ export type Database = {
           lot_number: number
           payment_methods: string[] | null
           reserve_price: number | null
+          safety_price: number | null
           starting_price: number
           status: string | null
           updated_at: string
@@ -614,6 +615,7 @@ export type Database = {
           lot_number: number
           payment_methods?: string[] | null
           reserve_price?: number | null
+          safety_price?: number | null
           starting_price: number
           status?: string | null
           updated_at?: string
@@ -634,6 +636,7 @@ export type Database = {
           lot_number?: number
           payment_methods?: string[] | null
           reserve_price?: number | null
+          safety_price?: number | null
           starting_price?: number
           status?: string | null
           updated_at?: string
@@ -747,6 +750,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           avatar_url: string | null
           cpf: string | null
           created_at: string
@@ -758,6 +763,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           cpf?: string | null
           created_at?: string
@@ -769,6 +776,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           cpf?: string | null
           created_at?: string
@@ -779,7 +788,15 @@ export type Database = {
           role?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sellers: {
         Row: {
