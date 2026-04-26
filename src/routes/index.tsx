@@ -277,7 +277,7 @@ function Home() {
               Ver todos <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {liveEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
           </div>
         </section>
@@ -289,7 +289,7 @@ function Home() {
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
           <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
         </div>
       </section>
@@ -317,7 +317,7 @@ function Home() {
             <h2 className="text-2xl font-bold tracking-tight md:text-3xl text-muted-foreground">Leilões encerrados</h2>
             <p className="mt-2 text-sm text-muted-foreground">Confira os resultados dos últimos eventos realizados.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 opacity-80 grayscale-[0.5]">
             {mappedPastEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
           </div>
         </section>
