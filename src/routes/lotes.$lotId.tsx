@@ -188,26 +188,31 @@ function LotDetail() {
     };
   }, [lot.id]);
 
-  const placeBid = async (amount: number) => {
-    if (!user) { toast.error("Faça login para dar lances."); return; }
-    if (!profile?.is_approved) { toast.error("Sua conta aguarda aprovação."); return; }
-    
-    if (dynamicStatus !== 'recebendo_lances' && dynamicStatus !== 'pre_lance') {
-      toast.error("Este lote não está aceitando lances no momento.");
-      return;
-    }
-
-    setIsBidding(true);
-    try {
-      const { error } = await supabase.from("bids").insert({ lot_id: lot.id, user_id: user.id, amount, bid_type: "online" });
-      if (error) throw error;
-      toast.success("Lance efetuado com sucesso!");
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao efetuar lance.");
-    } finally {
-      setIsBidding(false);
-    }
-  };
+   const placeBid = async (amount: number) => {
+     if (!user) { toast.error("Faça login para dar lances."); return; }
+     
+     setIsBidding(true);
+     try {
+       const { data, error } = await supabase.rpc('place_bid_safe', {
+         p_lot_id: lot.id,
+         p_amount: amount,
+         p_bid_type: 'online'
+       });
+ 
+       if (error) throw error;
+       
+       const result = data as { success: boolean, message: string };
+       if (result.success) {
+         toast.success(result.message);
+       } else {
+         toast.error(result.message);
+       }
+     } catch (error: any) {
+       toast.error(error.message || "Erro ao efetuar lance.");
+     } finally {
+       setIsBidding(false);
+     }
+   };
 
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);
