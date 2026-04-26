@@ -281,13 +281,24 @@
                  </SelectContent>
                </Select>
              </div>
-             <Button 
-               variant="outline" 
-               onClick={() => selectedEventId && fetchEventDetails(selectedEventId)}
-               disabled={!selectedEventId || isLoading}
-             >
-               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Painel"}
-             </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => selectedEventId && fetchEventDetails(selectedEventId)}
+                  disabled={!selectedEventId || isLoading}
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Painel"}
+                </Button>
+                {selectedEventId && liveEvent && (
+                  <Button 
+                    variant="destructive" 
+                    onClick={finalizeEvent}
+                    disabled={isActionLoading}
+                  >
+                    Encerrar Evento
+                  </Button>
+                )}
+              </div>
            </div>
          </CardContent>
        </Card>
