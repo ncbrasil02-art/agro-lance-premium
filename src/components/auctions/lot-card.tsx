@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
- import { Eye, Gavel, Info, ChevronRight } from "lucide-react";
+import { Eye, Gavel, Info, ChevronRight } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
@@ -77,12 +78,13 @@ import { Countdown } from "./countdown";
        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
       aria-labelledby={`lot-title-${lot.id}`}
     >
-      <div className="relative aspect-[9/16] overflow-hidden bg-muted">
-        <img 
-          src={lot?.cover || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+      <div className="relative overflow-hidden bg-muted">
+        <OptimizedImage 
+          src={lot?.cover || ""} 
           alt={lot?.name || "Animal"} 
-          loading="lazy" 
-          className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
+          width={400}
+          aspectRatio="9/16"
+          className="transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
         <div className="absolute left-3 top-3 flex flex-col gap-2 items-start">
