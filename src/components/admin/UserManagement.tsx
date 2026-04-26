@@ -4,13 +4,41 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock } from "lucide-react";
+ import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History } from "lucide-react";
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+   const [selectedUserLogs, setSelectedUserLogs] = useState<any[]>([]);
+   const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
+   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+ 
+   const fetchUserLogs = async (userId: string) => {
+     setIsLoadingLogs(true);
+     setIsLogsDialogOpen(true);
+     try {
+       const { data, error } = await supabase
+         .from("audit_logs")
+         .select(`
+           *,
+           admin:profiles!user_id(full_name)
+         `)
+         .eq("entity_id", userId)
+         .eq("entity_type", "profile")
+         .order("created_at", { ascending: false });
+ 
+       if (error) throw error;
+       setSelectedUserLogs(data || []);
+     } catch (error: any) {
+       toast.error("Erro ao carregar logs: " + error.message);
+     } finally {
+       setIsLoadingLogs(false);
+     }
+   };
+ 
  
  export function UserManagement() {
    const { profile: adminProfile } = useAuth();
@@ -207,7 +235,54 @@
                            <span className="text-xs text-muted-foreground italic">-</span>
                          )}
                        </TableCell>
-                       <TableCell className="text-right">
+                       <TableCell className="text-right space-x-1">
+                         <Button
+                           variant="ghost"
+                           size="icon"
+                           onClick={() => fetchUserLogs(user.id)}
+                           className="text-muted-foreground"
+                         >
+                           <History className="h-5 w-5" />
+                         </Button>
+       <Dialog open={isLogsDialogOpen} onOpenChange={setIsLogsDialogOpen}>
+         <DialogContent className="sm:max-w-[500px]">
+           <DialogHeader>
+             <DialogTitle>Histórico de Auditoria</DialogTitle>
+             <DialogDescription>
+               Ações realizadas neste perfil.
+             </DialogDescription>
+           </DialogHeader>
+           <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+             {isLoadingLogs ? (
+               <div className="flex justify-center py-8">
+                 <Loader2 className="h-6 w-6 animate-spin text-gold" />
+               </div>
+             ) : selectedUserLogs.length === 0 ? (
+               <p className="text-center text-muted-foreground py-8">Nenhum registro encontrado.</p>
+             ) : (
+               selectedUserLogs.map((log) => (
+                 <div key={log.id} className="flex flex-col p-3 rounded-lg border bg-muted/30">
+                   <div className="flex items-center justify-between mb-2">
+                     <Badge variant="outline" className={log.action === 'APPROVE_USER' ? 'text-emerald-500 border-emerald-500' : 'text-amber-500 border-amber-500'}>
+                       {log.action === 'APPROVE_USER' ? 'Aprovação' : 'Revogação'}
+                     </Badge>
+                     <span className="text-xs text-muted-foreground">
+                       {format(new Date(log.created_at), "dd/MM/yy HH:mm:ss", { locale: ptBR })}
+                     </span>
+                   </div>
+                   <div className="flex items-center gap-2 text-sm">
+                     <UserCheck className="h-4 w-4 text-gold" />
+                     <span className="font-medium">{log.admin?.full_name || 'Sistema'}</span>
+                   </div>
+                   {log.ip_address && (
+                     <span className="text-[10px] text-muted-foreground mt-1 italic">IP: {log.ip_address}</span>
+                   )}
+                 </div>
+               ))
+             )}
+           </div>
+         </DialogContent>
+       </Dialog>
                          <TooltipProvider>
                            <Tooltip>
                              <TooltipTrigger asChild>
