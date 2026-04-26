@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { EventDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
-import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
+import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw, Maximize2, Image as ImageIcon } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
@@ -10,6 +10,8 @@ import { eventSchema } from "@/lib/schemas";
 import { LotCard } from "@/components/auctions/lot-card";
 import { StatusBadge } from "@/components/auctions/status-badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from "react";
 
 export const Route = createFileRoute("/eventos/$eventSlug")({
   loader: async ({ params }) => {
@@ -53,6 +55,7 @@ function EventDetail() {
   const { event } = Route.useLoaderData() as any;
    const router = useRouter();
   const eventLots = event.lots || [];
+  const [isFlyerOpen, setIsFlyerOpen] = useState(false);
  
    const { status } = useRealtimeEvent(event.id, () => {
      router.invalidate();
@@ -85,7 +88,7 @@ function EventDetail() {
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-[1fr_1.8fr] items-start">
             {/* Main Rectangular Banner */}
-            <div className="relative group mx-auto w-full max-w-md lg:max-w-none">
+            <div className="relative group mx-auto w-full max-w-md lg:max-w-none flex flex-col gap-4">
               <div className="absolute -inset-2 bg-gold/10 blur-3xl rounded-[2.5rem] opacity-30 group-hover:opacity-50 transition-opacity" />
               <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30 group/banner">
                 {/* Blurred background to fill gaps */}
@@ -111,6 +114,25 @@ function EventDetail() {
                   </div>
                 </div>
               </div>
+              
+              <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full h-12 rounded-2xl border-white/10 bg-white/5 hover:bg-gold/10 hover:border-gold/30 hover:text-gold transition-all flex items-center gap-2 group/btn">
+                    <Maximize2 className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
+                    VER ENCARTE COMPLETO
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/90 border-white/10">
+                  <div className="relative w-full h-full flex items-center justify-center p-4">
+                    <OptimizedImage 
+                      src={event.banner_url || ""} 
+                      alt={event.name} 
+                      width={1600}
+                      className="max-w-full max-h-[85vh] object-contain" 
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Event Header Info */}
@@ -176,6 +198,51 @@ function EventDetail() {
           </div>
         </div>
       </section>
+
+      {/* Gallery Section - Only if there are photos */}
+      {event.photos && event.photos.length > 0 && (
+        <section className="container mx-auto px-4 py-16 border-t border-white/5">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="h-12 w-12 rounded-2xl bg-gold/10 flex items-center justify-center">
+              <ImageIcon className="h-6 w-6 text-gold" />
+            </div>
+            <div>
+              <h2 className="text-3xl md:text-5xl font-black text-foreground uppercase tracking-tighter">Galeria do Evento</h2>
+              <p className="text-muted-foreground font-medium">Registros oficiais e momentos exclusivos.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {event.photos.map((photo: string, index: number) => (
+              <Dialog key={index}>
+                <DialogTrigger asChild>
+                  <div className="relative aspect-square rounded-3xl overflow-hidden bg-emerald-deep/20 cursor-pointer group/photo">
+                    <OptimizedImage 
+                      src={photo} 
+                      alt={`Foto ${index + 1} do evento ${event.name}`}
+                      width={400}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover/photo:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
+                      <Maximize2 className="h-8 w-8 text-white scale-75 group-hover/photo:scale-100 transition-transform" />
+                    </div>
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/90 border-white/10">
+                  <div className="relative w-full h-full flex items-center justify-center p-4">
+                    <OptimizedImage 
+                      src={photo} 
+                      alt={`Foto ${index + 1}`}
+                      width={1600}
+                      className="max-w-full max-h-[85vh] object-contain" 
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Lots Section */}
       <section className="container mx-auto px-4 py-16">
