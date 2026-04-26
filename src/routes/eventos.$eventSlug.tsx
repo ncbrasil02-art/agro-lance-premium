@@ -49,8 +49,14 @@ function EventDetail() {
    const router = useRouter();
   const eventLots = event.lots || [];
  
-   const { status } = useRealtimeEvent(event.id, () => {
-     router.invalidate();
+   const { status } = useRealtimeEvent(event.id, (type, payload) => {
+     // Only invalidate the full route if the event data changed,
+     // or if a lot was added/removed (structural change).
+     // Individual lot updates (bids, prices) are handled by LotCard internally.
+     if (type === 'event' || (payload && (payload.eventType === 'INSERT' || payload.eventType === 'DELETE'))) {
+       logger.info("Structural change detected, invalidating route", { type, eventType: payload?.eventType });
+       router.invalidate();
+     }
    });
  
    const isConnected = status === 'SUBSCRIBED';
