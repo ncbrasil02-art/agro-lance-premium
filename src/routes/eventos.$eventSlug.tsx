@@ -1,4 +1,5 @@
- import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+import { EventDetailSkeleton } from "@/components/ui/page-skeleton";
  import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     </div>
   ),
   component: EventDetail,
+  pendingComponent: EventDetailSkeleton,
 });
 
 function EventDetail() {
