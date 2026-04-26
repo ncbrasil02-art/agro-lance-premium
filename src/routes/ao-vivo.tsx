@@ -88,6 +88,7 @@ export const Route = createFileRoute("/ao-vivo")({
 
         // Manual fetch of the active lot since we removed the join in main query
         if (liveEvent.active_lot_id) {
+          const eventAny = liveEvent as any;
           const { data: activeLotData } = await supabase
             .from("lots")
             .select("*")
@@ -102,14 +103,15 @@ export const Route = createFileRoute("/ao-vivo")({
                 .select("*")
                 .eq("id", activeLotData.animal_id)
                 .single();
-              activeLotData.animal = animalData;
+              (activeLotData as any).animal = animalData;
             }
-            liveEvent.active_lot = activeLotData;
+            eventAny.active_lot = activeLotData;
           }
         }
 
         // Fallback: Auto-selection of active lot
-        if (!liveEvent.active_lot && liveEvent.status === 'live') {
+        const eventAny = liveEvent as any;
+        if (!eventAny.active_lot && liveEvent.status === 'live') {
           const { data: fallbackLot } = await supabase
             .from("lots")
             .select("*")
@@ -126,10 +128,10 @@ export const Route = createFileRoute("/ao-vivo")({
                 .select("*")
                 .eq("id", fallbackLot.animal_id)
                 .single();
-              fallbackLot.animal = animalData;
+              (fallbackLot as any).animal = animalData;
             }
-            liveEvent.active_lot = fallbackLot;
-            liveEvent.active_lot_id = fallbackLot.id;
+            eventAny.active_lot = fallbackLot;
+            eventAny.active_lot_id = fallbackLot.id;
           }
         }
 
