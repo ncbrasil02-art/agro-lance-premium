@@ -1,4 +1,13 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouter } from "@tanstack/react-router";
+import { ErrorFallback } from "@/components/ui/error-fallback";
+function GlobalErrorComponent({ error }: { error: Error }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <ErrorFallback error={error} />
+    </div>
+  );
+}
+
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/site/theme-provider";
 import { SiteShell } from "@/components/site/site-shell";
@@ -48,6 +57,7 @@ export const Route = createRootRoute({
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
+  errorComponent: GlobalErrorComponent,
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
