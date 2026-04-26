@@ -1,6 +1,5 @@
- import { MessageSquare, Phone } from "lucide-react";
-   const [statusMessage, setStatusMessage] = useState<string | null>(null);
- import { createFileRoute, Link } from "@tanstack/react-router";
+import { MessageSquare, Phone } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
  import { Button } from "@/components/ui/button";
 import {
@@ -83,14 +82,6 @@ export const Route = createFileRoute("/ao-vivo")({
    component: LivePage,
 });
 
-  const getEmbedUrl = (url: string) => {
-    if (!url) return "";
-    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
-    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
-    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
-    return url;
-  };
-
  function LivePage() {
    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
    const { user, profile } = useAuth();
@@ -99,7 +90,16 @@ export const Route = createFileRoute("/ao-vivo")({
     const [isBidding, setIsBidding] = useState(false);
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
  
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
+    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    return url;
+  };
+
    useEffect(() => {
      if (!liveEvent) return;
  
