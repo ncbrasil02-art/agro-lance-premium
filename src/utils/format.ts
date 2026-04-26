@@ -25,3 +25,11 @@ export function formatDateBR(iso: string) {
   const minute = String(sp.getUTCMinutes()).padStart(2, "0");
   return `${day} de ${month} de ${year} às ${hour}:${minute}`;
 }
+
+export function validateLiveLink(url: string) {
+  if (!url) return true;
+  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+  const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com)\/.+$/;
+  const embedRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/embed\/|player\.vimeo\.com\/video\/).+$/;
+  return youtubeRegex.test(url) || vimeoRegex.test(url) || embedRegex.test(url);
+}
