@@ -594,28 +594,107 @@
                  </div>
                </TabsContent>
                
-               <TabsContent value="genealogia" className="space-y-4 pt-4">
-                 <div className="grid grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="father">Nome do Pai</Label>
-                     <Input id="father" value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="mother">Nome da Mãe</Label>
-                     <Input id="mother" value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
-                   </div>
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="weight">Peso (kg)</Label>
-                     <Input id="weight" type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="height">Altura (m)</Label>
-                     <Input id="height" type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
-                   </div>
-                 </div>
-               </TabsContent>
+                <TabsContent value="genealogia" className="space-y-6 pt-4 max-h-[60vh] overflow-y-auto pr-2">
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm border-b pb-1">1ª Geração (Pais)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="father">Pai</Label>
+                        <Input id="father" value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="mother">Mãe</Label>
+                        <Input id="mother" value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm border-b pb-1">2ª Geração (Avós)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="space-y-4">
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avô Paterno</Label>
+                          <Input value={formData.genealogy_grandfather_paternal} onChange={(e) => setFormData({ ...formData, genealogy_grandfather_paternal: e.target.value })} placeholder="Pai do pai" />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avó Paterna</Label>
+                          <Input value={formData.genealogy_grandmother_paternal} onChange={(e) => setFormData({ ...formData, genealogy_grandmother_paternal: e.target.value })} placeholder="Mãe do pai" />
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avô Materno</Label>
+                          <Input value={formData.genealogy_grandfather_maternal} onChange={(e) => setFormData({ ...formData, genealogy_grandfather_maternal: e.target.value })} placeholder="Pai da mãe" />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avó Materna</Label>
+                          <Input value={formData.genealogy_grandmother_maternal} onChange={(e) => setFormData({ ...formData, genealogy_grandmother_maternal: e.target.value })} placeholder="Mãe da mãe" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm border-b pb-1">3ª Geração (Bisavós)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      {/* Paternos */}
+                      <div className="space-y-4">
+                        <Label className="text-[10px] uppercase font-bold text-gold/60">Linha Paterna</Label>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai do Avô Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_pp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_pp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe do Avô Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_pp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_pp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai da Avó Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_pm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_pm: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe da Avó Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_pm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_pm: e.target.value })} />
+                        </div>
+                      </div>
+                      {/* Maternos */}
+                      <div className="space-y-4">
+                        <Label className="text-[10px] uppercase font-bold text-gold/60">Linha Materna</Label>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai do Avô Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_mp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_mp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe do Avô Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_mp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_mp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai da Avó Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_mm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_mm: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe da Avó Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_mm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_mm: e.target.value })} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t space-y-4">
+                    <h3 className="font-bold text-sm">Medidas</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="weight">Peso (kg)</Label>
+                        <Input id="weight" type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="height">Altura (m)</Label>
+                        <Input id="height" type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
                
                <TabsContent value="saude" className="space-y-4 pt-4">
                  <div className="grid gap-4">
