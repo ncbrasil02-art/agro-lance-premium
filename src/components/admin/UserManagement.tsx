@@ -4,7 +4,34 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History } from "lucide-react";
+ import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download } from "lucide-react";
+   const exportToCSV = () => {
+     const headers = ["Nome", "CPF", "Telefone", "Papel", "Aprovado", "Data Cadastro"];
+     const data = filteredUsers.map(user => [
+       user.full_name,
+       user.cpf,
+       user.phone,
+       user.role === 'admin' ? 'Administrador' : 'Licitante',
+       user.is_approved ? 'Sim' : 'Não',
+       format(new Date(user.created_at), "dd/MM/yyyy HH:mm")
+     ]);
+ 
+     const csvContent = [
+       headers.join(","),
+       ...data.map(row => row.join(","))
+     ].join("\n");
+ 
+     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+     const link = document.createElement("a");
+     const url = URL.createObjectURL(blob);
+     link.setAttribute("href", url);
+     link.setAttribute("download", `licitantes_${format(new Date(), "yyyy-MM-dd")}.csv`);
+     link.style.visibility = "hidden";
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
+   };
+ 
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
@@ -153,9 +180,14 @@
              onChange={(e) => setSearchQuery(e.target.value)}
            />
          </div>
-         <Button variant="outline" size="sm" onClick={fetchUsers} disabled={isLoading}>
-           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
-         </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={exportToCSV} className="gap-2">
+              <Download className="h-4 w-4" /> Exportar
+            </Button>
+            <Button variant="outline" size="sm" onClick={fetchUsers} disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
+            </Button>
+          </div>
        </div>
  
        <Card>
@@ -235,54 +267,15 @@
                            <span className="text-xs text-muted-foreground italic">-</span>
                          )}
                        </TableCell>
-                       <TableCell className="text-right space-x-1">
-                         <Button
-                           variant="ghost"
-                           size="icon"
-                           onClick={() => fetchUserLogs(user.id)}
-                           className="text-muted-foreground"
-                         >
-                           <History className="h-5 w-5" />
-                         </Button>
-       <Dialog open={isLogsDialogOpen} onOpenChange={setIsLogsDialogOpen}>
-         <DialogContent className="sm:max-w-[500px]">
-           <DialogHeader>
-             <DialogTitle>Histórico de Auditoria</DialogTitle>
-             <DialogDescription>
-               Ações realizadas neste perfil.
-             </DialogDescription>
-           </DialogHeader>
-           <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-             {isLoadingLogs ? (
-               <div className="flex justify-center py-8">
-                 <Loader2 className="h-6 w-6 animate-spin text-gold" />
-               </div>
-             ) : selectedUserLogs.length === 0 ? (
-               <p className="text-center text-muted-foreground py-8">Nenhum registro encontrado.</p>
-             ) : (
-               selectedUserLogs.map((log) => (
-                 <div key={log.id} className="flex flex-col p-3 rounded-lg border bg-muted/30">
-                   <div className="flex items-center justify-between mb-2">
-                     <Badge variant="outline" className={log.action === 'APPROVE_USER' ? 'text-emerald-500 border-emerald-500' : 'text-amber-500 border-amber-500'}>
-                       {log.action === 'APPROVE_USER' ? 'Aprovação' : 'Revogação'}
-                     </Badge>
-                     <span className="text-xs text-muted-foreground">
-                       {format(new Date(log.created_at), "dd/MM/yy HH:mm:ss", { locale: ptBR })}
-                     </span>
-                   </div>
-                   <div className="flex items-center gap-2 text-sm">
-                     <UserCheck className="h-4 w-4 text-gold" />
-                     <span className="font-medium">{log.admin?.full_name || 'Sistema'}</span>
-                   </div>
-                   {log.ip_address && (
-                     <span className="text-[10px] text-muted-foreground mt-1 italic">IP: {log.ip_address}</span>
-                   )}
-                 </div>
-               ))
-             )}
-           </div>
-         </DialogContent>
-       </Dialog>
+                        <TableCell className="text-right space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => fetchUserLogs(user.id)}
+                            className="text-muted-foreground"
+                          >
+                            <History className="h-5 w-5" />
+                          </Button>
                          <TooltipProvider>
                            <Tooltip>
                              <TooltipTrigger asChild>
