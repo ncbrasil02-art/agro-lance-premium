@@ -326,7 +326,8 @@
              value={searchQuery}
              onChange={(e) => setSearchQuery(e.target.value)}
            />
-         </div>
+            </div>
+          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
