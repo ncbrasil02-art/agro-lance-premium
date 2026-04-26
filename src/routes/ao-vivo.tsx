@@ -1,5 +1,6 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
- import { Radio, Users, Gavel, Volume2, Loader2 } from "lucide-react";
+  import { Radio, Users, Gavel, Volume2, Loader2, Circle } from "lucide-react";
+  import { useEffectiveEventStatus } from "@/utils/auction-status";
  import { Button } from "@/components/ui/button";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
@@ -104,7 +105,13 @@ export const Route = createFileRoute("/ao-vivo")({
      };
    }, [liveEvent?.id, liveEvent?.active_lot_id]);
  
-   const liveLot = liveEvent?.active_lot;
+    const dynamicStatus = useEffectiveEventStatus({
+      status: liveEvent?.status || 'scheduled',
+      start_date: liveEvent?.start_date || '',
+      end_date: liveEvent?.end_date
+    });
+ 
+    const liveLot = liveEvent?.active_lot;
  
    const placeBid = async (amount: number) => {
      if (!user) {
@@ -149,9 +156,17 @@ export const Route = createFileRoute("/ao-vivo")({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <StatusBadge status="live" />
-          <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{liveEvent.name}</h1>
+        <div className="flex flex-col gap-2">
+           <div className="flex items-center gap-2">
+             <StatusBadge status={dynamicStatus} />
+             {dynamicStatus === 'live' && (
+               <div className="flex items-center gap-1.5 bg-live/10 px-3 py-1 rounded-full border border-live/30 animate-pulse">
+                 <Circle className="h-1.5 w-1.5 fill-live text-live" />
+                 <span className="text-[10px] font-black text-live uppercase tracking-widest">Transmitindo</span>
+               </div>
+             )}
+           </div>
+           <h1 className="text-3xl font-bold tracking-tight md:text-4xl uppercase italic">{liveEvent.name}</h1>
            <div className="flex flex-col gap-1">
              <p className="text-sm text-muted-foreground italic line-clamp-1">{liveEvent.description || "Transmissão ao vivo do leilão premium."}</p>
              <p className="text-xs text-gold/60 font-bold uppercase tracking-wider">Leiloeiro: {liveEvent.auctioneer_name || "A definir"} · {liveEvent.promoter_company || "A definir"}</p>
