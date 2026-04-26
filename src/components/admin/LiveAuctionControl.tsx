@@ -12,6 +12,7 @@
     Ban
  } from "lucide-react";
   import { formatBRL, validateLiveLink } from "@/utils/format";
+  import { TrendingUp, History } from "lucide-react";
  
  export function LiveAuctionControl() {
    const [events, setEvents] = useState<any[]>([]);
@@ -53,6 +54,56 @@
      }
    }, [selectedEventId]);
  
+  // Real-time subscriptions
+  useEffect(() => {
+    if (!selectedEventId) return;
+
+    const eventChannel = supabase
+      .channel(`admin-event-updates-${selectedEventId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${selectedEventId}` },
+          async (payload) => {
+            setLiveEvent((prev: any) => prev ? ({ ...prev, ...payload.new }) : payload.new);
+          
+          if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
+            // When lot changes, we need to refresh details to get animal data etc
+            fetchEventDetails(selectedEventId);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(eventChannel);
+    };
+  }, [selectedEventId]);
+
+  useEffect(() => {
+    if (!activeLot?.id) return;
+
+    const lotChannel = supabase
+      .channel(`admin-lot-realtime-${activeLot.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${activeLot.id}` },
+          (payload) => {
+            setActiveLot((prev: any) => {
+            if (!prev || prev.id !== payload.new.id) return prev;
+            return { ...prev, ...payload.new };
+          });
+          
+            // Also update the lots list for consistency
+            setLots((prev: any[]) => prev.map(l => l.id === payload.new.id ? { ...l, ...payload.new } : l));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(lotChannel);
+    };
+  }, [activeLot?.id]);
+
     const fetchEvents = async () => {
       const { data } = await supabase
         .from("events")
@@ -453,6 +504,50 @@
        </Card>
  
         {selectedEventId && liveEvent && (
+          <div className="space-y-6">
+            {/* Destaque do Lote Ativo para o Narrador */}
+            {activeLot && (
+              <Card className="border-gold border-2 bg-emerald-deep shadow-2xl overflow-hidden">
+                <div className="bg-gold/10 px-6 py-3 border-b border-gold/30 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-gold animate-pulse" />
+                    <span className="text-gold font-black uppercase tracking-widest text-sm">Lote no Ar agora</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-white/60 text-xs font-bold uppercase">
+                    <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {liveEvent.viewers || 0} assistindo</span>
+                    <span className="flex items-center gap-1"><History className="h-3 w-3" /> {activeLot.bids_count || 0} lances</span>
+                  </div>
+                </div>
+                <CardContent className="p-6 md:p-8">
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                      <h2 className="text-white/60 text-lg uppercase font-bold mb-1">Lote {activeLot.lot_number}</h2>
+                      <h3 className="text-white text-4xl md:text-5xl font-black mb-4 tracking-tight">
+                        {activeLot.animal?.name}
+                      </h3>
+                      <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1">
+                        <TrendingUp className="h-4 w-4 text-gold" />
+                        <span className="text-white/80 font-medium text-sm">Valor Inicial: {formatBRL(activeLot.starting_price)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center text-center">
+                      <span className="text-gold font-black uppercase tracking-widest text-xs mb-2">Lance Atual / No Momento</span>
+                      <div className="text-5xl md:text-7xl font-black text-white tracking-tighter tabular-nums drop-shadow-sm">
+                        {formatBRL(activeLot.current_price || activeLot.starting_price)}
+                      </div>
+                      <div className="mt-4 flex gap-4">
+                         <div className="flex flex-col">
+                            <span className="text-[10px] text-white/40 uppercase font-bold">Mín. p/ Próximo</span>
+                            <span className="text-gold font-bold">{formatBRL((activeLot.current_price || activeLot.starting_price) + (activeLot.bid_increment || 500))}</span>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
           <Card className="border-gold/50 bg-gold/5">
             <CardContent className="pt-6">
               <div className="grid gap-4 md:grid-cols-[1fr_auto]">
@@ -491,7 +586,8 @@
               </div>
             </CardContent>
           </Card>
-        )}
+        </div>
+      )}
 
        {selectedEventId && liveEvent && (
          <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
