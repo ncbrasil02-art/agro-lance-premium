@@ -17,14 +17,22 @@ import { logger } from "@/utils/logger";
   "": { label: "PENDENTE", cls: "bg-muted text-muted-foreground border-border" },
 };
 
-  export function StatusBadge({ status, className }: { status: string | null | undefined; className?: string }) {
+   export function StatusBadge({ status, className, urgent }: { status: string | null | undefined; className?: string; urgent?: boolean }) {
     const safeStatus = (status || "").toLowerCase();
 
     if (status && !map[safeStatus]) {
       logger.warn(`Status desconhecido recebido: "${status}". Usando estilo padrão.`, { status });
     }
 
-    const s = map[safeStatus] || { 
+     let s = map[safeStatus] || { 
+ 
+     if (urgent && (safeStatus === 'recebendo_lances' || safeStatus === 'live' || safeStatus === 'active')) {
+       s = { 
+         label: "ÚLTIMOS MINUTOS!", 
+         cls: "bg-live/20 text-live border-live shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-blink-fast", 
+         dot: true 
+       };
+     }
       label: status || "PENDENTE", 
       cls: "bg-muted text-muted-foreground border-border" 
     };
