@@ -1,3 +1,5 @@
+ import { MessageSquare, Phone } from "lucide-react";
+   const [statusMessage, setStatusMessage] = useState<string | null>(null);
  import { createFileRoute, Link } from "@tanstack/react-router";
 import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
  import { Button } from "@/components/ui/button";
@@ -88,13 +90,19 @@ export const Route = createFileRoute("/ao-vivo")({
        .on(
          "postgres_changes",
          { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${liveEvent.id}` },
-         async () => {
+         async (payload) => {
             const { data } = await supabase
               .from("events")
               .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
               .eq("id", liveEvent.id)
              .single();
-            if (data) setLiveEvent(data as any);
+             if (data) {
+               setLiveEvent(data as any);
+               if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
+                 setStatusMessage(payload.new.live_status_message);
+                 setTimeout(() => setStatusMessage(null), 8000);
+               }
+             }
          }
        )
        .subscribe();
@@ -161,14 +169,40 @@ export const Route = createFileRoute("/ao-vivo")({
  
    const currentPrice = liveLot?.current_price || liveLot?.starting_price || 0;
  
-  if (!liveEvent || !liveLot) {
+   if (!liveEvent) {
+     return (
+       <div className="container mx-auto px-4 py-20 text-center">
+         <h1 className="text-3xl font-bold">Nenhum evento ao vivo no momento</h1>
+         <p className="mt-2 text-muted-foreground">Confira o calendário de próximos eventos.</p>
+         <Link to="/eventos" className="mt-6 inline-block">
+           <Button className="bg-gold-gradient text-emerald-deep">Ver eventos</Button>
+         </Link>
+       </div>
+     );
+   }
+ 
+   if (!liveLot) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-3xl font-bold">Nenhuma transmissão ao vivo no momento</h1>
-        <p className="mt-2 text-muted-foreground">Confira o calendário de próximos eventos.</p>
-        <Link to="/eventos" className="mt-6 inline-block">
-          <Button className="bg-gold-gradient text-emerald-deep">Ver eventos</Button>
-        </Link>
+         <h1 className="text-3xl font-bold">{liveEvent.name}</h1>
+         <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant flex flex-col items-center justify-center">
+           {liveEvent.transmission_link ? (
+             <iframe
+               className="h-full w-full border-0"
+               src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
+               title="Aguardando Próximo Lote"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+               allowFullScreen
+             />
+           ) : (
+             <>
+               <Loader2 className="h-12 w-12 text-gold animate-spin mb-4" />
+               <p className="text-gold font-bold uppercase tracking-widest">Aguardando próximo lote...</p>
+               <p className="text-white/60 text-sm mt-2">O leiloeiro está preparando a próxima oferta.</p>
+             </>
+           )}
+         </div>
+         <p className="mt-8 text-muted-foreground">Fique atento! A transmissão continua enquanto preparamos o próximo animal.</p>
       </div>
     );
   }
@@ -182,7 +216,14 @@ export const Route = createFileRoute("/ao-vivo")({
               <AlertTriangle className="h-5 w-5" /> Confirmar Lance Ao Vivo
             </AlertDialogTitle>
             <AlertDialogDescription className="text-white/80">
-              Deseja realmente confirmar o lance de <span className="text-white font-bold">{formatBRL(pendingBidAmount || 0)}</span> para o lote <span className="text-white font-bold">#{liveLot.lot_number}</span>?
+               Deseja realmente confirmar o lance de <span className="text-white font-bold">{formatBRL(pendingBidAmount || 0)}</span> para o lote <span className="text-white font-bold">#{liveLot.lot_number}</span>?
+               <br /><br />
+               {bids?.[0]?.is_phone_bid && (
+                 <div className="flex items-center gap-2 bg-white/10 p-2 rounded text-xs">
+                   <Phone className="h-3 w-3 text-gold" />
+                   <span>Último lance recebido via telefone</span>
+                 </div>
+               )}
               <br /><br />
               <span className="text-xs italic font-bold text-gold">Lances em leilão ao vivo são definitivos e irrevogáveis.</span>
             </AlertDialogDescription>
@@ -218,17 +259,39 @@ export const Route = createFileRoute("/ao-vivo")({
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         {/* Player + Lote em destaque */}
         <div className="space-y-6">
-          <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
-             <img src={liveLot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={liveLot.animal?.name} className="h-full w-full object-cover opacity-50" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent text-center">
-              <Radio className="h-12 w-12 text-gold animate-pulse-live" />
-              <p className="mt-3 text-sm font-bold uppercase tracking-wider text-gold">Transmissão ao vivo</p>
-              <p className="text-white/80 text-xs">Player de vídeo HD será exibido aqui</p>
-            </div>
-            <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur">
-              <Volume2 className="h-4 w-4" />
-            </div>
-          </div>
+           <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
+             {liveEvent.transmission_link ? (
+               <iframe
+                 className="h-full w-full border-0"
+                 src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
+                 title="Transmissão ao Vivo"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowFullScreen
+               />
+             ) : (
+               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent text-center">
+                 <img src={liveLot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={liveLot.animal?.name} className="absolute inset-0 h-full w-full object-cover opacity-30" />
+                 <Radio className="h-12 w-12 text-gold animate-pulse-live relative z-10" />
+                 <p className="mt-3 text-sm font-bold uppercase tracking-wider text-gold relative z-10">Aguardando Transmissão</p>
+                 <p className="text-white/80 text-xs relative z-10">O vídeo será exibido assim que o leiloeiro iniciar.</p>
+               </div>
+             )}
+             
+             {statusMessage && (
+               <div className="absolute bottom-4 left-4 right-4 z-20 animate-in fade-in slide-in-from-bottom-4">
+                 <div className="bg-gold/95 backdrop-blur-sm p-3 rounded-lg shadow-xl flex items-center gap-3 border border-emerald-deep/20">
+                   <div className="h-8 w-8 rounded-full bg-emerald-deep flex items-center justify-center">
+                     <MessageSquare className="h-4 w-4 text-gold" />
+                   </div>
+                   <p className="text-emerald-deep font-black text-sm uppercase tracking-tight">{statusMessage}</p>
+                 </div>
+               </div>
+             )}
+             
+             <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur z-10">
+               <Volume2 className="h-4 w-4" />
+             </div>
+           </div>
 
           {/* Lote em destaque */}
           <div className="rounded-2xl border border-gold/30 bg-card p-6 shadow-gold">
@@ -285,7 +348,15 @@ export const Route = createFileRoute("/ao-vivo")({
               {bids?.map((bid: any, i: number) => (
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
-                   <div className="font-semibold">Comprador ...{bid.user_id.slice(-4)}</div>
+                   <div className="font-semibold flex items-center gap-2">
+                     {bid.is_phone_bid ? (
+                       <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
+                         <Phone className="h-2 w-2" /> Telefone
+                       </span>
+                     ) : (
+                       <span>Comprador ...{bid.user_id.slice(-4)}</span>
+                     )}
+                   </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
                  </div>
                  <div className={`font-mono font-bold ${i === 0 ? "text-gold" : "text-foreground"}`}>{formatBRL(bid.amount)}</div>

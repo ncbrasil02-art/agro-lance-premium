@@ -27,6 +27,8 @@
    viewers: z.number().int().nonnegative().default(0),
    auctioneer_name: z.string().nullable().optional(),
    promoter_company: z.string().nullable().optional(),
+   transmission_link: z.string().nullable().optional(),
+   live_status_message: z.string().nullable().optional(),
    show_countdown: z.boolean().default(true),
  });
  
