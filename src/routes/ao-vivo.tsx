@@ -1,6 +1,6 @@
-import { MessageSquare, Phone } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
+import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
  import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -12,6 +12,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
   import { supabase } from "@/integrations/supabase/client";
@@ -199,6 +206,15 @@ export const Route = createFileRoute("/ao-vivo")({
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+
+  const nextPhoto = (photos: string[]) => {
+    setActivePhotoIndex((prev) => (prev + 1) % photos.length);
+  };
+
+  const prevPhoto = (photos: string[]) => {
+    setActivePhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
  
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
