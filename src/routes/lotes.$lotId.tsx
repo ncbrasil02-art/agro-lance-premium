@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -431,8 +432,14 @@ function LotDetail() {
             <div className="space-y-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl group cursor-zoom-in">
-                    <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <button className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl group cursor-zoom-in">
+                    <OptimizedImage 
+                      src={lot.animal?.photos?.[activePhoto] || ""} 
+                      alt={lot.animal?.name || "Animal"} 
+                      width={1000}
+                      aspectRatio="landscape"
+                      className="transition-transform duration-500 group-hover:scale-110" 
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                     <div className="absolute left-6 top-6 flex flex-col gap-2">
                      <StatusBadge status={dynamicStatus} urgent={isUrgent} />
@@ -443,13 +450,24 @@ function LotDetail() {
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black border-white/10 flex items-center justify-center overflow-hidden">
-                  <img src={lot.animal?.photos?.[activePhoto] || ""} alt="" className="max-w-full max-h-full object-contain" />
+                  <OptimizedImage 
+                    src={lot.animal?.photos?.[activePhoto] || ""} 
+                    alt="" 
+                    width={1600}
+                    className="max-w-full max-h-full object-contain" 
+                  />
                 </DialogContent>
               </Dialog>
               <div className="grid grid-cols-5 gap-3">
                 {lot.animal?.photos?.map((src: string, i: number) => (
                   <button key={i} onClick={() => setActivePhoto(i)} className={`aspect-square overflow-hidden rounded-xl border-2 transition-all ${activePhoto === i ? 'border-gold shadow-gold/20' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                    <img src={src} alt="" className="h-full w-full object-cover" />
+                    <OptimizedImage 
+                      src={src} 
+                      alt="" 
+                      width={200}
+                      aspectRatio="square"
+                      className="h-full w-full" 
+                    />
                   </button>
                 ))}
               </div>
