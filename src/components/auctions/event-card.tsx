@@ -35,10 +35,13 @@ import { Countdown } from "@/components/auctions/countdown";
    return <Gavel className="h-5 w-5 text-gold shrink-0" />;
  };
  
-  import { useState, useEffect } from "react";
+  import { useState, useEffect, MouseEvent } from "react";
+  import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+  import { Maximize2 } from "lucide-react";
  
   export function EventCard({ event }: { event: AuctionEvent & { end_date?: string | null } }) {
    const [isUrgent, setIsUrgent] = useState(false);
+    const [isFlyerOpen, setIsFlyerOpen] = useState(false);
    
    useEffect(() => {
      const checkUrgency = () => {
@@ -59,13 +62,14 @@ import { Countdown } from "@/components/auctions/countdown";
   });
 
   return (
-    <Link
-      to="/eventos/$eventSlug"
-       params={{ eventSlug: event.slug }}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
-      aria-labelledby={`event-title-${event.id}`}
-    >
-      <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-emerald-deep/20">
+     <div className="group relative flex flex-col">
+       <Link
+         to="/eventos/$eventSlug"
+         params={{ eventSlug: event.slug }}
+         className={`flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
+         aria-labelledby={`event-title-${event.id}`}
+       >
+       <div className="relative aspect-[3/4] overflow-hidden bg-emerald-deep/20">
         {/* Background Blur - Very low quality for background effect */}
         <OptimizedImage 
           src={event?.cover || ""} 
@@ -84,11 +88,33 @@ import { Countdown } from "@/components/auctions/countdown";
             category="event"
             className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
           />
-          <div className="absolute top-4 right-4 z-20">
-            <div className="rounded-lg bg-black/30 backdrop-blur-md border border-white/10 px-2 py-1 text-[10px] font-bold text-white/90 uppercase tracking-wider group-hover:bg-black/50 transition-colors">
-              Ver foto do flyer
-            </div>
-          </div>
+         </div>
+
+         <div className="absolute top-4 right-4 z-30">
+           <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
+             <DialogTrigger asChild>
+               <button 
+                 onClick={(e) => {
+                   e.preventDefault();
+                   e.stopPropagation();
+                   setIsFlyerOpen(true);
+                 }}
+                 className="rounded-lg bg-black/50 backdrop-blur-md border border-white/20 px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all flex items-center gap-2 shadow-xl"
+               >
+                 <Maximize2 className="h-3.3 w-3.3" />
+                 Ver Flyer
+               </button>
+             </DialogTrigger>
+             <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10 flex items-center justify-center">
+               <OptimizedImage 
+                 src={event?.cover || ""} 
+                 alt={event?.name || "Flyer do Evento"} 
+                 width={1600}
+                 className="max-w-full max-h-[90vh] object-contain" 
+               />
+             </DialogContent>
+           </Dialog>
+         </div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
         <div className="absolute left-4 top-4 z-10 flex flex-col gap-2 items-start">
