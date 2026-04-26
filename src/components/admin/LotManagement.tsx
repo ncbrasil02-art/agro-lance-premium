@@ -657,6 +657,18 @@ import {
                                <TooltipProvider>
                                  <Tooltip>
                                    <TooltipTrigger asChild>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gold" onClick={() => fetchLotBids(lot.id)}>
+                                       <History className="h-3.5 w-3.5" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>
+                                     <p>Histórico de Lances / Reverter</p>
+                                   </TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(lot)}>
                                        <Pencil className="h-3.5 w-3.5" />
                                      </Button>
