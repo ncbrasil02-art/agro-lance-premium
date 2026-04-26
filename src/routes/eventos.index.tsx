@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { useState, useMemo } from "react";
   import { EventCard } from "@/components/auctions/event-card";
   import { logger } from "@/utils/logger";
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/eventos/")({
       }
     },
    component: EventsPage,
+   pendingComponent: PageSkeleton,
 });
 
 function EventsPage() {
