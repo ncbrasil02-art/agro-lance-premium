@@ -175,10 +175,25 @@ function LotDetail() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lot.id}` },
-        async (payload) => {
-          const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
-           setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev].slice(0, 50));
-        }
+         async (payload) => {
+           const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
+           const newBid = { ...payload.new, profile };
+           setRecentBids((prev: any) => [newBid, ...prev].slice(0, 50));
+           
+           // Alerta de novo lance
+           toast.info(`Novo lance de ${formatBRL(payload.new.amount)}`, {
+             description: `Licitante: ${profile?.full_name || "Licitante"}`,
+             icon: <Gavel className="h-4 w-4 text-gold" />,
+             duration: 5000,
+           });
+           
+           // Som de alerta (opcional, pode ser bloqueado pelo navegador se não houver interação)
+           try {
+             const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+             audio.volume = 0.3;
+             audio.play().catch(() => {}); // Ignora erro se o navegador bloquear
+           } catch (e) {}
+         }
       )
       .subscribe();
 
