@@ -1,6 +1,5 @@
- import { MessageSquare, Phone } from "lucide-react";
-   const [statusMessage, setStatusMessage] = useState<string | null>(null);
- import { createFileRoute, Link } from "@tanstack/react-router";
+import { MessageSquare, Phone } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
  import { Button } from "@/components/ui/button";
 import {
@@ -47,7 +46,7 @@ export const Route = createFileRoute("/ao-vivo")({
       let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
       
       // If not found, look for any 'live' event
-   if (!liveEvent) {
+      if (!liveEvent) {
         liveEvent = events.find(e => e.status === 'live');
       }
 
@@ -60,20 +59,27 @@ export const Route = createFileRoute("/ao-vivo")({
         });
       }
 
-     if (!liveEvent) return { liveEvent: null };
- 
-     const { data: bids, error: bidsError } = await supabase
-       .from("bids")
-       .select("*")
-        .eq("lot_id", liveEvent.active_lot_id!)
-       .order("created_at", { ascending: false })
-       .limit(10);
+      if (!liveEvent) return { liveEvent: null };
+
+      let initialBids: any[] = [];
+      if (liveEvent.active_lot_id) {
+        const { data: bids, error: bidsError } = await supabase
+          .from("bids")
+          .select("*")
+          .eq("lot_id", liveEvent.active_lot_id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        
+        if (!bidsError && bids) {
+          initialBids = bids;
+        }
+      }
  
       try {
         const validatedEvent = eventSchema.parse(liveEvent);
         return { 
           liveEvent: validatedEvent,
-          initialBids: bids || []
+          initialBids
         };
       } catch (e) {
         console.error("Erro de validação do evento ao vivo:", e);
@@ -83,14 +89,6 @@ export const Route = createFileRoute("/ao-vivo")({
    component: LivePage,
 });
 
-  const getEmbedUrl = (url: string) => {
-    if (!url) return "";
-    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
-    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
-    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
-    return url;
-  };
-
  function LivePage() {
    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
    const { user, profile } = useAuth();
@@ -99,7 +97,16 @@ export const Route = createFileRoute("/ao-vivo")({
     const [isBidding, setIsBidding] = useState(false);
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
  
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
+    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    return url;
+  };
+
    useEffect(() => {
      if (!liveEvent) return;
  

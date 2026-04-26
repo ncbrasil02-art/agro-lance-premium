@@ -24,12 +24,12 @@
     end_date: z.string().nullable().optional(),
     active_lot_id: z.string().uuid().nullable().optional(),
     active_lot: z.any().nullable().optional(),
-   viewers: z.number().int().nonnegative().default(0),
+    viewers: z.preprocess((val) => val === null ? 0 : val, z.number().int().nonnegative().default(0)),
    auctioneer_name: z.string().nullable().optional(),
    promoter_company: z.string().nullable().optional(),
    transmission_link: z.string().nullable().optional(),
    live_status_message: z.string().nullable().optional(),
-   show_countdown: z.boolean().default(true),
+    show_countdown: z.preprocess((val) => val === null ? true : val, z.boolean().default(true)),
  });
  
  export const animalSchema = z.object({
@@ -66,8 +66,8 @@
    current_price: z.number().nonnegative().nullable().optional(),
    bid_increment: z.number().nonnegative().default(0),
    status: z.enum(["upcoming", "active", "sold", "passed"]).default("upcoming"),
-   bids_count: z.number().int().nonnegative().default(0),
-   viewers: z.number().int().nonnegative().default(0),
+    bids_count: z.preprocess((val) => val === null ? 0 : val, z.number().int().nonnegative().default(0)),
+    viewers: z.preprocess((val) => val === null ? 0 : val, z.number().int().nonnegative().default(0)),
    end_date: z.string().nullable().optional(),
    animal: animalSchema.nullable().optional(),
    event: eventSchema.nullable().optional(),
