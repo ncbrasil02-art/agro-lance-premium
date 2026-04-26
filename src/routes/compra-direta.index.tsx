@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PageSkeleton } from "@/components/ui/page-skeleton";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ShoppingCart, Search, Filter, ArrowRight, DollarSign, Package } from "lucide-react";
@@ -32,6 +34,7 @@ export const Route = createFileRoute("/compra-direta/")({
     return { animals: animals || [], categories: categories || [] };
   },
   component: DirectSalePage,
+  pendingComponent: PageSkeleton,
 });
 
 function DirectSalePage() {
@@ -142,10 +145,12 @@ function DirectSalePage() {
             <Card key={animal.id} className="group overflow-hidden border-border/50 bg-card/30 hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:shadow-gold/5 rounded-2xl flex flex-col h-full">
               <div className="relative aspect-[4/3] overflow-hidden">
                 {animal.photos && animal.photos.length > 0 ? (
-                  <img 
+                  <OptimizedImage 
                     src={animal.photos[0]} 
                     alt={animal.name} 
-                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                    width={400}
+                    aspectRatio="landscape"
+                    className="group-hover:scale-110 transition-transform duration-500"
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
