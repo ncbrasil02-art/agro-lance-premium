@@ -47,15 +47,7 @@ export const Route = createFileRoute("/ao-vivo")({
       let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
       
       // If not found, look for any 'live' event
-  const getEmbedUrl = (url: string) => {
-    if (!url) return "";
-    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
-    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
-    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
-    return url;
-  };
-
-      if (!liveEvent) {
+   if (!liveEvent) {
         liveEvent = events.find(e => e.status === 'live');
       }
 
@@ -90,6 +82,14 @@ export const Route = createFileRoute("/ao-vivo")({
    },
    component: LivePage,
 });
+
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
+    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    return url;
+  };
 
  function LivePage() {
    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
