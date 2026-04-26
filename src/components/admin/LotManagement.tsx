@@ -4,7 +4,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle } from "lucide-react";
+   import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
@@ -389,16 +389,16 @@
            ) : (
              <Table>
                <TableHeader>
-                 <TableRow>
-                   <TableHead className="w-[80px]">Nº Lote</TableHead>
-                   <TableHead>Animal</TableHead>
-                   <TableHead>Evento</TableHead>
-                    <TableHead>Destaque</TableHead>
-                    <TableHead>Preço Inicial</TableHead>
-                   <TableHead>Lances</TableHead>
-                   <TableHead>Status</TableHead>
-                   <TableHead className="text-right">Ações</TableHead>
-                 </TableRow>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[70px] font-bold">Nº</TableHead>
+                    <TableHead className="font-bold">Animal</TableHead>
+                    <TableHead className="font-bold">Evento</TableHead>
+                    <TableHead className="font-bold">Destaque</TableHead>
+                    <TableHead className="font-bold">Valores</TableHead>
+                    <TableHead className="font-bold">Lances</TableHead>
+                    <TableHead className="font-bold">Status</TableHead>
+                    <TableHead className="text-right font-bold">Ações de Gestão</TableHead>
+                  </TableRow>
                </TableHeader>
                <TableBody>
                  {filteredLots.length === 0 ? (
@@ -408,46 +408,113 @@
                      </TableCell>
                    </TableRow>
                  ) : (
-                    filteredLots.map((lot) => (
-                      <TableRow key={lot.id}>
-                        <TableCell className="font-bold">{lot.lot_number}</TableCell>
-                        <TableCell>
-                          {lot.is_featured ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gold/10 text-gold border border-gold/20">
-                              Sim
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground text-[10px] uppercase">Não</span>
-                          )}
-                        </TableCell>
-                       <TableCell>
-                         <div className="font-medium">{lot.animal?.name}</div>
-                         <div className="text-xs text-muted-foreground">{lot.animal?.internal_code}</div>
-                       </TableCell>
-                       <TableCell>{lot.event?.name}</TableCell>
-                       <TableCell>
-                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}
-                       </TableCell>
-                       <TableCell>{lot.bids_count || 0}</TableCell>
-                       <TableCell>
-                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                           lot.status === 'active' ? 'text-emerald-500 bg-emerald-500/10' : 'text-muted-foreground bg-muted'
-                         }`}>
-                           {lot.status === 'active' ? 'Ativo' : 'Pausado'}
-                         </span>
-                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(lot)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(lot.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                     </TableRow>
-                   ))
+                     filteredLots.map((lot) => {
+                       const endsAt = lot.event?.end_date ? new Date(lot.event.end_date).getTime() : null;
+                       const now = Date.now();
+                       const isUrgent = endsAt && (endsAt - now > 0) && (endsAt - now < 600000);
+                       const hasNoBids = (lot.bids_count || 0) === 0;
+                       const currentPrice = lot.current_price || lot.starting_price || 0;
+                       const isPriceLow = currentPrice <= lot.starting_price;
+
+                       return (
+                         <TableRow 
+                           key={lot.id} 
+                           className={`${lot.status === 'active' ? 'bg-emerald-50/30' : ''} ${isUrgent ? 'animate-neon border-live/30' : ''}`}
+                         >
+                           <TableCell className="font-bold">
+                             <div className="flex flex-col">
+                               <span>{String(lot.lot_number).padStart(2, '0')}</span>
+                               {lot.is_featured && <Zap className="h-3 w-3 text-gold fill-gold" />}
+                             </div>
+                           </TableCell>
+                           <TableCell>
+                             <div className="font-bold text-sm uppercase">{lot.animal?.name}</div>
+                             <div className="text-[10px] text-muted-foreground font-mono">{lot.animal?.internal_code || 'S/C'}</div>
+                           </TableCell>
+                           <TableCell>
+                             <div className="text-xs font-medium truncate max-w-[120px]">{lot.event?.name}</div>
+                           </TableCell>
+                           <TableCell>
+                             {lot.is_featured ? (
+                               <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-gold/20 text-gold border border-gold/30 uppercase">
+                                 Destaque
+                               </span>
+                             ) : (
+                               <span className="text-muted-foreground text-[10px] uppercase font-bold opacity-30">Normal</span>
+                             )}
+                           </TableCell>
+                           <TableCell>
+                             <div className="flex flex-col">
+                               <span className="text-[10px] text-muted-foreground uppercase font-bold">Atual</span>
+                               <span className="font-black text-sm text-emerald-deep">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
+                               </span>
+                               <span className="text-[9px] text-muted-foreground italic">Início: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}</span>
+                             </div>
+                           </TableCell>
+                           <TableCell>
+                             <div className="flex flex-col items-center">
+                               <span className={`text-sm font-black ${hasNoBids ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
+                                 {lot.bids_count || 0}
+                               </span>
+                               {hasNoBids && <AlertTriangle className="h-3 w-3 text-destructive" />}
+                             </div>
+                           </TableCell>
+                           <TableCell>
+                             <div className="flex flex-col gap-1">
+                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center ${
+                                 lot.status === 'active' ? 'text-emerald-bright bg-emerald-bright/10 border border-emerald-bright/20' : 'text-muted-foreground bg-muted border border-border'
+                               }`}>
+                                 {lot.status === 'active' ? 'No Ar' : 'Pausado'}
+                               </span>
+                               {isUrgent && (
+                                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center bg-live/10 text-live border border-live/20 animate-blink-fast">
+                                   Encerrando!
+                                 </span>
+                               )}
+                             </div>
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-2">
+                               {lot.status === 'active' && (
+                                 <Button 
+                                   variant="outline" 
+                                   size="sm" 
+                                   className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
+                                   onClick={async () => {
+                                     const bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                     const { data: { user } } = await supabase.auth.getUser();
+                                     if (!user) return;
+                                     
+                                     const { error } = await supabase.from("bids").insert({
+                                       lot_id: lot.id,
+                                       user_id: user.id,
+                                       amount: bidAmount,
+                                       bid_type: "online"
+                                     });
+                                     
+                                     if (error) toast.error("Erro no lance: " + error.message);
+                                     else {
+                                       toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
+                                       fetchData();
+                                     }
+                                   }}
+                                 >
+                                   <ShieldCheck className="h-3 w-3" /> Segurança
+                                 </Button>
+                               )}
+                               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(lot)}>
+                                 <Pencil className="h-3.5 w-3.5" />
+                               </Button>
+                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(lot.id)}>
+                                 <Trash2 className="h-3.5 w-3.5" />
+                               </Button>
+                             </div>
+                           </TableCell>
+                         </TableRow>
+                       );
+                     })
+                   )
                  )}
                </TableBody>
              </Table>
