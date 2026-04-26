@@ -309,9 +309,10 @@ export const Route = createFileRoute("/ao-vivo")({
                   setTimeout(() => setStatusMessage(null), 8000);
                 }
                 
-                // If active lot changed, fetch bids for the new lot
+                // If active lot changed, fetch bids for the new lot and reset state
                 if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
                   console.log("Lote alterado em tempo real:", payload.new.active_lot_id);
+                  setActivePhotoIndex(0);
                   const { data: newBids } = await supabase
                     .from("bids")
                     .select("*")
