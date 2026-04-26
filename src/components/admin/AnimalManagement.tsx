@@ -408,22 +408,24 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                <PlusCircle className="mr-2 h-4 w-4" /> Novo Animal
              </Button>
            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
                 <DialogTitle>{editingAnimal ? "Editar Animal" : "Cadastrar Novo Animal"}</DialogTitle>
                <DialogDescription>
                   Preencha as informações detalhadas do animal.
                </DialogDescription>
              </DialogHeader>
-              <Tabs defaultValue="geral" className="w-full">
-                 <TabsList className="grid w-full grid-cols-6">
-                  <TabsTrigger value="geral">Geral</TabsTrigger>
-                  <TabsTrigger value="registros">Registros</TabsTrigger>
-                  <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
-                  <TabsTrigger value="saude">Saúde</TabsTrigger>
-                   <TabsTrigger value="midia">Mídia</TabsTrigger>
-                   <TabsTrigger value="venda">Venda</TabsTrigger>
-                 <TabsContent value="venda" className="space-y-4 pt-4">
+               <Tabs defaultValue="geral" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 mb-4">
+                    <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
+                    <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
+                    <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
+                    <TabsTrigger value="saude" className="text-xs">Saúde</TabsTrigger>
+                    <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
+                    <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="venda" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                    <div className="flex items-center space-x-2 border p-4 rounded-md bg-muted/20">
                      <Checkbox 
                        id="is_direct_sale" 
