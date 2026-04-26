@@ -8,7 +8,7 @@ import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
 import { lotSchema } from "@/lib/schemas";
 import { useAuth } from "@/components/auth/auth-provider";
-import { useEffect, useState } from "react";
+ import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
