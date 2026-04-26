@@ -169,6 +169,8 @@ function LotDetail() {
   const [lot, setLot] = useState(initialLot);
   const [recentBids, setRecentBids] = useState<any[]>(initialBids);
   const [isBidding, setIsBidding] = useState(false);
+  const [showConfirmBid, setShowConfirmBid] = useState(false);
+  const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
   const [activePhoto, setActivePhoto] = useState(0);
 
   useEffect(() => {
