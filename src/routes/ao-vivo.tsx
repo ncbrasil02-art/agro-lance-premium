@@ -47,6 +47,14 @@ export const Route = createFileRoute("/ao-vivo")({
       let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
       
       // If not found, look for any 'live' event
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
+    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    return url;
+  };
+
       if (!liveEvent) {
         liveEvent = events.find(e => e.status === 'live');
       }
@@ -196,15 +204,15 @@ export const Route = createFileRoute("/ao-vivo")({
       <div className="container mx-auto px-4 py-20 text-center">
          <h1 className="text-3xl font-bold">{liveEvent.name}</h1>
          <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant flex flex-col items-center justify-center">
-           {liveEvent.transmission_link ? (
-             <iframe
-               className="h-full w-full border-0"
-               src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
-               title="Aguardando Próximo Lote"
-               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-               allowFullScreen
-             />
-           ) : (
+            {liveEvent.transmission_link ? (
+              <iframe
+                className="h-full w-full border-0"
+                src={getEmbedUrl(liveEvent.transmission_link)}
+                title="Aguardando Próximo Lote"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
              <>
                <Loader2 className="h-12 w-12 text-gold animate-spin mb-4" />
                <p className="text-gold font-bold uppercase tracking-widest">Aguardando próximo lote...</p>
@@ -273,7 +281,7 @@ export const Route = createFileRoute("/ao-vivo")({
              {liveEvent.transmission_link ? (
                <iframe
                  className="h-full w-full border-0"
-                 src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
+                 src={getEmbedUrl(liveEvent.transmission_link)}
                  title="Transmissão ao Vivo"
                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                  allowFullScreen
