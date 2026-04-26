@@ -287,8 +287,10 @@ import {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos Status</SelectItem>
-                  <SelectItem value="active">No Ar</SelectItem>
-                  <SelectItem value="paused">Pausados</SelectItem>
+                  <SelectItem value="active">No Ar / Ativo</SelectItem>
+                  <SelectItem value="sold">Arrematados</SelectItem>
+                  <SelectItem value="passed">Não Vendidos (Passou)</SelectItem>
+                  <SelectItem value="upcoming">Agendados</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -590,11 +592,46 @@ import {
                            </TableCell>
                            <TableCell>
                              <div className="flex flex-col gap-1">
-                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center ${
-                                 lot.status === 'active' ? 'text-emerald-bright bg-emerald-bright/10 border border-emerald-bright/20' : 'text-muted-foreground bg-muted border border-border'
-                               }`}>
-                                 {lot.status === 'active' ? 'No Ar' : 'Pausado'}
-                               </span>
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center ${
+                                  lot.status === 'active' ? 'text-emerald-bright bg-emerald-bright/10 border border-emerald-bright/20' : 
+                                  lot.status === 'sold' ? 'text-gold bg-gold/10 border border-gold/20' :
+                                  lot.status === 'passed' ? 'text-destructive bg-destructive/10 border border-destructive/20' :
+                                  'text-muted-foreground bg-muted border border-border'
+                                }`}>
+                                  {lot.status === 'active' ? 'No Ar' : 
+                                   lot.status === 'sold' ? 'Arrematado' :
+                                   lot.status === 'passed' ? 'Passou' : 
+                                   lot.status === 'upcoming' ? 'Agendado' : 'Finalizado'}
+                                </span>
+                                {(lot.status === 'sold' || lot.status === 'passed') && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-8 gap-1 border-emerald-500/50 hover:bg-emerald-50 text-emerald-600 text-[10px] font-bold"
+                                    onClick={async () => {
+                                      if (!confirm("Deseja REABRIR este lote? O arremate anterior será cancelado e o lote voltará a ficar disponível para lances.")) return;
+                                      setIsLoading(true);
+                                      try {
+                                        const { error } = await supabase
+                                          .from("lots")
+                                          .update({ 
+                                            status: 'active', 
+                                            winner_id: null 
+                                          })
+                                          .eq("id", lot.id);
+                                        if (error) throw error;
+                                        toast.success("Lote reaberto com sucesso!");
+                                        fetchData();
+                                      } catch (error: any) {
+                                        toast.error("Erro ao reabrir lote: " + error.message);
+                                      } finally {
+                                        setIsLoading(false);
+                                      }
+                                    }}
+                                  >
+                                    <History className="h-3 w-3" /> Reabrir
+                                  </Button>
+                                )}
                                {isUrgent && (
                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center bg-live/10 text-live border border-live/20 animate-blink-fast">
                                    Encerrando!

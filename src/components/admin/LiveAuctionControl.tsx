@@ -7,8 +7,9 @@
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  import { toast } from "sonner";
  import { 
-   Play, Square, MessageSquare, Phone, Timer, Gavel, 
-   Video, Users, Loader2, AlertTriangle, CheckCircle2 
+    Play, Square, MessageSquare, Phone, Timer, Gavel, Check,
+    Video, Users, Loader2, AlertTriangle, CheckCircle2,
+    Ban
  } from "lucide-react";
   import { formatBRL, validateLiveLink } from "@/utils/format";
  
@@ -152,25 +153,69 @@
      }
    };
  
+    const sellLot = async (lotId: string) => {
+      if (!confirm("Confirmar ARREMATE deste lote para o maior lance atual?")) return;
+      setIsActionLoading(true);
+      try {
+        // Find the winner (last bid)
+        const { data: lastBid } = await supabase
+          .from("bids")
+          .select("user_id")
+          .eq("lot_id", lotId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        await supabase.from("lots").update({ 
+          status: 'sold', 
+          is_currently_live: false,
+          winner_id: lastBid?.user_id || null
+        }).eq("id", lotId);
+        
+        await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao arrematar lote");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
+    const passLot = async (lotId: string) => {
+      if (!confirm("Finalizar lote sem venda? (Passou)")) return;
+      setIsActionLoading(true);
+      try {
+        await supabase.from("lots").update({ status: 'passed', is_currently_live: false }).eq("id", lotId);
+        await handleAfterLotFinalized(lotId, "Lote finalizado sem venda.");
+      } catch (error) {
+        toast.error("Erro ao finalizar lote");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
+    const handleAfterLotFinalized = async (lotId: string, successMessage: string) => {
+      // Check if there are more lots to be auctioned
+      const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'sold' && l.status !== 'passed' && l.status !== 'finished');
+      
+      if (remainingLots.length === 0) {
+        await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
+        toast.success(successMessage + " Evento encerrado!");
+      } else {
+        await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
+        toast.success(successMessage);
+      }
+      
+      fetchEventDetails(selectedEventId);
+      setActiveLot(null);
+    };
+
     const finalizeLot = async (lotId: string) => {
+      // Legacy function fallback or for generic finalization
       if (!confirm("Tem certeza que deseja finalizar este lote?")) return;
       setIsActionLoading(true);
       try {
-        await supabase.from("lots").update({ status: 'finished', is_currently_live: false }).eq("id", lotId);
-        
-        // Check if there are more lots to be auctioned
-        const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'finished');
-        
-        if (remainingLots.length === 0) {
-          await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
-          toast.success("Lote finalizado e evento encerrado!");
-        } else {
-          await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
-          toast.success("Lote finalizado!");
-        }
-        
-        fetchEventDetails(selectedEventId);
-        setActiveLot(null);
+        await supabase.from("lots").update({ status: 'passed', is_currently_live: false }).eq("id", lotId);
+        await handleAfterLotFinalized(lotId, "Lote finalizado!");
       } catch (error) {
         toast.error("Erro ao finalizar lote");
       } finally {
@@ -426,7 +471,7 @@
                        className={`relative rounded-xl border p-4 transition-all ${
                          lot.id === liveEvent.active_lot_id 
                          ? "border-gold bg-gold/5 ring-1 ring-gold shadow-gold-sm" 
-                         : lot.status === 'finished' 
+                          : (lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished')
                          ? "opacity-50 bg-muted" 
                          : "hover:border-gold/50 cursor-pointer"
                        }`}
@@ -440,29 +485,38 @@
                          )}
                        </div>
                        <h4 className="font-bold truncate">{lot.animal?.name}</h4>
-                       <div className="mt-4 flex gap-2">
-                         {lot.id !== liveEvent.active_lot_id && lot.status !== 'finished' && (
-                           <Button 
-                             size="sm" 
-                             className="w-full bg-gold/10 text-gold hover:bg-gold/20"
-                             onClick={() => activateLot(lot.id)}
-                             disabled={isActionLoading}
-                           >
-                             <Play className="mr-1 h-3 w-3" /> Entrar no Ar
-                           </Button>
-                         )}
-                         {lot.id === liveEvent.active_lot_id && (
-                           <Button 
-                             size="sm" 
-                             variant="destructive" 
-                             className="w-full"
-                             onClick={() => finalizeLot(lot.id)}
-                             disabled={isActionLoading}
-                           >
-                             <Square className="mr-1 h-3 w-3" /> Finalizar
-                           </Button>
-                         )}
-                       </div>
+                        <div className="mt-4 flex flex-col gap-2">
+                          {lot.id !== liveEvent.active_lot_id && lot.status !== 'sold' && lot.status !== 'passed' && lot.status !== 'finished' && (
+                            <Button 
+                              size="sm" 
+                              className="w-full bg-gold/10 text-gold hover:bg-gold/20"
+                              onClick={() => activateLot(lot.id)}
+                              disabled={isActionLoading}
+                            >
+                              <Play className="mr-1 h-3 w-3" /> Entrar no Ar
+                            </Button>
+                          )}
+                          {lot.id === liveEvent.active_lot_id && (
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button 
+                                size="sm" 
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                onClick={() => sellLot(lot.id)}
+                                disabled={isActionLoading}
+                              >
+                                <Check className="mr-1 h-3 w-3" /> Arrematar
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => passLot(lot.id)}
+                                disabled={isActionLoading}
+                              >
+                                <Ban className="mr-1 h-3 w-3" /> Passou
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                      </div>
                    ))}
                  </div>

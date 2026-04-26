@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type AuctionStatus = 'loteamento' | 'pre_lance' | 'recebendo_lances' | 'sold' | 'finished' | 'scheduled' | 'live';
+export type AuctionStatus = 'loteamento' | 'pre_lance' | 'recebendo_lances' | 'sold' | 'passed' | 'finished' | 'scheduled' | 'live';
 
 export function useEffectiveLotStatus(lot: {
   status: string;

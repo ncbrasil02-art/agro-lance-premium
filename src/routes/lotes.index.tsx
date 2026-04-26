@@ -25,6 +25,7 @@ export const Route = createFileRoute("/lotes/")({
         const { data: lots, error } = await supabase
           .from("lots")
            .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+          .not("status", "in", "('sold','passed','finished')")
           .order("is_featured", { ascending: false })
           .order("lot_number", { ascending: true });
        
