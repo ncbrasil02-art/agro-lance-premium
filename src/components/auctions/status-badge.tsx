@@ -2,14 +2,14 @@ import { cn } from "@/lib/utils";
 import { logger } from "@/utils/logger";
 
  const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
-   live: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_10px_rgba(16,185,129,0.2)] animate-pulse", dot: true },
-   active: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_10px_rgba(16,185,129,0.2)] animate-pulse", dot: true },
-   open: { label: "ACEITA PRÉ-LANCE", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]" },
-   upcoming: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_10px_rgba(234,179,8,0.1)]" },
-   scheduled: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_10px_rgba(234,179,8,0.1)]" },
-   loteamento: { label: "EM LOTEAMENTO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_10px_rgba(234,179,8,0.1)]" },
-   pre_lance: { label: "PRÉ-LANCE ABERTO", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]", dot: true },
-   recebendo_lances: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_10px_rgba(16,185,129,0.2)] animate-pulse", dot: true },
+    live: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)] animate-pulse", dot: true },
+    active: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)] animate-pulse", dot: true },
+    open: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_6px_rgba(16,185,129,0.1)]" },
+    upcoming: { label: "ABERTO PARA LANCES", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_6px_rgba(234,179,8,0.1)]" },
+    scheduled: { label: "ABERTO PARA LANCES", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_6px_rgba(234,179,8,0.1)]" },
+    loteamento: { label: "ABERTO PARA LANCES", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_6px_rgba(234,179,8,0.1)]" },
+    pre_lance: { label: "PRÉ-LANCE ABERTO", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_6px_rgba(16,185,129,0.15)]", dot: true },
+    recebendo_lances: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)] animate-pulse", dot: true },
   closed: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   finished: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   passed: { label: "NÃO VENDIDO", cls: "bg-muted text-muted-foreground border-border" },
@@ -31,8 +31,8 @@ import { logger } from "@/utils/logger";
 
     if (urgent && (safeStatus === 'recebendo_lances' || safeStatus === 'live' || safeStatus === 'active')) {
       s = { 
-        label: "ÚLTIMOS MINUTOS!", 
-        cls: "bg-live/20 text-live border-live shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-blink-fast", 
+        label: "ABERTO PARA LANCES", 
+        cls: "bg-live/20 text-live border-live shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-blink-fast", 
         dot: true 
       };
     }

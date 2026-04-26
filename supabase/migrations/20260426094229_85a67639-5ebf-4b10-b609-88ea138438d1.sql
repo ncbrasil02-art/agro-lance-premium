@@ -1,1 +1,0 @@
-ALTER TABLE public.lots ADD COLUMN IF NOT EXISTS safety_price NUMERIC;

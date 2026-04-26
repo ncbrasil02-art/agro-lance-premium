@@ -5,8 +5,7 @@ import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
  import { useEffectiveLotStatus } from "@/utils/auction-status";
- import { useState, useEffect, useRef } from "react";
- import { toast } from "sonner";
+ import { useState, useEffect } from "react";
 
  const AnimalIcon = ({ breed }: { breed?: string }) => {
    const b = breed?.toLowerCase() || "";
@@ -33,103 +32,49 @@ import { Countdown } from "./countdown";
    );
  };
  
-   import { supabase } from "@/integrations/supabase/client";
-
-   export function LotCard({ lot: initialLot }: { 
-     lot: Lot & { 
-       eventStartDate?: string; 
-       eventEndDate?: string; 
-       allowsPreBidding?: boolean; 
-       eventStatus?: string;
-       father?: string;
-       mother?: string;
-       sex?: string;
-       color?: string;
-       birthDate?: string;
-       seller?: string;
-       location?: string;
-     } 
-   }) {
-    const [lot, setLot] = useState(initialLot);
-    const [urgencyLevel, setUrgencyLevel] = useState<'normal' | 'urgent' | 'critical'>('normal');
-    const triggeredAlerts = useRef<Set<number>>(new Set());
+  export function LotCard({ lot }: { 
+    lot: Lot & { 
+      eventStartDate?: string; 
+      eventEndDate?: string; 
+      allowsPreBidding?: boolean; 
+      eventStatus?: string;
+      father?: string;
+      mother?: string;
+      sex?: string;
+      color?: string;
+      birthDate?: string;
+      seller?: string;
+      location?: string;
+    } 
+  }) {
+   const [isUrgent, setIsUrgent] = useState(false);
    
-    const dynamicStatus = useEffectiveLotStatus({
-      status: lot.status,
-      event_status: lot.eventStatus,
-      event_start_date: lot.eventStartDate,
-      event_end_date: lot.eventEndDate,
-      allows_pre_bidding: lot.allowsPreBidding
-    });
-
-    useEffect(() => {
-      const channel = supabase
-        .channel(`lot-card-${lot.id}`)
-        .on(
-          "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lot.id}` },
-          (payload) => {
-            setLot(prev => ({
-              ...prev,
-              currentBid: payload.new.current_price || payload.new.starting_price || prev.currentBid,
-              bidsCount: payload.new.bids_count ?? prev.bidsCount,
-              status: payload.new.status ?? prev.status,
-              endsAt: payload.new.end_date ?? prev.endsAt
-            }));
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }, [lot.id]);
+   const dynamicStatus = useEffectiveLotStatus({
+     status: lot.status,
+     event_status: lot.eventStatus,
+     event_start_date: lot.eventStartDate,
+     event_end_date: lot.eventEndDate,
+     allows_pre_bidding: lot.allowsPreBidding
+   });
  
-    useEffect(() => {
-      const checkUrgency = () => {
-        const endsAt = lot.endsAt || lot.eventEndDate;
-        if (!endsAt || dynamicStatus !== 'recebendo_lances') return;
-        
-        const diff = new Date(endsAt).getTime() - Date.now();
-        
-        if (diff <= 0) return;
-
-        // Alert thresholds (minutes to ms)
-        const thresholds = [
-          { min: 5, ms: 300000 },
-          { min: 2, ms: 120000 },
-          { min: 1, ms: 60000 }
-        ];
-
-        thresholds.forEach(t => {
-          if (diff <= t.ms && diff > t.ms - 10000 && !triggeredAlerts.current.has(t.min)) {
-            toast.warning(`Lote ${lot.number}: Faltam ${t.min} minuto${t.min > 1 ? 's' : ''}!`, {
-              description: lot.name,
-              duration: 5000,
-            });
-            triggeredAlerts.current.add(t.min);
-          }
-        });
-
-        if (diff < 120000) { // 2 minutes
-          setUrgencyLevel('critical');
-        } else if (diff < 600000) { // 10 minutes
-          setUrgencyLevel('urgent');
-        } else {
-          setUrgencyLevel('normal');
-        }
-      };
-      
-      const timer = setInterval(checkUrgency, 1000);
-      checkUrgency();
-      return () => clearInterval(timer);
-    }, [lot.endsAt, lot.eventEndDate, lot.number, lot.name, dynamicStatus]);
+   useEffect(() => {
+     const checkUrgency = () => {
+       const endsAt = lot.endsAt || lot.eventEndDate;
+       if (!endsAt) return;
+       const diff = new Date(endsAt).getTime() - Date.now();
+       setIsUrgent(diff > 0 && diff < 600000); // 10 minutes
+     };
+     
+     const timer = setInterval(checkUrgency, 5000); // Check every 5s is enough
+     checkUrgency();
+     return () => clearInterval(timer);
+   }, [lot.endsAt, lot.eventEndDate]);
 
   return (
     <Link
       to="/lotes/$lotId"
       params={{ lotId: lot.id }}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${urgencyLevel === 'critical' ? 'animate-neon-critical border-live ring-2 ring-live/40 z-10' : urgencyLevel === 'urgent' ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon-green border-emerald-bright/30 ring-1 ring-emerald-bright/10' : ''}`}
+       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
       aria-labelledby={`lot-title-${lot.id}`}
     >
       <div className="relative aspect-[9/16] overflow-hidden bg-muted">
@@ -141,7 +86,7 @@ import { Countdown } from "./countdown";
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
         <div className="absolute left-3 top-3 flex flex-col gap-2 items-start">
-            <StatusBadge status={dynamicStatus} urgent={urgencyLevel !== 'normal'} />
+           <StatusBadge status={dynamicStatus} urgent={isUrgent} />
           {dynamicStatus === 'loteamento' && (
             <div className="group/info relative">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-gold backdrop-blur-md border border-gold/30 cursor-help">

@@ -53,7 +53,7 @@
      <span 
        className={cn(
          className, 
-         isCritical && "text-live animate-blink-fast font-black shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+          isCritical && "text-live animate-blink-fast font-black shadow-[0_0_6px_rgba(239,68,68,0.15)]"
        )} 
        suppressHydrationWarning
      >

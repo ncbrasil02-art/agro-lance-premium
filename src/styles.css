@@ -1,64 +1,32 @@
-  @keyframes neon-pulse-green {
-    0%, 100% {
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.1);
-      border-color: rgba(16, 185, 129, 0.2);
-    }
-    50% {
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-      border-color: rgba(16, 185, 129, 0.4);
-    }
-  }
-
-  .animate-neon-green {
-    animation: neon-pulse-green 2.5s infinite ease-in-out;
-  }
-
-  @keyframes neon-pulse-urgent {
-    0%, 100% {
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-      border-color: rgba(239, 68, 68, 0.5);
-    }
-    50% {
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-      border-color: rgba(239, 68, 68, 0.8);
-    }
-  }
+ @keyframes neon-pulse-urgent {
+   0%, 100% {
+     box-shadow: 0 0 6px rgba(239, 68, 68, 0.2);
+     border-color: rgba(239, 68, 68, 0.4);
+   }
+   50% {
+     box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+     border-color: rgba(239, 68, 68, 0.6);
+   }
+ }
  
   .animate-neon-urgent {
-    animation: neon-pulse-urgent 0.8s infinite ease-in-out;
-  }
- 
-  @keyframes neon-pulse-critical {
-    0%, 100% {
-      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-      border-color: rgba(239, 68, 68, 0.7);
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 0 30px rgba(239, 68, 68, 0.8);
-      border-color: rgba(239, 68, 68, 1);
-      transform: scale(1.01);
-    }
-  }
- 
-  .animate-neon-critical {
-    animation: neon-pulse-critical 0.4s infinite ease-in-out;
+    animation: neon-pulse-urgent 0.6s infinite ease-in-out;
   }
  
  @keyframes neon-pulse {
    0%, 100% {
-     box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
-     border-color: rgba(212, 175, 55, 0.3);
+     box-shadow: 0 0 5px rgba(212, 175, 55, 0.1);
+     border-color: rgba(212, 175, 55, 0.2);
    }
    50% {
-     box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-     border-color: rgba(212, 175, 55, 0.5);
+     box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+     border-color: rgba(212, 175, 55, 0.4);
    }
  }
  
  @keyframes blink-fast {
    0%, 100% { opacity: 1; }
-   50% { opacity: 0.7; }
+   50% { opacity: 0.4; transform: scale(1.02); }
  }
  
  @keyframes shimmer-gold {

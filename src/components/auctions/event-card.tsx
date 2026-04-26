@@ -61,7 +61,7 @@ import { Countdown } from "@/components/auctions/countdown";
     <Link
       to="/eventos/$eventSlug"
        params={{ eventSlug: event.slug }}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon-green border-emerald-bright/30 ring-1 ring-emerald-bright/10' : ''}`}
+        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
       aria-labelledby={`event-title-${event.id}`}
     >
       <div className="relative aspect-video overflow-hidden bg-emerald-deep/20">
