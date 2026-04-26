@@ -88,7 +88,13 @@ import { Countdown } from "./countdown";
           className="transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
-        <div className="absolute left-3 top-3 flex flex-col gap-2 items-start">
+        <div className="absolute left-3 top-3 flex flex-col gap-2.5 items-start">
+           {dynamicStatus === 'recebendo_lances' && (
+             <div className="flex items-center gap-1.5 rounded-full bg-live px-3 py-1.5 text-[10px] font-black text-white shadow-[0_0_25px_rgba(239,68,68,0.6)] animate-blink-fast border border-white/40 ring-2 ring-live/20">
+               <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+               AO VIVO
+             </div>
+           )}
            <StatusBadge status={dynamicStatus} urgent={isUrgent} />
           {dynamicStatus === 'loteamento' && (
             <div className="group/info relative">
