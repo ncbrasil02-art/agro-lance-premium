@@ -17,24 +17,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  Search, 
-  Package, 
-  User, 
-  Phone, 
-  Mail, 
-  MapPin,
-  Loader2
-} from "lucide-react";
+   CheckCircle2, 
+   XCircle, 
+   Clock, 
+   Search, 
+   Package, 
+   User, 
+   Phone, 
+   Mail, 
+   MapPin,
+    Loader2,
+    Filter
+ } from "lucide-react";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 export function DirectSaleManagement() {
   const [sales, setSales] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+   const [searchTerm, setSearchTerm] = useState("");
+   const [statusFilter, setStatusFilter] = useState("all");
 
   const fetchSales = async () => {
     setIsLoading(true);
@@ -73,23 +76,41 @@ export function DirectSaleManagement() {
     }
   };
 
-  const filteredSales = sales.filter(sale => 
-    sale.buyer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.animals?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+   const filteredSales = sales.filter(sale => {
+     const matchesSearch = sale.buyer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          sale.animals?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+     const matchesStatus = statusFilter === "all" || sale.status === statusFilter;
+     return matchesSearch && matchesStatus;
+   });
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por comprador ou animal..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+       <div className="flex flex-1 items-center gap-4 max-w-2xl">
+         <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
+           <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
+           <Select value={statusFilter} onValueChange={setStatusFilter}>
+             <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[140px] text-xs">
+               <SelectValue placeholder="Status Venda" />
+             </SelectTrigger>
+             <SelectContent>
+               <SelectItem value="all">Todas as Vendas</SelectItem>
+               <SelectItem value="pending">Pendentes</SelectItem>
+               <SelectItem value="confirmed">Confirmadas</SelectItem>
+               <SelectItem value="cancelled">Canceladas</SelectItem>
+             </SelectContent>
+           </Select>
+         </div>
+         <div className="relative flex-1">
+           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+           <Input
+             placeholder="Buscar por comprador ou animal..."
+             className="pl-10"
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
+           />
+         </div>
+       </div>
         <Button variant="outline" onClick={fetchSales} disabled={isLoading}>
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Atualizar Lista

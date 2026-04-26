@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-   import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle } from "lucide-react";
+   import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter } from "lucide-react";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
@@ -23,8 +23,9 @@
       const [lots, setLots] = useState<any[]>([]);
       const [events, setEvents] = useState<any[]>([]);
       const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
-      const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
-      const [searchQuery, setSearchQuery] = useState("");
+       const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
+       const [statusFilter, setStatusFilter] = useState<string>("all");
+       const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
       
       const [formData, setFormData] = useState({
@@ -188,12 +189,13 @@
        if (onEventChange) onEventChange(val);
      };
  
-   const filteredLots = lots.filter(lot => {
-     const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          lot.lot_number?.toString().includes(searchQuery);
-     const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
-     return matchesSearch && matchesEvent;
-   });
+    const filteredLots = lots.filter(lot => {
+      const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           lot.lot_number?.toString().includes(searchQuery);
+      const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
+      const matchesStatus = statusFilter === "all" || lot.status === statusFilter;
+      return matchesSearch && matchesEvent && matchesStatus;
+    });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja remover este lote? O animal voltará a ficar disponível para outros eventos.")) return;
@@ -216,7 +218,20 @@
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar"}
             </Button>
           </div>
-         <div className="flex flex-1 gap-4 max-w-2xl">
+          <div className="flex flex-1 gap-4 max-w-3xl flex-wrap">
+            <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
+              <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[130px] text-xs">
+                  <SelectValue placeholder="Status Lote" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Status</SelectItem>
+                  <SelectItem value="active">No Ar</SelectItem>
+                  <SelectItem value="paused">Pausados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
            <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
              <Input

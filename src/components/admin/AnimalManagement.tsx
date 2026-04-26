@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-  import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign, Filter } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Checkbox } from "@/components/ui/checkbox";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -238,7 +238,8 @@
     };
 
    const [isLoading, setIsLoading] = useState(true);
-   const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
  
     const fetchAnimals = async () => {
       setIsLoading(true);
@@ -269,10 +270,15 @@
       fetchSellers();
     }, []);
  
-   const filteredAnimals = animals.filter(animal => 
-     animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase())
-   );
+   const filteredAnimals = animals.filter(animal => {
+     const matchesSearch = animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase());
+     
+     if (statusFilter === "all") return matchesSearch;
+     if (statusFilter === "direct_sale") return matchesSearch && animal.is_direct_sale;
+     if (statusFilter === "auction_only") return matchesSearch && !animal.is_direct_sale;
+     return matchesSearch && animal.sale_status === statusFilter;
+   });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este animal?")) return;
@@ -295,7 +301,24 @@
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
             </Button>
           </div>
-         <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-1 items-center gap-4 max-w-2xl">
+            <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
+              <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[150px] text-xs">
+                  <SelectValue placeholder="Filtrar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Animais</SelectItem>
+                  <SelectItem value="direct_sale">Venda Direta</SelectItem>
+                  <SelectItem value="auction_only">Apenas Leilão</SelectItem>
+                  <SelectItem value="available">Status: Disponível</SelectItem>
+                  <SelectItem value="reserved">Status: Reservado</SelectItem>
+                  <SelectItem value="sold">Status: Vendido</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="relative flex-1">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input
              placeholder="Buscar por nome ou registro..."
@@ -303,7 +326,8 @@
              value={searchQuery}
              onChange={(e) => setSearchQuery(e.target.value)}
            />
-         </div>
+            </div>
+          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
