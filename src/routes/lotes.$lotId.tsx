@@ -415,26 +415,54 @@ function LotDetail() {
 
               <TabsContent value="documentos" className="mt-6">
                 <div className="grid gap-4 md:grid-cols-2">
-                  {lot.animal?.pedigree_url && (
-                    <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
-                      <a href={lot.animal.pedigree_url} target="_blank">
-                        <span className="flex items-center font-bold"><FileText className="mr-3 h-6 w-6 text-gold" /> PEDIGREE COMPLETO</span>
-                        <Download className="h-5 w-5" />
-                      </a>
-                    </Button>
-                  )}
-                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando encarte do lote...")}>
-                    <span className="flex items-center font-bold"><Download className="mr-3 h-6 w-6 text-gold" /> ENCARTE DO LOTE (PDF)</span>
-                    <Download className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando exames laboratoriais...")}>
-                    <span className="flex items-center font-bold"><Stethoscope className="mr-3 h-6 w-6 text-gold" /> LAUDOS & EXAMES</span>
-                    <Download className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Visualizando histórico reprodutivo...")}>
-                    <span className="flex items-center font-bold"><Fingerprint className="mr-3 h-6 w-6 text-gold" /> HISTÓRICO REPRODUTIVO</span>
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
+                   {lot.animal?.pedigree_url && (
+                     <TooltipProvider>
+                       <Tooltip>
+                         <TooltipTrigger asChild>
+                           <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" asChild>
+                             <a href={lot.animal.pedigree_url} target="_blank">
+                               <span className="flex items-center font-bold"><FileText className="mr-3 h-6 w-6 text-gold" /> PEDIGREE COMPLETO</span>
+                               <Download className="h-5 w-5" />
+                             </a>
+                           </Button>
+                         </TooltipTrigger>
+                         <TooltipContent>Clique para visualizar o documento de pedigree original</TooltipContent>
+                       </Tooltip>
+                     </TooltipProvider>
+                   )}
+                   <TooltipProvider>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando encarte do lote...")}>
+                           <span className="flex items-center font-bold"><Download className="mr-3 h-6 w-6 text-gold" /> ENCARTE DO LOTE (PDF)</span>
+                           <Download className="h-5 w-5" />
+                         </Button>
+                       </TooltipTrigger>
+                       <TooltipContent>Baixar PDF com fotos e informações técnicas do lote</TooltipContent>
+                     </Tooltip>
+                   </TooltipProvider>
+                   <TooltipProvider>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Baixando exames laboratoriais...")}>
+                           <span className="flex items-center font-bold"><Stethoscope className="mr-3 h-6 w-6 text-gold" /> LAUDOS & EXAMES</span>
+                           <Download className="h-5 w-5" />
+                         </Button>
+                       </TooltipTrigger>
+                       <TooltipContent>Acessar laudos veterinários e exames laboratoriais recentes</TooltipContent>
+                     </Tooltip>
+                   </TooltipProvider>
+                   <TooltipProvider>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Button variant="outline" className="h-20 justify-between rounded-2xl border-white/10 bg-white/5 text-white hover:bg-gold hover:text-emerald-deep" onClick={() => toast.info("Visualizando histórico reprodutivo...")}>
+                           <span className="flex items-center font-bold"><Fingerprint className="mr-3 h-6 w-6 text-gold" /> HISTÓRICO REPRODUTIVO</span>
+                           <ChevronRight className="h-5 w-5" />
+                         </Button>
+                       </TooltipTrigger>
+                       <TooltipContent>Ver informações de genealogia e desempenho reprodutivo</TooltipContent>
+                     </Tooltip>
+                   </TooltipProvider>
                 </div>
               </TabsContent>
             </Tabs>
@@ -488,10 +516,17 @@ function LotDetail() {
                       <InstallmentSimulator price={currentPrice} />
                     </div>
                     
-                    <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center gap-2 group" onClick={() => toast.info("Gerando encarte PDF...")}>
-                      <Download className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
-                      <span className="text-xs font-bold uppercase tracking-wider">Baixar Encarte do Lote (PDF)</span>
-                    </Button>
+                     <TooltipProvider>
+                       <Tooltip>
+                         <TooltipTrigger asChild>
+                           <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center gap-2 group" onClick={() => toast.info("Gerando encarte PDF...")}>
+                             <Download className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
+                             <span className="text-xs font-bold uppercase tracking-wider">Baixar Encarte do Lote (PDF)</span>
+                           </Button>
+                         </TooltipTrigger>
+                         <TooltipContent>Documento completo com fotos e dados do animal</TooltipContent>
+                       </Tooltip>
+                     </TooltipProvider>
                   </div>
                   </div>
 
@@ -499,13 +534,20 @@ function LotDetail() {
                     {lot.animal?.youtube_url && (
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
-                          >
-                            <PlayCircle className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
-                          </Button>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button 
+                                   variant="ghost" 
+                                   className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
+                                 >
+                                   <PlayCircle className="h-4 w-4" />
+                                   <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>Abrir player de vídeo do YouTube</TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[800px] bg-black p-0 border-white/10 overflow-hidden">
                           <div className="aspect-video">
