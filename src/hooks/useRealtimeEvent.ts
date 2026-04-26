@@ -88,7 +88,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
   return { status };
 }
 
-export function useRealtimeLots(onUpdate: () => void) {
+export function useRealtimeLots(onUpdate: (payload?: any) => void) {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -97,9 +97,9 @@ export function useRealtimeLots(onUpdate: () => void) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'lots' },
-        () => {
-          logger.info('Mudança detectada em algum lote (global)');
-          onUpdate();
+        (payload) => {
+          logger.info('Mudança detectada em lote (global)', { id: payload.new?.id });
+          onUpdate(payload);
         }
       )
       .subscribe((status) => {
@@ -120,4 +120,39 @@ export function useRealtimeLots(onUpdate: () => void) {
       window.removeEventListener('online', handleOnline);
     };
   }, [onUpdate, retryCount]);
+}
+
+export function useLotRealtime(lotId: string, initialData: any) {
+  const [data, setData] = useState(initialData);
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
+    if (!lotId) return;
+
+    const channel = supabase
+      .channel(`lot-detail-${lotId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'lots',
+          filter: `id=eq.${lotId}`,
+        },
+        (payload) => {
+          logger.info(`Lote atualizado via realtime: ${lotId}`, payload.new);
+          setData((prev: any) => ({ ...prev, ...payload.new }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [lotId]);
+
+  return data;
 }
