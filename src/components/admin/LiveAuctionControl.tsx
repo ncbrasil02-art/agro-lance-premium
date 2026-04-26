@@ -23,7 +23,8 @@
   const [transmissionLink, setTransmissionLink] = useState("");
    
    // Phone bid form
-   const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "" });
+    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "" });
+    const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
  
    const quickMessages = [
      "Alguém dá mais algum lance?",
@@ -230,7 +231,7 @@
         return;
       }
 
-      const amount = (activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment;
+      const amount = securityBidAmount || (activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment;
       
       setIsActionLoading(true);
       try {
@@ -245,7 +246,8 @@
         
         const result = data as any;
         if (result.success) {
-          toast.success("Lance de segurança (reserva) efetuado!");
+          toast.success("Lance de segurança (auditório) efetuado!");
+          setSecurityBidAmount(0);
           fetchEventDetails(selectedEventId);
         } else {
           toast.error(result.message);
@@ -493,8 +495,18 @@
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-[10px] text-muted-foreground uppercase leading-tight">
-                    Use para cobrir o preço reserva ou estimular o leilão. Aparecerá no auditório sem identificar o usuário.
+                    Use para cobrir o preço reserva ou estimular o leilão. Aparecerá como "Auditório" no site.
                   </p>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-destructive/80">Valor do Lance (opcional)</Label>
+                    <Input 
+                      type="number" 
+                      className="h-8 bg-white/10 border-white/20 text-white" 
+                      placeholder={activeLot ? formatBRL((activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment) : "0,00"}
+                      value={securityBidAmount || ""}
+                      onChange={(e) => setSecurityBidAmount(parseFloat(e.target.value))}
+                    />
+                  </div>
                   <Button 
                     variant="destructive"
                     className="w-full font-bold"
@@ -502,7 +514,7 @@
                     disabled={isActionLoading || !activeLot}
                   >
                     {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
-                    Dar Lance + {activeLot ? formatBRL(activeLot.bid_increment) : "0,00"}
+                    {securityBidAmount ? `Dar Lance de ${formatBRL(securityBidAmount)}` : `Lance + ${activeLot ? formatBRL(activeLot.bid_increment) : "0,00"}`}
                   </Button>
                 </CardContent>
               </Card>
