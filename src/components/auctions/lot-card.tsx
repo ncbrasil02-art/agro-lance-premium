@@ -84,6 +84,7 @@ import { Countdown } from "./countdown";
           alt={lot?.name || "Animal"} 
           width={400}
           aspectRatio="9/16"
+          category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
           className="transition-smooth group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
