@@ -123,7 +123,7 @@ export const Route = createFileRoute("/ao-vivo")({
       try {
         const { error } = await supabase.from("bids").insert({
           lot_id: (liveLot as any).id,
-          user_id: user.id,
+          user_id: user?.id,
           amount,
           bid_type: "online",
         });
