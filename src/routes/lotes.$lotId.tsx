@@ -615,8 +615,8 @@ function LotDetail() {
                 <Zap className="h-4 w-4 text-gold" />
                 <span className="text-xs font-black uppercase tracking-widest text-white">Lances Recentes</span>
               </div>
-              <div className="p-6 space-y-4">
-                {recentBids.length > 0 ? recentBids.map((bid: any, i: number) => (
+               <div className="p-4 space-y-3">
+                 {recentBids.length > 0 ? recentBids.slice(0, 5).map((bid: any, i: number) => (
                   <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl ${i === 0 ? 'bg-gold/10 border border-gold/20' : 'bg-white/5'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black text-sm ${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-emerald-deep text-white/40'}`}> {bid.profile?.full_name?.charAt(0) || "P"} </div>
@@ -627,7 +627,22 @@ function LotDetail() {
                     </div>
                     <div className={`font-black tracking-tight ${i === 0 ? 'text-gold text-lg' : 'text-white'}`}> {formatBRL(bid.amount)} </div>
                   </div>
-                )) : <div className="text-center py-6 text-white/20 text-xs font-bold uppercase">Nenhum lance ainda</div>}
+                 )) : <div className="text-center py-6 text-white/20 text-[10px] font-black uppercase tracking-widest italic">Aguardando primeiro lance...</div>}
+                 
+                 {recentBids.length > 5 && (
+                   <Button 
+                     variant="ghost" 
+                     className="w-full h-8 text-[10px] font-black text-gold/60 hover:text-gold uppercase tracking-[0.2em]"
+                     onClick={() => {
+                       const tabsElement = document.querySelector('[role="tablist"]');
+                       const historyTab = tabsElement?.querySelector('[value="historico"]') as HTMLElement;
+                       historyTab?.click();
+                       historyTab?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                     }}
+                   >
+                     Ver todos os {recentBids.length} lances
+                   </Button>
+                 )}
               </div>
             </Card>
 
