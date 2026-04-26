@@ -479,7 +479,7 @@
                                   event_start_date: lot.event?.start_date,
                                   event_end_date: lot.event?.end_date,
                                   allows_pre_bidding: !!lot.allows_pre_bidding
-                                })} urgent={isUrgent} className="scale-90 origin-left" />
+                                 })} urgent={!!isUrgent} className="scale-90 origin-left" />
                                 {lot.status !== getEffectiveLotStatus({
                                   status: lot.status,
                                   event_status: lot.event?.status,
