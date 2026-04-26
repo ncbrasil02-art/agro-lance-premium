@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { getOptimizedImageUrl } from "@/utils/image-optimization";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
 
@@ -28,40 +29,17 @@ export function OptimizedImage({
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(src);
+  const optimizedUrl = useMemo(() => {
+    return getOptimizedImageUrl(src, { width, height, quality }, fallbackSrc);
+  }, [src, width, height, quality, fallbackSrc]);
 
-  // Function to optimize Supabase Storage URLs
-  const getOptimizedUrl = (originalUrl: string) => {
-    if (!originalUrl) return fallbackSrc;
-    
-    // If it's already a transformed URL or not from Supabase, return as is
-    if (!originalUrl.includes("supabase.co/storage/v1/object/public/") || originalUrl.includes("?")) {
-      return originalUrl;
-    }
-
-    try {
-      // Transform standard public URL to render URL for optimization
-      // From: https://[project].supabase.co/storage/v1/object/public/[bucket]/[path]
-      // To: https://[project].supabase.co/storage/v1/render/image/public/[bucket]/[path]?width=[w]&quality=[q]
-      const optimizedUrl = originalUrl.replace("/object/public/", "/render/image/public/");
-      const params = new URLSearchParams();
-      
-      if (width) params.append("width", width.toString());
-      if (height) params.append("height", height.toString());
-      params.append("quality", quality.toString());
-      params.append("format", "webp"); // Force webp for better compression
-
-      return `${optimizedUrl}?${params.toString()}`;
-    } catch (e) {
-      return originalUrl;
-    }
-  };
+  const [currentSrc, setCurrentSrc] = useState(optimizedUrl);
 
   useEffect(() => {
-    setCurrentSrc(getOptimizedUrl(src));
+    setCurrentSrc(optimizedUrl);
     setIsLoading(true);
     setError(false);
-  }, [src, width, height, quality]);
+  }, [optimizedUrl]);
 
   const handleLoad = () => {
     setIsLoading(false);
