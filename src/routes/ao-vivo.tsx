@@ -74,6 +74,18 @@ export const Route = createFileRoute("/ao-vivo")({
 
         if (!liveEvent) return { liveEvent: null };
 
+        // Fallback: If active_lot_id is present but join failed to fetch active_lot
+        if (liveEvent.active_lot_id && !liveEvent.active_lot) {
+          const { data: activeLotData } = await supabase
+            .from("lots")
+            .select("*, animal:animals(*)")
+            .eq("id", liveEvent.active_lot_id)
+            .single();
+          if (activeLotData) {
+            liveEvent.active_lot = activeLotData;
+          }
+        }
+
         let initialBids: any[] = [];
         if (liveEvent.active_lot_id) {
           const { data: bids, error: bidsError } = await supabase
@@ -216,40 +228,58 @@ export const Route = createFileRoute("/ao-vivo")({
  
    const currentPrice = liveLot?.current_price || liveLot?.starting_price || 0;
  
-   if (!liveEvent) {
-     return (
-       <div className="container mx-auto px-4 py-20 text-center">
-         <h1 className="text-3xl font-bold">Nenhum evento ao vivo no momento</h1>
-         <p className="mt-2 text-muted-foreground">Confira o calendário de próximos eventos.</p>
-         <Link to="/eventos" className="mt-6 inline-block">
-           <Button className="bg-gold-gradient text-emerald-deep">Ver eventos</Button>
-         </Link>
-       </div>
-     );
-   }
- 
-   if (!liveLot) {
+  if (!liveEvent) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-         <h1 className="text-3xl font-bold">{liveEvent.name}</h1>
-         <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant flex flex-col items-center justify-center">
-            {liveEvent.transmission_link ? (
-              <iframe
-                className="h-full w-full border-0"
-                src={getEmbedUrl(liveEvent.transmission_link)}
-                title="Aguardando Próximo Lote"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-             <>
-               <Loader2 className="h-12 w-12 text-gold animate-spin mb-4" />
-               <p className="text-gold font-bold uppercase tracking-widest">Aguardando próximo lote...</p>
-               <p className="text-white/60 text-sm mt-2">O leiloeiro está preparando a próxima oferta.</p>
-             </>
-           )}
-         </div>
-         <p className="mt-8 text-muted-foreground">Fique atento! A transmissão continua enquanto preparamos o próximo animal.</p>
+        <Radio className="h-16 w-16 text-gold animate-pulse mx-auto mb-6" />
+        <h1 className="text-3xl font-bold text-emerald-deep uppercase tracking-tighter">Aguardando Transmissão</h1>
+        <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+          Não há leilões ativos no momento. Fique atento às nossas redes sociais e ao calendário para os próximos eventos.
+        </p>
+        <Link to="/eventos" className="mt-8 inline-block">
+          <Button className="bg-gold-gradient text-emerald-deep font-bold px-8 py-6 rounded-xl shadow-gold hover:scale-105 transition-transform">
+            Ver calendário de eventos
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  if (!liveLot) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <div className="inline-block px-4 py-1.5 rounded-full bg-gold/10 border border-gold/20 mb-4">
+          <span className="text-xs font-bold text-gold uppercase tracking-widest animate-pulse">● Evento ao Vivo</span>
+        </div>
+        <h1 className="text-3xl font-extrabold text-emerald-deep md:text-5xl mb-2">{liveEvent.name}</h1>
+        <p className="text-muted-foreground mb-8">{liveEvent.location || "Transmissão Online"}</p>
+        
+        <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-3xl border-4 border-gold/30 bg-emerald-deep shadow-2xl flex flex-col items-center justify-center group">
+          {liveEvent.transmission_link ? (
+            <iframe
+              className="h-full w-full border-0"
+              src={getEmbedUrl(liveEvent.transmission_link)}
+              title="Transmissão ao Vivo"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="text-center p-8">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-gold/20 rounded-full blur-2xl animate-pulse" />
+                <Loader2 className="h-16 w-16 text-gold animate-spin relative z-10 mx-auto" />
+              </div>
+              <p className="text-gold font-black text-2xl uppercase tracking-tighter">Aguardando Transmissão</p>
+              <p className="text-white/60 mt-3 max-w-xs mx-auto">O leiloeiro está preparando o sinal de vídeo e o próximo lote para entrar no ar.</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="mt-12 p-6 rounded-2xl bg-gold/5 border border-gold/10 max-w-2xl mx-auto">
+          <p className="text-emerald-deep font-medium italic">
+            "A transmissão continuará em instantes. Aproveite para conferir os detalhes dos animais no catálogo enquanto aguardamos a próxima oferta."
+          </p>
+        </div>
       </div>
     );
   }
