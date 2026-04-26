@@ -29,7 +29,8 @@
    promoter_company: z.string().nullable().optional(),
    transmission_link: z.string().nullable().optional(),
    live_status_message: z.string().nullable().optional(),
-    show_countdown: z.preprocess((val) => val === null ? true : val, z.boolean().default(true)),
+     show_countdown: z.preprocess((val) => val === null ? true : val, z.boolean().default(true)),
+     photos: z.array(z.string()).nullable().optional().default([]),
  });
  
  export const animalSchema = z.object({
