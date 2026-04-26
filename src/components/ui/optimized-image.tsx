@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { getOptimizedImageUrl } from "@/utils/image-optimization";
+import { getOptimizedImageUrl, IMAGE_FALLBACKS } from "@/utils/image-optimization";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
 
@@ -13,6 +13,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   quality?: number;
   loading?: "lazy" | "eager";
   fallbackSrc?: string;
+  category?: keyof typeof IMAGE_FALLBACKS;
 }
 
 export function OptimizedImage({
@@ -24,14 +25,19 @@ export function OptimizedImage({
   aspectRatio = "auto",
   quality = 80,
   loading = "lazy",
-  fallbackSrc = "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
+  fallbackSrc,
+  category = "default",
   ...props
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const finalFallback = useMemo(() => {
+    return fallbackSrc || IMAGE_FALLBACKS[category] || IMAGE_FALLBACKS.default;
+  }, [fallbackSrc, category]);
+
   const optimizedUrl = useMemo(() => {
-    return getOptimizedImageUrl(src, { width, height, quality }, fallbackSrc);
-  }, [src, width, height, quality, fallbackSrc]);
+    return getOptimizedImageUrl(src, { width, height, quality }, finalFallback);
+  }, [src, width, height, quality, finalFallback]);
 
   const [currentSrc, setCurrentSrc] = useState(optimizedUrl);
 
@@ -48,7 +54,7 @@ export function OptimizedImage({
   const handleError = () => {
     setIsLoading(false);
     setError(true);
-    setCurrentSrc(fallbackSrc);
+    setCurrentSrc(finalFallback);
   };
 
   const aspectRatios = {

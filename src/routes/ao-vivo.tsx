@@ -624,6 +624,7 @@ export const Route = createFileRoute("/ao-vivo")({
                    src={liveLot.animal?.photos?.[0] || ""} 
                    alt={liveLot.animal?.name || "Animal"} 
                    width={1280}
+                   category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
                    className="absolute inset-0 h-full w-full object-cover opacity-30" 
                  />
                  <Radio className="h-12 w-12 text-gold animate-pulse-live relative z-10" />
@@ -664,6 +665,7 @@ export const Route = createFileRoute("/ao-vivo")({
                    src={liveLot.animal?.photos?.[activePhotoIndex] || ""} 
                    alt={liveLot.animal?.name || "Animal"} 
                    width={1000}
+                   category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
                  />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
