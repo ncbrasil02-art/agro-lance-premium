@@ -380,7 +380,37 @@ export const Route = createFileRoute("/ao-vivo")({
         if (lotChannel) supabase.removeChannel(lotChannel);
         if (bidsChannel) supabase.removeChannel(bidsChannel);
       };
-    }, [liveEvent?.id, liveEvent?.active_lot_id, bidderProfiles]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id]);
+
+    // Periodically refresh event data (viewers, etc)
+    useEffect(() => {
+      if (!liveEvent?.id) return;
+      
+      const interval = setInterval(async () => {
+        const { data } = await supabase
+          .from("events")
+          .select("viewers, active_lot:lots!active_lot_id(current_price, bids_count)")
+          .eq("id", liveEvent.id)
+          .single();
+        
+        if (data) {
+          setLiveEvent((prev: any) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              viewers: data.viewers,
+              active_lot: prev.active_lot ? {
+                ...prev.active_lot,
+                current_price: (data.active_lot as any)?.current_price ?? prev.active_lot.current_price,
+                bids_count: (data.active_lot as any)?.bids_count ?? prev.active_lot.bids_count,
+              } : null
+            };
+          });
+        }
+      }, 30000); // 30 seconds
+
+      return () => clearInterval(interval);
+    }, [liveEvent?.id]);
  
    const liveLot = liveEvent?.active_lot;
  
