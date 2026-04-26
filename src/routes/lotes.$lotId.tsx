@@ -313,6 +313,32 @@ function LotDetail() {
         </div>
       </header>
 
+      <AlertDialog open={showConfirmBid} onOpenChange={setShowConfirmBid}>
+        <AlertDialogContent className="bg-emerald-deep border-gold/20 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-gold">
+              <AlertTriangle className="h-5 w-5" /> Confirmar Lance
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-white/80">
+              Você está prestes a dar um lance de <span className="text-white font-bold">{formatBRL(pendingBidAmount || 0)}</span> para o lote <span className="text-white font-bold">#{lot.lot_number}</span>.
+              <br /><br />
+              <span className="text-xs italic font-bold text-gold">Lances confirmados são irrevogáveis e representam um compromisso de compra.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-gold text-emerald-deep hover:bg-gold/90 font-bold"
+              onClick={() => {
+                if (pendingBidAmount) executeBid(pendingBidAmount);
+              }}
+            >
+              Confirmar Lance
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-8">
