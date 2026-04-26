@@ -1,3 +1,5 @@
+ import { MessageSquare, Phone } from "lucide-react";
+   const [statusMessage, setStatusMessage] = useState<string | null>(null);
  import { createFileRoute, Link } from "@tanstack/react-router";
 import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
  import { Button } from "@/components/ui/button";
@@ -88,13 +90,19 @@ export const Route = createFileRoute("/ao-vivo")({
        .on(
          "postgres_changes",
          { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${liveEvent.id}` },
-         async () => {
+         async (payload) => {
             const { data } = await supabase
               .from("events")
               .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
               .eq("id", liveEvent.id)
              .single();
-            if (data) setLiveEvent(data as any);
+             if (data) {
+               setLiveEvent(data as any);
+               if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
+                 setStatusMessage(payload.new.live_status_message);
+                 setTimeout(() => setStatusMessage(null), 8000);
+               }
+             }
          }
        )
        .subscribe();
