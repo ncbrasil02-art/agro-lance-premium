@@ -601,47 +601,58 @@ import {
                            <TableCell className="text-right">
                              <div className="flex justify-end gap-2">
                                {lot.status === 'active' && (
-                                 <TooltipProvider>
-                                   <Tooltip>
-                                     <TooltipTrigger asChild>
-                                       <Button 
-                                         variant="outline" 
-                                         size="sm" 
-                                         className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
-                                          onClick={async () => {
-                                            const bidAmount = currentPrice + (lot.bid_increment || 1000);
-                                            setIsLoading(true);
-                                            try {
-                                              const { data, error } = await supabase.rpc('place_bid_safe', {
-                                                p_lot_id: lot.id,
-                                                p_amount: bidAmount,
-                                                p_bid_type: 'online',
-                                                p_session_id: 'admin-safety-bid'
-                                              });
- 
-                                              if (error) throw error;
-                                              const result = data as { success: boolean, message: string };
-                                              if (result.success) {
-                                                toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
-                                                fetchData();
-                                              } else {
-                                                toast.error(result.message);
-                                              }
-                                            } catch (error: any) {
-                                              toast.error("Erro no lance: " + error.message);
-                                            } finally {
-                                              setIsLoading(false);
-                                            }
-                                          }}
+                                 <AlertDialog>
+                                   <AlertDialogTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="sm" 
+                                       className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
+                                     >
+                                       <ShieldCheck className="h-3 w-3" /> Segurança
+                                     </Button>
+                                   </AlertDialogTrigger>
+                                   <AlertDialogContent>
+                                     <AlertDialogHeader>
+                                       <AlertDialogTitle>Confirmar Lance de Segurança</AlertDialogTitle>
+                                       <AlertDialogDescription>
+                                         Deseja realmente efetuar um lance de segurança no valor de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice + (lot.bid_increment || 1000))} para este lote?
+                                       </AlertDialogDescription>
+                                     </AlertDialogHeader>
+                                     <AlertDialogFooter>
+                                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                       <AlertDialogAction 
+                                         className="bg-gold text-emerald-deep hover:bg-gold/90"
+                                         onClick={async () => {
+                                           const bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                           setIsLoading(true);
+                                           try {
+                                             const { data, error } = await supabase.rpc('place_bid_safe', {
+                                               p_lot_id: lot.id,
+                                               p_amount: bidAmount,
+                                               p_bid_type: 'online',
+                                               p_session_id: 'admin-safety-bid'
+                                             });
+
+                                             if (error) throw error;
+                                             const result = data as { success: boolean, message: string };
+                                             if (result.success) {
+                                               toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
+                                               fetchData();
+                                             } else {
+                                               toast.error(result.message);
+                                             }
+                                           } catch (error: any) {
+                                             toast.error("Erro no lance: " + error.message);
+                                           } finally {
+                                             setIsLoading(false);
+                                           }
+                                         }}
                                        >
-                                         <ShieldCheck className="h-3 w-3" /> Segurança
-                                       </Button>
-                                     </TooltipTrigger>
-                                     <TooltipContent>
-                                       <p>Efetuar lance de segurança administrativa (+1 incremento)</p>
-                                     </TooltipContent>
-                                   </Tooltip>
-                                 </TooltipProvider>
+                                         Confirmar
+                                       </AlertDialogAction>
+                                     </AlertDialogFooter>
+                                   </AlertDialogContent>
+                                 </AlertDialog>
                                )}
                                <TooltipProvider>
                                  <Tooltip>
