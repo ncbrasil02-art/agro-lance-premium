@@ -305,7 +305,7 @@ function Home() {
             Ver todos os lotes <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {featuredLots.map((l: any) => <LotCard key={l.id} lot={l} />)}
         </div>
       </section>
