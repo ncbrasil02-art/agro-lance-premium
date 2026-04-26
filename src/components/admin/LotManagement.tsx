@@ -149,7 +149,48 @@ import {
         setIsDialogOpen(true);
       };
    
-      const handleSave = async () => {
+       const fetchLotBids = async (lotId: string) => {
+         setIsBidsLoading(true);
+         setIsBidsDialogOpen(true);
+         try {
+           const { data, error } = await supabase
+             .from("bids")
+             .select(`
+               *,
+               profile:profiles(full_name)
+             `)
+             .eq("lot_id", lotId)
+             .order("created_at", { ascending: false });
+
+           if (error) throw error;
+           setSelectedLotBids(data || []);
+         } catch (error: any) {
+           toast.error("Erro ao carregar lances: " + error.message);
+         } finally {
+           setIsBidsLoading(false);
+         }
+       };
+
+       const handleDeleteBid = async (bid: any) => {
+         if (!confirm(`Tem certeza que deseja EXCLUIR o lance de R$ ${bid.amount} de ${bid.profile?.full_name || 'Usuário'}?`)) return;
+         
+         try {
+           const { error } = await supabase
+             .from("bids")
+             .delete()
+             .eq("id", bid.id);
+
+           if (error) throw error;
+           
+           toast.success("Lance excluído com sucesso");
+           fetchLotBids(bid.lot_id);
+           fetchData(); // Refresh main list to update current price
+         } catch (error: any) {
+           toast.error("Erro ao excluir lance: " + error.message);
+         }
+       };
+
+       const handleSave = async () => {
         if (!formData.event_id || !formData.animal_id || !formData.lot_number) {
          toast.error("Preencha todos os campos obrigatórios");
          return;
