@@ -1,3 +1,4 @@
+   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
@@ -92,10 +93,14 @@
         }
       };
 
-      useEffect(() => {
-        setSelectedEventId(initialEventId);
-        fetchData();
-      }, [initialEventId]);
+       useEffect(() => {
+         setSelectedEventId(initialEventId);
+         fetchData();
+       }, [initialEventId]);
+ 
+       useRealtimeLots(() => {
+         fetchData();
+       });
 
       const resetForm = () => {
         setEditingLot(null);
