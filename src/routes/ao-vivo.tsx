@@ -61,7 +61,7 @@ export const Route = createFileRoute("/ao-vivo")({
 
       if (!liveEvent) return { liveEvent: null };
 
-      let initialBids = [];
+      let initialBids: any[] = [];
       if (liveEvent.active_lot_id) {
         const { data: bids, error: bidsError } = await supabase
           .from("bids")
