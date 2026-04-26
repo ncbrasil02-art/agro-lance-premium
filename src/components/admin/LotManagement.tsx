@@ -1,3 +1,5 @@
+ import { StatusBadge } from "@/components/auctions/status-badge";
+ import { getEffectiveLotStatus } from "@/utils/auction-status";
    import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
