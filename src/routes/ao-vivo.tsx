@@ -136,31 +136,61 @@ export const Route = createFileRoute("/ao-vivo")({
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
     try {
-      if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+      // Fix common malformed URLs (duplicate https, etc)
+      let cleanUrl = url.trim();
+      if (cleanUrl.includes("https:/https:/")) {
+        cleanUrl = cleanUrl.replace("https:/https:/", "https://");
+      }
+      if (cleanUrl.includes("http:/http:/")) {
+        cleanUrl = cleanUrl.replace("http:/http:/", "http://");
+      }
+      // If it contains multiple full URLs, take the last one
+      if (cleanUrl.lastIndexOf("https://") > 0) {
+        cleanUrl = cleanUrl.substring(cleanUrl.lastIndexOf("https://"));
+      }
+
+      if (cleanUrl.includes("youtube.com/embed/") || cleanUrl.includes("player.vimeo.com")) return cleanUrl;
       
       // Youtube long URL
-      if (url.includes("youtube.com/watch")) {
-        const urlObj = new URL(url);
-        const v = urlObj.searchParams.get("v");
-        if (v) return `https://www.youtube.com/embed/${v}?autoplay=1&mute=1`;
+      if (cleanUrl.includes("youtube.com/watch")) {
+        const v = new URLSearchParams(cleanUrl.split('?')[1]).get("v");
+        if (v) return `https://www.youtube.com/embed/${v}?autoplay=1&mute=1&rel=0`;
       }
       
       // Youtube short URL
-      if (url.includes("youtu.be/")) {
-        const id = url.split("youtu.be/")[1]?.split("?")[0];
-        if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`;
+      if (cleanUrl.includes("youtu.be/")) {
+        const id = cleanUrl.split("youtu.be/")[1]?.split("?")[0];
+        if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0`;
       }
       
       // Vimeo
-      if (url.includes("vimeo.com/")) {
-        const id = url.split("vimeo.com/")[1]?.split("?")[0];
+      if (cleanUrl.includes("vimeo.com/")) {
+        const id = cleanUrl.split("vimeo.com/")[1]?.split("?")[0];
         if (id) return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1`;
       }
+      return cleanUrl;
     } catch (e) {
       console.error("Erro ao processar URL de vídeo:", e);
+      return url;
     }
-    return url;
   };
+    // Secondary effect to ensure lot data is loaded if only ID is present
+    useEffect(() => {
+      if (liveEvent && liveEvent.active_lot_id && !liveEvent.active_lot) {
+        const fetchMissingLot = async () => {
+          const { data } = await supabase
+            .from("lots")
+            .select("*, animal:animals(*)")
+            .eq("id", liveEvent.active_lot_id)
+            .single();
+          if (data) {
+            setLiveEvent(prev => prev ? ({ ...prev, active_lot: data }) : null);
+          }
+        };
+        fetchMissingLot();
+      }
+    }, [liveEvent?.active_lot_id, liveEvent?.active_lot]);
+
 
     useEffect(() => {
       // Listen for updates to ANY event that could become live if we don't have one
