@@ -4,7 +4,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download } from "lucide-react";
+ import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon } from "lucide-react";
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
@@ -71,7 +71,35 @@
    const [isLoading, setIsLoading] = useState(true);
    const [users, setUsers] = useState<any[]>([]);
    const [searchQuery, setSearchQuery] = useState("");
-   const [filter, setFilter] = useState<"all" | "pending" | "approved">("all");
+   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "blocked">("all");
+   const handleToggleBlock = async (userId: string, currentBlockedStatus: boolean) => {
+     try {
+       const newStatus = !currentBlockedStatus;
+       const { error } = await supabase
+         .from("profiles")
+         .update({ 
+           is_blocked: newStatus,
+           block_reason: newStatus ? "Bloqueado manualmente pelo administrador" : null
+         })
+         .eq("id", userId);
+ 
+       if (error) throw error;
+ 
+       await supabase.from("audit_logs").insert({
+         user_id: adminProfile?.id,
+         action: newStatus ? "BLOCK_USER" : "UNBLOCK_USER",
+         entity_type: "profile",
+         entity_id: userId,
+         new_data: { is_blocked: newStatus }
+       });
+ 
+       toast.success(newStatus ? "Usuário bloqueado" : "Usuário desbloqueado");
+       fetchUsers();
+     } catch (error: any) {
+       toast.error("Erro ao atualizar status: " + error.message);
+     }
+   };
+ 
  
    const fetchUsers = async () => {
      setIsLoading(true);
@@ -135,8 +163,17 @@
      
      const matchesFilter = 
        filter === "all" || 
-       (filter === "pending" && !user.is_approved) || 
-       (filter === "approved" && user.is_approved);
+       (filter === "pending" && !user.is_approved && !user.is_blocked) || 
+       (filter === "approved" && user.is_approved && !user.is_blocked) ||
+       (filter === "blocked" && user.is_blocked);
+           <Button 
+             variant={filter === "blocked" ? "default" : "outline"} 
+             size="sm" 
+             onClick={() => setFilter("blocked")}
+             className={filter === "blocked" ? "bg-destructive text-white" : ""}
+           >
+             Bloqueados
+           </Button>
  
      return matchesSearch && matchesFilter;
    });
@@ -204,7 +241,7 @@
                    <TableHead className="font-bold">Usuário</TableHead>
                    <TableHead className="font-bold">CPF / Telefone</TableHead>
                    <TableHead className="font-bold">Cadastro</TableHead>
-                   <TableHead className="font-bold">Status</TableHead>
+                   <TableHead className="font-bold">Status / Risco</TableHead>
                    <TableHead className="font-bold">Audit. Aprovação</TableHead>
                    <TableHead className="text-right font-bold">Ações</TableHead>
                  </TableRow>
@@ -244,11 +281,22 @@
                          </div>
                        </TableCell>
                        <TableCell>
-                         {user.is_approved ? (
-                           <Badge className="bg-emerald-500 hover:bg-emerald-600">Aprovado</Badge>
-                         ) : (
-                           <Badge variant="outline" className="text-amber-500 border-amber-500">Pendente</Badge>
-                         )}
+                         <div className="flex flex-col gap-1">
+                           {user.is_blocked ? (
+                             <Badge variant="destructive" className="flex w-fit items-center gap-1">
+                               <ShieldAlert className="h-3 w-3" /> Bloqueado
+                             </Badge>
+                           ) : user.is_approved ? (
+                             <Badge className="bg-emerald-500 hover:bg-emerald-600">Aprovado</Badge>
+                           ) : (
+                             <Badge variant="outline" className="text-amber-500 border-amber-500">Pendente</Badge>
+                           )}
+                           {user.block_reason && (
+                             <span className="text-[10px] text-destructive italic max-w-[150px] truncate" title={user.block_reason}>
+                               {user.block_reason}
+                             </span>
+                           )}
+                         </div>
                        </TableCell>
                        <TableCell>
                          {user.is_approved && user.approved_at ? (
@@ -266,7 +314,24 @@
                            <span className="text-xs text-muted-foreground italic">-</span>
                          )}
                        </TableCell>
-                        <TableCell className="text-right space-x-1">
+                        <TableCell className="text-right space-x-1 whitespace-nowrap">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleToggleBlock(user.id, user.is_blocked)}
+                                  className={user.is_blocked ? "text-emerald-500 hover:bg-emerald-50" : "text-destructive hover:bg-destructive/10"}
+                                >
+                                  {user.is_blocked ? <ShieldCheckIcon className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{user.is_blocked ? "Desbloquear Usuário" : "Bloquear Usuário"}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                           <Button
                             variant="ghost"
                             size="icon"

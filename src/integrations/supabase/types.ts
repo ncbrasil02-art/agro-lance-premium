@@ -221,6 +221,7 @@ export type Database = {
           bid_type: string | null
           created_at: string
           id: string
+          ip_address: string | null
           is_manual: boolean | null
           lot_id: string | null
           user_id: string | null
@@ -230,6 +231,7 @@ export type Database = {
           bid_type?: string | null
           created_at?: string
           id?: string
+          ip_address?: string | null
           is_manual?: boolean | null
           lot_id?: string | null
           user_id?: string | null
@@ -239,6 +241,7 @@ export type Database = {
           bid_type?: string | null
           created_at?: string
           id?: string
+          ip_address?: string | null
           is_manual?: boolean | null
           lot_id?: string | null
           user_id?: string | null
@@ -753,12 +756,15 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           avatar_url: string | null
+          block_reason: string | null
           cpf: string | null
           created_at: string
           full_name: string | null
           id: string
           is_approved: boolean
+          is_blocked: boolean | null
           phone: string | null
+          risk_score: number | null
           role: string
           updated_at: string
         }
@@ -766,12 +772,15 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           avatar_url?: string | null
+          block_reason?: string | null
           cpf?: string | null
           created_at?: string
           full_name?: string | null
           id: string
           is_approved?: boolean
+          is_blocked?: boolean | null
           phone?: string | null
+          risk_score?: number | null
           role?: string
           updated_at?: string
         }
@@ -779,12 +788,15 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           avatar_url?: string | null
+          block_reason?: string | null
           cpf?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           is_approved?: boolean
+          is_blocked?: boolean | null
           phone?: string | null
+          risk_score?: number | null
           role?: string
           updated_at?: string
         }
@@ -927,6 +939,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_user_risk: { Args: { p_user_id: string }; Returns: boolean }
       close_lot: { Args: { p_lot_id: string }; Returns: Json }
       increment_viewer_count: {
         Args: { p_entity_id: string; p_entity_type: string }
@@ -936,6 +949,10 @@ export type Database = {
       is_approved: { Args: never; Returns: boolean }
       place_bid: {
         Args: { p_amount: number; p_lot_id: string; p_user_id: string }
+        Returns: Json
+      }
+      place_bid_safe: {
+        Args: { p_amount: number; p_bid_type?: string; p_lot_id: string }
         Returns: Json
       }
     }
