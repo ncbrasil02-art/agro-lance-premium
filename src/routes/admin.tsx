@@ -1,7 +1,7 @@
  import { useState, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
- import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList } from "lucide-react";
+  import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
@@ -17,7 +17,8 @@ export const Route = createFileRoute("/admin")({
   import { AnimalManagement } from "@/components/admin/AnimalManagement";
   import { SellerManagement } from "@/components/admin/SellerManagement";
  import { CategoryManagement } from "@/components/admin/CategoryManagement";
- import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
+  import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
+  import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
  
   type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "settings";
  
@@ -36,10 +37,9 @@ export const Route = createFileRoute("/admin")({
       { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
       { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
       { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
-      { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
-      { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
-import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
-     { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+       { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
+       { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
+       { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
    ];
  
