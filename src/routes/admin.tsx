@@ -1,7 +1,7 @@
  import { useState, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
-  import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart } from "lucide-react";
+    import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart, ShieldCheck } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
@@ -212,28 +212,28 @@ function AdminLayout() {
                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("lots")}>
                         <Gavel className="mr-2 h-4 w-4" /> Alocar Lotes
                       </Button>
-                     <Button 
-                       variant="outline" 
-                       className="w-full"
-                       onClick={async () => {
-                         const { data: lot } = await supabase.from("lots").select("id, current_price, starting_price, bid_increment").eq("status", "active").limit(1).single();
-                         if (!lot) {
-                           toast.error("Nenhum lote ativo encontrado para simular lance.");
-                           return;
-                         }
-                         const bidAmount = (lot.current_price || lot.starting_price) + lot.bid_increment;
-                         const { error } = await supabase.from("bids").insert({
-                           lot_id: lot.id,
-                           user_id: profile?.id,
-                           amount: bidAmount,
-                           bid_type: "online"
-                         });
-                         if (error) toast.error("Erro ao simular lance: " + error.message);
-                         else toast.success(`Lance simulado de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}!`);
-                       }}
-                     >
-                       <Zap className="mr-2 h-4 w-4" /> Simular Lance Rápido
-                     </Button>
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-gold/50 text-gold hover:bg-gold/10"
+                        onClick={async () => {
+                          const { data: lot } = await supabase.from("lots").select("id, current_price, starting_price, bid_increment").eq("status", "active").limit(1).single();
+                          if (!lot) {
+                            toast.error("Nenhum lote ativo encontrado para lance de segurança.");
+                            return;
+                          }
+                          const bidAmount = (lot.current_price || lot.starting_price) + lot.bid_increment;
+                          const { error } = await supabase.from("bids").insert({
+                            lot_id: lot.id,
+                            user_id: profile?.id,
+                            amount: bidAmount,
+                            bid_type: "online"
+                          });
+                          if (error) toast.error("Erro ao efetuar lance: " + error.message);
+                          else toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}!`);
+                        }}
+                      >
+                        <ShieldCheck className="mr-2 h-4 w-4" /> Lance de Segurança
+                      </Button>
                      <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
                   </CardContent>
                 </Card>
