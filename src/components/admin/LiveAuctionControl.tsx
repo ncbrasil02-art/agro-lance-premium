@@ -659,14 +659,25 @@
                       
                       <div className="space-y-2">
                         <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Identificação (Telefone/Plaqueta)</Label>
-                        <div className="flex gap-2">
-                          <Input 
-                            className="bg-white/10 border-white/20 text-white flex-1" 
-                            placeholder="Ex: Plaquetão 45 / João"
-                            value={phoneBid.identifier}
-                            onChange={(e) => setPhoneBid({...phoneBid, identifier: e.target.value})}
-                          />
+                        <div className="grid grid-cols-3 gap-1 mb-2">
+                          {["Mesa 1", "Mesa 2", "Tel 1", "Tel 2", "Auditório", "Plaqueta"].map(id => (
+                            <Button
+                              key={id}
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-7 text-[9px] px-1"
+                              onClick={() => setPhoneBid({ ...phoneBid, identifier: id })}
+                            >
+                              {id}
+                            </Button>
+                          ))}
                         </div>
+                        <Input 
+                          className="bg-white/10 border-white/20 text-white flex-1" 
+                          placeholder="Ex: Plaquetão 45 / João"
+                          value={phoneBid.identifier}
+                          onChange={(e) => setPhoneBid({...phoneBid, identifier: e.target.value})}
+                        />
                       </div>
 
                       <div className="space-y-2">
