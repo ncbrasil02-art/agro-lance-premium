@@ -381,8 +381,8 @@ export const Route = createFileRoute("/ao-vivo")({
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
         const currentActiveLotId = liveEvent.active_lot_id;
-        console.log("Subscrevendo a lances do lote:", currentActiveLotId);
         
+        // Use a simpler subscription without filter and filter in JS for better compatibility
         bidsChannel = supabase
           .channel(`live-bids-${currentActiveLotId}`)
           .on(
@@ -390,35 +390,36 @@ export const Route = createFileRoute("/ao-vivo")({
             { 
               event: "INSERT", 
               schema: "public", 
-              table: "bids", 
-              filter: `lot_id=eq.${currentActiveLotId}` 
+              table: "bids"
             },
             async (payload) => {
-              console.log("Novo lance detectado via Realtime:", payload.new);
               const newBid = payload.new;
               
-              setBids((prev) => {
-                // Verificar se o lance já existe no estado para evitar duplicatas
-                if (prev.some(b => b.id === newBid.id)) return prev;
-                return [newBid, ...prev].slice(0, 15);
-              });
-              
-              // Buscar perfil se ainda não carregado
-              if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
-                const { data } = await supabase
-                  .from("profiles")
-                  .select("id, full_name")
-                  .eq("id", newBid.user_id)
-                  .single();
-                if (data) {
-                  setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+              // Match the lot ID in JavaScript
+              if (newBid.lot_id === currentActiveLotId) {
+                console.log("Novo lance recebido em tempo real:", newBid);
+                
+                setBids((prev) => {
+                  // Evitar duplicatas (pode acontecer se o usuário for o próprio licitante e o fetch manual também rodar)
+                  if (prev.some(b => b.id === newBid.id)) return prev;
+                  return [newBid, ...prev].slice(0, 20);
+                });
+                
+                // Buscar perfil (tentar, se RLS permitir)
+                if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
+                  const { data } = await supabase
+                    .from("profiles")
+                    .select("id, full_name")
+                    .eq("id", newBid.user_id)
+                    .maybeSingle();
+                  if (data) {
+                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                  }
                 }
               }
             }
           )
-          .subscribe((status) => {
-            console.log(`Status da subscrição de lances (${currentActiveLotId}):`, status);
-          });
+          .subscribe();
       }
 
       return () => {
