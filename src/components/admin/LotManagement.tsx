@@ -501,24 +501,31 @@
                                    variant="outline" 
                                    size="sm" 
                                    className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
-                                   onClick={async () => {
-                                     const bidAmount = currentPrice + (lot.bid_increment || 1000);
-                                     const { data: { user } } = await supabase.auth.getUser();
-                                     if (!user) return;
-                                     
-                                     const { error } = await supabase.from("bids").insert({
-                                       lot_id: lot.id,
-                                       user_id: user.id,
-                                       amount: bidAmount,
-                                       bid_type: "online"
-                                     });
-                                     
-                                     if (error) toast.error("Erro no lance: " + error.message);
-                                     else {
-                                       toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
-                                       fetchData();
-                                     }
-                                   }}
+                                    onClick={async () => {
+                                      const bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                      setIsLoading(true);
+                                      try {
+                                        const { data, error } = await supabase.rpc('place_bid_safe', {
+                                          p_lot_id: lot.id,
+                                          p_amount: bidAmount,
+                                          p_bid_type: 'online',
+                                          p_session_id: 'admin-safety-bid'
+                                        });
+
+                                        if (error) throw error;
+                                        const result = data as { success: boolean, message: string };
+                                        if (result.success) {
+                                          toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
+                                          fetchData();
+                                        } else {
+                                          toast.error(result.message);
+                                        }
+                                      } catch (error: any) {
+                                        toast.error("Erro no lance: " + error.message);
+                                      } finally {
+                                        setIsLoading(false);
+                                      }
+                                    }}
                                  >
                                    <ShieldCheck className="h-3 w-3" /> Segurança
                                  </Button>
