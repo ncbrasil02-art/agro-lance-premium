@@ -43,12 +43,22 @@ export const Route = createFileRoute("/ao-vivo")({
      if (eventError || !events || events.length === 0) return { liveEvent: null };
 
      const now = new Date();
-     const liveEvent = events.find(e => {
-       if (e.status === 'live') return true;
-       const start = new Date(e.start_date);
-       const end = e.end_date ? new Date(e.end_date) : null;
-       return now >= start && (!end || now < end);
-     });
+      // First, try to find an event that is explicitly 'live' AND has an active lot
+      let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
+      
+      // If not found, look for any 'live' event
+      if (!liveEvent) {
+        liveEvent = events.find(e => e.status === 'live');
+      }
+
+      // If still not found, look for a scheduled event that should be happening now
+      if (!liveEvent) {
+        liveEvent = events.find(e => {
+          const start = new Date(e.start_date);
+          const end = e.end_date ? new Date(e.end_date) : null;
+          return now >= start && (!end || now < end);
+        });
+      }
 
      if (!liveEvent) return { liveEvent: null };
  
