@@ -10,7 +10,24 @@
   }
  
   .animate-neon-urgent {
-    animation: neon-pulse-urgent 0.6s infinite ease-in-out;
+    animation: neon-pulse-urgent 0.8s infinite ease-in-out;
+  }
+ 
+  @keyframes neon-pulse-critical {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+      border-color: rgba(239, 68, 68, 0.7);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.8);
+      border-color: rgba(239, 68, 68, 1);
+      transform: scale(1.01);
+    }
+  }
+ 
+  .animate-neon-critical {
+    animation: neon-pulse-critical 0.4s infinite ease-in-out;
   }
  
  @keyframes neon-pulse {
