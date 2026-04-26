@@ -434,8 +434,10 @@ export const Route = createFileRoute("/ao-vivo")({
                         <span className="flex items-center gap-1 text-[10px] bg-emerald-deep/20 text-emerald-deep px-1.5 rounded uppercase font-black">
                           <Gavel className="h-2 w-2" /> Auditório
                         </span>
-                      ) : (
+                      ) : bid.user_id ? (
                         <span>Comprador ...{bid.user_id.slice(-4)}</span>
+                      ) : (
+                        <span>Licitante</span>
                       )}
                    </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
