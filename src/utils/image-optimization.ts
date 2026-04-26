@@ -1,3 +1,29 @@
+/**
+ * Preloads an array of images to the browser cache.
+ */
+export function preloadImages(urls: string[], options: OptimizationOptions = {}) {
+  if (typeof window === "undefined") return;
+  
+  urls.forEach(url => {
+    const optimizedUrl = getOptimizedImageUrl(url, options);
+    const img = new Image();
+    img.src = optimizedUrl;
+  });
+}
+
+/**
+ * Returns current cache statistics.
+ */
+export function getCacheStats() {
+  return {
+    hits: cacheHits,
+    misses: cacheMisses,
+    size: urlCache.size,
+    hitRate: cacheHits + cacheMisses > 0 
+      ? (cacheHits / (cacheHits + cacheMisses)) * 100 
+      : 0
+  };
+}
 const CACHE_KEY = "lovable_image_optimization_cache";
 const MAX_CACHE_SIZE = 500;
 
