@@ -201,12 +201,7 @@ function LotDetail() {
     };
   }, [lot.id]);
 
-  const placeBid = async (amount: number) => {
-    if (!user) {
-      toast.error("Faça login para dar lances.");
-      return;
-    }
-
+  const executeBid = async (amount: number) => {
     setIsBidding(true);
     try {
       // Obtém ou gera um ID de sessão persistente para proteção contra bots
