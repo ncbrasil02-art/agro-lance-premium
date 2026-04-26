@@ -22,7 +22,8 @@ export const Route = createFileRoute("/admin")({
    import { UserManagement } from "@/components/admin/UserManagement";
    import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
   
-   type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings";
+ type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings";
+ import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/admin")({
  function AdminSidebar({ activeTab, setActiveTab, signOut, onItemClick }: SidebarProps) {
    const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
      { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+     { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
      { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
       { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
       { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
