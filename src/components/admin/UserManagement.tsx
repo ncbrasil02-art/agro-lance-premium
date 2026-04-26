@@ -71,7 +71,7 @@
    const [isLoading, setIsLoading] = useState(true);
    const [users, setUsers] = useState<any[]>([]);
    const [searchQuery, setSearchQuery] = useState("");
-   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "blocked">("all");
+   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "blocked" | "risk">("all");
    const handleToggleBlock = async (userId: string, currentBlockedStatus: boolean) => {
      try {
        const newStatus = !currentBlockedStatus;
@@ -282,20 +282,34 @@
                        </TableCell>
                        <TableCell>
                          <div className="flex flex-col gap-1">
-                           {user.is_blocked ? (
-                             <Badge variant="destructive" className="flex w-fit items-center gap-1">
-                               <ShieldAlert className="h-3 w-3" /> Bloqueado
-                             </Badge>
-                           ) : user.is_approved ? (
-                             <Badge className="bg-emerald-500 hover:bg-emerald-600">Aprovado</Badge>
-                           ) : (
-                             <Badge variant="outline" className="text-amber-500 border-amber-500">Pendente</Badge>
-                           )}
-                           {user.block_reason && (
-                             <span className="text-[10px] text-destructive italic max-w-[150px] truncate" title={user.block_reason}>
-                               {user.block_reason}
-                             </span>
-                           )}
+                            <div className="flex flex-wrap gap-1">
+                              {user.is_blocked ? (
+                                <Badge variant="destructive" className="flex items-center gap-1">
+                                  <ShieldAlert className="h-3 w-3" /> Bloqueado
+                                </Badge>
+                              ) : user.is_approved ? (
+                                <Badge className="bg-emerald-500 hover:bg-emerald-600">Aprovado</Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-amber-500 border-amber-500">Pendente</Badge>
+                              )}
+                              
+                              {user.risk_level === 'high' && (
+                                <Badge variant="destructive" className="bg-red-600 animate-pulse">Risco Alto</Badge>
+                              )}
+                              {user.risk_level === 'medium' && (
+                                <Badge variant="secondary" className="bg-orange-500 text-white">Risco Médio</Badge>
+                              )}
+                            </div>
+                            {user.block_reason && (
+                              <span className="text-[10px] text-destructive italic max-w-[150px] truncate block" title={user.block_reason}>
+                                {user.block_reason}
+                              </span>
+                            )}
+                            {user.auto_unlock_at && new Date(user.auto_unlock_at) > new Date() && (
+                              <span className="text-[10px] text-amber-600 font-bold block">
+                                Desbloqueio em: {format(new Date(user.auto_unlock_at), "HH:mm", { locale: ptBR })}
+                              </span>
+                            )}
                          </div>
                        </TableCell>
                        <TableCell>
