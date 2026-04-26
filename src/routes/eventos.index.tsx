@@ -117,7 +117,7 @@ function EventsPage() {
         </Tabs>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
          {filteredEvents.length === 0 ? (
             <div className="col-span-full py-20 text-center bg-white/5 rounded-3xl border border-dashed border-white/10">
               <p className="text-muted-foreground">Nenhum evento encontrado nesta categoria.</p>
