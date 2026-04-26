@@ -586,10 +586,26 @@ import { Textarea } from "@/components/ui/textarea";
                                 className="h-8 px-2 border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
                                 onClick={async () => {
                                   if (!confirm("Deseja colocar este evento AO VIVO agora?")) return;
-                                  const { error } = await supabase.from("events").update({ status: 'live' }).eq("id", event.id);
+                                  // Get the first lot of this event to auto-select it
+                                  const { data: eventLots } = await supabase
+                                    .from("lots")
+                                    .select("id")
+                                    .eq("event_id", event.id)
+                                    .order("lot_number", { ascending: true })
+                                    .limit(1);
+
+                                  const updateData: any = { status: 'live' };
+                                  if (eventLots && eventLots.length > 0) {
+                                    updateData.active_lot_id = eventLots[0].id;
+                                    // Also mark the lot as active
+                                    await supabase.from("lots").update({ status: 'active' }).eq("id", eventLots[0].id);
+                                  }
+
+                                  const { error } = await supabase.from("events").update(updateData).eq("id", event.id);
+                                  
                                   if (error) toast.error("Erro ao ativar: " + error.message);
                                   else {
-                                    toast.success("Evento está AO VIVO!");
+                                    toast.success(eventLots?.length ? "Evento AO VIVO com primeiro lote ativo!" : "Evento está AO VIVO!");
                                     fetchEvents();
                                   }
                                 }}

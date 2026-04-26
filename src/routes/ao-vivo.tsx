@@ -74,7 +74,7 @@ export const Route = createFileRoute("/ao-vivo")({
 
         if (!liveEvent) return { liveEvent: null };
 
-        // Fallback: If active_lot_id is present but join failed to fetch active_lot
+        // Fallback 1: If active_lot_id is present but join failed
         if (liveEvent.active_lot_id && !liveEvent.active_lot) {
           const { data: activeLotData } = await supabase
             .from("lots")
@@ -83,6 +83,24 @@ export const Route = createFileRoute("/ao-vivo")({
             .single();
           if (activeLotData) {
             liveEvent.active_lot = activeLotData;
+          }
+        }
+
+        // Fallback 2: Auto-selection of active lot
+        // If active_lot_id is null but the event is live, search for any lot marked as 'active' or 'live'
+        if (!liveEvent.active_lot && liveEvent.status === 'live') {
+          const { data: fallbackLot } = await supabase
+            .from("lots")
+            .select("*, animal:animals(*)")
+            .eq("event_id", liveEvent.id)
+            .or("status.eq.active,status.eq.live")
+            .order("lot_number", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          
+          if (fallbackLot) {
+            liveEvent.active_lot = fallbackLot;
+            liveEvent.active_lot_id = fallbackLot.id;
           }
         }
 

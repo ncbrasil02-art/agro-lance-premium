@@ -75,10 +75,18 @@
         setTransmissionLink(event?.transmission_link || "");
        setLots(eventLots || []);
        
-       if (event?.active_lot_id) {
-         const currentActive = eventLots?.find(l => l.id === event.active_lot_id);
-         setActiveLot(currentActive);
-       }
+        if (event?.active_lot_id) {
+          const currentActive = eventLots?.find(l => l.id === event.active_lot_id);
+          setActiveLot(currentActive);
+        } else {
+          // Auto-selection: If event has no active_lot_id, look for first lot with 'active' status
+          const firstActive = eventLots?.find(l => l.status === 'active' || l.status === 'live');
+          if (firstActive) {
+            setActiveLot(firstActive);
+            // Sync back to event table to ensure everyone sees this lot
+            await supabase.from("events").update({ active_lot_id: firstActive.id }).eq("id", eventId);
+          }
+        }
      } catch (error) {
        toast.error("Erro ao carregar detalhes do evento");
      } finally {
