@@ -133,7 +133,12 @@ export const Route = createFileRoute("/ao-vivo")({
         // Skip strict validation to avoid "Waiting for Transmission" due to minor schema mismatches
         return { 
           liveEvent: liveEvent as any,
-          initialBids
+          initialBids,
+          debug: {
+            eventsCount: events.length,
+            firstEventStatus: events[0]?.status,
+            pickedEventName: liveEvent?.name
+          }
         };
       } catch (err) {
         console.error("Erro fatal no loader ao-vivo:", err);
