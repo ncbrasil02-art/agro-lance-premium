@@ -26,10 +26,10 @@ import {
    Phone, 
    Mail, 
    MapPin,
-   Loader2,
-   Filter
+    Loader2,
+    Filter
+ } from "lucide-react";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
