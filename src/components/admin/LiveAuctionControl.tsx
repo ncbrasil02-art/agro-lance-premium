@@ -317,13 +317,52 @@
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Painel"}
                 </Button>
                 {selectedEventId && liveEvent && (
-                  <Button 
-                    variant="destructive" 
-                    onClick={finalizeEvent}
-                    disabled={isActionLoading}
-                  >
-                    Encerrar Evento
-                  </Button>
+                  <div className="flex gap-2">
+                    {liveEvent.status === 'scheduled' && (
+                      <Button 
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        onClick={async () => {
+                          setIsActionLoading(true);
+                          const { error } = await supabase.from("events").update({ status: 'live' }).eq("id", selectedEventId);
+                          if (error) toast.error(error.message);
+                          else {
+                            toast.success("Evento agora está AO VIVO!");
+                            fetchEventDetails(selectedEventId);
+                          }
+                          setIsActionLoading(false);
+                        }}
+                        disabled={isActionLoading}
+                      >
+                        <Play className="mr-2 h-4 w-4" /> Iniciar Leilão
+                      </Button>
+                    )}
+                    {liveEvent.status === 'live' && (
+                      <Button 
+                        variant="outline"
+                        className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                        onClick={async () => {
+                          setIsActionLoading(true);
+                          const { error } = await supabase.from("events").update({ status: 'scheduled' }).eq("id", selectedEventId);
+                          if (error) toast.error(error.message);
+                          else {
+                            toast.success("Evento pausado (Agendado)");
+                            fetchEventDetails(selectedEventId);
+                          }
+                          setIsActionLoading(false);
+                        }}
+                        disabled={isActionLoading}
+                      >
+                        <Timer className="mr-2 h-4 w-4" /> Pausar / Voltar p/ Agendado
+                      </Button>
+                    )}
+                    <Button 
+                      variant="destructive" 
+                      onClick={finalizeEvent}
+                      disabled={isActionLoading}
+                    >
+                      <Square className="mr-2 h-4 w-4" /> Encerrar Evento
+                    </Button>
+                  </div>
                 )}
               </div>
            </div>
