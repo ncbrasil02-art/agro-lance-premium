@@ -281,6 +281,7 @@ export const Route = createFileRoute("/admin")({
             </>
           )}
 
+          {activeTab === "live" && <LiveAuctionControl />}
           {activeTab === "events" && <EventManagement onManageLots={handleManageLots} />}
           {activeTab === "lots" && (
             <LotManagement 
