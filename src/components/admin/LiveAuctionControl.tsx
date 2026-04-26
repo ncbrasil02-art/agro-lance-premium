@@ -20,6 +20,7 @@
    const [activeLot, setActiveLot] = useState<any>(null);
    const [isLoading, setIsLoading] = useState(false);
    const [isActionLoading, setIsActionLoading] = useState(false);
+  const [transmissionLink, setTransmissionLink] = useState("");
    
    // Phone bid form
    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "" });
@@ -70,6 +71,7 @@
          .order("lot_number", { ascending: true });
  
        setLiveEvent(event);
+        setTransmissionLink(event?.transmission_link || "");
        setLots(eventLots || []);
        
        if (event?.active_lot_id) {
@@ -94,6 +96,25 @@
      else toast.success("Mensagem enviada!");
    };
  
+    const updateTransmissionLink = async () => {
+      if (!selectedEventId) return;
+      setIsActionLoading(true);
+      try {
+        const { error } = await supabase
+          .from("events")
+          .update({ transmission_link: transmissionLink })
+          .eq("id", selectedEventId);
+        
+        if (error) throw error;
+        toast.success("Link de transmissão atualizado!");
+        fetchEventDetails(selectedEventId);
+      } catch (error: any) {
+        toast.error("Erro ao atualizar link: " + error.message);
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
    const activateLot = async (lotId: string) => {
      setIsActionLoading(true);
      try {
@@ -115,22 +136,49 @@
      }
    };
  
-   const finalizeLot = async (lotId: string) => {
-     if (!confirm("Tem certeza que deseja finalizar este lote?")) return;
-     setIsActionLoading(true);
-     try {
-       await supabase.from("lots").update({ status: 'finished', is_currently_live: false }).eq("id", lotId);
-       await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
-       
-       toast.success("Lote finalizado!");
-       fetchEventDetails(selectedEventId);
-       setActiveLot(null);
-     } catch (error) {
-       toast.error("Erro ao finalizar lote");
-     } finally {
-       setIsActionLoading(false);
-     }
-   };
+    const finalizeLot = async (lotId: string) => {
+      if (!confirm("Tem certeza que deseja finalizar este lote?")) return;
+      setIsActionLoading(true);
+      try {
+        await supabase.from("lots").update({ status: 'finished', is_currently_live: false }).eq("id", lotId);
+        
+        // Check if there are more lots to be auctioned
+        const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'finished');
+        
+        if (remainingLots.length === 0) {
+          await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
+          toast.success("Lote finalizado e evento encerrado!");
+        } else {
+          await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
+          toast.success("Lote finalizado!");
+        }
+        
+        fetchEventDetails(selectedEventId);
+        setActiveLot(null);
+      } catch (error) {
+        toast.error("Erro ao finalizar lote");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
+    const finalizeEvent = async () => {
+      if (!confirm("Deseja realmente encerrar este evento? Todos os lotes pendentes serão mantidos como estão.")) return;
+      setIsActionLoading(true);
+      try {
+        await supabase.from("events").update({ status: 'finished', active_lot_id: null }).eq("id", selectedEventId);
+        await supabase.from("lots").update({ is_currently_live: false }).eq("event_id", selectedEventId);
+        
+        toast.success("Evento encerrado com sucesso!");
+        fetchEvents();
+        setLiveEvent(null);
+        setSelectedEventId("");
+      } catch (error) {
+        toast.error("Erro ao encerrar evento");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
  
    const handlePhoneBid = async () => {
      if (!activeLot || phoneBid.amount <= (activeLot.current_price || activeLot.starting_price)) {
@@ -176,6 +224,39 @@
      }
    };
  
+    const handleSecurityBid = async () => {
+      if (!activeLot) {
+        toast.error("Nenhum lote ativo");
+        return;
+      }
+
+      const amount = (activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment;
+      
+      setIsActionLoading(true);
+      try {
+        const { data, error } = await supabase.rpc("place_bid_safe", {
+          p_lot_id: activeLot.id,
+          p_amount: amount,
+          p_bid_type: "security",
+          p_session_id: "admin-security-bid"
+        });
+
+        if (error) throw error;
+        
+        const result = data as any;
+        if (result.success) {
+          toast.success("Lance de segurança (reserva) efetuado!");
+          fetchEventDetails(selectedEventId);
+        } else {
+          toast.error(result.message);
+        }
+      } catch (error: any) {
+        toast.error(error.message);
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
    return (
      <div className="space-y-6">
        <Card className="border-gold/30">
@@ -200,17 +281,54 @@
                  </SelectContent>
                </Select>
              </div>
-             <Button 
-               variant="outline" 
-               onClick={() => selectedEventId && fetchEventDetails(selectedEventId)}
-               disabled={!selectedEventId || isLoading}
-             >
-               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Painel"}
-             </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => selectedEventId && fetchEventDetails(selectedEventId)}
+                  disabled={!selectedEventId || isLoading}
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Painel"}
+                </Button>
+                {selectedEventId && liveEvent && (
+                  <Button 
+                    variant="destructive" 
+                    onClick={finalizeEvent}
+                    disabled={isActionLoading}
+                  >
+                    Encerrar Evento
+                  </Button>
+                )}
+              </div>
            </div>
          </CardContent>
        </Card>
  
+        {selectedEventId && liveEvent && (
+          <Card className="border-gold/30">
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <Video className="h-4 w-4 text-gold" /> Transmissão ao Vivo
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Link do YouTube/Vimeo" 
+                  value={transmissionLink}
+                  onChange={(e) => setTransmissionLink(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={updateTransmissionLink}
+                  disabled={isActionLoading}
+                >
+                  {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar Link"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
        {selectedEventId && liveEvent && (
          <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
            <div className="space-y-6">
@@ -367,6 +485,28 @@
                </CardContent>
              </Card>
  
+              <Card className="border-destructive/30 bg-destructive/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="h-4 w-4" /> Lance de Segurança
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-[10px] text-muted-foreground uppercase leading-tight">
+                    Use para cobrir o preço reserva ou estimular o leilão. Aparecerá no auditório sem identificar o usuário.
+                  </p>
+                  <Button 
+                    variant="destructive"
+                    className="w-full font-bold"
+                    onClick={handleSecurityBid}
+                    disabled={isActionLoading || !activeLot}
+                  >
+                    {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
+                    Dar Lance + {activeLot ? formatBRL(activeLot.bid_increment) : "0,00"}
+                  </Button>
+                </CardContent>
+              </Card>
+
              <Card>
                <CardHeader className="pb-2">
                  <CardTitle className="text-sm font-bold flex items-center gap-2">

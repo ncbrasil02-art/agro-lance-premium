@@ -467,16 +467,19 @@ import { Textarea } from "@/components/ui/textarea";
                      </SelectContent>
                    </Select>
                  </div>
-                 <div className="grid gap-2">
-                   <Label htmlFor="status">Status Inicial</Label>
+                  <div className="grid gap-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="status">Status Inicial</Label>
+                      <span className="text-[10px] text-muted-foreground italic">"Ao Vivo" apenas indica que terá transmissão.</span>
+                    </div>
                     <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
-                     <SelectTrigger><SelectValue /></SelectTrigger>
-                     <SelectContent>
-                       <SelectItem value="scheduled">Agendado</SelectItem>
-                         <SelectItem value="live">Ao Vivo</SelectItem>
-                     </SelectContent>
-                   </Select>
-                 </div>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="scheduled">Agendado</SelectItem>
+                        <SelectItem value="live">Ao Vivo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="location">Localização</Label>

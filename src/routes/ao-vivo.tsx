@@ -43,12 +43,22 @@ export const Route = createFileRoute("/ao-vivo")({
      if (eventError || !events || events.length === 0) return { liveEvent: null };
 
      const now = new Date();
-     const liveEvent = events.find(e => {
-       if (e.status === 'live') return true;
-       const start = new Date(e.start_date);
-       const end = e.end_date ? new Date(e.end_date) : null;
-       return now >= start && (!end || now < end);
-     });
+      // First, try to find an event that is explicitly 'live' AND has an active lot
+      let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
+      
+      // If not found, look for any 'live' event
+   if (!liveEvent) {
+        liveEvent = events.find(e => e.status === 'live');
+      }
+
+      // If still not found, look for a scheduled event that should be happening now
+      if (!liveEvent) {
+        liveEvent = events.find(e => {
+          const start = new Date(e.start_date);
+          const end = e.end_date ? new Date(e.end_date) : null;
+          return now >= start && (!end || now < end);
+        });
+      }
 
      if (!liveEvent) return { liveEvent: null };
  
@@ -72,6 +82,14 @@ export const Route = createFileRoute("/ao-vivo")({
    },
    component: LivePage,
 });
+
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
+    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    return url;
+  };
 
  function LivePage() {
    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData();
@@ -186,15 +204,15 @@ export const Route = createFileRoute("/ao-vivo")({
       <div className="container mx-auto px-4 py-20 text-center">
          <h1 className="text-3xl font-bold">{liveEvent.name}</h1>
          <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant flex flex-col items-center justify-center">
-           {liveEvent.transmission_link ? (
-             <iframe
-               className="h-full w-full border-0"
-               src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
-               title="Aguardando Próximo Lote"
-               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-               allowFullScreen
-             />
-           ) : (
+            {liveEvent.transmission_link ? (
+              <iframe
+                className="h-full w-full border-0"
+                src={getEmbedUrl(liveEvent.transmission_link)}
+                title="Aguardando Próximo Lote"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
              <>
                <Loader2 className="h-12 w-12 text-gold animate-spin mb-4" />
                <p className="text-gold font-bold uppercase tracking-widest">Aguardando próximo lote...</p>
@@ -263,7 +281,7 @@ export const Route = createFileRoute("/ao-vivo")({
              {liveEvent.transmission_link ? (
                <iframe
                  className="h-full w-full border-0"
-                 src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
+                 src={getEmbedUrl(liveEvent.transmission_link)}
                  title="Transmissão ao Vivo"
                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                  allowFullScreen
@@ -349,13 +367,17 @@ export const Route = createFileRoute("/ao-vivo")({
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
                    <div className="font-semibold flex items-center gap-2">
-                     {bid.is_phone_bid ? (
-                       <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
-                         <Phone className="h-2 w-2" /> Telefone
-                       </span>
-                     ) : (
-                       <span>Comprador ...{bid.user_id.slice(-4)}</span>
-                     )}
+                      {bid.is_phone_bid ? (
+                        <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
+                          <Phone className="h-2 w-2" /> Telefone
+                        </span>
+                      ) : bid.bid_type === 'security' ? (
+                        <span className="flex items-center gap-1 text-[10px] bg-emerald-deep/20 text-emerald-deep px-1.5 rounded uppercase font-black">
+                          <Gavel className="h-2 w-2" /> Auditório
+                        </span>
+                      ) : (
+                        <span>Comprador ...{bid.user_id.slice(-4)}</span>
+                      )}
                    </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
                  </div>
