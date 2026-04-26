@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
+import { ErrorFallback } from "@/components/ui/error-fallback";
    import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
  import { LotCard } from "@/components/auctions/lot-card";
   import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/lotes/")({
     },
    component: LotsPage,
    pendingComponent: PageSkeleton,
+   errorComponent: ErrorFallback,
 });
 
 function LotsPage() {

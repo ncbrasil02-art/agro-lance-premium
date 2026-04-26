@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { EventDetailSkeleton } from "@/components/ui/page-skeleton";
+import { ErrorFallback } from "@/components/ui/error-fallback";
 import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
@@ -45,6 +46,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
   ),
   component: EventDetail,
   pendingComponent: EventDetailSkeleton,
+  errorComponent: ErrorFallback,
 });
 
 function EventDetail() {
