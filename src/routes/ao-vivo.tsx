@@ -84,8 +84,6 @@ export const Route = createFileRoute("/ao-vivo")({
           return { liveEvent: null };
         }
 
-        console.log("Evento selecionado para Ao Vivo:", liveEvent.name, "ID:", liveEvent.id);
-
         // Manual fetch of the active lot since we removed the join in main query
         if (liveEvent.active_lot_id) {
           const eventAny = liveEvent as any;
@@ -152,12 +150,7 @@ export const Route = createFileRoute("/ao-vivo")({
         // Skip strict validation to avoid "Waiting for Transmission" due to minor schema mismatches
         return { 
           liveEvent: liveEvent as any,
-          initialBids,
-          debug: {
-            eventsCount: events.length,
-            firstEventStatus: events[0]?.status,
-            pickedEventName: liveEvent?.name
-          }
+          initialBids
         };
       } catch (err) {
         console.error("Erro fatal no loader ao-vivo:", err);
@@ -168,10 +161,7 @@ export const Route = createFileRoute("/ao-vivo")({
 });
 
   function LivePage() {
-    const loaderData = Route.useLoaderData() as any;
-    const initialEvent = loaderData?.liveEvent;
-    const initialBids = loaderData?.initialBids;
-    console.log("LivePage Render - initialEvent:", initialEvent?.name);
+    const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
    const [bids, setBids] = useState(initialBids);
