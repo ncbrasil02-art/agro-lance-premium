@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { FormSkeleton } from "@/components/ui/form-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { Loader2 } from "lucide-react";
 export const Route = createFileRoute("/cadastro")({
   head: () => ({ meta: [{ title: "Cadastre-se — Premium Agro Leilões" }] }),
   component: SignupPage,
+  pendingComponent: FormSkeleton,
 });
 
 function SignupPage() {
