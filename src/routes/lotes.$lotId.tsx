@@ -188,31 +188,46 @@ function LotDetail() {
     };
   }, [lot.id]);
 
-   const placeBid = async (amount: number) => {
-     if (!user) { toast.error("Faça login para dar lances."); return; }
-     
-     setIsBidding(true);
-     try {
-       const { data, error } = await supabase.rpc('place_bid_safe', {
-         p_lot_id: lot.id,
-         p_amount: amount,
-         p_bid_type: 'online'
-       });
- 
-       if (error) throw error;
-       
-       const result = data as { success: boolean, message: string };
-       if (result.success) {
-         toast.success(result.message);
-       } else {
-         toast.error(result.message);
-       }
-     } catch (error: any) {
-       toast.error(error.message || "Erro ao efetuar lance.");
-     } finally {
-       setIsBidding(false);
-     }
-   };
+  const placeBid = async (amount: number) => {
+    if (!user) {
+      toast.error("Faça login para dar lances.");
+      return;
+    }
+
+    setIsBidding(true);
+    try {
+      // Obtém ou gera um ID de sessão persistente para proteção contra bots
+      let sessionId = sessionStorage.getItem("bid_session_id");
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        sessionStorage.setItem("bid_session_id", sessionId);
+      }
+
+      const { data, error } = await supabase.rpc("place_bid_safe", {
+        p_lot_id: lot.id,
+        p_amount: amount,
+        p_bid_type: "online",
+        p_session_id: sessionId,
+      });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; message: string };
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        // Se o erro for de bloqueio, a mensagem explicará o motivo (ex: excesso de lances)
+        toast.error(result.message, {
+          duration: 5000,
+          icon: <Fingerprint className="h-4 w-4 text-destructive" />,
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao efetuar lance.");
+    } finally {
+      setIsBidding(false);
+    }
+  };
 
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);

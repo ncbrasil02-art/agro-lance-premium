@@ -224,6 +224,7 @@ export type Database = {
           ip_address: string | null
           is_manual: boolean | null
           lot_id: string | null
+          session_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -234,6 +235,7 @@ export type Database = {
           ip_address?: string | null
           is_manual?: boolean | null
           lot_id?: string | null
+          session_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -244,6 +246,7 @@ export type Database = {
           ip_address?: string | null
           is_manual?: boolean | null
           lot_id?: string | null
+          session_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -755,6 +758,7 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          auto_unlock_at: string | null
           avatar_url: string | null
           block_reason: string | null
           cpf: string | null
@@ -764,6 +768,7 @@ export type Database = {
           is_approved: boolean
           is_blocked: boolean | null
           phone: string | null
+          risk_level: string | null
           risk_score: number | null
           role: string
           updated_at: string
@@ -771,6 +776,7 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          auto_unlock_at?: string | null
           avatar_url?: string | null
           block_reason?: string | null
           cpf?: string | null
@@ -780,6 +786,7 @@ export type Database = {
           is_approved?: boolean
           is_blocked?: boolean | null
           phone?: string | null
+          risk_level?: string | null
           risk_score?: number | null
           role?: string
           updated_at?: string
@@ -787,6 +794,7 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          auto_unlock_at?: string | null
           avatar_url?: string | null
           block_reason?: string | null
           cpf?: string | null
@@ -796,6 +804,7 @@ export type Database = {
           is_approved?: boolean
           is_blocked?: boolean | null
           phone?: string | null
+          risk_level?: string | null
           risk_score?: number | null
           role?: string
           updated_at?: string
@@ -951,10 +960,20 @@ export type Database = {
         Args: { p_amount: number; p_lot_id: string; p_user_id: string }
         Returns: Json
       }
-      place_bid_safe: {
-        Args: { p_amount: number; p_bid_type?: string; p_lot_id: string }
-        Returns: Json
-      }
+      place_bid_safe:
+        | {
+            Args: { p_amount: number; p_bid_type?: string; p_lot_id: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_bid_type: string
+              p_lot_id: string
+              p_session_id?: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       [_ in never]: never
