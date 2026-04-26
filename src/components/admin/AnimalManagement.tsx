@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Checkbox } from "@/components/ui/checkbox";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -57,9 +57,12 @@
          vaccination_records: "",
          veterinary_history: {},
          other_veterinary_info: "",
-         genealogy_father: "",
-         genealogy_mother: "",
-         description: ""
+          genealogy_father: "",
+          genealogy_mother: "",
+          description: "",
+          is_direct_sale: false,
+          sale_price: "",
+          sale_status: "available"
     });
 
      const resetForm = () => {
@@ -89,9 +92,12 @@
          vaccination_records: "",
          veterinary_history: {},
          other_veterinary_info: "",
-         genealogy_father: "",
-         genealogy_mother: "",
-         description: ""
+          genealogy_father: "",
+          genealogy_mother: "",
+          description: "",
+          is_direct_sale: false,
+          sale_price: "",
+          sale_status: "available"
       });
     };
 
@@ -123,8 +129,11 @@
          veterinary_history: animal.veterinary_history || {},
          other_veterinary_info: animal.veterinary_history?.other_info || "",
         genealogy_father: animal.genealogy?.father || "",
-        genealogy_mother: animal.genealogy?.mother || "",
-        description: animal.description || ""
+         genealogy_mother: animal.genealogy?.mother || "",
+         description: animal.description || "",
+         is_direct_sale: animal.is_direct_sale || false,
+         sale_price: animal.sale_price || "",
+         sale_status: animal.sale_status || "available"
       });
       setIsDialogOpen(true);
     };
@@ -162,9 +171,12 @@
               height: formData.height ? parseFloat(formData.height as string) : null,
                  vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                  veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
-              genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
-                photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
-              description: formData.description
+               genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
+               photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
+               description: formData.description,
+               is_direct_sale: formData.is_direct_sale,
+               sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
+               sale_status: formData.sale_status
             })
             .eq("id", editingAnimal.id);
           if (error) throw error;
@@ -193,10 +205,13 @@
             height: formData.height ? parseFloat(formData.height as string) : null,
                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
-            genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
-            internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
+             genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
+             internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
              photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
-            description: formData.description
+             description: formData.description,
+             is_direct_sale: formData.is_direct_sale,
+             sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
+             sale_status: formData.sale_status
           });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
@@ -309,12 +324,60 @@
                </DialogDescription>
              </DialogHeader>
               <Tabs defaultValue="geral" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                 <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="geral">Geral</TabsTrigger>
                   <TabsTrigger value="registros">Registros</TabsTrigger>
                   <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
                   <TabsTrigger value="saude">Saúde</TabsTrigger>
-                  <TabsTrigger value="midia">Mídia</TabsTrigger>
+                   <TabsTrigger value="midia">Mídia</TabsTrigger>
+                   <TabsTrigger value="venda">Venda</TabsTrigger>
+                 <TabsContent value="venda" className="space-y-4 pt-4">
+                   <div className="flex items-center space-x-2 border p-4 rounded-md bg-muted/20">
+                     <Checkbox 
+                       id="is_direct_sale" 
+                       checked={formData.is_direct_sale}
+                       onCheckedChange={(checked) => setFormData({ ...formData, is_direct_sale: !!checked })}
+                     />
+                     <div className="grid gap-1.5 leading-none">
+                       <Label htmlFor="is_direct_sale" className="text-sm font-medium leading-none cursor-pointer">
+                         Disponível para Venda Direta
+                       </Label>
+                       <p className="text-xs text-muted-foreground">
+                         Ao marcar esta opção, o animal aparecerá na área de "Compra de Animais" do site.
+                       </p>
+                     </div>
+                   </div>
+
+                   {formData.is_direct_sale && (
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                       <div className="grid gap-2">
+                         <Label htmlFor="sale_price">Preço de Venda (R$)</Label>
+                         <div className="relative">
+                           <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                           <Input 
+                             id="sale_price" 
+                             type="number" 
+                             className="pl-9"
+                             value={formData.sale_price} 
+                             onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })} 
+                             placeholder="0,00"
+                           />
+                         </div>
+                       </div>
+                       <div className="grid gap-2">
+                         <Label htmlFor="sale_status">Status da Venda</Label>
+                         <Select onValueChange={(v) => setFormData({ ...formData, sale_status: v })} value={formData.sale_status}>
+                           <SelectTrigger id="sale_status"><SelectValue /></SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="available">Disponível</SelectItem>
+                             <SelectItem value="reserved">Reservado</SelectItem>
+                             <SelectItem value="sold">Vendido</SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
+                     </div>
+                   )}
+                 </TabsContent>
                 </TabsList>
                
                 <TabsContent value="registros" className="space-y-4 pt-4">
@@ -681,7 +744,8 @@
                  <TableRow>
                     <TableHead className="w-[80px]">Foto</TableHead>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Categoria/Raça</TableHead>
+                     <TableHead>Categoria/Raça</TableHead>
+                     <TableHead>Venda Direta</TableHead>
                    <TableHead>Registro</TableHead>
                    <TableHead>Sexo</TableHead>
                    <TableHead className="text-right">Ações</TableHead>
@@ -695,8 +759,8 @@
                      </TableCell>
                    </TableRow>
                  ) : (
-                   filteredAnimals.map((animal) => (
-                      <TableRow key={animal.id}>
+                    filteredAnimals.map((animal) => (
+                       <TableRow key={animal.id} className={animal.sale_status === 'sold' ? "opacity-60 bg-muted/20" : ""}>
                         <TableCell>
                           {animal.photos && animal.photos.length > 0 ? (
                             <img 
@@ -716,7 +780,30 @@
                              <div className="text-[10px] text-muted-foreground uppercase">{animal.categories.name}</div>
                            )}
                          </TableCell>
-                        <TableCell>{animal.species} / {animal.breed}</TableCell>
+                         <TableCell>{animal.species} / {animal.breed}</TableCell>
+                         <TableCell>
+                           {animal.is_direct_sale ? (
+                             <div className="flex flex-col gap-1">
+                               <div className="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                                 <ShoppingCart className="h-3 w-3" />
+                                 Sim
+                               </div>
+                               <div className="text-[10px] font-bold">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(animal.sale_price || 0)}
+                               </div>
+                               <div className={`text-[9px] uppercase px-1 rounded-full w-fit ${
+                                 animal.sale_status === 'available' ? "bg-emerald-100 text-emerald-700" :
+                                 animal.sale_status === 'reserved' ? "bg-amber-100 text-amber-700" :
+                                 "bg-red-100 text-red-700"
+                               }`}>
+                                 {animal.sale_status === 'available' ? 'Disponível' : 
+                                  animal.sale_status === 'reserved' ? 'Reservado' : 'Vendido'}
+                               </div>
+                             </div>
+                           ) : (
+                             <span className="text-xs text-muted-foreground">Não</span>
+                           )}
+                         </TableCell>
                        <TableCell>{animal.registration_number}</TableCell>
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
                       <TableCell className="text-right">
