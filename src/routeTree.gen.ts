@@ -19,6 +19,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LotesIndexRouteImport } from './routes/lotes.index'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
+import { Route as CompraDiretaIndexRouteImport } from './routes/compra-direta.index'
 import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
 
@@ -72,6 +73,11 @@ const EventosIndexRoute = EventosIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EventosRoute,
 } as any)
+const CompraDiretaIndexRoute = CompraDiretaIndexRouteImport.update({
+  id: '/compra-direta/',
+  path: '/compra-direta/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LotesLotIdRoute = LotesLotIdRouteImport.update({
   id: '/$lotId',
   path: '/$lotId',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
+  '/compra-direta/': typeof CompraDiretaIndexRoute
   '/eventos/': typeof EventosIndexRoute
   '/lotes/': typeof LotesIndexRoute
 }
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
+  '/compra-direta': typeof CompraDiretaIndexRoute
   '/eventos': typeof EventosIndexRoute
   '/lotes': typeof LotesIndexRoute
 }
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
+  '/compra-direta/': typeof CompraDiretaIndexRoute
   '/eventos/': typeof EventosIndexRoute
   '/lotes/': typeof LotesIndexRoute
 }
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
+    | '/compra-direta/'
     | '/eventos/'
     | '/lotes/'
   fileRoutesByTo: FileRoutesByTo
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
+    | '/compra-direta'
     | '/eventos'
     | '/lotes'
   id:
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
+    | '/compra-direta/'
     | '/eventos/'
     | '/lotes/'
   fileRoutesById: FileRoutesById
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   LotesRoute: typeof LotesRouteWithChildren
   SobreRoute: typeof SobreRoute
+  CompraDiretaIndexRoute: typeof CompraDiretaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventosIndexRouteImport
       parentRoute: typeof EventosRoute
     }
+    '/compra-direta/': {
+      id: '/compra-direta/'
+      path: '/compra-direta'
+      fullPath: '/compra-direta/'
+      preLoaderRoute: typeof CompraDiretaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lotes/$lotId': {
       id: '/lotes/$lotId'
       path: '/$lotId'
@@ -301,6 +321,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   LotesRoute: LotesRouteWithChildren,
   SobreRoute: SobreRoute,
+  CompraDiretaIndexRoute: CompraDiretaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin")({
  import { CategoryManagement } from "@/components/admin/CategoryManagement";
  import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
  
- type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "users" | "settings";
+  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "settings";
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -36,6 +36,8 @@ export const Route = createFileRoute("/admin")({
       { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
       { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
       { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
+      { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
+  import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
       { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
      { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
@@ -249,6 +251,7 @@ function AdminLayout() {
           {activeTab === "animals" && <AnimalManagement />}
           {activeTab === "categories" && <CategoryManagement />}
           {activeTab === "event_requests" && <EventRequestManagement />}
+          {activeTab === "direct_sales" && <DirectSaleManagement />}
           {activeTab === "sellers" && <SellerManagement />}
           {activeTab === "users" && (
             <Card>
