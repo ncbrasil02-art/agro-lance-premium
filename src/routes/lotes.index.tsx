@@ -46,8 +46,10 @@ function LotsPage() {
    const { lots = [] } = Route.useLoaderData() as any;
     const router = useRouter();
  
-    useRealtimeLots(() => {
-      router.invalidate();
+    useRealtimeLots((payload) => {
+      if (payload && (payload.eventType === 'INSERT' || payload.eventType === 'DELETE' || payload.eventType === 'RECONNECT')) {
+        router.invalidate();
+      }
     });
  
    const mappedLots = lots?.map((l: any) => ({
