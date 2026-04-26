@@ -833,13 +833,27 @@
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(animal)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(animal.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(animal)}>
+                                   <Pencil className="h-4 w-4" />
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>Editar informações do animal</TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(animal.id)}>
+                                   <Trash2 className="h-4 w-4" />
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>Excluir registro permanentemente</TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
+                         </div>
                       </TableCell>
                      </TableRow>
                    ))
