@@ -788,10 +788,24 @@ export const Route = createFileRoute("/ao-vivo")({
                                 <Info className="h-4 w-4" /> Ficha Técnica
                               </h3>
                               <div className="space-y-2 text-sm">
-                                <div className="flex justify-between border-b border-border/40 pb-1">
-                                  <span className="text-muted-foreground">Registro</span>
-                                  <span className="font-bold">{liveLot.animal?.registration_number || "-"}</span>
-                                </div>
+                                {liveLot.animal?.registration_number && (
+                                  <div className="flex justify-between border-b border-border/40 pb-1">
+                                    <span className="text-muted-foreground">Registro Principal</span>
+                                    <span className="font-bold">{liveLot.animal.registration_number}</span>
+                                  </div>
+                                )}
+                                {liveLot.animal?.registration_1cc && (
+                                  <div className="flex justify-between border-b border-border/40 pb-1">
+                                    <span className="text-muted-foreground">Registro 1CC</span>
+                                    <span className="font-bold">{liveLot.animal.registration_1cc}</span>
+                                  </div>
+                                )}
+                                {liveLot.animal?.registration_2 && (
+                                  <div className="flex justify-between border-b border-border/40 pb-1">
+                                    <span className="text-muted-foreground">Registro Secundário</span>
+                                    <span className="font-bold">{liveLot.animal.registration_2}</span>
+                                  </div>
+                                )}
                                 <div className="flex justify-between border-b border-border/40 pb-1">
                                   <span className="text-muted-foreground">Sexo</span>
                                   <span className="font-bold uppercase">{liveLot.animal?.sex === 'male' ? 'Macho' : 'Fêmea'}</span>
