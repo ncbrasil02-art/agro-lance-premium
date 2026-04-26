@@ -701,6 +701,71 @@ import {
            )}
          </CardContent>
        </Card>
+
+       <Dialog open={isBidsDialogOpen} onOpenChange={setIsBidsDialogOpen}>
+         <DialogContent className="sm:max-w-[600px]">
+           <DialogHeader>
+             <DialogTitle>Histórico de Lances</DialogTitle>
+             <DialogDescription>
+               Visualize e gerencie os lances efetuados para este lote.
+             </DialogDescription>
+           </DialogHeader>
+           <div className="py-4">
+             {isBidsLoading ? (
+               <div className="flex justify-center py-8">
+                 <Loader2 className="h-8 w-8 animate-spin text-gold" />
+               </div>
+             ) : (
+               <div className="max-h-[400px] overflow-y-auto rounded-md border">
+                 <Table>
+                   <TableHeader className="bg-muted/50 sticky top-0 z-10">
+                     <TableRow>
+                       <TableHead>Licitante</TableHead>
+                       <TableHead>Valor</TableHead>
+                       <TableHead>Data/Hora</TableHead>
+                       <TableHead className="text-right">Ações</TableHead>
+                     </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                     {selectedLotBids.length === 0 ? (
+                       <TableRow>
+                         <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                           Nenhum lance efetuado ainda.
+                         </TableCell>
+                       </TableRow>
+                     ) : (
+                       selectedLotBids.map((bid) => (
+                         <TableRow key={bid.id}>
+                           <TableCell className="font-medium">{bid.profile?.full_name || "Usuário"}</TableCell>
+                           <TableCell className="font-bold text-emerald-600">
+                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
+                           </TableCell>
+                           <TableCell className="text-xs text-muted-foreground">
+                             {new Date(bid.created_at).toLocaleString('pt-BR')}
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <Button 
+                               variant="ghost" 
+                               size="icon" 
+                               className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                               onClick={() => handleDeleteBid(bid)}
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </TableCell>
+                         </TableRow>
+                       ))
+                     )}
+                   </TableBody>
+                 </Table>
+               </div>
+             )}
+           </div>
+           <DialogFooter>
+             <Button onClick={() => setIsBidsDialogOpen(false)}>Fechar</Button>
+           </DialogFooter>
+         </DialogContent>
+       </Dialog>
      </div>
    );
  }
