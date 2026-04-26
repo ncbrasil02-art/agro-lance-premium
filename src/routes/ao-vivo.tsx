@@ -190,7 +190,14 @@ export const Route = createFileRoute("/ao-vivo")({
               <AlertTriangle className="h-5 w-5" /> Confirmar Lance Ao Vivo
             </AlertDialogTitle>
             <AlertDialogDescription className="text-white/80">
-              Deseja realmente confirmar o lance de <span className="text-white font-bold">{formatBRL(pendingBidAmount || 0)}</span> para o lote <span className="text-white font-bold">#{liveLot.lot_number}</span>?
+               Deseja realmente confirmar o lance de <span className="text-white font-bold">{formatBRL(pendingBidAmount || 0)}</span> para o lote <span className="text-white font-bold">#{liveLot.lot_number}</span>?
+               <br /><br />
+               {bids?.[0]?.is_phone_bid && (
+                 <div className="flex items-center gap-2 bg-white/10 p-2 rounded text-xs">
+                   <Phone className="h-3 w-3 text-gold" />
+                   <span>Último lance recebido via telefone</span>
+                 </div>
+               )}
               <br /><br />
               <span className="text-xs italic font-bold text-gold">Lances em leilão ao vivo são definitivos e irrevogáveis.</span>
             </AlertDialogDescription>
@@ -315,7 +322,15 @@ export const Route = createFileRoute("/ao-vivo")({
               {bids?.map((bid: any, i: number) => (
                <li key={bid.id} className={`flex items-center justify-between rounded-lg p-3 ${i === 0 ? "bg-gold/10 ring-1 ring-gold/30 animate-bid-flash" : "border-b border-border/40"}`}>
                  <div>
-                   <div className="font-semibold">Comprador ...{bid.user_id.slice(-4)}</div>
+                   <div className="font-semibold flex items-center gap-2">
+                     {bid.is_phone_bid ? (
+                       <span className="flex items-center gap-1 text-[10px] bg-gold/20 text-gold px-1.5 rounded uppercase font-black">
+                         <Phone className="h-2 w-2" /> Telefone
+                       </span>
+                     ) : (
+                       <span>Comprador ...{bid.user_id.slice(-4)}</span>
+                     )}
+                   </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
                  </div>
                  <div className={`font-mono font-bold ${i === 0 ? "text-gold" : "text-foreground"}`}>{formatBRL(bid.amount)}</div>
