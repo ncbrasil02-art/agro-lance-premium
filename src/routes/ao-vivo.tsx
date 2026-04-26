@@ -380,16 +380,30 @@ export const Route = createFileRoute("/ao-vivo")({
       // Specific bids channel for the active lot
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
+        const currentActiveLotId = liveEvent.active_lot_id;
+        console.log("Subscrevendo a lances do lote:", currentActiveLotId);
+        
         bidsChannel = supabase
-          .channel(`live-bids-${liveEvent.active_lot_id}`)
+          .channel(`live-bids-${currentActiveLotId}`)
           .on(
             "postgres_changes",
-            { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
+            { 
+              event: "INSERT", 
+              schema: "public", 
+              table: "bids", 
+              filter: `lot_id=eq.${currentActiveLotId}` 
+            },
             async (payload) => {
+              console.log("Novo lance detectado via Realtime:", payload.new);
               const newBid = payload.new;
-              setBids((prev: any) => [newBid, ...prev].slice(0, 10));
               
-              // Fetch profile if not already loaded
+              setBids((prev) => {
+                // Verificar se o lance já existe no estado para evitar duplicatas
+                if (prev.some(b => b.id === newBid.id)) return prev;
+                return [newBid, ...prev].slice(0, 15);
+              });
+              
+              // Buscar perfil se ainda não carregado
               if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
                 const { data } = await supabase
                   .from("profiles")
@@ -402,7 +416,9 @@ export const Route = createFileRoute("/ao-vivo")({
               }
             }
           )
-          .subscribe();
+          .subscribe((status) => {
+            console.log(`Status da subscrição de lances (${currentActiveLotId}):`, status);
+          });
       }
 
       return () => {
