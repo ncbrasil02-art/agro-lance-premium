@@ -143,16 +143,29 @@ import { useEffectiveLotStatus } from "@/utils/auction-status";
             <div className="text-xl font-bold text-gradient-gold">{formatBRL(lot?.currentBid || 0)}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? 'Status' : 'Encerra em'}
-            </div>
-            {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? (
-              <span className="text-sm font-semibold text-muted-foreground uppercase">Encerrado</span>
-            ) : lot.endsAt || lot.eventEndDate ? (
-              <Countdown endsAt={lot.endsAt || lot.eventEndDate || ""} className="font-mono text-sm font-semibold text-foreground" />
-            ) : (
-              <span className="text-sm font-semibold text-foreground">--:--:--</span>
-            )}
+             {dynamicStatus === 'loteamento' ? (
+               <>
+                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Inicia em</div>
+                 {lot.eventStartDate ? (
+                   <Countdown endsAt={lot.eventStartDate} className="font-mono text-sm font-semibold text-upcoming" />
+                 ) : (
+                   <span className="text-sm font-semibold text-foreground">--:--:--</span>
+                 )}
+               </>
+             ) : (
+               <>
+                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                   {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? 'Status' : 'Encerra em'}
+                 </div>
+                 {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? (
+                   <span className="text-sm font-semibold text-muted-foreground uppercase">Encerrado</span>
+                 ) : lot.endsAt || lot.eventEndDate ? (
+                   <Countdown endsAt={lot.endsAt || lot.eventEndDate || ""} className="font-mono text-sm font-semibold text-foreground" />
+                 ) : (
+                   <span className="text-sm font-semibold text-foreground">--:--:--</span>
+                 )}
+               </>
+             )}
           </div>
         </div>
       </div>

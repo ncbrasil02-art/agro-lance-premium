@@ -93,13 +93,17 @@ export function getEffectiveLotStatus(lot: {
     return lot.status === 'sold' ? 'sold' : 'finished';
   }
 
-  if (eventStart && now >= eventStart && (!eventEnd || now < eventEnd)) {
-    return 'recebendo_lances';
-  }
-
-  if (eventStart && now < eventStart) {
-    return lot.allows_pre_bidding ? 'pre_lance' : 'loteamento';
-  }
+   if (eventStart) {
+     // If current date is past start date and not past end date
+     if (now >= eventStart && (!eventEnd || now < eventEnd)) {
+       return 'recebendo_lances';
+     }
+     
+     // If current date is before start date
+     if (now < eventStart) {
+       return lot.allows_pre_bidding ? 'pre_lance' : 'loteamento';
+     }
+   }
 
   return lot.status;
 }
