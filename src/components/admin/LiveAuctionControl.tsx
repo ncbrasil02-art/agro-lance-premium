@@ -262,12 +262,22 @@
    return (
      <div className="space-y-6">
        <Card className="border-gold/30">
-         <CardHeader>
-           <CardTitle className="flex items-center gap-2">
-             <Video className="h-5 w-5 text-gold" /> Controle de Leilão ao Vivo
-           </CardTitle>
-           <CardDescription>Gerencie a transmissão e o lote em destaque na tela do auditório.</CardDescription>
-         </CardHeader>
+          <CardHeader className="pb-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Video className="h-6 w-6 text-gold" /> Painel do Auditório (Ao Vivo)
+                </CardTitle>
+                <CardDescription>Controle total da transmissão e dos lances em tempo real.</CardDescription>
+              </div>
+              {selectedEventId && liveEvent && (
+                <div className="flex items-center gap-2 bg-emerald-deep/5 px-4 py-2 rounded-full border border-gold/20">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-sm font-bold text-emerald-deep uppercase">{liveEvent.name}</span>
+                </div>
+              )}
+            </div>
+          </CardHeader>
          <CardContent>
            <div className="flex flex-col gap-4 md:flex-row md:items-end">
              <div className="flex-1 space-y-2">
@@ -306,26 +316,41 @@
        </Card>
  
         {selectedEventId && liveEvent && (
-          <Card className="border-gold/30">
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Video className="h-4 w-4 text-gold" /> Transmissão ao Vivo
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="Link do YouTube/Vimeo" 
-                  value={transmissionLink}
-                  onChange={(e) => setTransmissionLink(e.target.value)}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={updateTransmissionLink}
-                  disabled={isActionLoading}
-                >
-                  {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar Link"}
-                </Button>
+          <Card className="border-gold/50 bg-gold/5">
+            <CardContent className="pt-6">
+              <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-gold font-bold">
+                    <Video className="h-4 w-4" /> LINK DA TRANSMISSÃO (YOUTUBE / VIMEO)
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="Cole aqui o link do vídeo ao vivo (ex: https://www.youtube.com/watch?v=...)" 
+                      value={transmissionLink}
+                      onChange={(e) => setTransmissionLink(e.target.value)}
+                      className="flex-1 bg-white border-gold/30 focus:border-gold"
+                    />
+                    <Button 
+                      onClick={updateTransmissionLink}
+                      disabled={isActionLoading}
+                      className="bg-gold text-emerald-deep hover:bg-gold/90 font-bold"
+                    >
+                      {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "ATUALIZAR VÍDEO"}
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground italic">
+                    Este link será exibido imediatamente para todos os usuários no "Auditório / Ao Vivo".
+                  </p>
+                </div>
+                <div className="flex items-end">
+                  <Button 
+                    variant="outline"
+                    onClick={() => window.open('/ao-vivo', '_blank')}
+                    className="border-gold/30 text-gold hover:bg-gold/10"
+                  >
+                    Ver Tela do Público
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
