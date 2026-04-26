@@ -136,22 +136,49 @@
      }
    };
  
-   const finalizeLot = async (lotId: string) => {
-     if (!confirm("Tem certeza que deseja finalizar este lote?")) return;
-     setIsActionLoading(true);
-     try {
-       await supabase.from("lots").update({ status: 'finished', is_currently_live: false }).eq("id", lotId);
-       await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
-       
-       toast.success("Lote finalizado!");
-       fetchEventDetails(selectedEventId);
-       setActiveLot(null);
-     } catch (error) {
-       toast.error("Erro ao finalizar lote");
-     } finally {
-       setIsActionLoading(false);
-     }
-   };
+    const finalizeLot = async (lotId: string) => {
+      if (!confirm("Tem certeza que deseja finalizar este lote?")) return;
+      setIsActionLoading(true);
+      try {
+        await supabase.from("lots").update({ status: 'finished', is_currently_live: false }).eq("id", lotId);
+        
+        // Check if there are more lots to be auctioned
+        const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'finished');
+        
+        if (remainingLots.length === 0) {
+          await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
+          toast.success("Lote finalizado e evento encerrado!");
+        } else {
+          await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
+          toast.success("Lote finalizado!");
+        }
+        
+        fetchEventDetails(selectedEventId);
+        setActiveLot(null);
+      } catch (error) {
+        toast.error("Erro ao finalizar lote");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
+    const finalizeEvent = async () => {
+      if (!confirm("Deseja realmente encerrar este evento? Todos os lotes pendentes serão mantidos como estão.")) return;
+      setIsActionLoading(true);
+      try {
+        await supabase.from("events").update({ status: 'finished', active_lot_id: null }).eq("id", selectedEventId);
+        await supabase.from("lots").update({ is_currently_live: false }).eq("event_id", selectedEventId);
+        
+        toast.success("Evento encerrado com sucesso!");
+        fetchEvents();
+        setLiveEvent(null);
+        setSelectedEventId("");
+      } catch (error) {
+        toast.error("Erro ao encerrar evento");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
  
    const handlePhoneBid = async () => {
      if (!activeLot || phoneBid.amount <= (activeLot.current_price || activeLot.starting_price)) {
