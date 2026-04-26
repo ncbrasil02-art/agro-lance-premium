@@ -24,18 +24,18 @@ import { logger } from "@/utils/logger";
       logger.warn(`Status desconhecido recebido: "${status}". Usando estilo padrão.`, { status });
     }
 
-     let s = map[safeStatus] || { 
- 
-     if (urgent && (safeStatus === 'recebendo_lances' || safeStatus === 'live' || safeStatus === 'active')) {
-       s = { 
-         label: "ÚLTIMOS MINUTOS!", 
-         cls: "bg-live/20 text-live border-live shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-blink-fast", 
-         dot: true 
-       };
-     }
+    let s = map[safeStatus] || { 
       label: status || "PENDENTE", 
       cls: "bg-muted text-muted-foreground border-border" 
     };
+
+    if (urgent && (safeStatus === 'recebendo_lances' || safeStatus === 'live' || safeStatus === 'active')) {
+      s = { 
+        label: "ÚLTIMOS MINUTOS!", 
+        cls: "bg-live/20 text-live border-live shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-blink-fast", 
+        dot: true 
+      };
+    }
  
     return (
       <span 
