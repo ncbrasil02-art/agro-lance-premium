@@ -40,6 +40,33 @@
        setIsLoadingLogs(false);
      }
    };
+ 
+   const exportToCSV = () => {
+     const headers = ["Nome", "CPF", "Telefone", "Papel", "Aprovado", "Data Cadastro"];
+     const data = filteredUsers.map(user => [
+       user.full_name,
+       user.cpf,
+       user.phone,
+       user.role === 'admin' ? 'Administrador' : 'Licitante',
+       user.is_approved ? 'Sim' : 'Não',
+       format(new Date(user.created_at), "dd/MM/yyyy HH:mm")
+     ]);
+ 
+     const csvContent = [
+       headers.join(","),
+       ...data.map(row => row.join(","))
+     ].join("\n");
+ 
+     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+     const link = document.createElement("a");
+     const url = URL.createObjectURL(blob);
+     link.setAttribute("href", url);
+     link.setAttribute("download", `licitantes_${format(new Date(), "yyyy-MM-dd")}.csv`);
+     link.style.visibility = "hidden";
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
+   };
    const { profile: adminProfile } = useAuth();
    const [isLoading, setIsLoading] = useState(true);
    const [users, setUsers] = useState<any[]>([]);
