@@ -191,15 +191,31 @@
            >
              Pendentes
            </Button>
-           <Button 
-             variant={filter === "approved" ? "default" : "outline"} 
-             size="sm" 
-             onClick={() => setFilter("approved")}
-             className={filter === "approved" ? "bg-gold text-emerald-deep" : ""}
-           >
-             Aprovados
-           </Button>
-         </div>
+            <Button
+              variant={filter === "approved" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter("approved")}
+              className={filter === "approved" ? "bg-gold text-emerald-deep" : ""}
+            >
+              Aprovados
+            </Button>
+            <Button
+              variant={filter === "blocked" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter("blocked")}
+              className={filter === "blocked" ? "bg-destructive text-white" : ""}
+            >
+              Bloqueados
+            </Button>
+            <Button
+              variant={filter === "risk" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter("risk")}
+              className={filter === "risk" ? "bg-orange-500 text-white" : ""}
+            >
+              Risco
+            </Button>
+          </div>
          <div className="relative flex-1 max-w-md">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input
