@@ -1,0 +1,1 @@
+ALTER FUNCTION public.handle_confirmed_direct_sale() SET search_path = public;
