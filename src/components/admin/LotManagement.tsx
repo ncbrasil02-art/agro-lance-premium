@@ -485,8 +485,8 @@
                        const now = Date.now();
                        const isUrgent = endsAt && (endsAt - now > 0) && (endsAt - now < 600000);
                        const hasNoBids = (lot.bids_count || 0) === 0;
-                       const currentPrice = lot.current_price || lot.starting_price || 0;
-                       const isPriceLow = currentPrice <= lot.starting_price;
+                        const currentPrice = lot.current_price || lot.starting_price || 0;
+                        const isBelowReserve = lot.reserve_price && currentPrice < lot.reserve_price;
 
                        return (
                          <TableRow 
@@ -521,7 +521,18 @@
                                <span className="font-black text-sm text-emerald-deep">
                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
                                </span>
-                               <span className="text-[9px] text-muted-foreground italic">Início: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}</span>
+                               <div className="flex flex-col gap-0.5 mt-1">
+                                 <span className="text-[9px] text-muted-foreground">Início: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}</span>
+                                 {lot.reserve_price > 0 && (
+                                   <span className={`text-[9px] font-bold ${isBelowReserve ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                     Reserva: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.reserve_price)}
+                                     {isBelowReserve ? ' (Abaixo)' : ' (Atingida!)'}
+                                   </span>
+                                 )}
+                                 {lot.safety_price > 0 && (
+                                   <span className="text-[9px] text-gold font-medium">Alvo Seg.: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.safety_price)}</span>
+                                 )}
+                               </div>
                              </div>
                            </TableCell>
                            <TableCell>
