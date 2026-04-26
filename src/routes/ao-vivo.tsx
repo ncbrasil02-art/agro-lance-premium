@@ -185,6 +185,14 @@ export const Route = createFileRoute("/ao-vivo")({
     }, [liveEvent?.active_lot_id]);
 
   const [bids, setBids] = useState<any[]>(initialBids || []);
+  
+  // Sincronizar lances iniciais quando o loader for atualizado
+  useEffect(() => {
+    if (initialBids) {
+      setBids(initialBids);
+    }
+  }, [initialBids]);
+
   const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
     // Increment viewer count when page loads
     useEffect(() => {
@@ -348,30 +356,32 @@ export const Route = createFileRoute("/ao-vivo")({
       // Specific channel for the active lot to catch price and bid count updates
       let lotChannel: any = null;
       if (liveEvent?.active_lot_id) {
+        const currentActiveLotId = liveEvent.active_lot_id;
         lotChannel = supabase
-          .channel(`lot-updates-${liveEvent.active_lot_id}`)
+          .channel(`lot-updates-${currentActiveLotId}`)
           .on(
             "postgres_changes",
             { 
               event: "UPDATE", 
               schema: "public", 
-              table: "lots", 
-              filter: `id=eq.${liveEvent.active_lot_id}` 
+              table: "lots"
             },
             (payload) => {
-              console.log("Lote atualizado em tempo real:", payload.new);
-              setLiveEvent((prev: any) => {
-                if (!prev || !prev.active_lot) return prev;
-                return {
-                  ...prev,
-                  active_lot: {
-                    ...prev.active_lot,
-                    ...payload.new,
-                    // Preserve animal data which isn't in the lot update payload
-                    animal: prev.active_lot.animal
-                  }
-                };
-              });
+              if (payload.new.id === currentActiveLotId) {
+                console.log("Preço do lote atualizado em tempo real:", payload.new.current_price);
+                setLiveEvent((prev: any) => {
+                  if (!prev || !prev.active_lot) return prev;
+                  return {
+                    ...prev,
+                    active_lot: {
+                      ...prev.active_lot,
+                      ...payload.new,
+                      // Preserve animal data which isn't in the lot update payload
+                      animal: prev.active_lot.animal
+                    }
+                  };
+                });
+              }
             }
           )
           .subscribe();
@@ -380,24 +390,41 @@ export const Route = createFileRoute("/ao-vivo")({
       // Specific bids channel for the active lot
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
+        const currentActiveLotId = liveEvent.active_lot_id;
+        
+        // Use a simpler subscription without filter and filter in JS for better compatibility
         bidsChannel = supabase
-          .channel(`live-bids-${liveEvent.active_lot_id}`)
+          .channel(`live-bids-${currentActiveLotId}`)
           .on(
             "postgres_changes",
-            { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
+            { 
+              event: "INSERT", 
+              schema: "public", 
+              table: "bids"
+            },
             async (payload) => {
               const newBid = payload.new;
-              setBids((prev: any) => [newBid, ...prev].slice(0, 10));
               
-              // Fetch profile if not already loaded
-              if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
-                const { data } = await supabase
-                  .from("profiles")
-                  .select("id, full_name")
-                  .eq("id", newBid.user_id)
-                  .single();
-                if (data) {
-                  setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+              // Match the lot ID in JavaScript
+              if (newBid.lot_id === currentActiveLotId) {
+                console.log("Novo lance recebido em tempo real:", newBid);
+                
+                setBids((prev) => {
+                  // Evitar duplicatas (pode acontecer se o usuário for o próprio licitante e o fetch manual também rodar)
+                  if (prev.some(b => b.id === newBid.id)) return prev;
+                  return [newBid, ...prev].slice(0, 20);
+                });
+                
+                // Buscar perfil (tentar, se RLS permitir)
+                if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
+                  const { data } = await supabase
+                    .from("profiles")
+                    .select("id, full_name")
+                    .eq("id", newBid.user_id)
+                    .maybeSingle();
+                  if (data) {
+                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                  }
                 }
               }
             }
