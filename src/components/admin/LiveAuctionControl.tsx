@@ -23,9 +23,11 @@
    const [isActionLoading, setIsActionLoading] = useState(false);
   const [transmissionLink, setTransmissionLink] = useState("");
    
-   // Phone bid form
-    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "" });
+    // Phone bid form
+    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "", profileId: "" });
     const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
+    const [profiles, setProfiles] = useState<any[]>([]);
+    const [searchProfile, setSearchProfile] = useState("");
  
    const quickMessages = [
      "Alguém dá mais algum lance?",
