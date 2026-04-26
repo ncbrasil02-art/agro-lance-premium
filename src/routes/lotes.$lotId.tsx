@@ -237,6 +237,15 @@ function LotDetail() {
     }
   };
 
+  const placeBid = (amount: number) => {
+    if (!user) {
+      toast.error("Faça login para dar lances.");
+      return;
+    }
+    setPendingBidAmount(amount);
+    setShowConfirmBid(true);
+  };
+
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);
   
