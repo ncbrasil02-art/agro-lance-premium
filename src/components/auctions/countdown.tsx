@@ -1,4 +1,4 @@
- import { useEffect, useState } from "react";
+  import { useEffect, useState, useRef } from "react";
  import { cn } from "@/lib/utils";
 
  export function Countdown({ endsAt, className, variant = "default" }: { endsAt: string; className?: string; variant?: "default" | "segmented" }) {
@@ -20,7 +20,25 @@
   const m = Math.floor((diff % 3_600_000) / 60_000);
   const s = Math.floor((diff % 60_000) / 1000);
 
-   const isCritical = diff > 0 && diff < 600000; // Less than 10 minutes
+    const isCritical = diff > 0 && diff < 600000; // Less than 10 minutes
+    const isVibrationCritical = diff > 0 && diff <= 60000; // Last minute
+ 
+    const lastVibratedSecond = useRef<number>(-1);
+ 
+    useEffect(() => {
+      if (isVibrationCritical && mounted) {
+        const currentSecond = Math.floor(diff / 1000);
+        if (currentSecond !== lastVibratedSecond.current) {
+          lastVibratedSecond.current = currentSecond;
+          // Only vibrate every second if it's the last minute
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            // Short pulse for last minute, stronger every 10s
+            const pattern = currentSecond % 10 === 0 ? [200, 100, 200] : [50];
+            navigator.vibrate(pattern);
+          }
+        }
+      }
+    }, [diff, isVibrationCritical, mounted]);
  
    if (diff <= 0) return <span className={className} suppressHydrationWarning>{variant === 'segmented' ? '00:00:00' : 'Encerrado'}</span>;
 
