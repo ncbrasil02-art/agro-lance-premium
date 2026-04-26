@@ -1,6 +1,7 @@
  import { logger } from "@/utils/logger";
  import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
- import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
+ import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw, Circle } from "lucide-react";
+ import { useEffectiveEventStatus } from "@/utils/auction-status";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,6 +50,12 @@ function EventDetail() {
   const { event } = Route.useLoaderData() as any;
    const router = useRouter();
   const eventLots = event.lots || [];
+ 
+   const dynamicStatus = useEffectiveEventStatus({
+     status: event.status,
+     start_date: event.start_date,
+     end_date: event.end_date
+   });
  
    const { status } = useRealtimeEvent(event.id, (type, payload) => {
      // Only invalidate the full route if the event data changed,
@@ -113,7 +120,13 @@ function EventDetail() {
             {/* Event Header Info */}
             <div className="flex flex-col lg:pt-12">
               <div className="flex flex-wrap items-center gap-3 mb-8">
-                <StatusBadge status={event.status} className="scale-110" />
+                 <StatusBadge status={dynamicStatus} className="scale-110" />
+                 {dynamicStatus === 'live' && (
+                   <div className="flex items-center gap-1.5 bg-live/10 px-3 py-1 rounded-full border border-live/30 animate-pulse">
+                     <Circle className="h-2 w-2 fill-live text-live" />
+                     <span className="text-[10px] font-black text-live uppercase tracking-widest">Ao Vivo</span>
+                   </div>
+                 )}
                 <div className="h-4 w-px bg-white/10" />
                  <span className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">{event.event_type || 'Leilão Premium'}</span>
               </div>
