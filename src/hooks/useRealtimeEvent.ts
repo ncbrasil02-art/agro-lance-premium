@@ -63,7 +63,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: (type: 'lot' | 'even
     // Monitoramento de volta da internet
     const handleOnline = () => {
       logger.info('Internet detectada, forçando reconexão e atualização');
-      onUpdate();
+      onUpdate('event', null);
       setRetryCount(prev => prev + 1);
     };
 
