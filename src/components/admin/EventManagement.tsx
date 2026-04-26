@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { toast } from "sonner";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
+ import { validateLiveLink } from "@/utils/format";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
@@ -134,6 +135,11 @@ import { Textarea } from "@/components/ui/textarea";
 
       if (formData.end_date && new Date(formData.end_date) <= new Date(formData.start_date)) {
         toast.error("A data de término deve ser posterior à data de início");
+        return;
+      }
+      
+      if (formData.transmission_link && !validateLiveLink(formData.transmission_link)) {
+        toast.error("Por favor, insira um link válido do YouTube ou Vimeo");
         return;
       }
 
