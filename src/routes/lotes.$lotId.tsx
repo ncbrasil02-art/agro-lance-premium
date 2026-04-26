@@ -212,13 +212,26 @@ function LotDetail() {
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
   const nextBid = currentPrice + (lot?.bid_increment || 0);
   
-  const dynamicStatus = useEffectiveLotStatus({
-    status: lot.status,
-    event_status: lot.event?.status,
-    event_start_date: lot.event?.start_date,
-    event_end_date: lot.event?.end_date,
-    allows_pre_bidding: lot.event?.allows_pre_bidding
-  });
+   const dynamicStatus = useEffectiveLotStatus({
+     status: lot.status,
+     event_status: lot.event?.status,
+     event_start_date: lot.event?.start_date,
+     event_end_date: lot.event?.end_date,
+     allows_pre_bidding: lot.event?.allows_pre_bidding
+   });
+   
+   const [isUrgent, setIsUrgent] = useState(false);
+   useEffect(() => {
+     const checkUrgency = () => {
+       const endsAt = lot.end_date || lot.event?.end_date;
+       if (!endsAt) return;
+       const diff = new Date(endsAt).getTime() - Date.now();
+       setIsUrgent(diff > 0 && diff < 600000);
+     };
+     const timer = setInterval(checkUrgency, 5000);
+     checkUrgency();
+     return () => clearInterval(timer);
+   }, [lot.end_date, lot.event?.end_date]);
   const installments = 30;
   const installmentValue = currentPrice / installments;
 
@@ -248,7 +261,7 @@ function LotDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-            <StatusBadge status={dynamicStatus} className="scale-90 md:scale-100 origin-right" />
+             <StatusBadge status={dynamicStatus} urgent={isUrgent} className="scale-90 md:scale-100 origin-right" />
             {dynamicStatus === 'loteamento' && lot.event?.start_date && (
               <div className="hidden md:flex items-center gap-2 bg-black/20 border border-white/10 px-3 py-1 rounded-full text-[10px] font-mono text-white/60">
                 <Timer className="h-3 w-3" />
@@ -273,7 +286,7 @@ function LotDetail() {
                     <img src={lot.animal?.photos?.[activePhoto] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={lot.animal?.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                     <div className="absolute left-6 top-6 flex flex-col gap-2">
-                      <StatusBadge status={dynamicStatus} />
+                     <StatusBadge status={dynamicStatus} urgent={isUrgent} />
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
                       <Eye className="h-10 w-10 text-white/50" />

@@ -4,7 +4,8 @@ import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
-import { useEffectiveLotStatus } from "@/utils/auction-status";
+ import { useEffectiveLotStatus } from "@/utils/auction-status";
+ import { useState, useEffect } from "react";
 
  const AnimalIcon = ({ breed }: { breed?: string }) => {
    const b = breed?.toLowerCase() || "";
@@ -31,34 +32,49 @@ import { useEffectiveLotStatus } from "@/utils/auction-status";
    );
  };
  
- export function LotCard({ lot }: { 
-   lot: Lot & { 
-     eventStartDate?: string; 
-     eventEndDate?: string; 
-     allowsPreBidding?: boolean; 
-     eventStatus?: string;
-     father?: string;
-     mother?: string;
-     sex?: string;
-     color?: string;
-     birthDate?: string;
-     seller?: string;
-     location?: string;
-   } 
- }) {
-  const dynamicStatus = useEffectiveLotStatus({
-    status: lot.status,
-    event_status: lot.eventStatus,
-    event_start_date: lot.eventStartDate,
-    event_end_date: lot.eventEndDate,
-    allows_pre_bidding: lot.allowsPreBidding
-  });
+  export function LotCard({ lot }: { 
+    lot: Lot & { 
+      eventStartDate?: string; 
+      eventEndDate?: string; 
+      allowsPreBidding?: boolean; 
+      eventStatus?: string;
+      father?: string;
+      mother?: string;
+      sex?: string;
+      color?: string;
+      birthDate?: string;
+      seller?: string;
+      location?: string;
+    } 
+  }) {
+   const [isUrgent, setIsUrgent] = useState(false);
+   
+   const dynamicStatus = useEffectiveLotStatus({
+     status: lot.status,
+     event_status: lot.eventStatus,
+     event_start_date: lot.eventStartDate,
+     event_end_date: lot.eventEndDate,
+     allows_pre_bidding: lot.allowsPreBidding
+   });
+ 
+   useEffect(() => {
+     const checkUrgency = () => {
+       const endsAt = lot.endsAt || lot.eventEndDate;
+       if (!endsAt) return;
+       const diff = new Date(endsAt).getTime() - Date.now();
+       setIsUrgent(diff > 0 && diff < 600000); // 10 minutes
+     };
+     
+     const timer = setInterval(checkUrgency, 5000); // Check every 5s is enough
+     checkUrgency();
+     return () => clearInterval(timer);
+   }, [lot.endsAt, lot.eventEndDate]);
 
   return (
     <Link
       to="/lotes/$lotId"
       params={{ lotId: lot.id }}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
+       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
       aria-labelledby={`lot-title-${lot.id}`}
     >
       <div className="relative aspect-[9/16] overflow-hidden bg-muted">
@@ -70,7 +86,7 @@ import { useEffectiveLotStatus } from "@/utils/auction-status";
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
         <div className="absolute left-3 top-3 flex flex-col gap-2 items-start">
-          <StatusBadge status={dynamicStatus} />
+           <StatusBadge status={dynamicStatus} urgent={isUrgent} />
           {dynamicStatus === 'loteamento' && (
             <div className="group/info relative">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-gold backdrop-blur-md border border-gold/30 cursor-help">
