@@ -951,6 +951,10 @@ export type Database = {
         Args: { p_amount: number; p_lot_id: string; p_user_id: string }
         Returns: Json
       }
+      place_bid_safe: {
+        Args: { p_amount: number; p_bid_type?: string; p_lot_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
