@@ -98,7 +98,8 @@ export function useRealtimeLots(onUpdate: (payload?: any) => void) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'lots' },
         (payload) => {
-          logger.info('Mudança detectada em lote (global)', { id: payload.new?.id });
+          const newId = payload.new && 'id' in payload.new ? payload.new.id : 'unknown';
+          logger.info('Mudança detectada em lote (global)', { id: newId });
           onUpdate(payload);
         }
       )
