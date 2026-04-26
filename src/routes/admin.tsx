@@ -17,8 +17,9 @@ export const Route = createFileRoute("/admin")({
   import { AnimalManagement } from "@/components/admin/AnimalManagement";
   import { SellerManagement } from "@/components/admin/SellerManagement";
  import { CategoryManagement } from "@/components/admin/CategoryManagement";
-  import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
-  import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
+   import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
+   import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
+   import { UserManagement } from "@/components/admin/UserManagement";
  
   type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "settings";
  
@@ -253,12 +254,7 @@ function AdminLayout() {
           {activeTab === "event_requests" && <EventRequestManagement />}
           {activeTab === "direct_sales" && <DirectSaleManagement />}
           {activeTab === "sellers" && <SellerManagement />}
-          {activeTab === "users" && (
-            <Card>
-              <CardHeader><CardTitle>Usuários</CardTitle></CardHeader>
-              <CardContent><p className="text-muted-foreground">Módulo de gestão de usuários em desenvolvimento.</p></CardContent>
-            </Card>
-          )}
+           {activeTab === "users" && <UserManagement />}
            {activeTab === "settings" && (
              <Card>
                <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
