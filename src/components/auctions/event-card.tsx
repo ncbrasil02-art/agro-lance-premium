@@ -17,7 +17,7 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
     <Link
       to="/eventos/$eventSlug"
        params={{ eventSlug: event.slug }}
-       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${effectiveStatus === 'live' ? 'animate-neon border-gold/40' : ''}`}
       aria-labelledby={`event-title-${event.id}`}
     >
       <div className="relative aspect-video overflow-hidden bg-emerald-deep/20">
