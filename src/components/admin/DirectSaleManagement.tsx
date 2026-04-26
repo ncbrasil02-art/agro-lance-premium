@@ -29,6 +29,7 @@ import {
     Loader2,
     Filter
  } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -154,7 +155,13 @@ export function DirectSaleManagement() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {sale.animals?.photos?.[0] ? (
-                            <img src={sale.animals.photos[0]} alt="" className="h-8 w-8 rounded object-cover" />
+                            <OptimizedImage 
+                              src={sale.animals.photos[0]} 
+                              alt="" 
+                              width={64}
+                              aspectRatio="square"
+                              className="h-8 w-8 rounded" 
+                            />
                           ) : (
                             <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
                               <Package className="h-4 w-4 text-muted-foreground" />
