@@ -32,6 +32,8 @@ const saveCache = (cache: Map<string, string>) => {
 };
 
 const urlCache = loadCache();
+let cacheHits = 0;
+let cacheMisses = 0;
 
 export const IMAGE_FALLBACKS = {
   horse: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
@@ -65,8 +67,14 @@ export function getOptimizedImageUrl(
   const cacheKey = `${originalUrl}|w:${width}|h:${height}|q:${quality}|f:${format}`;
   
   if (urlCache.has(cacheKey)) {
+    cacheHits++;
+    if (process.env.NODE_ENV === 'development' && cacheHits % 10 === 0) {
+      console.log(`[ImageCache] Hits: ${cacheHits}, Misses: ${cacheMisses}, Rate: ${((cacheHits / (cacheHits + cacheMisses)) * 100).toFixed(1)}%`);
+    }
     return urlCache.get(cacheKey)!;
   }
+
+  cacheMisses++;
 
   // If it's not a Supabase public storage URL or already has params, return as is
   if (!originalUrl.includes("supabase.co/storage/v1/object/public/") || originalUrl.includes("?")) {
