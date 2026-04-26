@@ -185,6 +185,14 @@ export const Route = createFileRoute("/ao-vivo")({
     }, [liveEvent?.active_lot_id]);
 
   const [bids, setBids] = useState<any[]>(initialBids || []);
+  
+  // Sincronizar lances iniciais quando o loader for atualizado
+  useEffect(() => {
+    if (initialBids) {
+      setBids(initialBids);
+    }
+  }, [initialBids]);
+
   const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
     // Increment viewer count when page loads
     useEffect(() => {
