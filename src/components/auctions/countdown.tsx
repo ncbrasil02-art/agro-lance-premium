@@ -16,7 +16,7 @@ export function Countdown({ endsAt, className, variant = "default" }: { endsAt: 
   const m = Math.floor((diff % 3_600_000) / 60_000);
   const s = Math.floor((diff % 60_000) / 1000);
 
-  if (diff === 0) return <span className={className} suppressHydrationWarning>{variant === 'segmented' ? '00:00:00' : 'Encerrado'}</span>;
+   if (diff <= 0) return <span className={className} suppressHydrationWarning>{variant === 'segmented' ? '00:00:00' : 'Encerrado'}</span>;
 
   if (variant === "segmented") {
     return (
