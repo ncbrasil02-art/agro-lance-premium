@@ -10,7 +10,7 @@
    Play, Square, MessageSquare, Phone, Timer, Gavel, 
    Video, Users, Loader2, AlertTriangle, CheckCircle2 
  } from "lucide-react";
- import { formatBRL } from "@/utils/format";
+  import { formatBRL, validateLiveLink } from "@/utils/format";
  
  export function LiveAuctionControl() {
    const [events, setEvents] = useState<any[]>([]);
@@ -99,6 +99,13 @@
  
     const updateTransmissionLink = async () => {
       if (!selectedEventId) return;
+      
+      if (transmissionLink && !validateLiveLink(transmissionLink)) {
+        toast.error("Por favor, insira um link válido do YouTube ou Vimeo");
+        return;
+      }
+      
+      setIsActionLoading(true);
       setIsActionLoading(true);
       try {
         const { error } = await supabase
