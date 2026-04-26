@@ -39,12 +39,12 @@ export const Route = createFileRoute("/lotes/$lotId")({
          .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
          .eq("id", lotId)
          .maybeSingle(),
-      supabase
-        .from("bids")
-        .select("*, profile:profiles(full_name)")
-        .eq("lot_id", lotId)
-        .order("created_at", { ascending: false })
-        .limit(5)
+       supabase
+         .from("bids")
+         .select("*, profile:profiles(full_name)")
+         .eq("lot_id", lotId)
+         .order("created_at", { ascending: false })
+         .limit(50)
     ]);
 
     if (lotRes.error || !lotRes.data) {
@@ -177,7 +177,7 @@ function LotDetail() {
         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lot.id}` },
         async (payload) => {
           const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
-          setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev].slice(0, 5));
+           setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev].slice(0, 50));
         }
       )
       .subscribe();
@@ -308,12 +308,65 @@ function LotDetail() {
 
             <Tabs defaultValue="detalhes" className="w-full">
               <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-                <TabsList className="inline-flex md:grid w-max md:w-full md:grid-cols-5 bg-emerald-deep/20 border border-white/5 rounded-2xl p-1 gap-1">
+                 <TabsList className="inline-flex md:grid w-max md:w-full md:grid-cols-6 bg-emerald-deep/20 border border-white/5 rounded-2xl p-1 gap-1">
                   <TabsTrigger value="detalhes" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Descrição</TabsTrigger>
                   <TabsTrigger value="genealogia" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Genealogia</TabsTrigger>
                   <TabsTrigger value="saude" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Saúde</TabsTrigger>
                   <TabsTrigger value="videos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Vídeo</TabsTrigger>
-                  <TabsTrigger value="documentos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Documentos</TabsTrigger>
+                   <TabsTrigger value="documentos" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Documentos</TabsTrigger>
+                   <TabsTrigger value="historico" className="rounded-xl px-4 md:px-0 data-[state=active]:bg-gold data-[state=active]:text-emerald-deep text-[10px] md:text-sm">Histórico</TabsTrigger>
+               <TabsContent value="historico" className="mt-6">
+                 <Card className="bg-card/50 border-white/5 overflow-hidden rounded-3xl">
+                   <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                     <div className="flex items-center gap-2">
+                       <Gavel className="h-5 w-5 text-gold" />
+                       <h3 className="font-bold text-white uppercase tracking-wider text-sm">Histórico Completo de Lances</h3>
+                     </div>
+                     <span className="text-[10px] font-bold text-white/40 uppercase bg-white/5 px-2 py-1 rounded-full">{recentBids.length} lances</span>
+                   </div>
+                   <div className="overflow-x-auto">
+                     <table className="w-full text-left border-collapse">
+                       <thead>
+                         <tr className="bg-white/5 text-[10px] font-black text-gold uppercase tracking-[0.2em]">
+                           <th className="px-6 py-4">Licitante</th>
+                           <th className="px-6 py-4">Valor</th>
+                           <th className="px-6 py-4">Data/Hora</th>
+                           <th className="px-6 py-4 text-right">Canal</th>
+                         </tr>
+                       </thead>
+                       <tbody className="divide-y divide-white/5">
+                         {recentBids.length > 0 ? recentBids.map((bid: any, i: number) => (
+                           <tr key={bid.id} className={`group hover:bg-white/5 transition-colors ${i === 0 ? 'bg-gold/5' : ''}`}>
+                             <td className="px-6 py-4">
+                               <div className="flex items-center gap-3">
+                                 <div className={`h-8 w-8 rounded-full flex items-center justify-center font-black text-xs ${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-emerald-deep text-white/40'}`}>
+                                   {bid.profile?.full_name?.charAt(0) || "P"}
+                                 </div>
+                                 <span className={`text-sm font-bold ${i === 0 ? 'text-gold' : 'text-white/80'}`}>
+                                   {bid.profile?.full_name || "Licitante oculto"}
+                                 </span>
+                               </div>
+                             </td>
+                             <td className="px-6 py-4 font-black text-white">{formatBRL(bid.amount)}</td>
+                             <td className="px-6 py-4 text-xs text-white/40 font-medium">
+                               {new Date(bid.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                             </td>
+                             <td className="px-6 py-4 text-right">
+                               <span className="text-[10px] font-black uppercase tracking-widest text-gold/30 group-hover:text-gold/60 transition-colors">
+                                 {bid.bid_type || 'Online'}
+                               </span>
+                             </td>
+                           </tr>
+                         )) : (
+                           <tr>
+                             <td colSpan={4} className="px-6 py-10 text-center text-white/20 text-xs font-bold uppercase italic">Nenhum lance registrado até o momento</td>
+                           </tr>
+                         )}
+                       </tbody>
+                     </table>
+                   </div>
+                 </Card>
+               </TabsContent>
                 </TabsList>
               </div>
               
