@@ -1,6 +1,16 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
- import { Radio, Users, Gavel, Volume2, Loader2 } from "lucide-react";
+import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle } from "lucide-react";
  import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
   import { supabase } from "@/integrations/supabase/client";
@@ -66,7 +76,9 @@ export const Route = createFileRoute("/ao-vivo")({
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
    const [bids, setBids] = useState(initialBids);
-   const [isBidding, setIsBidding] = useState(false);
+    const [isBidding, setIsBidding] = useState(false);
+    const [showConfirmBid, setShowConfirmBid] = useState(false);
+    const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
  
    useEffect(() => {
      if (!liveEvent) return;
@@ -106,31 +118,36 @@ export const Route = createFileRoute("/ao-vivo")({
  
    const liveLot = liveEvent?.active_lot;
  
-   const placeBid = async (amount: number) => {
-     if (!user) {
-       toast.error("Você precisa estar logado para dar lances.");
-       return;
-     }
-     if (!profile?.is_approved) {
-       toast.error("Sua conta ainda não foi aprovada para dar lances.");
-       return;
-     }
-     setIsBidding(true);
-     try {
-       const { error } = await supabase.from("bids").insert({
-        lot_id: (liveLot as any).id,
-         user_id: user.id,
-         amount,
-         bid_type: "online",
-       });
-       if (error) throw error;
-       toast.success("Lance efetuado com sucesso!");
-     } catch (error: any) {
-       toast.error(error.message || "Erro ao efetuar lance.");
-     } finally {
-       setIsBidding(false);
-     }
-   };
+    const executeBid = async (amount: number) => {
+      setIsBidding(true);
+      try {
+        const { error } = await supabase.from("bids").insert({
+          lot_id: (liveLot as any).id,
+          user_id: user.id,
+          amount,
+          bid_type: "online",
+        });
+        if (error) throw error;
+        toast.success("Lance efetuado com sucesso!");
+      } catch (error: any) {
+        toast.error(error.message || "Erro ao efetuar lance.");
+      } finally {
+        setIsBidding(false);
+      }
+    };
+
+    const placeBid = (amount: number) => {
+      if (!user) {
+        toast.error("Você precisa estar logado para dar lances.");
+        return;
+      }
+      if (!profile?.is_approved) {
+        toast.error("Sua conta ainda não foi aprovada para dar lances.");
+        return;
+      }
+      setPendingBidAmount(amount);
+      setShowConfirmBid(true);
+    };
  
    const currentPrice = liveLot?.current_price || liveLot?.starting_price || 0;
  
