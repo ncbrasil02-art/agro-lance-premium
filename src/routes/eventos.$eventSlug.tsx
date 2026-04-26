@@ -118,20 +118,23 @@ function EventDetail() {
                 </div>
               </div>
               
-              <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
+              <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full h-12 rounded-2xl border-white/10 bg-white/5 hover:bg-gold/10 hover:border-gold/30 hover:text-gold transition-all flex items-center gap-2 group/btn">
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 rounded-2xl border-white/10 bg-white/5 hover:bg-gold/10 hover:border-gold/30 hover:text-gold transition-all flex items-center gap-2 group/btn shadow-lg"
+                  >
                     <Maximize2 className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
                     VER ENCARTE COMPLETO
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/90 border-white/10">
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10 flex items-center justify-center">
                   <div className="relative w-full h-full flex items-center justify-center p-4">
                     <OptimizedImage 
                       src={event.banner_url || ""} 
                       alt={event.name} 
                       width={1600}
-                      className="max-w-full max-h-[85vh] object-contain" 
+                      className="max-w-full max-h-[90vh] object-contain" 
                     />
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
                       Resolução Sugerida: 1080x1350px ou Superior
