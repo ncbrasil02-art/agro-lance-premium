@@ -84,11 +84,13 @@ export function getEffectiveLotStatus(lot: {
 
   if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
   if (lot.status === 'passed') return 'passed';
-  if (lot.event_status === 'finished' || (eventEnd && now >= eventEnd)) {
-    if (lot.status === 'sold') return 'sold';
-    if (lot.status === 'passed') return 'passed';
-    return 'finished';
-  }
+   if (lot.event_status === 'finished' || (eventEnd && now >= eventEnd)) {
+     if (lot.status === 'sold') return 'sold';
+     if (lot.status === 'passed') return 'passed';
+     // Se o evento acabou e o lote não foi vendido/passado manualmente, 
+     // provavelmente encerrou sem lances ou não foi arrematado.
+     return 'passed';
+   }
 
   // Se a data de início do evento já passou há mais de 24h e não tem data de fim, 
   // provavelmente já encerrou (safeguard para eventos esquecidos abertos)

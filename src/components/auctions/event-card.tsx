@@ -35,10 +35,13 @@ import { Countdown } from "@/components/auctions/countdown";
    return <Gavel className="h-5 w-5 text-gold shrink-0" />;
  };
  
-  import { useState, useEffect } from "react";
+  import { useState, useEffect, MouseEvent } from "react";
+  import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+  import { Maximize2 } from "lucide-react";
  
   export function EventCard({ event }: { event: AuctionEvent & { end_date?: string | null } }) {
    const [isUrgent, setIsUrgent] = useState(false);
+    const [isFlyerOpen, setIsFlyerOpen] = useState(false);
    
    useEffect(() => {
      const checkUrgency = () => {
@@ -59,24 +62,24 @@ import { Countdown } from "@/components/auctions/countdown";
   });
 
   return (
-    <Link
-      to="/eventos/$eventSlug"
-       params={{ eventSlug: event.slug }}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
-      aria-labelledby={`event-title-${event.id}`}
-    >
-      <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-emerald-deep/20">
-        {/* Background Blur - Very low quality for background effect */}
-        <OptimizedImage 
-          src={event?.cover || ""} 
-          alt="" 
-          width={50}
-          quality={10}
-          category="event"
-          className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
-        />
-        {/* Main Image - Now filling the space correctly while allowing the flyer to be seen */}
-        <div className="relative h-full w-full overflow-hidden">
+    <div className="group relative flex flex-col">
+      <Link
+        to="/eventos/$eventSlug"
+        params={{ eventSlug: event.slug }}
+        className={`flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
+        aria-labelledby={`event-title-${event.id}`}
+      >
+        <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-emerald-deep/20">
+          {/* Background Blur */}
+          <OptimizedImage 
+            src={event?.cover || ""} 
+            alt="" 
+            width={50}
+            quality={10}
+            category="event"
+            className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
+          />
+          {/* Main Image */}
           <OptimizedImage 
             src={event?.cover || ""} 
             alt={event?.name || "Evento"} 
@@ -84,53 +87,83 @@ import { Countdown } from "@/components/auctions/countdown";
             category="event"
             className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
           />
-          <div className="absolute top-4 right-4 z-20">
-            <div className="rounded-lg bg-black/30 backdrop-blur-md border border-white/10 px-2 py-1 text-[10px] font-bold text-white/90 uppercase tracking-wider group-hover:bg-black/50 transition-colors">
-              Ver foto do flyer
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
+          
+          <div className="absolute left-4 top-4 z-10 flex flex-col gap-2 items-start">
+            <StatusBadge status={effectiveStatus} urgent={isUrgent} />
+            {effectiveStatus === 'scheduled' && event?.date && (
+              <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg">
+                <Timer className="h-3 w-3" />
+                <Countdown endsAt={event.date} className="font-mono" />
+              </div>
+            )}
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent z-10">
+            <div className="flex items-center gap-3 mb-2">
+              <AnimalIcon name={event.name} description={event.description} />
+              <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter italic">
+                {event?.name || "Evento sem nome"}
+              </h3>
             </div>
+            <p className="text-xs text-white/70 line-clamp-2 font-medium italic">
+              {event?.description || "Leilão premium com curadoria genética de elite."}
+            </p>
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
-        <div className="absolute left-4 top-4 z-10 flex flex-col gap-2 items-start">
-           <StatusBadge status={effectiveStatus} urgent={isUrgent} />
-          {effectiveStatus === 'scheduled' && event?.date && (
-            <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg animate-in fade-in slide-in-from-left-2">
-              <Timer className="h-3 w-3" />
-              <Countdown endsAt={event.date} className="font-mono" />
-            </div>
-          )}
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent">
-           <div className="flex items-center gap-3 mb-2">
-             <AnimalIcon name={event.name} description={event.description} />
-             <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter italic">
-               {event?.name || "Evento sem nome"}
-             </h3>
-           </div>
-          <p className="text-xs text-white/70 line-clamp-2 font-medium italic">
-            {event?.description || "Leilão premium com curadoria genética de elite."}
-          </p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-3 p-4 text-xs">
-         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Data do evento: ${event?.date ? formatDateBR(event.date) : "--"}`}>
-           <Calendar className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-          <span suppressHydrationWarning>{event?.date ? formatDateBR(event.date) : "--"}</span>
+        <div className="grid grid-cols-2 gap-3 p-4 text-xs">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5 text-gold" />
+            <span suppressHydrationWarning>{event?.date ? formatDateBR(event.date) : "--"}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 text-gold" />
+            <span>{event?.city || ""}/{event?.state || ""}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Gavel className="h-3.5 w-3.5 text-gold" />
+            <span>{event?.lotsCount || 0} lotes</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Users className="h-3.5 w-3.5 text-gold" />
+            <span>{(event?.viewers || 0).toLocaleString("pt-BR")} visualizações</span>
+          </div>
         </div>
-         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Localização: ${event?.city || ""}/${event?.state || ""}`}>
-           <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-          <span>{event?.city || ""}/{event?.state || ""}</span>
-        </div>
-         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Total de lotes: ${event?.lotsCount || 0}`}>
-           <Gavel className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-          <span>{event?.lotsCount || 0} lotes</span>
-        </div>
-         <div className="flex items-center gap-2 text-muted-foreground" aria-label={`${(event?.viewers || 0).toLocaleString("pt-BR")} visualizações`}>
-           <Users className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-          <span>{(event?.viewers || 0).toLocaleString("pt-BR")} visualizações</span>
-        </div>
+      </Link>
+
+      {/* Flyer Dialog Button - Outside the main link to avoid event collision, but positioned over it */}
+      <div className="absolute top-4 right-4 z-30">
+        <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
+          <DialogTrigger asChild>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsFlyerOpen(true);
+              }}
+              className="rounded-lg bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all flex items-center gap-2 shadow-xl group-hover:bg-black/80"
+            >
+              <Maximize2 className="h-3 w-3" />
+              Ver Flyer
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10 flex items-center justify-center">
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <OptimizedImage 
+                src={event?.cover || ""} 
+                alt={event?.name || "Flyer do Evento"} 
+                width={1600}
+                className="max-w-full max-h-[90vh] object-contain" 
+              />
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
+                Medida Ideal: 1080x1350px (4:5) ou 1080x1920px (9:16)
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-    </Link>
+    </div>
   );
 }

@@ -173,12 +173,16 @@ import { Countdown } from "./countdown";
                </>
              ) : (
                <>
-                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                   {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? 'Status' : 'Encerra em'}
-                 </div>
-                 {dynamicStatus === 'finished' || dynamicStatus === 'sold' ? (
-                   <span className="text-sm font-semibold text-muted-foreground uppercase">Encerrado</span>
-                 ) : lot.endsAt || lot.eventEndDate ? (
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {dynamicStatus === 'finished' || dynamicStatus === 'sold' || dynamicStatus === 'passed' ? 'Resultado' : 'Encerra em'}
+                  </div>
+                  {dynamicStatus === 'sold' ? (
+                    <span className="text-sm font-bold text-gold uppercase italic">Arrematado</span>
+                  ) : dynamicStatus === 'passed' ? (
+                    <span className="text-sm font-bold text-muted-foreground uppercase italic">Não Vendido</span>
+                  ) : dynamicStatus === 'finished' ? (
+                    <span className="text-sm font-semibold text-muted-foreground uppercase">Encerrado</span>
+                  ) : lot.endsAt || lot.eventEndDate ? (
                    <Countdown endsAt={lot.endsAt || lot.eventEndDate || ""} className="font-mono text-sm font-semibold text-foreground" />
                  ) : (
                    <span className="text-sm font-semibold text-foreground">--:--:--</span>
