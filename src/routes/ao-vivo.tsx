@@ -567,10 +567,22 @@ export const Route = createFileRoute("/ao-vivo")({
              <p className="text-xs text-gold/60 font-bold uppercase tracking-wider">Leiloeiro: {liveEvent.auctioneer_name || "A definir"} · {liveEvent.promoter_company || "A definir"}</p>
            </div>
         </div>
-        <div className="flex gap-4 text-sm">
-           <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="h-4 w-4 text-gold" /> {(liveEvent.viewers || 0).toLocaleString("pt-BR")} assistindo</span>
-           <span className="flex items-center gap-1.5 text-muted-foreground"><Gavel className="h-4 w-4 text-gold" /> {liveEvent.active_lot?.bids_count || 0} lances</span>
-        </div>
+         <div className="flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
+              <Users className="h-4 w-4 text-gold" /> 
+              <span className="font-bold">{(liveEvent.viewers || 0).toLocaleString("pt-BR")}</span> assistindo
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
+              <Gavel className="h-4 w-4 text-gold" /> 
+              <span className="font-bold">{liveEvent.active_lot?.bids_count || 0}</span> lances
+            </div>
+            {liveEvent.active_lot?.viewers !== undefined && (
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
+                <Radio className="h-4 w-4 text-gold" /> 
+                <span className="font-bold">{(liveEvent.active_lot.viewers || 0).toLocaleString("pt-BR")}</span> visualizações
+              </div>
+            )}
+         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
