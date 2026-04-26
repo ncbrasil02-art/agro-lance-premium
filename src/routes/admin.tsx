@@ -20,8 +20,9 @@ export const Route = createFileRoute("/admin")({
    import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
    import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
    import { UserManagement } from "@/components/admin/UserManagement";
- 
-  type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "settings";
+   import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+  
+   type AdminTab = "dashboard" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings";
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -40,7 +41,8 @@ export const Route = createFileRoute("/admin")({
       { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
        { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
        { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
-       { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+        { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+        { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
    ];
  
@@ -289,7 +291,8 @@ export const Route = createFileRoute("/admin")({
           {activeTab === "event_requests" && <EventRequestManagement />}
           {activeTab === "direct_sales" && <DirectSaleManagement />}
           {activeTab === "sellers" && <SellerManagement />}
-           {activeTab === "users" && <UserManagement />}
+            {activeTab === "users" && <UserManagement />}
+            {activeTab === "security" && <BidSecurityAudit />}
            {activeTab === "settings" && (
              <Card>
                <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
