@@ -4,7 +4,7 @@ import { logger } from '@/utils/logger';
 
 type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL';
 
-export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
+export function useRealtimeEvent(eventId: string, onUpdate: (type: 'lot' | 'event', payload: any) => void) {
   const [status, setStatus] = useState<ChannelStatus>('INITIAL');
   const [retryCount, setRetryCount] = useState(0);
 
@@ -25,7 +25,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
         },
         (payload) => {
           logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
-          onUpdate();
+          onUpdate('lot', payload);
         }
       )
       .on(
@@ -38,7 +38,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
         },
         (payload) => {
           logger.info('Mudança detectada nos dados do evento', { eventId, payload });
-          onUpdate();
+          onUpdate('event', payload);
         }
       )
       .subscribe((newStatus) => {
@@ -47,7 +47,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
         // Se voltamos de um erro para inscrito, forçamos uma atualização para garantir que não perdemos nada
         if (status !== 'INITIAL' && status !== 'SUBSCRIBED' && newStatus === 'SUBSCRIBED') {
           logger.info('Conexão restabelecida, forçando atualização de dados');
-          onUpdate();
+          onUpdate('event', null); // Refresh everything on reconnect
         }
         
         setStatus(newStatus);
