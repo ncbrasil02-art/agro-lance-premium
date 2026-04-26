@@ -436,7 +436,8 @@ function LotDetail() {
                     <OptimizedImage 
                       src={lot.animal?.photos?.[activePhoto] || ""} 
                       alt={lot.animal?.name || "Animal"} 
-                      width={1000}
+                      width={1200}
+                      priority="high"
                       aspectRatio="landscape"
                       className="transition-transform duration-500 group-hover:scale-110" 
                     />
