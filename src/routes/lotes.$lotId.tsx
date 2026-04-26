@@ -175,10 +175,25 @@ function LotDetail() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lot.id}` },
-        async (payload) => {
-          const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
-           setRecentBids((prev: any) => [{ ...payload.new, profile }, ...prev].slice(0, 50));
-        }
+         async (payload) => {
+           const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
+           const newBid = { ...payload.new, profile };
+           setRecentBids((prev: any) => [newBid, ...prev].slice(0, 50));
+           
+           // Alerta de novo lance
+           toast.info(`Novo lance de ${formatBRL(payload.new.amount)}`, {
+             description: `Licitante: ${profile?.full_name || "Licitante"}`,
+             icon: <Gavel className="h-4 w-4 text-gold" />,
+             duration: 5000,
+           });
+           
+           // Som de alerta (opcional, pode ser bloqueado pelo navegador se não houver interação)
+           try {
+             const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+             audio.volume = 0.3;
+             audio.play().catch(() => {}); // Ignora erro se o navegador bloquear
+           } catch (e) {}
+         }
       )
       .subscribe();
 
@@ -617,7 +632,7 @@ function LotDetail() {
               </div>
                <div className="p-4 space-y-3">
                  {recentBids.length > 0 ? recentBids.slice(0, 5).map((bid: any, i: number) => (
-                  <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl ${i === 0 ? 'bg-gold/10 border border-gold/20' : 'bg-white/5'}`}>
+                  <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl ${i === 0 ? 'bg-gold/10 border border-gold/20 animate-bid-flash' : 'bg-white/5'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black text-sm ${i === 0 ? 'bg-gold text-emerald-deep' : 'bg-emerald-deep text-white/40'}`}> {bid.profile?.full_name?.charAt(0) || "P"} </div>
                       <div>

@@ -1,5 +1,5 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
-  import { Radio, Users, Gavel, Volume2, Loader2, Circle } from "lucide-react";
+  import { Radio, Users, Gavel, Volume2, Loader2, Circle, Zap } from "lucide-react";
   import { useEffectiveEventStatus } from "@/utils/auction-status";
  import { Button } from "@/components/ui/button";
  import { Countdown } from "@/components/auctions/countdown";
@@ -88,16 +88,31 @@ export const Route = createFileRoute("/ao-vivo")({
        )
        .subscribe();
  
-     const bidsChannel = supabase
-       .channel(`live-bids-${liveEvent.active_lot_id}`)
-       .on(
-         "postgres_changes",
-         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
-         (payload) => {
-           setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
-         }
-       )
-       .subscribe();
+      const bidsChannel = supabase
+        .channel(`live-bids-${liveEvent.active_lot_id}`)
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
+          async (payload) => {
+            const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", payload.new.user_id).single();
+            const newBid = { ...payload.new, profile };
+            setBids((prev: any) => [newBid, ...prev].slice(0, 10));
+            
+            // Alerta de novo lance
+            toast.success(`Nº Lote #${String(liveEvent.active_lot?.lot_number).padStart(2, '0')} recebeu um lance!`, {
+              description: `${profile?.full_name || "Licitante"} ofertou ${formatBRL(payload.new.amount)}`,
+              icon: <Zap className="h-4 w-4 text-gold animate-pulse" />,
+            });
+            
+            // Som de martelo
+            try {
+              const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+              audio.volume = 0.4;
+              audio.play().catch(() => {});
+            } catch (e) {}
+          }
+        )
+        .subscribe();
  
      return () => {
        supabase.removeChannel(eventChannel);
