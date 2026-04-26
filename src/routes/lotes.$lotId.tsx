@@ -614,14 +614,29 @@ function LotDetail() {
                       </div>
                     </div>
 
-                     <Button 
-                       size="lg" 
-                       className={`w-full h-20 text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter ${dynamicStatus === 'recebendo_lances' ? 'shimmer-button animate-blink-fast' : 'bg-gold-gradient'}`} 
-                       disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance")} 
-                       onClick={() => placeBid(nextBid)}
-                     >
-                      {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
-                    </Button>
+                     <TooltipProvider>
+                       <Tooltip>
+                         <TooltipTrigger asChild>
+                           <div className="w-full">
+                             <Button 
+                               size="lg" 
+                               className={`w-full h-20 text-emerald-deep font-black text-2xl hover:opacity-90 shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all active:scale-[0.97] rounded-2xl uppercase tracking-tighter ${dynamicStatus === 'recebendo_lances' ? 'shimmer-button animate-blink-fast' : 'bg-gold-gradient'}`} 
+                               disabled={isBidding || (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance") || !profile?.is_approved || profile?.is_blocked} 
+                               onClick={() => placeBid(nextBid)}
+                             >
+                              {isBidding ? <Loader2 className="animate-spin" /> : "CONFIRMAR LANCE"}
+                            </Button>
+                           </div>
+                         </TooltipTrigger>
+                         <TooltipContent side="top" className="bg-emerald-deep border-gold/20 text-white text-xs p-3">
+                            {!user ? "Faça login para dar lances" :
+                             profile?.is_blocked ? "Sua conta está bloqueada" :
+                             !profile?.is_approved ? "Aguardando aprovação de cadastro" :
+                             (dynamicStatus !== "recebendo_lances" && dynamicStatus !== "pre_lance") ? "Lances não permitidos agora" :
+                             `Dar lance de ${formatBRL(nextBid)}`}
+                         </TooltipContent>
+                       </Tooltip>
+                     </TooltipProvider>
                     
                     <p className="text-center text-[10px] text-white/40 font-bold uppercase tracking-widest">
                       Lances confirmados são irrevogáveis.
