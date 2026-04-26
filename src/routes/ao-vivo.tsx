@@ -153,53 +153,139 @@ export const Route = createFileRoute("/ao-vivo")({
  
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
-    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
-    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
-    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
-    return url;
-  };
+    try {
+      // Fix common malformed URLs (duplicate https, etc)
+      let cleanUrl = url.trim();
+      if (cleanUrl.includes("https:/https:/")) {
+        cleanUrl = cleanUrl.replace("https:/https:/", "https://");
+      }
+      if (cleanUrl.includes("http:/http:/")) {
+        cleanUrl = cleanUrl.replace("http:/http:/", "http://");
+      }
+      // If it contains multiple full URLs, take the last one
+      if (cleanUrl.lastIndexOf("https://") > 0) {
+        cleanUrl = cleanUrl.substring(cleanUrl.lastIndexOf("https://"));
+      }
 
-   useEffect(() => {
-     if (!liveEvent) return;
- 
-     const eventChannel = supabase
-       .channel(`live-event-${liveEvent.id}`)
-       .on(
-         "postgres_changes",
-         { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${liveEvent.id}` },
-         async (payload) => {
-            const { data } = await supabase
-              .from("events")
-              .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
-              .eq("id", liveEvent.id)
-             .single();
-             if (data) {
-               setLiveEvent(data as any);
-               if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
-                 setStatusMessage(payload.new.live_status_message);
-                 setTimeout(() => setStatusMessage(null), 8000);
-               }
-             }
-         }
-       )
-       .subscribe();
- 
-     const bidsChannel = supabase
-       .channel(`live-bids-${liveEvent.active_lot_id}`)
-       .on(
-         "postgres_changes",
-         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
-         (payload) => {
-           setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
-         }
-       )
-       .subscribe();
- 
-     return () => {
-       supabase.removeChannel(eventChannel);
-       supabase.removeChannel(bidsChannel);
-     };
-   }, [liveEvent?.id, liveEvent?.active_lot_id]);
+      if (cleanUrl.includes("youtube.com/embed/") || cleanUrl.includes("player.vimeo.com")) return cleanUrl;
+      
+      // Youtube long URL
+      if (cleanUrl.includes("youtube.com/watch")) {
+        const v = new URLSearchParams(cleanUrl.split('?')[1]).get("v");
+        if (v) return `https://www.youtube.com/embed/${v}?autoplay=1&mute=1&rel=0`;
+      }
+      
+      // Youtube short URL
+      if (cleanUrl.includes("youtu.be/")) {
+        const id = cleanUrl.split("youtu.be/")[1]?.split("?")[0];
+        if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0`;
+      }
+      
+      // Vimeo
+      if (cleanUrl.includes("vimeo.com/")) {
+        const id = cleanUrl.split("vimeo.com/")[1]?.split("?")[0];
+        if (id) return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1`;
+      }
+      return cleanUrl;
+    } catch (e) {
+      console.error("Erro ao processar URL de vídeo:", e);
+      return url;
+    }
+  };
+    // Secondary effect to ensure lot data is loaded if only ID is present
+    useEffect(() => {
+      if (liveEvent && liveEvent.active_lot_id && !liveEvent.active_lot) {
+        const fetchMissingLot = async () => {
+          const { data } = await supabase
+            .from("lots")
+            .select("*, animal:animals(*)")
+            .eq("id", liveEvent.active_lot_id as string)
+            .single();
+          if (data) {
+            setLiveEvent(prev => prev ? ({ ...prev, active_lot: data }) : null);
+          }
+        };
+        fetchMissingLot();
+      }
+    }, [liveEvent?.active_lot_id, liveEvent?.active_lot]);
+
+
+    useEffect(() => {
+      // Listen for updates to ANY event that could become live if we don't have one
+      const globalChannel = supabase
+        .channel("global-events-status")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "events" },
+          async (payload) => {
+            // If we don't have a live event, and an event just became 'live', or if a scheduled event updated
+            if (!liveEvent) {
+              if (payload.new.status === 'live' || payload.new.transmission_link) {
+                console.log("Detectado novo evento ao vivo ou link, recarregando...");
+                window.location.reload();
+                return;
+              }
+            }
+            
+            // If it's our current event being updated
+            if (liveEvent && payload.new.id === liveEvent.id) {
+              const { data } = await supabase
+                .from("events")
+                .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+                .eq("id", liveEvent.id)
+                .single();
+              
+              if (data) {
+                setLiveEvent(data as any);
+                
+                // Handle status messages
+                if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
+                  setStatusMessage(payload.new.live_status_message);
+                  setTimeout(() => setStatusMessage(null), 8000);
+                }
+                
+                // If active lot changed, fetch bids for the new lot
+                if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
+                  console.log("Lote alterado em tempo real:", payload.new.active_lot_id);
+                  const { data: newBids } = await supabase
+                    .from("bids")
+                    .select("*")
+                    .eq("lot_id", payload.new.active_lot_id)
+                    .order("created_at", { ascending: false })
+                    .limit(10);
+                  if (newBids) setBids(newBids);
+                  
+                  toast.info("Próximo lote entrando no ar!", { 
+                    description: "A tela será atualizada automaticamente.",
+                    duration: 3000 
+                  });
+                }
+              }
+            }
+          }
+        )
+        .subscribe();
+
+      // Specific bids channel for the active lot
+      let bidsChannel: any = null;
+      if (liveEvent?.active_lot_id) {
+        bidsChannel = supabase
+          .channel(`live-bids-${liveEvent.active_lot_id}`)
+          .on(
+            "postgres_changes",
+            { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
+            (payload) => {
+              setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
+            }
+          )
+          .subscribe();
+      }
+
+      return () => {
+        supabase.removeChannel(globalChannel);
+        if (bidsChannel) supabase.removeChannel(bidsChannel);
+      };
+    }, [liveEvent?.id, liveEvent?.active_lot_id]);
  
    const liveLot = liveEvent?.active_lot;
  
