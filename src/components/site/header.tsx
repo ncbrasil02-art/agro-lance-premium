@@ -103,9 +103,9 @@ export function Header() {
               <Link to="/login" className="hidden md:block">
                 <Button variant="ghost" size="sm">Entrar</Button>
               </Link>
-              <Link to="/cadastro" className="hidden md:block">
-                <Button size="sm" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">Cadastre-se</Button>
-              </Link>
+               <Link to="/cadastro" className="hidden md:block">
+                 <Button size="sm" className="shimmer-button text-emerald-deep hover:opacity-90 shadow-gold animate-blink-fast">Cadastre-se</Button>
+               </Link>
             </>
           )}
 
@@ -133,11 +133,11 @@ export function Header() {
                          <LogIn className="h-4 w-4" /> Entrar
                        </Button>
                      </Link>
-                     <Link to="/cadastro" onClick={() => setOpen(false)}>
-                       <Button className="w-full justify-start gap-2 bg-gold-gradient text-emerald-deep">
-                         <UserPlus className="h-4 w-4" /> Criar Conta
-                       </Button>
-                     </Link>
+                   <Link to="/cadastro" onClick={() => setOpen(false)}>
+                     <Button className="w-full justify-start gap-2 shimmer-button text-emerald-deep animate-blink-fast">
+                       <UserPlus className="h-4 w-4" /> Criar Conta
+                     </Button>
+                   </Link>
                    </div>
                    
                    <div className="grid gap-2 mt-4">

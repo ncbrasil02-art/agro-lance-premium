@@ -6,6 +6,34 @@ import { StatusBadge } from "@/components/auctions/status-badge";
 import { useEffectiveEventStatus } from "@/utils/auction-status";
 import { Countdown } from "@/components/auctions/countdown";
 
+ const AnimalIcon = ({ name, description }: { name?: string, description?: string }) => {
+   const text = `${name} ${description}`.toLowerCase();
+   const isHorse = text.includes("cavalo") || text.includes("egua") || text.includes("potro") || text.includes("quarto de milha") || text.includes("mangalarga");
+   
+   if (isHorse) {
+     return (
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-gold shrink-0">
+         <path d="M19 19c-1.5-1-3-4-3-4s-1-4-1-6 1-3 1-3-2 0-4 1-2 2-2 2-1 3-1 4 1 6 1 6" />
+         <path d="M5 19s1-1 1-6-1-4-1-4 2 0 4 1" />
+         <path d="M11 9s-1-2-3-2-3 2-3 2 1 3 1 4" />
+       </svg>
+     );
+   }
+   const isCattle = text.includes("nelore") || text.includes("boi") || text.includes("vaca") || text.includes("touro") || text.includes("gado") || text.includes("angus");
+   if (isCattle) {
+     return (
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-gold shrink-0">
+         <path d="M17 11V6c0-1.1-.9-2-2-2h-6C7.9 4 7 4.9 7 6v5" />
+         <path d="M3 13h18l-1.5 6H4.5L3 13z" />
+         <path d="M7 11c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2" />
+         <path d="M7 6l-3-3" />
+         <path d="M17 6l3-3" />
+       </svg>
+     );
+   }
+   return <Gavel className="h-5 w-5 text-gold shrink-0" />;
+ };
+ 
 export function EventCard({ event }: { event: AuctionEvent & { end_date?: string | null } }) {
   const effectiveStatus = useEffectiveEventStatus({
     status: event.status,
@@ -17,7 +45,7 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
     <Link
       to="/eventos/$eventSlug"
        params={{ eventSlug: event.slug }}
-       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${effectiveStatus === 'live' ? 'animate-neon border-gold/40' : ''}`}
       aria-labelledby={`event-title-${event.id}`}
     >
       <div className="relative aspect-video overflow-hidden bg-emerald-deep/20">
@@ -45,9 +73,12 @@ export function EventCard({ event }: { event: AuctionEvent & { end_date?: string
           )}
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent">
-          <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter mb-2 italic">
-            {event?.name || "Evento sem nome"}
-          </h3>
+           <div className="flex items-center gap-3 mb-2">
+             <AnimalIcon name={event.name} description={event.description} />
+             <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter italic">
+               {event?.name || "Evento sem nome"}
+             </h3>
+           </div>
           <p className="text-xs text-white/70 line-clamp-2 font-medium italic">
             {event?.description || "Leilão premium com curadoria genética de elite."}
           </p>

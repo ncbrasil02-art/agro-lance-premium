@@ -1,3 +1,45 @@
+ @keyframes neon-pulse {
+   0%, 100% {
+     box-shadow: 0 0 5px rgba(212, 175, 55, 0.2), 0 0 10px rgba(212, 175, 55, 0.2);
+     border-color: rgba(212, 175, 55, 0.4);
+   }
+   50% {
+     box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), 0 0 40px rgba(212, 175, 55, 0.4);
+     border-color: rgba(212, 175, 55, 0.8);
+   }
+ }
+ 
+ @keyframes blink-fast {
+   0%, 100% { opacity: 1; }
+   50% { opacity: 0.7; }
+ }
+ 
+ @keyframes shimmer-gold {
+   0% { background-position: -200% 0; }
+   100% { background-position: 200% 0; }
+ }
+ 
+ .animate-neon {
+   animation: neon-pulse 2s infinite ease-in-out;
+ }
+ 
+ .animate-blink-fast {
+   animation: blink-fast 0.8s infinite;
+ }
+ 
+ .shimmer-button {
+   background: linear-gradient(90deg, #d4af37, #f7ef8a, #d4af37, #f7ef8a, #d4af37);
+   background-size: 200% 100%;
+   animation: shimmer-gold 3s infinite linear;
+ }
+ 
+ .hover-neon:hover {
+   box-shadow: 0 0 15px rgba(212, 175, 55, 0.8), 0 0 30px rgba(212, 175, 55, 0.4);
+   border-color: #d4af37 !important;
+   transform: translateY(-4px);
+   transition: all 0.3s ease;
+ }
+ 
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";

@@ -1,11 +1,36 @@
 import { Link } from "@tanstack/react-router";
-import { Eye, Gavel, Info } from "lucide-react";
+ import { Eye, Gavel, Info, ChevronRight } from "lucide-react";
 import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
 import { useEffectiveLotStatus } from "@/utils/auction-status";
 
+ const AnimalIcon = ({ breed }: { breed?: string }) => {
+   const b = breed?.toLowerCase() || "";
+   const isHorse = b.includes("milha") || b.includes("mangalarga") || b.includes("cavalo") || b.includes("egua") || b.includes("potro") || b.includes("crioulo");
+   
+   if (isHorse) {
+     return (
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-gold shrink-0">
+         <path d="M19 19c-1.5-1-3-4-3-4s-1-4-1-6 1-3 1-3-2 0-4 1-2 2-2 2-1 3-1 4 1 6 1 6" />
+         <path d="M5 19s1-1 1-6-1-4-1-4 2 0 4 1" />
+         <path d="M11 9s-1-2-3-2-3 2-3 2 1 3 1 4" />
+       </svg>
+     );
+   }
+   // Default to Cattle/Boi
+   return (
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-gold shrink-0">
+       <path d="M17 11V6c0-1.1-.9-2-2-2h-6C7.9 4 7 4.9 7 6v5" />
+       <path d="M3 13h18l-1.5 6H4.5L3 13z" />
+       <path d="M7 11c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2" />
+       <path d="M7 6l-3-3" />
+       <path d="M17 6l3-3" />
+     </svg>
+   );
+ };
+ 
  export function LotCard({ lot }: { 
    lot: Lot & { 
      eventStartDate?: string; 
@@ -33,7 +58,7 @@ import { useEffectiveLotStatus } from "@/utils/auction-status";
     <Link
       to="/lotes/$lotId"
       params={{ lotId: lot.id }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover:-translate-y-1 hover:border-gold/40 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${dynamicStatus === 'recebendo_lances' ? 'animate-neon border-gold/40' : ''}`}
       aria-labelledby={`lot-title-${lot.id}`}
     >
       <div className="relative aspect-[9/16] overflow-hidden bg-muted">
@@ -72,9 +97,10 @@ import { useEffectiveLotStatus } from "@/utils/auction-status";
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="mb-1">
-          <h3 id={`lot-title-${lot.id}`} className="font-bold text-lg leading-tight uppercase tracking-tight">{lot?.name || "Lote sem nome"}</h3>
-        </div>
+         <div className="mb-1 flex items-center gap-2">
+           <AnimalIcon breed={lot.breed} />
+           <h3 id={`lot-title-${lot.id}`} className="font-bold text-lg leading-tight uppercase tracking-tight">{lot?.name || "Lote sem nome"}</h3>
+         </div>
 
         <div className="grid grid-cols-1 gap-y-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3">
           <div className="flex justify-between items-center">
