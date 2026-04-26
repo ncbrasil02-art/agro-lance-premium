@@ -1,4 +1,37 @@
-const urlCache = new Map<string, string>();
+const CACHE_KEY = "lovable_image_optimization_cache";
+const MAX_CACHE_SIZE = 500;
+
+const loadCache = (): Map<string, string> => {
+  if (typeof window === "undefined") return new Map();
+  try {
+    const saved = localStorage.getItem(CACHE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      return new Map(Object.entries(data));
+    }
+  } catch (e) {
+    console.warn("Failed to load image cache from localStorage", e);
+  }
+  return new Map();
+};
+
+const saveCache = (cache: Map<string, string>) => {
+  if (typeof window === "undefined") return;
+  try {
+    // If cache is too big, clear half of it (LRU would be better but this is simpler)
+    if (cache.size > MAX_CACHE_SIZE) {
+      const entries = Array.from(cache.entries());
+      const newEntries = entries.slice(Math.floor(MAX_CACHE_SIZE / 2));
+      cache = new Map(newEntries);
+    }
+    const data = Object.fromEntries(cache);
+    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn("Failed to save image cache to localStorage", e);
+  }
+};
+
+const urlCache = loadCache();
 
 interface OptimizationOptions {
   width?: number;
@@ -44,6 +77,7 @@ export function getOptimizedImageUrl(
 
     const finalUrl = `${optimizedBase}?${params.toString()}`;
     urlCache.set(cacheKey, finalUrl);
+    saveCache(urlCache);
     return finalUrl;
   } catch (e) {
     console.error("Error optimizing image URL:", e);
