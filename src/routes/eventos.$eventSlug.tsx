@@ -1,5 +1,7 @@
- import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
- import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
+import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+import { EventDetailSkeleton } from "@/components/ui/page-skeleton";
+import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +44,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     </div>
   ),
   component: EventDetail,
+  pendingComponent: EventDetailSkeleton,
 });
 
 function EventDetail() {
@@ -59,10 +62,12 @@ function EventDetail() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header com transição suave para o conteúdo */}
       <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
-        <img 
-          src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+        <OptimizedImage 
+          src={event.banner_url || ""} 
           alt="" 
-          className="h-full w-full object-cover blur-sm brightness-50" 
+          width={100}
+          quality={10}
+          className="h-full w-full blur-sm brightness-50" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
       </div>
@@ -82,15 +87,18 @@ function EventDetail() {
               <div className="absolute -inset-2 bg-gold/10 blur-3xl rounded-[2.5rem] opacity-30 group-hover:opacity-50 transition-opacity" />
               <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30 group/banner">
                 {/* Blurred background to fill gaps */}
-                <img 
-                  src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+                <OptimizedImage 
+                  src={event.banner_url || ""} 
                   alt="" 
-                  className="absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-110" 
+                  width={100}
+                  quality={10}
+                  className="absolute inset-0 h-full w-full blur-2xl opacity-40 scale-110" 
                 />
                 {/* Main contained image to see everything */}
-                <img 
-                  src={event.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80"} 
+                <OptimizedImage 
+                  src={event.banner_url || ""} 
                   alt={event.name} 
+                  width={1200}
                   className="relative h-full w-full object-contain transition-transform duration-700 group-hover/banner:scale-[1.03]" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />

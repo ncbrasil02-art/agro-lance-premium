@@ -1,7 +1,7 @@
-import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
+import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
  import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -166,6 +166,7 @@ export const Route = createFileRoute("/ao-vivo")({
       }
     },
    component: LivePage,
+   pendingComponent: PageSkeleton,
 });
 
   function LivePage() {
