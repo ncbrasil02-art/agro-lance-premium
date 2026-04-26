@@ -512,11 +512,11 @@
                              </div>
                            </TableCell>
                          </TableRow>
-                       );
-                      })}
-                  </TableBody>
-               </TableBody>
-             </Table>
+                        );
+                      })
+                    )}
+                </TableBody>
+              </Table>
            )}
          </CardContent>
        </Card>
