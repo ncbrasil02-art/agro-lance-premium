@@ -72,6 +72,7 @@ import { Countdown } from "@/components/auctions/countdown";
           alt="" 
           width={50}
           quality={10}
+          category="event"
           className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
         />
         {/* Main Image Contained - High quality */}
@@ -79,6 +80,7 @@ import { Countdown } from "@/components/auctions/countdown";
           src={event?.cover || ""} 
           alt={event?.name || "Evento"} 
           width={800}
+          category="event"
           className="relative h-full w-full object-contain transition-smooth group-hover:scale-[1.02]" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
