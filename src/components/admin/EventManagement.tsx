@@ -588,22 +588,43 @@ import { Textarea } from "@/components/ui/textarea";
                                 Finalizar
                               </Button>
                             )}
-                            {onManageLots && (
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-8 px-2"
-                                onClick={() => onManageLots(event.id)}
-                              >
-                                <Plus className="mr-1 h-3 w-3" /> Lotes
-                              </Button>
-                            )}
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(event.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                             {onManageLots && (
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="sm" 
+                                       className="h-8 px-2"
+                                       onClick={() => onManageLots(event.id)}
+                                     >
+                                       <Plus className="mr-1 h-3 w-3" /> Lotes
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Gerenciar e alocar lotes para este evento</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                             )}
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
+                                   <Pencil className="h-4 w-4" />
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>Editar configurações do evento</TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(event.id)}>
+                                   <Trash2 className="h-4 w-4" />
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>Excluir evento permanentemente</TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
                         </div>
                       </TableCell>
                      </TableRow>
