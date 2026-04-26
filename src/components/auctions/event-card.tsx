@@ -133,24 +133,25 @@ import { Countdown } from "@/components/auctions/countdown";
         </div>
       </Link>
 
-      {/* Flyer Dialog Button - Outside the main link to avoid event collision, but positioned over it */}
-      <div className="absolute top-4 right-4 z-30">
+      {/* Flyer Dialog Button - Positioned over the card */}
+      <div 
+        className="absolute top-4 right-4 z-40"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
           <DialogTrigger asChild>
             <button 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsFlyerOpen(true);
-              }}
               className="rounded-lg bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all flex items-center gap-2 shadow-xl group-hover:bg-black/80"
             >
               <Maximize2 className="h-3 w-3" />
               Ver Flyer
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10 flex items-center justify-center">
-            <div className="relative w-full h-full flex items-center justify-center p-4">
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10">
+            <div className="relative w-full h-full flex items-center justify-center p-4 min-h-[50vh]">
               <OptimizedImage 
                 src={event?.cover || ""} 
                 alt={event?.name || "Flyer do Evento"} 
