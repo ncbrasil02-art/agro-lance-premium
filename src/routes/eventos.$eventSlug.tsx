@@ -108,17 +108,17 @@ function EventDetail() {
               <div className="flex flex-wrap items-center gap-3 mb-8">
                 <StatusBadge status={event.status} className="scale-110" />
                 <div className="h-4 w-px bg-white/10" />
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-white/40">{event.event_type || 'Leilão Premium'}</span>
+                 <span className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">{event.event_type || 'Leilão Premium'}</span>
               </div>
               
-              <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.85] italic">
+               <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-foreground mb-8 uppercase leading-[0.85] italic">
                 {event.name}
               </h1>
               
               <div className="relative mb-12 max-w-2xl">
                 <div className="absolute -left-6 top-0 bottom-0 w-1.5 bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full" />
-                <div className="bg-white/5 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white/5 shadow-2xl">
-                  <p className="text-lg md:text-2xl text-white/90 leading-relaxed font-medium italic whitespace-pre-wrap">
+                 <div className="bg-card/40 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-border/10 shadow-2xl">
+                   <p className="text-lg md:text-2xl text-foreground/90 leading-relaxed font-medium italic whitespace-pre-wrap">
                     {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium selecionados cuidadosamente por nossa curadoria genética."}
                   </p>
                 </div>
@@ -138,7 +138,7 @@ function EventDetail() {
                       </div>
                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60">{m.label}</span>
                     </div>
-                    <div className="text-base md:text-lg font-black text-white leading-tight uppercase tracking-tight">{m.value}</div>
+                     <div className="text-base md:text-lg font-black text-foreground leading-tight uppercase tracking-tight">{m.value}</div>
                   </div>
                 ))}
               </div>
@@ -158,7 +158,7 @@ function EventDetail() {
                     </div>
                   </div>
                 )}
-                <Button variant="outline" size="lg" className="h-20 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs">
+                   <Button variant="outline" size="lg" className="h-20 px-8 border-border bg-card/10 text-foreground hover:bg-card/20 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs">
                   Contatar Assessoria
                 </Button>
               </div>
@@ -171,7 +171,7 @@ function EventDetail() {
       <section className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Lotes Disponíveis</h2>
+             <h2 className="text-3xl md:text-5xl font-black text-foreground uppercase tracking-tighter">Lotes Disponíveis</h2>
             <p className="mt-2 text-muted-foreground font-medium">Exemplares selecionados exclusivamente para este evento.</p>
           </div>
           <div className="h-px flex-1 bg-white/5 hidden md:block mx-8" />
@@ -216,8 +216,8 @@ function EventDetail() {
           </div>
         ) : (
           <div className="text-center py-20 rounded-[3rem] bg-white/5 border border-dashed border-white/10">
-            <Gavel className="h-16 w-16 text-white/10 mx-auto mb-4" />
-            <p className="text-xl text-muted-foreground font-medium italic">Lotes em fase de preparação.</p>
+             <Gavel className="h-16 w-16 text-muted-foreground/20 mx-auto mb-4" />
+             <p className="text-xl text-muted-foreground font-semibold italic">Lotes em fase de preparação.</p>
             <p className="text-sm text-muted-foreground/60 mt-1">Acompanhe nossas redes para saber quando os lotes forem liberados.</p>
           </div>
         )}
