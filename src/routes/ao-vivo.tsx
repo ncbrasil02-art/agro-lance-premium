@@ -429,6 +429,17 @@ export const Route = createFileRoute("/ao-vivo")({
         const result = data as { success: boolean; message: string };
         if (result.success) {
           toast.success(result.message);
+          // Fetch latest lot data immediately after a successful bid
+          if (liveEvent?.active_lot_id) {
+            const { data: latestLot } = await supabase
+              .from("lots")
+              .select("*, animal:animals(*)")
+              .eq("id", liveEvent.active_lot_id)
+              .single();
+            if (latestLot) {
+              setLiveEvent((prev: any) => prev ? ({ ...prev, active_lot: latestLot }) : prev);
+            }
+          }
         } else {
           toast.error(result.message, {
             duration: 6000,
