@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
+import { ErrorFallback } from "@/components/ui/error-fallback";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -86,6 +87,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
   ),
   component: LotDetail,
   pendingComponent: LotDetailSkeleton,
+  errorComponent: ErrorFallback,
 });
 
 function GenealogyTree({ genealogy }: { genealogy: any }) {
