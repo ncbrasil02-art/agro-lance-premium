@@ -1,5 +1,5 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
-  import { Radio, Users, Gavel, Volume2, Loader2, Circle } from "lucide-react";
+  import { Radio, Users, Gavel, Volume2, Loader2, Circle, Zap } from "lucide-react";
   import { useEffectiveEventStatus } from "@/utils/auction-status";
  import { Button } from "@/components/ui/button";
  import { Countdown } from "@/components/auctions/countdown";
