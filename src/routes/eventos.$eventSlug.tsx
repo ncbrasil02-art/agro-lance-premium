@@ -1,5 +1,6 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Calendar, MapPin, Gavel, Users, Trophy, Zap } from "lucide-react";
+ import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+ import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw } from "lucide-react";
+ import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
 import { eventSchema } from "@/lib/schemas";
@@ -45,7 +46,14 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
 
 function EventDetail() {
   const { event } = Route.useLoaderData() as any;
+   const router = useRouter();
   const eventLots = event.lots || [];
+ 
+   const { status } = useRealtimeEvent(event.id, () => {
+     router.invalidate();
+   });
+ 
+   const isConnected = status === 'SUBSCRIBED';
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -59,7 +67,14 @@ function EventDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
       </div>
 
-      <section className="relative -mt-40 md:-mt-60 z-10 pb-16">
+       <section className="relative -mt-40 md:-mt-60 z-10 pb-16">
+         {/* Connection Indicator */}
+         {!isConnected && (
+           <div className="absolute top-0 right-4 z-50 flex items-center gap-2 rounded-full bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] text-white/60 border border-white/5">
+             <RefreshCw className="h-3 w-3 animate-spin" />
+             Sincronizando...
+           </div>
+         )}
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-[1fr_1.8fr] items-start">
             {/* Main Rectangular Banner */}
