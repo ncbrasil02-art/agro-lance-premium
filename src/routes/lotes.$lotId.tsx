@@ -534,13 +534,20 @@ function LotDetail() {
                     {lot.animal?.youtube_url && (
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
-                          >
-                            <PlayCircle className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
-                          </Button>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button 
+                                   variant="ghost" 
+                                   className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
+                                 >
+                                   <PlayCircle className="h-4 w-4" />
+                                   <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>Abrir player de vídeo do YouTube</TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[800px] bg-black p-0 border-white/10 overflow-hidden">
                           <div className="aspect-video">
