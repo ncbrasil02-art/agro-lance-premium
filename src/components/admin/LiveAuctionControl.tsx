@@ -19,13 +19,16 @@
    const [liveEvent, setLiveEvent] = useState<any>(null);
    const [lots, setLots] = useState<any[]>([]);
    const [activeLot, setActiveLot] = useState<any>(null);
-   const [isLoading, setIsLoading] = useState(false);
-   const [isActionLoading, setIsActionLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isActionLoading, setIsActionLoading] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [transmissionLink, setTransmissionLink] = useState("");
    
-   // Phone bid form
-    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "" });
+    // Phone bid form
+    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "", profileId: "" });
     const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
+    const [profiles, setProfiles] = useState<any[]>([]);
+    const [searchProfile, setSearchProfile] = useState("");
  
    const quickMessages = [
      "Alguém dá mais algum lance?",
@@ -38,9 +41,11 @@
      "Lote em destaque na tela!"
    ];
  
-   useEffect(() => {
-     fetchEvents();
-   }, []);
+    useEffect(() => {
+      fetchEvents();
+      fetchProfiles();
+      supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null));
+    }, []);
  
    useEffect(() => {
      if (selectedEventId) {
@@ -48,14 +53,22 @@
      }
    }, [selectedEventId]);
  
-   const fetchEvents = async () => {
-     const { data } = await supabase
-       .from("events")
-       .select("id, name")
-       .or("status.eq.live,status.eq.scheduled")
-       .order("start_date", { ascending: false });
-     setEvents(data || []);
-   };
+    const fetchEvents = async () => {
+      const { data } = await supabase
+        .from("events")
+        .select("id, name")
+        .or("status.eq.live,status.eq.scheduled")
+        .order("start_date", { ascending: false });
+      setEvents(data || []);
+    };
+
+    const fetchProfiles = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone, cpf")
+        .order("full_name");
+      setProfiles(data || []);
+    };
  
    const fetchEventDetails = async (eventId: string) => {
      setIsLoading(true);
@@ -153,32 +166,51 @@
      }
    };
  
-    const sellLot = async (lotId: string) => {
-      if (!confirm("Confirmar ARREMATE deste lote para o maior lance atual?")) return;
-      setIsActionLoading(true);
-      try {
-        // Find the winner (last bid)
-        const { data: lastBid } = await supabase
-          .from("bids")
-          .select("user_id")
-          .eq("lot_id", lotId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+     const sellLot = async (lotId: string) => {
+       // Find the winner (last bid)
+       const { data: lastBid } = await supabase
+         .from("bids")
+         .select("*, profile:profiles(full_name)")
+         .eq("lot_id", lotId)
+         .order("created_at", { ascending: false })
+         .limit(1)
+         .maybeSingle();
 
-        await supabase.from("lots").update({ 
-          status: 'sold', 
-          is_currently_live: false,
-          winner_id: lastBid?.user_id || null
-        }).eq("id", lotId);
-        
-        await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
-      } catch (error) {
-        toast.error("Erro ao arrematar lote");
-      } finally {
-        setIsActionLoading(false);
-      }
-    };
+       let finalWinnerId = lastBid?.user_id || null;
+       
+       // If it was a bid by the admin (phone/manual), or if we want to confirm/override
+       if (lastBid?.user_id === currentUserId || lastBid?.is_phone_bid) {
+         const promptText = lastBid?.is_phone_bid 
+           ? `Lote arrematado por lance de TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`
+           : `Lote arrematado por lance MANUAL no auditório.\n\nDeseja vincular este arremate a um cadastro real agora?`;
+           
+         if (confirm(promptText)) {
+            if (phoneBid.profileId) {
+              finalWinnerId = phoneBid.profileId;
+            } else {
+              toast.info("Por favor, selecione o 'Cadastro Real' no formulário lateral antes de clicar em Arrematar para vincular automaticamente.");
+              return;
+            }
+         }
+       } else {
+         if (!confirm(`Confirmar ARREMATE deste lote para ${lastBid?.profile?.full_name || 'o maior lance'} no valor de ${formatBRL(lastBid?.amount || 0)}?`)) return;
+       }
+
+       setIsActionLoading(true);
+       try {
+         await supabase.from("lots").update({ 
+           status: 'sold', 
+           is_currently_live: false,
+           winner_id: finalWinnerId
+         }).eq("id", lotId);
+         
+         await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
+       } catch (error) {
+         toast.error("Erro ao arrematar lote");
+       } finally {
+         setIsActionLoading(false);
+       }
+     };
 
     const passLot = async (lotId: string) => {
       if (!confirm("Finalizar lote sem venda? (Passou)")) return;
@@ -275,8 +307,14 @@
          }).eq("id", latestBid.id);
        }
  
-       toast.success("Lance via telefone registrado!");
-       setPhoneBid({ amount: 0, identifier: "" });
+        if (latestBid && phoneBid.profileId) {
+          await supabase.from("bids").update({
+            user_id: phoneBid.profileId
+          }).eq("id", latestBid.id);
+        }
+
+        toast.success("Lance via telefone registrado!");
+        setPhoneBid({ amount: 0, identifier: "", profileId: "" });
        fetchEventDetails(selectedEventId);
      } catch (error: any) {
        toast.error(error.message);
@@ -582,25 +620,96 @@
                      </div>
                      
                      <div className="space-y-2">
-                       <Label className="text-white/80">Valor do Lance</Label>
-                       <Input 
-                         type="number" 
-                         className="bg-white/10 border-white/20 text-white" 
-                         placeholder="0,00"
-                         value={phoneBid.amount || ""}
-                         onChange={(e) => setPhoneBid({...phoneBid, amount: parseFloat(e.target.value)})}
-                       />
-                     </div>
-                     
-                     <div className="space-y-2">
-                       <Label className="text-white/80">Identificador (Nome/Tel)</Label>
-                       <Input 
-                         className="bg-white/10 border-white/20 text-white" 
-                         placeholder="Ex: João (WhatsApp)"
-                         value={phoneBid.identifier}
-                         onChange={(e) => setPhoneBid({...phoneBid, identifier: e.target.value})}
-                       />
-                     </div>
+                        <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Valor do Lance</Label>
+                        <div className="grid grid-cols-3 gap-2 mb-2">
+                          {[500, 1000, 2000, 5000].map((inc) => (
+                            <Button
+                              key={inc}
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
+                              onClick={() => {
+                                const current = activeLot.current_price || activeLot.starting_price;
+                                setPhoneBid({ ...phoneBid, amount: current + inc });
+                              }}
+                            >
+                              +{formatBRL(inc)}
+                            </Button>
+                          ))}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
+                            onClick={() => {
+                              const current = activeLot.current_price || activeLot.starting_price;
+                              setPhoneBid({ ...phoneBid, amount: current + activeLot.bid_increment });
+                            }}
+                          >
+                            +Inc ({formatBRL(activeLot.bid_increment)})
+                          </Button>
+                        </div>
+                        <Input 
+                          type="number" 
+                          className="bg-white/10 border-white/20 text-white text-lg font-bold" 
+                          placeholder="0,00"
+                          value={phoneBid.amount || ""}
+                          onChange={(e) => setPhoneBid({...phoneBid, amount: parseFloat(e.target.value)})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Identificação (Telefone/Plaqueta)</Label>
+                        <div className="grid grid-cols-3 gap-1 mb-2">
+                          {["Mesa 1", "Mesa 2", "Tel 1", "Tel 2", "Auditório", "Plaqueta"].map(id => (
+                            <Button
+                              key={id}
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-7 text-[9px] px-1"
+                              onClick={() => setPhoneBid({ ...phoneBid, identifier: id })}
+                            >
+                              {id}
+                            </Button>
+                          ))}
+                        </div>
+                        <Input 
+                          className="bg-white/10 border-white/20 text-white flex-1" 
+                          placeholder="Ex: Plaquetão 45 / João"
+                          value={phoneBid.identifier}
+                          onChange={(e) => setPhoneBid({...phoneBid, identifier: e.target.value})}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Vincular a Cadastro Real (Opcional)</Label>
+                        <Select 
+                          value={phoneBid.profileId} 
+                          onValueChange={(val) => setPhoneBid({...phoneBid, profileId: val})}
+                        >
+                          <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                            <SelectValue placeholder="Selecione um cliente..." />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            <div className="p-2 border-b">
+                              <Input 
+                                placeholder="Filtrar por nome..." 
+                                className="h-8"
+                                value={searchProfile}
+                                onChange={(e) => setSearchProfile(e.target.value)}
+                              />
+                            </div>
+                            {profiles
+                              .filter(p => p.full_name?.toLowerCase().includes(searchProfile.toLowerCase()) || p.phone?.includes(searchProfile))
+                              .slice(0, 10)
+                              .map(p => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.full_name} {p.phone ? `(${p.phone})` : ''}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[9px] text-white/40 italic">Vincular agora facilita a geração de contratos após o leilão.</p>
+                      </div>
  
                      <Button 
                        className="w-full bg-gold text-emerald-deep font-bold hover:bg-gold/90"
@@ -631,11 +740,27 @@
                     Lances manuais recebidos no local físico ou lances de segurança.
                   </p>
                   
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[500, 1000, 2000, 5000].map(inc => (
+                      <Button 
+                        key={inc}
+                        variant="outline" 
+                        size="sm"
+                        className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-8 font-bold text-[10px]"
+                        onClick={() => {
+                          if (!activeLot) return;
+                          const base = activeLot.current_price || activeLot.starting_price;
+                          setSecurityBidAmount(base + inc);
+                        }}
+                        disabled={!activeLot}
+                      >
+                        +{formatBRL(inc)}
+                      </Button>
+                    ))}
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-10 font-bold"
+                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-8 font-bold text-[10px]"
                       onClick={() => {
                         if (!activeLot) return;
                         const base = activeLot.current_price || activeLot.starting_price;
@@ -643,20 +768,7 @@
                       }}
                       disabled={!activeLot}
                     >
-                      +{activeLot ? formatBRL(activeLot.bid_increment) : "..."}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-10 font-bold"
-                      onClick={() => {
-                        if (!activeLot) return;
-                        const base = activeLot.current_price || activeLot.starting_price;
-                        setSecurityBidAmount(base + (activeLot.bid_increment * 2));
-                      }}
-                      disabled={!activeLot}
-                    >
-                      +{(activeLot?.bid_increment || 0) * 2 ? formatBRL(activeLot.bid_increment * 2) : "..."}
+                      +Inc ({activeLot ? formatBRL(activeLot.bid_increment) : "..."})
                     </Button>
                   </div>
 
