@@ -30,20 +30,20 @@
          {d > 0 && (
            <div className="flex flex-col items-center" suppressHydrationWarning>
              <span className="text-2xl md:text-4xl font-black" suppressHydrationWarning>{String(d).padStart(2, "0")}</span>
-             <span className="text-[8px] uppercase font-bold text-white/40">Dias</span>
+              <span className="text-[8px] uppercase font-bold text-muted-foreground/70">Dias</span>
            </div>
          )}
          <div className="flex flex-col items-center" suppressHydrationWarning>
            <span className="text-2xl md:text-4xl font-black" suppressHydrationWarning>{String(h).padStart(2, "0")}</span>
-           <span className="text-[8px] uppercase font-bold text-white/40">Horas</span>
+            <span className="text-[8px] uppercase font-bold text-muted-foreground/70">Horas</span>
          </div>
          <div className="flex flex-col items-center" suppressHydrationWarning>
            <span className="text-2xl md:text-4xl font-black" suppressHydrationWarning>{String(m).padStart(2, "0")}</span>
-           <span className="text-[8px] uppercase font-bold text-white/40">Min</span>
+            <span className="text-[8px] uppercase font-bold text-muted-foreground/70">Min</span>
          </div>
          <div className="flex flex-col items-center" suppressHydrationWarning>
            <span className="text-2xl md:text-4xl font-black text-gold" suppressHydrationWarning>{String(s).padStart(2, "0")}</span>
-           <span className="text-[8px] uppercase font-bold text-white/40">Seg</span>
+            <span className="text-[8px] uppercase font-bold text-muted-foreground/70">Seg</span>
          </div>
        </div>
     );

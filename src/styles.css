@@ -152,16 +152,16 @@
   --sidebar-ring: oklch(0.78 0.13 85);
 
   /* Marca */
-  --gold: oklch(0.78 0.13 85);
-  --gold-bright: oklch(0.86 0.15 88);
-  --gold-deep: oklch(0.6 0.13 70);
-  --emerald: oklch(0.45 0.11 155);
-  --emerald-bright: oklch(0.6 0.14 152);
-  --emerald-deep: oklch(0.28 0.07 155);
-
-  --live: oklch(0.62 0.24 25);
-   --upcoming: oklch(0.82 0.18 90);
-  --closed: oklch(0.55 0.02 150);
+   --gold: oklch(0.65 0.13 85);
+   --gold-bright: oklch(0.72 0.15 88);
+   --gold-deep: oklch(0.5 0.13 70);
+   --emerald: oklch(0.4 0.11 155);
+   --emerald-bright: oklch(0.48 0.14 152);
+   --emerald-deep: oklch(0.25 0.07 155);
+ 
+   --live: oklch(0.55 0.24 25);
+   --upcoming: oklch(0.6 0.18 90);
+   --closed: oklch(0.45 0.02 150);
 
   --gradient-hero: linear-gradient(135deg, oklch(0.18 0.04 150) 0%, oklch(0.28 0.07 155) 50%, oklch(0.18 0.04 150) 100%);
   --gradient-gold: linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
@@ -211,12 +211,12 @@
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.78 0.13 85);
 
-  --gold: oklch(0.82 0.14 86);
-  --gold-bright: oklch(0.9 0.15 90);
-  --gold-deep: oklch(0.62 0.13 72);
-  --emerald: oklch(0.55 0.13 152);
-  --emerald-bright: oklch(0.68 0.15 150);
-  --emerald-deep: oklch(0.32 0.08 155);
+   --gold: oklch(0.82 0.14 86);
+   --gold-bright: oklch(0.9 0.15 90);
+   --gold-deep: oklch(0.62 0.13 72);
+   --emerald: oklch(0.55 0.13 152);
+   --emerald-bright: oklch(0.68 0.15 150);
+   --emerald-deep: oklch(0.32 0.08 155);
 
   --gradient-hero: linear-gradient(135deg, oklch(0.1 0.015 150) 0%, oklch(0.18 0.04 155) 60%, oklch(0.1 0.015 150) 100%);
   --gradient-gold: linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
