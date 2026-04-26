@@ -1,3 +1,4 @@
+import { getCacheStats } from "@/utils/image-optimization";
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
@@ -320,20 +321,45 @@ export const Route = createFileRoute("/admin")({
           {activeTab === "sellers" && <SellerManagement />}
             {activeTab === "users" && <UserManagement />}
             {activeTab === "security" && <BidSecurityAudit />}
-           {activeTab === "settings" && (
-             <Card>
-               <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
-               <CardContent>
-                 <p className="text-muted-foreground">Configurações da plataforma em desenvolvimento.</p>
-                 <div className="mt-8 pt-8 border-t text-[10px] text-muted-foreground">
-                   <p>Debug Info:</p>
-                   <p>User ID: {profile?.id}</p>
-                   <p>Role: {profile?.role}</p>
-                   <p>Environment: {import.meta.env.MODE}</p>
-                 </div>
-               </CardContent>
-             </Card>
-           )}
+            {activeTab === "settings" && (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm">Configurações da plataforma em desenvolvimento.</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm font-bold uppercase tracking-wider">Performance de Ativos</CardTitle>
+                    <CardDescription>Estatísticas do cache de imagens otimizadas</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {[
+                        { label: "Hits", value: getCacheStats().hits },
+                        { label: "Misses", value: getCacheStats().misses },
+                        { label: "Tamanho Cache", value: getCacheStats().size },
+                        { label: "Taxa de Sucesso", value: `${getCacheStats().hitRate.toFixed(1)}%` },
+                      ].map(stat => (
+                        <div key={stat.label} className="p-4 rounded-xl bg-muted/50 border">
+                          <div className="text-[10px] uppercase font-black text-muted-foreground mb-1">{stat.label}</div>
+                          <div className="text-xl font-bold">{stat.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="mt-8 pt-8 border-t text-[10px] text-muted-foreground">
+                  <p>Debug Info:</p>
+                  <p>User ID: {profile?.id}</p>
+                  <p>Role: {profile?.role}</p>
+                  <p>Environment: {import.meta.env.MODE}</p>
+                </div>
+              </div>
+            )}
        </main>
      </div>
    );
