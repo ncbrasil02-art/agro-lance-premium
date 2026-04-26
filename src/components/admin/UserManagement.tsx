@@ -161,19 +161,12 @@
        user.cpf?.includes(searchQuery) ||
        user.phone?.includes(searchQuery);
      
-     const matchesFilter = 
-       filter === "all" || 
-       (filter === "pending" && !user.is_approved && !user.is_blocked) || 
-       (filter === "approved" && user.is_approved && !user.is_blocked) ||
-       (filter === "blocked" && user.is_blocked);
-           <Button 
-             variant={filter === "blocked" ? "default" : "outline"} 
-             size="sm" 
-             onClick={() => setFilter("blocked")}
-             className={filter === "blocked" ? "bg-destructive text-white" : ""}
-           >
-             Bloqueados
-           </Button>
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "pending" && !user.is_approved && !user.is_blocked) ||
+        (filter === "approved" && user.is_approved && !user.is_blocked) ||
+        (filter === "blocked" && user.is_blocked) ||
+        (filter === "risk" && (user.risk_level === "high" || user.risk_level === "medium"));
  
      return matchesSearch && matchesFilter;
    });
