@@ -471,7 +471,7 @@
                        className={`relative rounded-xl border p-4 transition-all ${
                          lot.id === liveEvent.active_lot_id 
                          ? "border-gold bg-gold/5 ring-1 ring-gold shadow-gold-sm" 
-                         : lot.status === 'finished' 
+                          : (lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished')
                          ? "opacity-50 bg-muted" 
                          : "hover:border-gold/50 cursor-pointer"
                        }`}
