@@ -37,8 +37,8 @@ export const Route = createFileRoute("/admin")({
       { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
       { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
       { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
-  import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
       { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
+import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
      { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
    ];
