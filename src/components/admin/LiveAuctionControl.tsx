@@ -317,13 +317,52 @@
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Painel"}
                 </Button>
                 {selectedEventId && liveEvent && (
-                  <Button 
-                    variant="destructive" 
-                    onClick={finalizeEvent}
-                    disabled={isActionLoading}
-                  >
-                    Encerrar Evento
-                  </Button>
+                  <div className="flex gap-2">
+                    {liveEvent.status === 'scheduled' && (
+                      <Button 
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        onClick={async () => {
+                          setIsActionLoading(true);
+                          const { error } = await supabase.from("events").update({ status: 'live' }).eq("id", selectedEventId);
+                          if (error) toast.error(error.message);
+                          else {
+                            toast.success("Evento agora está AO VIVO!");
+                            fetchEventDetails(selectedEventId);
+                          }
+                          setIsActionLoading(false);
+                        }}
+                        disabled={isActionLoading}
+                      >
+                        <Play className="mr-2 h-4 w-4" /> Iniciar Leilão
+                      </Button>
+                    )}
+                    {liveEvent.status === 'live' && (
+                      <Button 
+                        variant="outline"
+                        className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                        onClick={async () => {
+                          setIsActionLoading(true);
+                          const { error } = await supabase.from("events").update({ status: 'scheduled' }).eq("id", selectedEventId);
+                          if (error) toast.error(error.message);
+                          else {
+                            toast.success("Evento pausado (Agendado)");
+                            fetchEventDetails(selectedEventId);
+                          }
+                          setIsActionLoading(false);
+                        }}
+                        disabled={isActionLoading}
+                      >
+                        <Timer className="mr-2 h-4 w-4" /> Pausar / Voltar p/ Agendado
+                      </Button>
+                    )}
+                    <Button 
+                      variant="destructive" 
+                      onClick={finalizeEvent}
+                      disabled={isActionLoading}
+                    >
+                      <Square className="mr-2 h-4 w-4" /> Encerrar Evento
+                    </Button>
+                  </div>
                 )}
               </div>
            </div>
@@ -527,34 +566,63 @@
                </CardContent>
              </Card>
  
-              <Card className="border-destructive/30 bg-destructive/5">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-destructive">
-                    <AlertTriangle className="h-4 w-4" /> Lance de Segurança
+              <Card className="border-gold/50 bg-emerald-deep text-white shadow-gold-sm">
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-lg text-gold font-bold flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" /> Auditório / Segurança
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-[10px] text-muted-foreground uppercase leading-tight">
-                    Use para cobrir o preço reserva ou estimular o leilão. Aparecerá como "Auditório" no site.
+                <CardContent className="space-y-4">
+                  <p className="text-[10px] text-white/60 uppercase leading-tight">
+                    Lances manuais recebidos no local físico ou lances de segurança.
                   </p>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-10 font-bold"
+                      onClick={() => {
+                        if (!activeLot) return;
+                        const base = activeLot.current_price || activeLot.starting_price;
+                        setSecurityBidAmount(base + activeLot.bid_increment);
+                      }}
+                      disabled={!activeLot}
+                    >
+                      +{activeLot ? formatBRL(activeLot.bid_increment) : "..."}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-10 font-bold"
+                      onClick={() => {
+                        if (!activeLot) return;
+                        const base = activeLot.current_price || activeLot.starting_price;
+                        setSecurityBidAmount(base + (activeLot.bid_increment * 2));
+                      }}
+                      disabled={!activeLot}
+                    >
+                      +{(activeLot?.bid_increment || 0) * 2 ? formatBRL(activeLot.bid_increment * 2) : "..."}
+                    </Button>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label className="text-xs text-destructive/80">Valor do Lance (opcional)</Label>
+                    <Label className="text-xs text-white/80">Valor do Lance</Label>
                     <Input 
                       type="number" 
-                      className="h-8 bg-white/10 border-white/20 text-white" 
-                      placeholder={activeLot ? formatBRL((activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment) : "0,00"}
+                      className="h-10 bg-white/10 border-white/20 text-white text-lg font-bold" 
+                      placeholder="0,00"
                       value={securityBidAmount || ""}
                       onChange={(e) => setSecurityBidAmount(parseFloat(e.target.value))}
                     />
                   </div>
                   <Button 
-                    variant="destructive"
-                    className="w-full font-bold"
+                    className="w-full h-12 bg-gold text-emerald-deep font-black text-base hover:bg-gold/90 transition-all active:scale-95"
                     onClick={handleSecurityBid}
                     disabled={isActionLoading || !activeLot}
                   >
-                    {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
-                    {securityBidAmount ? `Dar Lance de ${formatBRL(securityBidAmount)}` : `Lance + ${activeLot ? formatBRL(activeLot.bid_increment) : "0,00"}`}
+                    {isActionLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Gavel className="mr-2 h-5 w-5" />}
+                    {securityBidAmount ? `CONFIRMAR ${formatBRL(securityBidAmount)}` : "CONFIRMAR LANCE"}
                   </Button>
                 </CardContent>
               </Card>
