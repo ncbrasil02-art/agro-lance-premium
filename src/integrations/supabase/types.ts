@@ -950,6 +950,7 @@ export type Database = {
     Functions: {
       check_user_risk: { Args: { p_user_id: string }; Returns: boolean }
       close_lot: { Args: { p_lot_id: string }; Returns: Json }
+      delete_bid_safe: { Args: { p_bid_id: string }; Returns: Json }
       increment_viewer_count: {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: undefined
