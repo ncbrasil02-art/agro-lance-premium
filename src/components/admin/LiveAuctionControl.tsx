@@ -63,8 +63,8 @@
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${selectedEventId}` },
-        async (payload) => {
-          setLiveEvent(prev => prev ? ({ ...prev, ...payload.new }) : payload.new);
+          async (payload) => {
+            setLiveEvent((prev: any) => prev ? ({ ...prev, ...payload.new }) : payload.new);
           
           if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
             // When lot changes, we need to refresh details to get animal data etc
@@ -87,14 +87,14 @@
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${activeLot.id}` },
-        (payload) => {
-          setActiveLot(prev => {
+          (payload) => {
+            setActiveLot((prev: any) => {
             if (!prev || prev.id !== payload.new.id) return prev;
             return { ...prev, ...payload.new };
           });
           
-          // Also update the lots list for consistency
-          setLots(prev => prev.map(l => l.id === payload.new.id ? { ...l, ...payload.new } : l));
+            // Also update the lots list for consistency
+            setLots((prev: any[]) => prev.map(l => l.id === payload.new.id ? { ...l, ...payload.new } : l));
         }
       )
       .subscribe();
