@@ -4,7 +4,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon } from "lucide-react";
+ import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon, HelpCircle } from "lucide-react";
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
