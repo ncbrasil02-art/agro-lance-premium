@@ -169,14 +169,40 @@ export const Route = createFileRoute("/ao-vivo")({
  
    const currentPrice = liveLot?.current_price || liveLot?.starting_price || 0;
  
-  if (!liveEvent || !liveLot) {
+   if (!liveEvent) {
+     return (
+       <div className="container mx-auto px-4 py-20 text-center">
+         <h1 className="text-3xl font-bold">Nenhum evento ao vivo no momento</h1>
+         <p className="mt-2 text-muted-foreground">Confira o calendário de próximos eventos.</p>
+         <Link to="/eventos" className="mt-6 inline-block">
+           <Button className="bg-gold-gradient text-emerald-deep">Ver eventos</Button>
+         </Link>
+       </div>
+     );
+   }
+ 
+   if (!liveLot) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-3xl font-bold">Nenhuma transmissão ao vivo no momento</h1>
-        <p className="mt-2 text-muted-foreground">Confira o calendário de próximos eventos.</p>
-        <Link to="/eventos" className="mt-6 inline-block">
-          <Button className="bg-gold-gradient text-emerald-deep">Ver eventos</Button>
-        </Link>
+         <h1 className="text-3xl font-bold">{liveEvent.name}</h1>
+         <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant flex flex-col items-center justify-center">
+           {liveEvent.transmission_link ? (
+             <iframe
+               className="h-full w-full border-0"
+               src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
+               title="Aguardando Próximo Lote"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+               allowFullScreen
+             />
+           ) : (
+             <>
+               <Loader2 className="h-12 w-12 text-gold animate-spin mb-4" />
+               <p className="text-gold font-bold uppercase tracking-widest">Aguardando próximo lote...</p>
+               <p className="text-white/60 text-sm mt-2">O leiloeiro está preparando a próxima oferta.</p>
+             </>
+           )}
+         </div>
+         <p className="mt-8 text-muted-foreground">Fique atento! A transmissão continua enquanto preparamos o próximo animal.</p>
       </div>
     );
   }
