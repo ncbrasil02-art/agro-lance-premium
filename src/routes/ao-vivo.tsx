@@ -164,7 +164,37 @@ export const Route = createFileRoute("/ao-vivo")({
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
-   const [bids, setBids] = useState(initialBids);
+  const [bids, setBids] = useState<any[]>(initialBids || []);
+  const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
+    // Increment viewer count when page loads
+    useEffect(() => {
+      if (liveEvent?.id) {
+        supabase.rpc("increment_viewer_count", {
+          p_entity_id: liveEvent.id,
+          p_entity_type: 'event'
+        }).then(() => console.log("Viewer count incremented"));
+      }
+    }, [liveEvent?.id]);
+
+    // Fetch profiles for initial bids
+    useEffect(() => {
+      if (initialBids && initialBids.length > 0) {
+        const userIds = [...new Set(initialBids.map((b: any) => b.user_id).filter(Boolean))];
+        if (userIds.length > 0) {
+          supabase
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", userIds)
+            .then(({ data }) => {
+              if (data) {
+                const map = data.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
+                setBidderProfiles(prev => ({ ...prev, ...map }));
+              }
+            });
+        }
+      }
+    }, [initialBids]);
+
     const [isBidding, setIsBidding] = useState(false);
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
@@ -285,6 +315,38 @@ export const Route = createFileRoute("/ao-vivo")({
         )
         .subscribe();
 
+      // Specific channel for the active lot to catch price and bid count updates
+      let lotChannel: any = null;
+      if (liveEvent?.active_lot_id) {
+        lotChannel = supabase
+          .channel(`lot-updates-${liveEvent.active_lot_id}`)
+          .on(
+            "postgres_changes",
+            { 
+              event: "UPDATE", 
+              schema: "public", 
+              table: "lots", 
+              filter: `id=eq.${liveEvent.active_lot_id}` 
+            },
+            (payload) => {
+              console.log("Lote atualizado em tempo real:", payload.new);
+              setLiveEvent((prev: any) => {
+                if (!prev || !prev.active_lot) return prev;
+                return {
+                  ...prev,
+                  active_lot: {
+                    ...prev.active_lot,
+                    ...payload.new,
+                    // Preserve animal data which isn't in the lot update payload
+                    animal: prev.active_lot.animal
+                  }
+                };
+              });
+            }
+          )
+          .subscribe();
+      }
+
       // Specific bids channel for the active lot
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
@@ -293,8 +355,21 @@ export const Route = createFileRoute("/ao-vivo")({
           .on(
             "postgres_changes",
             { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
-            (payload) => {
-              setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
+            async (payload) => {
+              const newBid = payload.new;
+              setBids((prev: any) => [newBid, ...prev].slice(0, 10));
+              
+              // Fetch profile if not already loaded
+              if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
+                const { data } = await supabase
+                  .from("profiles")
+                  .select("id, full_name")
+                  .eq("id", newBid.user_id)
+                  .single();
+                if (data) {
+                  setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                }
+              }
             }
           )
           .subscribe();
@@ -302,9 +377,10 @@ export const Route = createFileRoute("/ao-vivo")({
 
       return () => {
         supabase.removeChannel(globalChannel);
+        if (lotChannel) supabase.removeChannel(lotChannel);
         if (bidsChannel) supabase.removeChannel(bidsChannel);
       };
-    }, [liveEvent?.id, liveEvent?.active_lot_id]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, bidderProfiles]);
  
    const liveLot = liveEvent?.active_lot;
  
