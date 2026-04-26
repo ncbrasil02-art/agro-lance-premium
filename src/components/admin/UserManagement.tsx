@@ -250,7 +250,23 @@
                    <TableHead className="font-bold">Usuário</TableHead>
                    <TableHead className="font-bold">CPF / Telefone</TableHead>
                    <TableHead className="font-bold">Cadastro</TableHead>
-                   <TableHead className="font-bold">Status / Risco</TableHead>
+                    <TableHead className="font-bold">
+                      <div className="flex items-center gap-1">
+                        Status / Risco
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[250px] text-xs">
+                              <p><b>Pendente:</b> Aguardando aprovação.</p>
+                              <p><b>Aprovado:</b> Pode dar lances.</p>
+                              <p><b>Bloqueado:</b> Acesso restrito por admin ou sistema de risco.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TableHead>
                    <TableHead className="font-bold">Audit. Aprovação</TableHead>
                    <TableHead className="text-right font-bold">Ações</TableHead>
                  </TableRow>
