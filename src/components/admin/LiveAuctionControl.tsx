@@ -423,8 +423,9 @@
                 <div className="flex items-center gap-2 bg-emerald-deep/5 px-4 py-2 rounded-full border border-gold/20">
                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-sm font-bold text-emerald-deep uppercase">{liveEvent.name}</span>
-                </div>
-              )}
+            </div>
+          </div>
+        )}
             </div>
           </CardHeader>
          <CardContent>
