@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
   import { z } from "zod";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { HomeSkeleton } from "@/components/ui/page-skeleton";
+import { ErrorFallback } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   export const Route = createFileRoute("/")({
@@ -72,6 +73,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
     },
     component: Home,
     pendingComponent: HomeSkeleton,
+    errorComponent: ErrorFallback,
   });
 
 function Home() {
