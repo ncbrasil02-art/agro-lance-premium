@@ -5,33 +5,6 @@
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
  import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download } from "lucide-react";
-   const exportToCSV = () => {
-     const headers = ["Nome", "CPF", "Telefone", "Papel", "Aprovado", "Data Cadastro"];
-     const data = filteredUsers.map(user => [
-       user.full_name,
-       user.cpf,
-       user.phone,
-       user.role === 'admin' ? 'Administrador' : 'Licitante',
-       user.is_approved ? 'Sim' : 'Não',
-       format(new Date(user.created_at), "dd/MM/yyyy HH:mm")
-     ]);
- 
-     const csvContent = [
-       headers.join(","),
-       ...data.map(row => row.join(","))
-     ].join("\n");
- 
-     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-     const link = document.createElement("a");
-     const url = URL.createObjectURL(blob);
-     link.setAttribute("href", url);
-     link.setAttribute("download", `licitantes_${format(new Date(), "yyyy-MM-dd")}.csv`);
-     link.style.visibility = "hidden";
-     document.body.appendChild(link);
-     link.click();
-     document.body.removeChild(link);
-   };
- 
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
@@ -39,6 +12,8 @@
  import { ptBR } from "date-fns/locale";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+ 
+ export function UserManagement() {
    const [selectedUserLogs, setSelectedUserLogs] = useState<any[]>([]);
    const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
@@ -65,9 +40,6 @@
        setIsLoadingLogs(false);
      }
    };
- 
- 
- export function UserManagement() {
    const { profile: adminProfile } = useAuth();
    const [isLoading, setIsLoading] = useState(true);
    const [users, setUsers] = useState<any[]>([]);
