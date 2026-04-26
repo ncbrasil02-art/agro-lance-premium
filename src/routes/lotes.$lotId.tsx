@@ -331,7 +331,8 @@ function LotDetail() {
                            <th className="px-6 py-4">Licitante</th>
                            <th className="px-6 py-4">Valor</th>
                            <th className="px-6 py-4">Data/Hora</th>
-                           <th className="px-6 py-4 text-right">Canal</th>
+                           <th className="px-6 py-4">Canal</th>
+                           {profile?.role === 'admin' && <th className="px-6 py-4 text-right">Ações</th>}
                          </tr>
                        </thead>
                        <tbody className="divide-y divide-white/5">
@@ -351,7 +352,32 @@ function LotDetail() {
                              <td className="px-6 py-4 text-xs text-white/40 font-medium">
                                {new Date(bid.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                              </td>
-                             <td className="px-6 py-4 text-right">
+                             <td className="px-6 py-4">
+                             {profile?.role === 'admin' && (
+                               <td className="px-6 py-4 text-right">
+                                 <Button 
+                                   variant="ghost" 
+                                   size="sm" 
+                                   className="text-[10px] h-7 text-gold hover:text-gold-bright hover:bg-gold/10"
+                                   onClick={async () => {
+                                     const { data: userProfile } = await supabase
+                                       .from('profiles')
+                                       .select('*')
+                                       .eq('id', bid.user_id)
+                                       .single();
+                                     
+                                     if (userProfile) {
+                                       toast.info(`Detalhes: ${userProfile.full_name}`, {
+                                         description: `CPF: ${userProfile.cpf || 'Não informado'} | Tel: ${userProfile.phone || 'Não informado'}`,
+                                         duration: 10000,
+                                       });
+                                     }
+                                   }}
+                                 >
+                                   Detalhes
+                                 </Button>
+                               </td>
+                             )}
                                <span className="text-[10px] font-black uppercase tracking-widest text-gold/30 group-hover:text-gold/60 transition-colors">
                                  {bid.bid_type || 'Online'}
                                </span>
