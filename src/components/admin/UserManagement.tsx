@@ -371,14 +371,23 @@
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => fetchUserLogs(user.id)}
-                            className="text-muted-foreground"
-                          >
-                            <History className="h-5 w-5" />
-                          </Button>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button
+                                   variant="ghost"
+                                   size="icon"
+                                   onClick={() => fetchUserLogs(user.id)}
+                                   className="text-muted-foreground"
+                                 >
+                                   <History className="h-5 w-5" />
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>
+                                 <p>Ver Histórico de Auditoria</p>
+                               </TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
                          <TooltipProvider>
                            <Tooltip>
                              <TooltipTrigger asChild>
