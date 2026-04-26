@@ -32,60 +32,94 @@ export const Route = createFileRoute("/ao-vivo")({
     ],
   }),
    loader: async () => {
-     // Search for an event that is explicitly live OR scheduled but whose time has already arrived
-     const { data: events, error: eventError } = await supabase
-        .from("events")
-        .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
-        .or("status.eq.live,status.eq.scheduled")
-        .order("start_date", { ascending: true });
-
-     if (eventError || !events || events.length === 0) return { liveEvent: null };
-
-     const now = new Date();
-      // First, try to find an event that is explicitly 'live' AND has an active lot
-      let liveEvent = events.find(e => e.status === 'live' && e.active_lot_id);
-      
-      // If not found, look for any 'live' event
-      if (!liveEvent) {
-        liveEvent = events.find(e => e.status === 'live');
-      }
-
-      // If still not found, look for a scheduled event that should be happening now
-      if (!liveEvent) {
-        liveEvent = events.find(e => {
-          const start = new Date(e.start_date);
-          const end = e.end_date ? new Date(e.end_date) : null;
-          return now >= start && (!end || now < end);
-        });
-      }
-
-      if (!liveEvent) return { liveEvent: null };
-
-      let initialBids: any[] = [];
-      if (liveEvent.active_lot_id) {
-        const { data: bids, error: bidsError } = await supabase
-          .from("bids")
-          .select("*")
-          .eq("lot_id", liveEvent.active_lot_id)
-          .order("created_at", { ascending: false })
-          .limit(10);
-        
-        if (!bidsError && bids) {
-          initialBids = bids;
-        }
-      }
- 
       try {
-        const validatedEvent = eventSchema.parse(liveEvent);
-        return { 
-          liveEvent: validatedEvent,
-          initialBids
-        };
-      } catch (e) {
-        console.error("Erro de validação do evento ao vivo:", e);
+        const now = new Date();
+        // First, search for ANY event that is live or scheduled today
+        const { data: events, error: eventError } = await supabase
+           .from("events")
+           .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+           .or("status.eq.live,status.eq.scheduled")
+           .order("start_date", { ascending: true });
+
+        if (eventError) {
+          console.error("Erro ao buscar eventos ao vivo:", eventError);
+          return { liveEvent: null };
+        }
+
+        if (!events || events.length === 0) return { liveEvent: null };
+
+        // Priority 1: Event explicitly marked as 'live'
+        let liveEvent = events.find(e => e.status === 'live');
+        
+        // Priority 2: Event that has a transmission link and is starting soon (within 2 hours) or already started
+        if (!liveEvent) {
+          const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+          const fourHoursFromNow = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+          
+          liveEvent = events.find(e => {
+            const start = new Date(e.start_date);
+            const hasTransmission = !!e.transmission_link;
+            return hasTransmission && start >= twoHoursAgo && start <= fourHoursFromNow;
+          });
+        }
+
+        // Priority 3: Scheduled event that should be happening now
+        if (!liveEvent) {
+          liveEvent = events.find(e => {
+            const start = new Date(e.start_date);
+            const end = e.end_date ? new Date(e.end_date) : null;
+            return now >= start && (!end || now < end);
+          });
+        }
+
+        if (!liveEvent) return { liveEvent: null };
+
+        // Fallback: If active_lot_id is present but join failed to fetch active_lot
+        if (liveEvent.active_lot_id && !liveEvent.active_lot) {
+          const { data: activeLotData } = await supabase
+            .from("lots")
+            .select("*, animal:animals(*)")
+            .eq("id", liveEvent.active_lot_id)
+            .single();
+          if (activeLotData) {
+            liveEvent.active_lot = activeLotData;
+          }
+        }
+
+        let initialBids: any[] = [];
+        if (liveEvent.active_lot_id) {
+          const { data: bids, error: bidsError } = await supabase
+            .from("bids")
+            .select("*")
+            .eq("lot_id", liveEvent.active_lot_id)
+            .order("created_at", { ascending: false })
+            .limit(10);
+          
+          if (!bidsError && bids) {
+            initialBids = bids;
+          }
+        }
+
+        // Try parsing, but don't fail hard if it's mostly valid data
+        try {
+          const validatedEvent = eventSchema.parse(liveEvent);
+          return { 
+            liveEvent: validatedEvent,
+            initialBids
+          };
+        } catch (schemaError) {
+          console.warn("Validação parcial do evento (usando dados brutos):", schemaError);
+          // Return the event as is if it has the required UI fields
+          if (liveEvent.id && liveEvent.name) {
+            return { liveEvent, initialBids };
+          }
+          return { liveEvent: null };
+        }
+      } catch (err) {
+        console.error("Erro fatal no loader ao-vivo:", err);
         return { liveEvent: null };
       }
-   },
+    },
    component: LivePage,
 });
 
@@ -194,40 +228,58 @@ export const Route = createFileRoute("/ao-vivo")({
  
    const currentPrice = liveLot?.current_price || liveLot?.starting_price || 0;
  
-   if (!liveEvent) {
-     return (
-       <div className="container mx-auto px-4 py-20 text-center">
-         <h1 className="text-3xl font-bold">Nenhum evento ao vivo no momento</h1>
-         <p className="mt-2 text-muted-foreground">Confira o calendário de próximos eventos.</p>
-         <Link to="/eventos" className="mt-6 inline-block">
-           <Button className="bg-gold-gradient text-emerald-deep">Ver eventos</Button>
-         </Link>
-       </div>
-     );
-   }
- 
-   if (!liveLot) {
+  if (!liveEvent) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-         <h1 className="text-3xl font-bold">{liveEvent.name}</h1>
-         <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant flex flex-col items-center justify-center">
-            {liveEvent.transmission_link ? (
-              <iframe
-                className="h-full w-full border-0"
-                src={getEmbedUrl(liveEvent.transmission_link)}
-                title="Aguardando Próximo Lote"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-             <>
-               <Loader2 className="h-12 w-12 text-gold animate-spin mb-4" />
-               <p className="text-gold font-bold uppercase tracking-widest">Aguardando próximo lote...</p>
-               <p className="text-white/60 text-sm mt-2">O leiloeiro está preparando a próxima oferta.</p>
-             </>
-           )}
-         </div>
-         <p className="mt-8 text-muted-foreground">Fique atento! A transmissão continua enquanto preparamos o próximo animal.</p>
+        <Radio className="h-16 w-16 text-gold animate-pulse mx-auto mb-6" />
+        <h1 className="text-3xl font-bold text-emerald-deep uppercase tracking-tighter">Aguardando Transmissão</h1>
+        <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+          Não há leilões ativos no momento. Fique atento às nossas redes sociais e ao calendário para os próximos eventos.
+        </p>
+        <Link to="/eventos" className="mt-8 inline-block">
+          <Button className="bg-gold-gradient text-emerald-deep font-bold px-8 py-6 rounded-xl shadow-gold hover:scale-105 transition-transform">
+            Ver calendário de eventos
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  if (!liveLot) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <div className="inline-block px-4 py-1.5 rounded-full bg-gold/10 border border-gold/20 mb-4">
+          <span className="text-xs font-bold text-gold uppercase tracking-widest animate-pulse">● Evento ao Vivo</span>
+        </div>
+        <h1 className="text-3xl font-extrabold text-emerald-deep md:text-5xl mb-2">{liveEvent.name}</h1>
+        <p className="text-muted-foreground mb-8">{liveEvent.location || "Transmissão Online"}</p>
+        
+        <div className="mt-8 relative aspect-video max-w-4xl mx-auto overflow-hidden rounded-3xl border-4 border-gold/30 bg-emerald-deep shadow-2xl flex flex-col items-center justify-center group">
+          {liveEvent.transmission_link ? (
+            <iframe
+              className="h-full w-full border-0"
+              src={getEmbedUrl(liveEvent.transmission_link)}
+              title="Transmissão ao Vivo"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="text-center p-8">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-gold/20 rounded-full blur-2xl animate-pulse" />
+                <Loader2 className="h-16 w-16 text-gold animate-spin relative z-10 mx-auto" />
+              </div>
+              <p className="text-gold font-black text-2xl uppercase tracking-tighter">Aguardando Transmissão</p>
+              <p className="text-white/60 mt-3 max-w-xs mx-auto">O leiloeiro está preparando o sinal de vídeo e o próximo lote para entrar no ar.</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="mt-12 p-6 rounded-2xl bg-gold/5 border border-gold/10 max-w-2xl mx-auto">
+          <p className="text-emerald-deep font-medium italic">
+            "A transmissão continuará em instantes. Aproveite para conferir os detalhes dos animais no catálogo enquanto aguardamos a próxima oferta."
+          </p>
+        </div>
       </div>
     );
   }
@@ -382,8 +434,10 @@ export const Route = createFileRoute("/ao-vivo")({
                         <span className="flex items-center gap-1 text-[10px] bg-emerald-deep/20 text-emerald-deep px-1.5 rounded uppercase font-black">
                           <Gavel className="h-2 w-2" /> Auditório
                         </span>
-                      ) : (
+                      ) : bid.user_id ? (
                         <span>Comprador ...{bid.user_id.slice(-4)}</span>
+                      ) : (
+                        <span>Licitante</span>
                       )}
                    </div>
                    <div className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</div>
