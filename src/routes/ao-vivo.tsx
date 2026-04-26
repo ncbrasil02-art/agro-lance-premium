@@ -226,17 +226,39 @@ export const Route = createFileRoute("/ao-vivo")({
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         {/* Player + Lote em destaque */}
         <div className="space-y-6">
-          <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
-             <img src={liveLot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={liveLot.animal?.name} className="h-full w-full object-cover opacity-50" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent text-center">
-              <Radio className="h-12 w-12 text-gold animate-pulse-live" />
-              <p className="mt-3 text-sm font-bold uppercase tracking-wider text-gold">Transmissão ao vivo</p>
-              <p className="text-white/80 text-xs">Player de vídeo HD será exibido aqui</p>
-            </div>
-            <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur">
-              <Volume2 className="h-4 w-4" />
-            </div>
-          </div>
+           <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
+             {liveEvent.transmission_link ? (
+               <iframe
+                 className="h-full w-full border-0"
+                 src={liveEvent.transmission_link.replace("watch?v=", "embed/")}
+                 title="Transmissão ao Vivo"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowFullScreen
+               />
+             ) : (
+               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent text-center">
+                 <img src={liveLot.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} alt={liveLot.animal?.name} className="absolute inset-0 h-full w-full object-cover opacity-30" />
+                 <Radio className="h-12 w-12 text-gold animate-pulse-live relative z-10" />
+                 <p className="mt-3 text-sm font-bold uppercase tracking-wider text-gold relative z-10">Aguardando Transmissão</p>
+                 <p className="text-white/80 text-xs relative z-10">O vídeo será exibido assim que o leiloeiro iniciar.</p>
+               </div>
+             )}
+             
+             {statusMessage && (
+               <div className="absolute bottom-4 left-4 right-4 z-20 animate-in fade-in slide-in-from-bottom-4">
+                 <div className="bg-gold/95 backdrop-blur-sm p-3 rounded-lg shadow-xl flex items-center gap-3 border border-emerald-deep/20">
+                   <div className="h-8 w-8 rounded-full bg-emerald-deep flex items-center justify-center">
+                     <MessageSquare className="h-4 w-4 text-gold" />
+                   </div>
+                   <p className="text-emerald-deep font-black text-sm uppercase tracking-tight">{statusMessage}</p>
+                 </div>
+               </div>
+             )}
+             
+             <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur z-10">
+               <Volume2 className="h-4 w-4" />
+             </div>
+           </div>
 
           {/* Lote em destaque */}
           <div className="rounded-2xl border border-gold/30 bg-card p-6 shadow-gold">
