@@ -398,7 +398,19 @@
                       onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
                       className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
                     />
-                    <Label htmlFor="pre_bidding_lot">Lances Antecipados</Label>
+                    <Label htmlFor="pre_bidding_lot" className="flex items-center gap-1 cursor-pointer">
+                      Lances Antecipados
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Permite que licitantes deem lances antes do início oficial do evento.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <input 
@@ -408,7 +420,19 @@
                       onChange={(e) => setFormData({...formData, is_featured: e.target.checked})}
                       className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
                     />
-                    <Label htmlFor="is_featured">Lote em Destaque</Label>
+                    <Label htmlFor="is_featured" className="flex items-center gap-1 cursor-pointer">
+                      Lote em Destaque
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Dá prioridade visual ao lote na lista principal.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Label>
                   </div>
                 </div>
              </div>
