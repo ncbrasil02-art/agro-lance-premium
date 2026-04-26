@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { toast } from "sonner";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
@@ -369,155 +370,164 @@ import { Textarea } from "@/components/ui/textarea";
                   <PlusCircle className="mr-2 h-4 w-4" /> Novo Evento
                 </Button>
               </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
                 <DialogTitle>{editingEvent ? "Editar Evento" : "Criar Novo Evento"}</DialogTitle>
                <DialogDescription>
                   Defina as configurações do leilão.
                </DialogDescription>
              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Nome do Evento</Label>
-                  <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Descrição do Evento</Label>
-                  <Textarea 
-                    value={formData.description} 
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
-                    placeholder="Fale um pouco sobre o evento, linhagens, etc."
-                    className="min-h-[100px]"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="banner">Imagem de Destaque (Banner)</Label>
-                  <div className="flex gap-2">
-                    <Input 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
-                      id="banner-upload" 
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const toastId = toast.loading("Enviando banner...");
-                        const fileExt = file.name.split('.').pop();
-                        const fileName = `${Math.random()}.${fileExt}`;
-                        const { data, error } = await supabase.storage.from('banners').upload(fileName, file);
-                        if (error) {
-                          toast.error(`Erro no upload: ${error.message}`);
-                        } else {
-                          const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(data.path);
-                          setFormData({ ...formData, banner_url: publicUrl });
-                          toast.success("Banner enviado!");
-                        }
-                        toast.dismiss(toastId);
-                      }}
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="flex-1 border-dashed" 
-                      onClick={() => document.getElementById('banner-upload')?.click()}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" /> 
-                      {formData.banner_url ? "Trocar Banner" : "Upload Banner"}
-                    </Button>
-                  </div>
-                  {formData.banner_url && (
-                    <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
-                  )}
-                  <p className="text-[10px] text-muted-foreground">Esta imagem aparece na página inicial e no topo do evento.</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+              <Tabs defaultValue="basico" className="w-full mt-4">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="basico">Básico</TabsTrigger>
+                  <TabsTrigger value="agenda">Agenda</TabsTrigger>
+                  <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="basico" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                   <div className="grid gap-2">
-                    <Label htmlFor="date">Data/Hora Início</Label>
-                    <Input 
-                      type="datetime-local" 
-                      step="1"
-                      value={formData.start_date} 
-                      onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
+                    <Label htmlFor="name">Nome do Evento</Label>
+                    <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Ex: Grande Leilão Elite 2024" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="description">Descrição do Evento</Label>
+                    <Textarea 
+                      value={formData.description} 
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                      placeholder="Fale um pouco sobre o evento, linhagens, etc."
+                      className="min-h-[120px]"
                     />
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="end_date">Data/Hora Fim</Label>
-                    <Input 
-                      type="datetime-local" 
-                      step="1"
-                      value={formData.end_date} 
-                      onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} 
-                    />
-                  </div>
-                </div>
-                <p className="text-[10px] text-muted-foreground">O leilão iniciará e encerrará automaticamente nestas datas. Certifique-se de definir também os segundos.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="promoter">Empresa Promotora</Label>
-                    <Input value={formData.promoter_company} onChange={(e) => setFormData({ ...formData, promoter_company: e.target.value })} placeholder="Nome da Fazenda/Empresa" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="auctioneer">Leiloeiro</Label>
-                    <Input value={formData.auctioneer_name} onChange={(e) => setFormData({ ...formData, auctioneer_name: e.target.value })} placeholder="Nome do Leiloeiro" />
-                  </div>
-                </div>
-               <div className="grid grid-cols-2 gap-4">
-                 <div className="grid gap-2">
-                   <Label htmlFor="type">Tipo</Label>
-                    <Select onValueChange={(v) => setFormData({ ...formData, event_type: v })} value={formData.event_type}>
-                     <SelectTrigger><SelectValue /></SelectTrigger>
-                     <SelectContent>
-                       <SelectItem value="online">Online</SelectItem>
-                       <SelectItem value="presencial">Presencial</SelectItem>
-                       <SelectItem value="hibrido">Híbrido</SelectItem>
-                     </SelectContent>
-                   </Select>
-                 </div>
-                  <div className="grid gap-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="status">Status Inicial</Label>
-                      <span className="text-[10px] text-muted-foreground italic">"Ao Vivo" apenas indica que terá transmissão.</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="type">Tipo</Label>
+                      <Select onValueChange={(v) => setFormData({ ...formData, event_type: v })} value={formData.event_type}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="online">Online</SelectItem>
+                          <SelectItem value="presencial">Presencial</SelectItem>
+                          <SelectItem value="hibrido">Híbrido</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="scheduled">Agendado</SelectItem>
-                        <SelectItem value="live">Ao Vivo</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="grid gap-2">
+                      <Label htmlFor="status">Status Inicial</Label>
+                      <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="scheduled">Agendado</SelectItem>
+                          <SelectItem value="live">Ao Vivo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-               </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="location">Localização</Label>
-                  <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="transmission">Link da Transmissão (YouTube/Vimeo)</Label>
-                  <Input value={formData.transmission_link} onChange={(e) => setFormData({ ...formData, transmission_link: e.target.value })} placeholder="https://..." />
-                </div>
-                <div className="flex items-center gap-4 py-2">
-                  <div className="flex items-center space-x-2">
-                    <input 
-                      type="checkbox" 
-                      id="pre_bidding" 
-                      checked={formData.allows_pre_bidding} 
-                      onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
-                      className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
-                    />
-                    <Label htmlFor="pre_bidding">Lances Antecipados</Label>
+                </TabsContent>
+
+                <TabsContent value="agenda" className="space-y-4 animate-in fade-in slide-in-from-left-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="date">Data/Hora Início</Label>
+                      <Input 
+                        type="datetime-local" 
+                        step="1"
+                        value={formData.start_date} 
+                        onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="end_date">Data/Hora Fim</Label>
+                      <Input 
+                        type="datetime-local" 
+                        step="1"
+                        value={formData.end_date} 
+                        onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} 
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input 
-                      type="checkbox" 
-                      id="countdown" 
-                      checked={formData.show_countdown} 
-                      onChange={(e) => setFormData({...formData, show_countdown: e.target.checked})}
-                      className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
-                    />
-                    <Label htmlFor="countdown">Mostrar Contagem</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="location">Localização</Label>
+                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
                   </div>
-                </div>
-             </div>
+                  <div className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/20">
+                    <div className="flex items-center space-x-2">
+                      <input 
+                        type="checkbox" 
+                        id="pre_bidding" 
+                        checked={formData.allows_pre_bidding} 
+                        onChange={(e) => setFormData({...formData, allows_pre_bidding: e.target.checked})}
+                        className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                      />
+                      <Label htmlFor="pre_bidding" className="cursor-pointer">Permitir Lances Antecipados</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input 
+                        type="checkbox" 
+                        id="countdown" 
+                        checked={formData.show_countdown} 
+                        onChange={(e) => setFormData({...formData, show_countdown: e.target.checked})}
+                        className="h-4 w-4 rounded border-gray-300 text-gold focus:ring-gold"
+                      />
+                      <Label htmlFor="countdown" className="cursor-pointer">Mostrar Contagem Regressiva</Label>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="transmissao" className="space-y-4 animate-in fade-in slide-in-from-left-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="banner">Imagem de Destaque (Banner)</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        id="banner-upload" 
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const toastId = toast.loading("Enviando banner...");
+                          const fileExt = file.name.split('.').pop();
+                          const fileName = `${Math.random()}.${fileExt}`;
+                          const { data, error } = await supabase.storage.from('banners').upload(fileName, file);
+                          if (error) {
+                            toast.error(`Erro no upload: ${error.message}`);
+                          } else {
+                            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(data.path);
+                            setFormData({ ...formData, banner_url: publicUrl });
+                            toast.success("Banner enviado!");
+                          }
+                          toast.dismiss(toastId);
+                        }}
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="flex-1 border-dashed h-24 flex-col gap-2" 
+                        onClick={() => document.getElementById('banner-upload')?.click()}
+                      >
+                        <PlusCircle className="h-6 w-6" /> 
+                        {formData.banner_url ? "Trocar Banner" : "Upload Banner"}
+                      </Button>
+                    </div>
+                    {formData.banner_url && (
+                      <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
+                    )}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="transmission">Link da Transmissão (YouTube/Vimeo)</Label>
+                    <Input value={formData.transmission_link} onChange={(e) => setFormData({ ...formData, transmission_link: e.target.value })} placeholder="https://..." />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="promoter">Empresa Promotora</Label>
+                      <Input value={formData.promoter_company} onChange={(e) => setFormData({ ...formData, promoter_company: e.target.value })} placeholder="Fazenda / Empresa" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="auctioneer">Leiloeiro</Label>
+                      <Input value={formData.auctioneer_name} onChange={(e) => setFormData({ ...formData, auctioneer_name: e.target.value })} placeholder="Nome do Leiloeiro" />
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
              <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
                 <Button className="bg-gold text-emerald-deep" onClick={handleSave}>

@@ -28,10 +28,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           .limit(6),
           supabase.from("lots")
             .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+            .eq("is_featured", true)
             .not("status", "in", "('sold','passed','finished')")
-            .order("is_featured", { ascending: false })
-          .order("created_at", { ascending: false })
-          .limit(6),
+            .order("created_at", { ascending: false })
+            .limit(6),
          supabase.from("events")
            .select("*, lots!lots_event_id_fkey(id)")
            .eq("status", "finished")
