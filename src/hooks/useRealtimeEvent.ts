@@ -88,7 +88,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: (type: 'lot' | 'even
   return { status };
 }
 
-export function useRealtimeLots(onUpdate: (payload?: any) => void) {
+export function useRealtimeLots(onUpdate: (payload: any) => void) {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export function useRealtimeLots(onUpdate: (payload?: any) => void) {
       });
 
     const handleOnline = () => {
-      onUpdate();
+      onUpdate({ eventType: 'RECONNECT' });
       setRetryCount(c => c + 1);
     };
 
