@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const nav = [
   { to: "/", label: "Início" },
   { to: "/eventos", label: "Eventos" },
+  { to: "/compra-direta", label: "Compra de Animais" },
   { to: "/lotes", label: "Lotes" },
   { to: "/ao-vivo", label: "Ao Vivo" },
   { to: "/sobre", label: "Sobre" },
