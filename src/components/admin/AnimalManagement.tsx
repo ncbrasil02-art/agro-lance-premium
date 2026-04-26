@@ -57,10 +57,22 @@
        height: "",
          vaccination_records: "",
          veterinary_history: {},
-         other_veterinary_info: "",
-          genealogy_father: "",
-          genealogy_mother: "",
-          description: "",
+          other_veterinary_info: "",
+           genealogy_father: "",
+           genealogy_mother: "",
+           genealogy_grandfather_paternal: "",
+           genealogy_grandmother_paternal: "",
+           genealogy_grandfather_maternal: "",
+           genealogy_grandmother_maternal: "",
+           genealogy_great_grandfather_pp: "",
+           genealogy_great_grandmother_pp: "",
+           genealogy_great_grandfather_pm: "",
+           genealogy_great_grandmother_pm: "",
+           genealogy_great_grandfather_mp: "",
+           genealogy_great_grandmother_mp: "",
+           genealogy_great_grandfather_mm: "",
+           genealogy_great_grandmother_mm: "",
+           description: "",
           is_direct_sale: false,
           sale_price: "",
           sale_status: "available"
@@ -92,10 +104,22 @@
         height: "",
          vaccination_records: "",
          veterinary_history: {},
-         other_veterinary_info: "",
-          genealogy_father: "",
-          genealogy_mother: "",
-          description: "",
+          other_veterinary_info: "",
+           genealogy_father: "",
+           genealogy_mother: "",
+           genealogy_grandfather_paternal: "",
+           genealogy_grandmother_paternal: "",
+           genealogy_grandfather_maternal: "",
+           genealogy_grandmother_maternal: "",
+           genealogy_great_grandfather_pp: "",
+           genealogy_great_grandmother_pp: "",
+           genealogy_great_grandfather_pm: "",
+           genealogy_great_grandmother_pm: "",
+           genealogy_great_grandfather_mp: "",
+           genealogy_great_grandmother_mp: "",
+           genealogy_great_grandfather_mm: "",
+           genealogy_great_grandmother_mm: "",
+           description: "",
           is_direct_sale: false,
           sale_price: "",
           sale_status: "available"
@@ -129,8 +153,20 @@
          vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
          veterinary_history: animal.veterinary_history || {},
          other_veterinary_info: animal.veterinary_history?.other_info || "",
-        genealogy_father: animal.genealogy?.father || "",
-         genealogy_mother: animal.genealogy?.mother || "",
+         genealogy_father: animal.genealogy?.father || "",
+          genealogy_mother: animal.genealogy?.mother || "",
+          genealogy_grandfather_paternal: animal.genealogy?.grandfather_paternal || "",
+          genealogy_grandmother_paternal: animal.genealogy?.grandmother_paternal || "",
+          genealogy_grandfather_maternal: animal.genealogy?.grandfather_maternal || "",
+          genealogy_grandmother_maternal: animal.genealogy?.grandmother_maternal || "",
+          genealogy_great_grandfather_pp: animal.genealogy?.great_grandfather_pp || "",
+          genealogy_great_grandmother_pp: animal.genealogy?.great_grandmother_pp || "",
+          genealogy_great_grandfather_pm: animal.genealogy?.great_grandfather_pm || "",
+          genealogy_great_grandmother_pm: animal.genealogy?.great_grandmother_pm || "",
+          genealogy_great_grandfather_mp: animal.genealogy?.great_grandfather_mp || "",
+          genealogy_great_grandmother_mp: animal.genealogy?.great_grandmother_mp || "",
+          genealogy_great_grandfather_mm: animal.genealogy?.great_grandfather_mm || "",
+          genealogy_great_grandmother_mm: animal.genealogy?.great_grandmother_mm || "",
          description: animal.description || "",
          is_direct_sale: animal.is_direct_sale || false,
          sale_price: animal.sale_price || "",
@@ -172,7 +208,22 @@
               height: formData.height ? parseFloat(formData.height as string) : null,
                  vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                  veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
-               genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
+               genealogy: { 
+                 father: formData.genealogy_father, 
+                 mother: formData.genealogy_mother,
+                 grandfather_paternal: formData.genealogy_grandfather_paternal,
+                 grandmother_paternal: formData.genealogy_grandmother_paternal,
+                 grandfather_maternal: formData.genealogy_grandfather_maternal,
+                 grandmother_maternal: formData.genealogy_grandmother_maternal,
+                 great_grandfather_pp: formData.genealogy_great_grandfather_pp,
+                 great_grandmother_pp: formData.genealogy_great_grandmother_pp,
+                 great_grandfather_pm: formData.genealogy_great_grandfather_pm,
+                 great_grandmother_pm: formData.genealogy_great_grandmother_pm,
+                 great_grandfather_mp: formData.genealogy_great_grandfather_mp,
+                 great_grandmother_mp: formData.genealogy_great_grandmother_mp,
+                 great_grandfather_mm: formData.genealogy_great_grandfather_mm,
+                 great_grandmother_mm: formData.genealogy_great_grandmother_mm
+               },
                photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                description: formData.description,
                is_direct_sale: formData.is_direct_sale,
@@ -206,7 +257,22 @@
             height: formData.height ? parseFloat(formData.height as string) : null,
                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
-             genealogy: { father: formData.genealogy_father, mother: formData.genealogy_mother },
+              genealogy: { 
+                father: formData.genealogy_father, 
+                mother: formData.genealogy_mother,
+                grandfather_paternal: formData.genealogy_grandfather_paternal,
+                grandmother_paternal: formData.genealogy_grandmother_paternal,
+                grandfather_maternal: formData.genealogy_grandfather_maternal,
+                grandmother_maternal: formData.genealogy_grandmother_maternal,
+                great_grandfather_pp: formData.genealogy_great_grandfather_pp,
+                great_grandmother_pp: formData.genealogy_great_grandmother_pp,
+                great_grandfather_pm: formData.genealogy_great_grandfather_pm,
+                great_grandmother_pm: formData.genealogy_great_grandmother_pm,
+                great_grandfather_mp: formData.genealogy_great_grandfather_mp,
+                great_grandmother_mp: formData.genealogy_great_grandmother_mp,
+                great_grandfather_mm: formData.genealogy_great_grandfather_mm,
+                great_grandmother_mm: formData.genealogy_great_grandmother_mm
+              },
              internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
              photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
              description: formData.description,
@@ -528,28 +594,107 @@
                  </div>
                </TabsContent>
                
-               <TabsContent value="genealogia" className="space-y-4 pt-4">
-                 <div className="grid grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="father">Nome do Pai</Label>
-                     <Input id="father" value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="mother">Nome da Mãe</Label>
-                     <Input id="mother" value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
-                   </div>
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="weight">Peso (kg)</Label>
-                     <Input id="weight" type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="height">Altura (m)</Label>
-                     <Input id="height" type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
-                   </div>
-                 </div>
-               </TabsContent>
+                <TabsContent value="genealogia" className="space-y-6 pt-4 max-h-[60vh] overflow-y-auto pr-2">
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm border-b pb-1">1ª Geração (Pais)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="father">Pai</Label>
+                        <Input id="father" value={formData.genealogy_father} onChange={(e) => setFormData({ ...formData, genealogy_father: e.target.value })} placeholder="Nome do pai" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="mother">Mãe</Label>
+                        <Input id="mother" value={formData.genealogy_mother} onChange={(e) => setFormData({ ...formData, genealogy_mother: e.target.value })} placeholder="Nome da mãe" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm border-b pb-1">2ª Geração (Avós)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="space-y-4">
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avô Paterno</Label>
+                          <Input value={formData.genealogy_grandfather_paternal} onChange={(e) => setFormData({ ...formData, genealogy_grandfather_paternal: e.target.value })} placeholder="Pai do pai" />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avó Paterna</Label>
+                          <Input value={formData.genealogy_grandmother_paternal} onChange={(e) => setFormData({ ...formData, genealogy_grandmother_paternal: e.target.value })} placeholder="Mãe do pai" />
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avô Materno</Label>
+                          <Input value={formData.genealogy_grandfather_maternal} onChange={(e) => setFormData({ ...formData, genealogy_grandfather_maternal: e.target.value })} placeholder="Pai da mãe" />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-xs text-muted-foreground">Avó Materna</Label>
+                          <Input value={formData.genealogy_grandmother_maternal} onChange={(e) => setFormData({ ...formData, genealogy_grandmother_maternal: e.target.value })} placeholder="Mãe da mãe" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm border-b pb-1">3ª Geração (Bisavós)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      {/* Paternos */}
+                      <div className="space-y-4">
+                        <Label className="text-[10px] uppercase font-bold text-gold/60">Linha Paterna</Label>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai do Avô Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_pp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_pp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe do Avô Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_pp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_pp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai da Avó Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_pm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_pm: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe da Avó Pat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_pm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_pm: e.target.value })} />
+                        </div>
+                      </div>
+                      {/* Maternos */}
+                      <div className="space-y-4">
+                        <Label className="text-[10px] uppercase font-bold text-gold/60">Linha Materna</Label>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai do Avô Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_mp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_mp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe do Avô Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_mp} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_mp: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Pai da Avó Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandfather_mm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandfather_mm: e.target.value })} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label className="text-[9px]">Mãe da Avó Mat.</Label>
+                          <Input size={1} className="h-8 text-xs" value={formData.genealogy_great_grandmother_mm} onChange={(e) => setFormData({ ...formData, genealogy_great_grandmother_mm: e.target.value })} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t space-y-4">
+                    <h3 className="font-bold text-sm">Medidas</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="weight">Peso (kg)</Label>
+                        <Input id="weight" type="number" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="0.00" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="height">Altura (m)</Label>
+                        <Input id="height" type="number" step="0.01" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} placeholder="0.00" />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
                
                <TabsContent value="saude" className="space-y-4 pt-4">
                  <div className="grid gap-4">
