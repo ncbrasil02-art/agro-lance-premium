@@ -1,6 +1,16 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useEffectiveLotStatus } from "@/utils/auction-status";
 import { formatBRL } from "@/utils/format";
 import { Button } from "@/components/ui/button";
@@ -159,6 +169,8 @@ function LotDetail() {
   const [lot, setLot] = useState(initialLot);
   const [recentBids, setRecentBids] = useState<any[]>(initialBids);
   const [isBidding, setIsBidding] = useState(false);
+  const [showConfirmBid, setShowConfirmBid] = useState(false);
+  const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
   const [activePhoto, setActivePhoto] = useState(0);
 
   useEffect(() => {
@@ -189,12 +201,7 @@ function LotDetail() {
     };
   }, [lot.id]);
 
-  const placeBid = async (amount: number) => {
-    if (!user) {
-      toast.error("Faça login para dar lances.");
-      return;
-    }
-
+  const executeBid = async (amount: number) => {
     setIsBidding(true);
     try {
       // Obtém ou gera um ID de sessão persistente para proteção contra bots
@@ -228,6 +235,15 @@ function LotDetail() {
     } finally {
       setIsBidding(false);
     }
+  };
+
+  const placeBid = (amount: number) => {
+    if (!user) {
+      toast.error("Faça login para dar lances.");
+      return;
+    }
+    setPendingBidAmount(amount);
+    setShowConfirmBid(true);
   };
 
   const currentPrice = lot?.current_price || lot?.starting_price || 0;
@@ -296,6 +312,32 @@ function LotDetail() {
           </div>
         </div>
       </header>
+
+      <AlertDialog open={showConfirmBid} onOpenChange={setShowConfirmBid}>
+        <AlertDialogContent className="bg-emerald-deep border-gold/20 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-gold">
+              <AlertTriangle className="h-5 w-5" /> Confirmar Lance
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-white/80">
+              Você está prestes a dar um lance de <span className="text-white font-bold">{formatBRL(pendingBidAmount || 0)}</span> para o lote <span className="text-white font-bold">#{lot.lot_number}</span>.
+              <br /><br />
+              <span className="text-xs italic font-bold text-gold">Lances confirmados são irrevogáveis e representam um compromisso de compra.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-gold text-emerald-deep hover:bg-gold/90 font-bold"
+              onClick={() => {
+                if (pendingBidAmount) executeBid(pendingBidAmount);
+              }}
+            >
+              Confirmar Lance
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">

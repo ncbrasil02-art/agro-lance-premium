@@ -5,9 +5,20 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info } from "lucide-react";
- import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
- import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
  import { Label } from "@/components/ui/label";
   import { toast } from "sonner";
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -26,8 +37,11 @@
       const [availableAnimals, setAvailableAnimals] = useState<any[]>([]);
        const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
        const [statusFilter, setStatusFilter] = useState<string>("all");
-       const [searchQuery, setSearchQuery] = useState("");
+      const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
+      const [selectedLotBids, setSelectedLotBids] = useState<any[]>([]);
+      const [isBidsDialogOpen, setIsBidsDialogOpen] = useState(false);
+      const [isBidsLoading, setIsBidsLoading] = useState(false);
       
       const [formData, setFormData] = useState({
         event_id: "",
@@ -135,7 +149,48 @@
         setIsDialogOpen(true);
       };
    
-      const handleSave = async () => {
+       const fetchLotBids = async (lotId: string) => {
+         setIsBidsLoading(true);
+         setIsBidsDialogOpen(true);
+         try {
+           const { data, error } = await supabase
+             .from("bids")
+             .select(`
+               *,
+               profile:profiles(full_name)
+             `)
+             .eq("lot_id", lotId)
+             .order("created_at", { ascending: false });
+
+           if (error) throw error;
+           setSelectedLotBids(data || []);
+         } catch (error: any) {
+           toast.error("Erro ao carregar lances: " + error.message);
+         } finally {
+           setIsBidsLoading(false);
+         }
+       };
+
+       const handleDeleteBid = async (bid: any) => {
+         if (!confirm(`Tem certeza que deseja EXCLUIR o lance de R$ ${bid.amount} de ${bid.profile?.full_name || 'Usuário'}?`)) return;
+         
+         try {
+           const { error } = await supabase
+             .from("bids")
+             .delete()
+             .eq("id", bid.id);
+
+           if (error) throw error;
+           
+           toast.success("Lance excluído com sucesso");
+           fetchLotBids(bid.lot_id);
+           fetchData(); // Refresh main list to update current price
+         } catch (error: any) {
+           toast.error("Erro ao excluir lance: " + error.message);
+         }
+       };
+
+       const handleSave = async () => {
         if (!formData.event_id || !formData.animal_id || !formData.lot_number) {
          toast.error("Preencha todos os campos obrigatórios");
          return;
@@ -546,48 +601,71 @@
                            <TableCell className="text-right">
                              <div className="flex justify-end gap-2">
                                {lot.status === 'active' && (
-                                 <TooltipProvider>
-                                   <Tooltip>
-                                     <TooltipTrigger asChild>
-                                       <Button 
-                                         variant="outline" 
-                                         size="sm" 
-                                         className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
-                                          onClick={async () => {
-                                            const bidAmount = currentPrice + (lot.bid_increment || 1000);
-                                            setIsLoading(true);
-                                            try {
-                                              const { data, error } = await supabase.rpc('place_bid_safe', {
-                                                p_lot_id: lot.id,
-                                                p_amount: bidAmount,
-                                                p_bid_type: 'online',
-                                                p_session_id: 'admin-safety-bid'
-                                              });
- 
-                                              if (error) throw error;
-                                              const result = data as { success: boolean, message: string };
-                                              if (result.success) {
-                                                toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
-                                                fetchData();
-                                              } else {
-                                                toast.error(result.message);
-                                              }
-                                            } catch (error: any) {
-                                              toast.error("Erro no lance: " + error.message);
-                                            } finally {
-                                              setIsLoading(false);
-                                            }
-                                          }}
+                                 <AlertDialog>
+                                   <AlertDialogTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="sm" 
+                                       className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
+                                     >
+                                       <ShieldCheck className="h-3 w-3" /> Segurança
+                                     </Button>
+                                   </AlertDialogTrigger>
+                                   <AlertDialogContent>
+                                     <AlertDialogHeader>
+                                       <AlertDialogTitle>Confirmar Lance de Segurança</AlertDialogTitle>
+                                       <AlertDialogDescription>
+                                         Deseja realmente efetuar um lance de segurança no valor de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice + (lot.bid_increment || 1000))} para este lote?
+                                       </AlertDialogDescription>
+                                     </AlertDialogHeader>
+                                     <AlertDialogFooter>
+                                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                       <AlertDialogAction 
+                                         className="bg-gold text-emerald-deep hover:bg-gold/90"
+                                         onClick={async () => {
+                                           const bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                           setIsLoading(true);
+                                           try {
+                                             const { data, error } = await supabase.rpc('place_bid_safe', {
+                                               p_lot_id: lot.id,
+                                               p_amount: bidAmount,
+                                               p_bid_type: 'online',
+                                               p_session_id: 'admin-safety-bid'
+                                             });
+
+                                             if (error) throw error;
+                                             const result = data as { success: boolean, message: string };
+                                             if (result.success) {
+                                               toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
+                                               fetchData();
+                                             } else {
+                                               toast.error(result.message);
+                                             }
+                                           } catch (error: any) {
+                                             toast.error("Erro no lance: " + error.message);
+                                           } finally {
+                                             setIsLoading(false);
+                                           }
+                                         }}
                                        >
-                                         <ShieldCheck className="h-3 w-3" /> Segurança
-                                       </Button>
-                                     </TooltipTrigger>
-                                     <TooltipContent>
-                                       <p>Efetuar lance de segurança administrativa (+1 incremento)</p>
-                                     </TooltipContent>
-                                   </Tooltip>
-                                 </TooltipProvider>
+                                         Confirmar
+                                       </AlertDialogAction>
+                                     </AlertDialogFooter>
+                                   </AlertDialogContent>
+                                 </AlertDialog>
                                )}
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gold" onClick={() => fetchLotBids(lot.id)}>
+                                       <History className="h-3.5 w-3.5" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>
+                                     <p>Histórico de Lances / Reverter</p>
+                                   </TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
                                <TooltipProvider>
                                  <Tooltip>
                                    <TooltipTrigger asChild>
@@ -623,6 +701,71 @@
            )}
          </CardContent>
        </Card>
+
+       <Dialog open={isBidsDialogOpen} onOpenChange={setIsBidsDialogOpen}>
+         <DialogContent className="sm:max-w-[600px]">
+           <DialogHeader>
+             <DialogTitle>Histórico de Lances</DialogTitle>
+             <DialogDescription>
+               Visualize e gerencie os lances efetuados para este lote.
+             </DialogDescription>
+           </DialogHeader>
+           <div className="py-4">
+             {isBidsLoading ? (
+               <div className="flex justify-center py-8">
+                 <Loader2 className="h-8 w-8 animate-spin text-gold" />
+               </div>
+             ) : (
+               <div className="max-h-[400px] overflow-y-auto rounded-md border">
+                 <Table>
+                   <TableHeader className="bg-muted/50 sticky top-0 z-10">
+                     <TableRow>
+                       <TableHead>Licitante</TableHead>
+                       <TableHead>Valor</TableHead>
+                       <TableHead>Data/Hora</TableHead>
+                       <TableHead className="text-right">Ações</TableHead>
+                     </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                     {selectedLotBids.length === 0 ? (
+                       <TableRow>
+                         <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                           Nenhum lance efetuado ainda.
+                         </TableCell>
+                       </TableRow>
+                     ) : (
+                       selectedLotBids.map((bid) => (
+                         <TableRow key={bid.id}>
+                           <TableCell className="font-medium">{bid.profile?.full_name || "Usuário"}</TableCell>
+                           <TableCell className="font-bold text-emerald-600">
+                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
+                           </TableCell>
+                           <TableCell className="text-xs text-muted-foreground">
+                             {new Date(bid.created_at).toLocaleString('pt-BR')}
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <Button 
+                               variant="ghost" 
+                               size="icon" 
+                               className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                               onClick={() => handleDeleteBid(bid)}
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </TableCell>
+                         </TableRow>
+                       ))
+                     )}
+                   </TableBody>
+                 </Table>
+               </div>
+             )}
+           </div>
+           <DialogFooter>
+             <Button onClick={() => setIsBidsDialogOpen(false)}>Fechar</Button>
+           </DialogFooter>
+         </DialogContent>
+       </Dialog>
      </div>
    );
  }
