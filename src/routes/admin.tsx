@@ -155,7 +155,7 @@ function AdminLayout() {
           {activeTab === "dashboard" && (
             <>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                 <Card className="cursor-pointer hover:bg-muted/10 transition-colors" onClick={() => setActiveTab("users")}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total de Lances</CardTitle>
                     <Gavel className="h-4 w-4 text-muted-foreground" />
@@ -235,7 +235,10 @@ function AdminLayout() {
                       >
                         <ShieldCheck className="mr-2 h-4 w-4" /> Lance de Segurança
                       </Button>
-                     <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
+                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("users")}>
+                         <Users className="mr-2 h-4 w-4" /> Gestão de Usuários
+                       </Button>
+                       <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
                   </CardContent>
                 </Card>
               </div>
