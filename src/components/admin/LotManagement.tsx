@@ -171,24 +171,28 @@ import {
          }
        };
 
-       const handleDeleteBid = async (bid: any) => {
-         if (!confirm(`Tem certeza que deseja EXCLUIR o lance de R$ ${bid.amount} de ${bid.profile?.full_name || 'Usuário'}?`)) return;
-         
-         try {
-           const { error } = await supabase
-             .from("bids")
-             .delete()
-             .eq("id", bid.id);
+        const handleDeleteBid = async (bid: any) => {
+          if (!confirm(`Tem certeza que deseja EXCLUIR o lance de R$ ${bid.amount} de ${bid.profile?.full_name || 'Usuário'}?`)) return;
+          
+          try {
+            const { data, error } = await supabase.rpc("delete_bid_safe", {
+              p_bid_id: bid.id
+            });
 
-           if (error) throw error;
-           
-           toast.success("Lance excluído com sucesso");
-           fetchLotBids(bid.lot_id);
-           fetchData(); // Refresh main list to update current price
-         } catch (error: any) {
-           toast.error("Erro ao excluir lance: " + error.message);
-         }
-       };
+            if (error) throw error;
+            
+            const result = data as { success: boolean; message: string };
+            if (result.success) {
+              toast.success(result.message);
+              fetchLotBids(bid.lot_id);
+              fetchData(); // Refresh main list to update current price
+            } else {
+              toast.error(result.message);
+            }
+          } catch (error: any) {
+            toast.error("Erro ao excluir lance: " + error.message);
+          }
+        };
 
        const handleSave = async () => {
         if (!formData.event_id || !formData.animal_id || !formData.lot_number) {
