@@ -1,3 +1,5 @@
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import { getCacheStats } from "@/utils/image-optimization";
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
@@ -324,9 +326,19 @@ export const Route = createFileRoute("/admin")({
             {activeTab === "settings" && (
               <div className="space-y-6">
                 <Card>
-                  <CardHeader><CardTitle>Configurações</CardTitle></CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-sm">Configurações da plataforma em desenvolvimento.</p>
+                  <CardHeader>
+                    <CardTitle>Configurações Globais</CardTitle>
+                    <CardDescription>Ajuste o comportamento do sistema de otimização</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-bold">Qualidade Padrão das Imagens</Label>
+                        <span className="text-xs font-mono bg-gold/10 text-gold px-2 py-0.5 rounded">80%</span>
+                      </div>
+                      <Slider defaultValue={[80]} max={100} step={5} className="w-full" />
+                      <p className="text-[10px] text-muted-foreground">Qualidade sugerida para o WebP. Valores menores economizam dados, valores maiores aumentam a nitidez.</p>
+                    </div>
                   </CardContent>
                 </Card>
 
