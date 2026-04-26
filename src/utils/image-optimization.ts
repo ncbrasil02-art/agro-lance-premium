@@ -33,6 +33,14 @@ const saveCache = (cache: Map<string, string>) => {
 
 const urlCache = loadCache();
 
+export const IMAGE_FALLBACKS = {
+  horse: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
+  cattle: "https://images.unsplash.com/photo-1547499617-dc3f9b2df334?auto=format&fit=crop&q=80",
+  event: "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  default: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"
+};
+
 interface OptimizationOptions {
   width?: number;
   height?: number;
@@ -47,7 +55,7 @@ interface OptimizationOptions {
 export function getOptimizedImageUrl(
   originalUrl: string, 
   options: OptimizationOptions = {}, 
-  fallbackSrc = "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"
+  fallbackSrc = IMAGE_FALLBACKS.default
 ): string {
   if (!originalUrl) return fallbackSrc;
 
