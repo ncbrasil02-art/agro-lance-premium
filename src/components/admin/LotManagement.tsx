@@ -546,45 +546,72 @@
                            <TableCell className="text-right">
                              <div className="flex justify-end gap-2">
                                {lot.status === 'active' && (
-                                 <Button 
-                                   variant="outline" 
-                                   size="sm" 
-                                   className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
-                                    onClick={async () => {
-                                      const bidAmount = currentPrice + (lot.bid_increment || 1000);
-                                      setIsLoading(true);
-                                      try {
-                                        const { data, error } = await supabase.rpc('place_bid_safe', {
-                                          p_lot_id: lot.id,
-                                          p_amount: bidAmount,
-                                          p_bid_type: 'online',
-                                          p_session_id: 'admin-safety-bid'
-                                        });
-
-                                        if (error) throw error;
-                                        const result = data as { success: boolean, message: string };
-                                        if (result.success) {
-                                          toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
-                                          fetchData();
-                                        } else {
-                                          toast.error(result.message);
-                                        }
-                                      } catch (error: any) {
-                                        toast.error("Erro no lance: " + error.message);
-                                      } finally {
-                                        setIsLoading(false);
-                                      }
-                                    }}
-                                 >
-                                   <ShieldCheck className="h-3 w-3" /> Segurança
-                                 </Button>
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button 
+                                         variant="outline" 
+                                         size="sm" 
+                                         className="h-8 gap-1 border-gold/50 hover:bg-gold/10 text-gold text-[10px] font-bold"
+                                          onClick={async () => {
+                                            const bidAmount = currentPrice + (lot.bid_increment || 1000);
+                                            setIsLoading(true);
+                                            try {
+                                              const { data, error } = await supabase.rpc('place_bid_safe', {
+                                                p_lot_id: lot.id,
+                                                p_amount: bidAmount,
+                                                p_bid_type: 'online',
+                                                p_session_id: 'admin-safety-bid'
+                                              });
+ 
+                                              if (error) throw error;
+                                              const result = data as { success: boolean, message: string };
+                                              if (result.success) {
+                                                toast.success(`Lance de Segurança efetuado: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bidAmount)}`);
+                                                fetchData();
+                                              } else {
+                                                toast.error(result.message);
+                                              }
+                                            } catch (error: any) {
+                                              toast.error("Erro no lance: " + error.message);
+                                            } finally {
+                                              setIsLoading(false);
+                                            }
+                                          }}
+                                       >
+                                         <ShieldCheck className="h-3 w-3" /> Segurança
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>
+                                       <p>Efetuar lance de segurança administrativa (+1 incremento)</p>
+                                     </TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
                                )}
-                               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(lot)}>
-                                 <Pencil className="h-3.5 w-3.5" />
-                               </Button>
-                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(lot.id)}>
-                                 <Trash2 className="h-3.5 w-3.5" />
-                               </Button>
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(lot)}>
+                                       <Pencil className="h-3.5 w-3.5" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>
+                                     <p>Editar Lote</p>
+                                   </TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(lot.id)}>
+                                       <Trash2 className="h-3.5 w-3.5" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>
+                                     <p>Excluir Lote</p>
+                                   </TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
                              </div>
                            </TableCell>
                          </TableRow>
