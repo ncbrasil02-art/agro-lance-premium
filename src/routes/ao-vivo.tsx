@@ -135,53 +135,100 @@ export const Route = createFileRoute("/ao-vivo")({
  
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
-    if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
-    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/");
-    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    try {
+      if (url.includes("youtube.com/embed/") || url.includes("player.vimeo.com")) return url;
+      
+      // Youtube long URL
+      if (url.includes("youtube.com/watch")) {
+        const urlObj = new URL(url);
+        const v = urlObj.searchParams.get("v");
+        if (v) return `https://www.youtube.com/embed/${v}?autoplay=1&mute=1`;
+      }
+      
+      // Youtube short URL
+      if (url.includes("youtu.be/")) {
+        const id = url.split("youtu.be/")[1]?.split("?")[0];
+        if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`;
+      }
+      
+      // Vimeo
+      if (url.includes("vimeo.com/")) {
+        const id = url.split("vimeo.com/")[1]?.split("?")[0];
+        if (id) return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1`;
+      }
+    } catch (e) {
+      console.error("Erro ao processar URL de vídeo:", e);
+    }
     return url;
   };
 
-   useEffect(() => {
-     if (!liveEvent) return;
- 
-     const eventChannel = supabase
-       .channel(`live-event-${liveEvent.id}`)
-       .on(
-         "postgres_changes",
-         { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${liveEvent.id}` },
-         async (payload) => {
-            const { data } = await supabase
-              .from("events")
-              .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
-              .eq("id", liveEvent.id)
-             .single();
-             if (data) {
-               setLiveEvent(data as any);
-               if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
-                 setStatusMessage(payload.new.live_status_message);
-                 setTimeout(() => setStatusMessage(null), 8000);
-               }
-             }
-         }
-       )
-       .subscribe();
- 
-     const bidsChannel = supabase
-       .channel(`live-bids-${liveEvent.active_lot_id}`)
-       .on(
-         "postgres_changes",
-         { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
-         (payload) => {
-           setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
-         }
-       )
-       .subscribe();
- 
-     return () => {
-       supabase.removeChannel(eventChannel);
-       supabase.removeChannel(bidsChannel);
-     };
-   }, [liveEvent?.id, liveEvent?.active_lot_id]);
+    useEffect(() => {
+      // Listen for updates to ANY event that could become live if we don't have one
+      const globalChannel = supabase
+        .channel("global-events-status")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "events" },
+          async (payload) => {
+            // If we don't have a live event, and an event just became 'live', refresh everything
+            if (!liveEvent && payload.new.status === 'live') {
+              window.location.reload(); // Hard refresh to trigger loader again if no event was active
+              return;
+            }
+            
+            // If it's our current event being updated
+            if (liveEvent && payload.new.id === liveEvent.id) {
+              const { data } = await supabase
+                .from("events")
+                .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+                .eq("id", liveEvent.id)
+                .single();
+              
+              if (data) {
+                setLiveEvent(data as any);
+                
+                // Handle status messages
+                if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
+                  setStatusMessage(payload.new.live_status_message);
+                  setTimeout(() => setStatusMessage(null), 8000);
+                }
+                
+                // If active lot changed, fetch bids for the new lot
+                if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
+                  const { data: newBids } = await supabase
+                    .from("bids")
+                    .select("*")
+                    .eq("lot_id", payload.new.active_lot_id)
+                    .order("created_at", { ascending: false })
+                    .limit(10);
+                  if (newBids) setBids(newBids);
+                }
+              }
+            }
+          }
+        )
+        .subscribe();
+
+      // Specific bids channel for the active lot
+      let bidsChannel: any = null;
+      if (liveEvent?.active_lot_id) {
+        bidsChannel = supabase
+          .channel(`live-bids-${liveEvent.active_lot_id}`)
+          .on(
+            "postgres_changes",
+            { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
+            (payload) => {
+              setBids((prev: any) => [payload.new, ...prev].slice(0, 10));
+            }
+          )
+          .subscribe();
+      }
+
+      return () => {
+        supabase.removeChannel(globalChannel);
+        if (bidsChannel) supabase.removeChannel(bidsChannel);
+      };
+    }, [liveEvent?.id, liveEvent?.active_lot_id]);
  
    const liveLot = liveEvent?.active_lot;
  
