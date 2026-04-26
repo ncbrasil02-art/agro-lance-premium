@@ -1,5 +1,5 @@
  import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell } from "lucide-react";
+import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2 } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
 import { useEffect, useState } from "react";
@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema, announcementSchema, ValidatedEvent, ValidatedLot } from "@/lib/schemas";
   import { z } from "zod";
-import heroImage from "@/assets/hero-horse.jpg";
+import { OptimizedImage } from "@/components/ui/optimized-image";
+import { HomeSkeleton } from "@/components/ui/page-skeleton";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   export const Route = createFileRoute("/")({
@@ -70,6 +71,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
       }
     },
     component: Home,
+    pendingComponent: HomeSkeleton,
   });
 
 function Home() {
@@ -186,7 +188,12 @@ function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Cavalo de elite ao entardecer" width={1920} height={1080} className="h-full w-full object-cover opacity-40" />
+          <OptimizedImage 
+            src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
+            alt="Cavalo de elite ao entardecer" 
+            width={1920} 
+            className="h-full w-full opacity-40" 
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         </div>
