@@ -98,8 +98,10 @@
          fetchData();
        }, [initialEventId]);
  
-       useRealtimeLots(() => {
-         fetchData();
+       useRealtimeLots((payload) => {
+         if (payload && (payload.eventType === 'INSERT' || payload.eventType === 'DELETE' || payload.eventType === 'RECONNECT')) {
+           fetchData();
+         }
        });
 
       const resetForm = () => {
