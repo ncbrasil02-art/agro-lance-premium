@@ -99,7 +99,9 @@
        }, [initialEventId]);
  
        useRealtimeLots((payload) => {
-         if (payload && (payload.eventType === 'INSERT' || payload.eventType === 'DELETE' || payload.eventType === 'RECONNECT')) {
+         // In admin management, we usually want to see everything updated
+         // but we can still skip if the payload is empty or unknown.
+         if (!payload || payload.eventType !== 'SELECT') {
            fetchData();
          }
        });
