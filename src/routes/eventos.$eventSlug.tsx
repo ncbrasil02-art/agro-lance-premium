@@ -118,18 +118,19 @@ function EventDetail() {
                 </div>
               </div>
               
-              <Dialog>
+              <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
                 <DialogTrigger asChild>
                   <Button 
                     variant="outline" 
                     className="w-full h-12 rounded-2xl border-white/10 bg-white/5 hover:bg-gold/10 hover:border-gold/30 hover:text-gold transition-all flex items-center gap-2 group/btn shadow-lg"
+                    onClick={() => setIsFlyerOpen(true)}
                   >
                     <Maximize2 className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
                     VER ENCARTE COMPLETO
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10 flex items-center justify-center">
-                  <div className="relative w-full h-full flex items-center justify-center p-4">
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10">
+                  <div className="relative w-full h-full flex items-center justify-center p-4 min-h-[50vh]">
                     <OptimizedImage 
                       src={event.banner_url || ""} 
                       alt={event.name} 
