@@ -20,6 +20,7 @@
    const [activeLot, setActiveLot] = useState<any>(null);
    const [isLoading, setIsLoading] = useState(false);
    const [isActionLoading, setIsActionLoading] = useState(false);
+  const [transmissionLink, setTransmissionLink] = useState("");
    
    // Phone bid form
    const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "" });
@@ -70,6 +71,7 @@
          .order("lot_number", { ascending: true });
  
        setLiveEvent(event);
+        setTransmissionLink(event?.transmission_link || "");
        setLots(eventLots || []);
        
        if (event?.active_lot_id) {
@@ -94,6 +96,25 @@
      else toast.success("Mensagem enviada!");
    };
  
+    const updateTransmissionLink = async () => {
+      if (!selectedEventId) return;
+      setIsActionLoading(true);
+      try {
+        const { error } = await supabase
+          .from("events")
+          .update({ transmission_link: transmissionLink })
+          .eq("id", selectedEventId);
+        
+        if (error) throw error;
+        toast.success("Link de transmissão atualizado!");
+        fetchEventDetails(selectedEventId);
+      } catch (error: any) {
+        toast.error("Erro ao atualizar link: " + error.message);
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
    const activateLot = async (lotId: string) => {
      setIsActionLoading(true);
      try {
@@ -176,6 +197,39 @@
      }
    };
  
+    const handleSecurityBid = async () => {
+      if (!activeLot) {
+        toast.error("Nenhum lote ativo");
+        return;
+      }
+
+      const amount = (activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment;
+      
+      setIsActionLoading(true);
+      try {
+        const { data, error } = await supabase.rpc("place_bid_safe", {
+          p_lot_id: activeLot.id,
+          p_amount: amount,
+          p_bid_type: "security",
+          p_session_id: "admin-security-bid"
+        });
+
+        if (error) throw error;
+        
+        const result = data as any;
+        if (result.success) {
+          toast.success("Lance de segurança (reserva) efetuado!");
+          fetchEventDetails(selectedEventId);
+        } else {
+          toast.error(result.message);
+        }
+      } catch (error: any) {
+        toast.error(error.message);
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
    return (
      <div className="space-y-6">
        <Card className="border-gold/30">
@@ -211,6 +265,32 @@
          </CardContent>
        </Card>
  
+        {selectedEventId && liveEvent && (
+          <Card className="border-gold/30">
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <Video className="h-4 w-4 text-gold" /> Transmissão ao Vivo
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Link do YouTube/Vimeo" 
+                  value={transmissionLink}
+                  onChange={(e) => setTransmissionLink(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={updateTransmissionLink}
+                  disabled={isActionLoading}
+                >
+                  {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar Link"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
        {selectedEventId && liveEvent && (
          <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
            <div className="space-y-6">
@@ -367,6 +447,28 @@
                </CardContent>
              </Card>
  
+              <Card className="border-destructive/30 bg-destructive/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="h-4 w-4" /> Lance de Segurança
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-[10px] text-muted-foreground uppercase leading-tight">
+                    Use para cobrir o preço reserva ou estimular o leilão. Aparecerá no auditório sem identificar o usuário.
+                  </p>
+                  <Button 
+                    variant="destructive"
+                    className="w-full font-bold"
+                    onClick={handleSecurityBid}
+                    disabled={isActionLoading || !activeLot}
+                  >
+                    {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
+                    Dar Lance + {activeLot ? formatBRL(activeLot.bid_increment) : "0,00"}
+                  </Button>
+                </CardContent>
+              </Card>
+
              <Card>
                <CardHeader className="pb-2">
                  <CardTitle className="text-sm font-bold flex items-center gap-2">
