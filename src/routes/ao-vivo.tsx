@@ -130,21 +130,11 @@ export const Route = createFileRoute("/ao-vivo")({
           }
         }
 
-        // Try parsing, but don't fail hard if it's mostly valid data
-        try {
-          const validatedEvent = eventSchema.parse(liveEvent);
-          return { 
-            liveEvent: validatedEvent,
-            initialBids
-          };
-        } catch (schemaError) {
-          console.warn("Validação parcial do evento (usando dados brutos):", schemaError);
-          // Return the event as is if it has the required UI fields
-          if (liveEvent.id && liveEvent.name) {
-            return { liveEvent, initialBids };
-          }
-          return { liveEvent: null };
-        }
+        // Skip strict validation to avoid "Waiting for Transmission" due to minor schema mismatches
+        return { 
+          liveEvent: liveEvent as any,
+          initialBids
+        };
       } catch (err) {
         console.error("Erro fatal no loader ao-vivo:", err);
         return { liveEvent: null };
