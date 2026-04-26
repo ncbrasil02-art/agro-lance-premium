@@ -1,4 +1,5 @@
- import { createFileRoute } from "@tanstack/react-router";
+  import { createFileRoute, useRouter } from "@tanstack/react-router";
+   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
  import { LotCard } from "@/components/auctions/lot-card";
   import { supabase } from "@/integrations/supabase/client";
   import { lotSchema } from "@/lib/schemas";
@@ -43,6 +44,11 @@ export const Route = createFileRoute("/lotes/")({
 
 function LotsPage() {
    const { lots = [] } = Route.useLoaderData() as any;
+    const router = useRouter();
+ 
+    useRealtimeLots(() => {
+      router.invalidate();
+    });
  
    const mappedLots = lots?.map((l: any) => ({
      id: l.id,
