@@ -205,8 +205,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
               pedigree_url: formData.pedigree_url,
               color: formData.color,
               birth_date: formData.birth_date || null,
-              weight: formData.weight ? parseFloat(formData.weight as string) : null,
-              height: formData.height ? parseFloat(formData.height as string) : null,
+               weight: formData.weight ? parseFloat(formData.weight as string) : null,
+               height: formData.height ? parseFloat(formData.height as string) : null,
+               default_bid_increment: formData.default_bid_increment ? parseFloat(formData.default_bid_increment as string) : 1000,
                  vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                  veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
                genealogy: { 
@@ -254,8 +255,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
             pedigree_url: formData.pedigree_url,
             color: formData.color,
             birth_date: formData.birth_date || null,
-            weight: formData.weight ? parseFloat(formData.weight as string) : null,
-            height: formData.height ? parseFloat(formData.height as string) : null,
+             weight: formData.weight ? parseFloat(formData.weight as string) : null,
+             height: formData.height ? parseFloat(formData.height as string) : null,
+             default_bid_increment: formData.default_bid_increment ? parseFloat(formData.default_bid_increment as string) : 1000,
                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
               genealogy: { 
