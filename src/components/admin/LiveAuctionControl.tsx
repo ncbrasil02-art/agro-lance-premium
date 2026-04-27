@@ -373,6 +373,7 @@
         const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
 
         if (isGenericPhoneBid) {
+          // Only for generic phone bids we ask to link, as we don't know who it is
           if (confirm(`Lote arrematado via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`)) {
             if (phoneBid.profileId) {
               finalWinnerId = phoneBid.profileId;
@@ -381,12 +382,10 @@
               return;
             }
           }
-        } else if (isAdminBid) {
-          // Admin bidding for himself or as a placeholder
-          if (!confirm(`Confirmar ARREMATE para você (Administrador) no valor de ${formatBRL(lastBid.amount)}?`)) return;
         } else {
-          // Normal registered user
-          if (!confirm(`Confirmar ARREMATE para ${lastBid.profile?.full_name || 'o maior lance'} no valor de ${formatBRL(lastBid.amount)}?`)) return;
+          // For registered users (including admin), we proceed automatically as requested
+          // No second confirmation dialog after clicking "Arrematar"
+          console.log("Arrematando automaticamente para usuário registrado:", lastBid.profile?.full_name);
         }
 
        setIsActionLoading(true);
