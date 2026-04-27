@@ -235,8 +235,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
     const fetchEvents = async () => {
       const { data } = await supabase
         .from("events")
-        .select("id, name")
-        .or("status.eq.live,status.eq.scheduled")
+        .select("id, name, event_type")
+        .eq("event_type", "ao_vivo")
+        .in("status", ["live", "scheduled", "em_loteamento", "recebendo_lances", "em_condicional"])
         .order("start_date", { ascending: false });
       setEvents(data || []);
     };

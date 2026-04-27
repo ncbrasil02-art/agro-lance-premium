@@ -150,7 +150,7 @@ function EventDetail() {
               <div className="flex flex-wrap items-center gap-3 mb-8">
                 <StatusBadge status={event.status} className="scale-110" />
                 <div className="h-4 w-px bg-white/10" />
-                 <span className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">{event.event_type || 'Leilão Premium'}</span>
+                 <span className="text-xs font-black uppercase tracking-[0.2em] text-gold">{event.event_type === 'ao_vivo' ? 'LEILÃO AO VIVO' : 'LEILÃO ONLINE'}</span>
               </div>
               
                <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-foreground mb-8 uppercase leading-[0.85] italic">

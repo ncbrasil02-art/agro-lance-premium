@@ -98,6 +98,9 @@ import { Countdown } from "@/components/auctions/countdown";
               </div>
             )}
             <StatusBadge status={effectiveStatus} urgent={isUrgent} />
+            <div className="rounded-full bg-white/10 backdrop-blur-md px-2.5 py-1 text-[8px] font-black text-white/80 border border-white/10 uppercase tracking-widest">
+              {event.event_type === 'ao_vivo' ? 'Ao Vivo' : 'Online'}
+            </div>
             {effectiveStatus === 'scheduled' && event?.date && (
               <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg">
                 <Timer className="h-3 w-3" />

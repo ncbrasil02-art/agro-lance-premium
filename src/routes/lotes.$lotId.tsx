@@ -320,14 +320,19 @@ function LotDetail() {
 
    const currentPrice = lot?.current_price || lot?.starting_price || 0;
    const isSold = lot?.status === 'sold';
+  const isPassed = lot?.status === 'passed';
    const nextBid = currentPrice + (lot?.bid_increment || 0);
   const dynamicStatus = useEffectiveLotStatus({
      status: lot.status,
      event_status: lot.event?.status,
+     event_type: lot.event?.event_type,
      event_start_date: lot.event?.start_date,
      event_end_date: lot.event?.end_date,
      allows_pre_bidding: lot.event?.allows_pre_bidding
    });
+
+  const isBiddingOpen = (dynamicStatus === 'live' || dynamicStatus === 'recebendo_lances' || dynamicStatus === 'pre_lance') && !isSold && !isPassed;
+
   const [isUrgent, setIsUrgent] = useState(false);
   const installments = 30;
   const installmentValue = currentPrice / installments;
@@ -662,7 +667,7 @@ function LotDetail() {
                    </div>
                  </div>
                    <div className="mt-8 space-y-6">
-                     {!isSold && (
+                     {isBiddingOpen && (
                        <div className="space-y-3">
                          <p className="text-[10px] font-black text-gold/60 uppercase tracking-widest text-center">Sugestões de Lance</p>
                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -681,11 +686,11 @@ function LotDetail() {
                      )}
                      <Button 
                        size="lg" 
-                       className={`w-full h-20 font-black text-2xl rounded-2xl ${isSold ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep'}`} 
-                       onClick={() => !isSold && placeBid(nextBid)}
-                       disabled={isSold}
+                       className={`w-full h-20 font-black text-2xl rounded-2xl ${!isBiddingOpen ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep'}`} 
+                       onClick={() => isBiddingOpen && placeBid(nextBid)}
+                       disabled={!isBiddingOpen}
                      >
-                       {isSold ? 'LOTE ARREMATADO' : 'CONFIRMAR LANCE'}
+                       {isSold ? 'LOTE ARREMATADO' : isPassed ? 'LOTE FINALIZADO' : !isBiddingOpen ? 'AGUARDANDO ABERTURA' : 'CONFIRMAR LANCE'}
                      </Button>
                    <div className="grid grid-cols-2 gap-4">
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>

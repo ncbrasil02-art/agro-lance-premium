@@ -521,6 +521,8 @@ export type Database = {
           name: string
           photos: string[] | null
           promoter_company: string | null
+          seller_id: string | null
+          seller_name: string | null
           show_countdown: boolean | null
           slug: string | null
           start_date: string
@@ -549,6 +551,8 @@ export type Database = {
           name: string
           photos?: string[] | null
           promoter_company?: string | null
+          seller_id?: string | null
+          seller_name?: string | null
           show_countdown?: boolean | null
           slug?: string | null
           start_date: string
@@ -577,6 +581,8 @@ export type Database = {
           name?: string
           photos?: string[] | null
           promoter_company?: string | null
+          seller_id?: string | null
+          seller_name?: string | null
           show_countdown?: boolean | null
           slug?: string | null
           start_date?: string
@@ -599,6 +605,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
             referencedColumns: ["id"]
           },
           {
