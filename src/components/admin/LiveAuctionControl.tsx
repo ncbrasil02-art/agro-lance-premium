@@ -744,8 +744,48 @@
            </div>
  
            {/* Sidebar de Lance Ativo */}
-           <div className="space-y-6">
-             <Card className="border-gold/50 bg-emerald-deep text-white">
+            <div className="space-y-4">
+              <Card className="border-gold/50 bg-emerald-deep text-white shadow-lg overflow-hidden">
+                <CardHeader className="pb-2 bg-gold/10 border-b border-gold/20">
+                  <CardTitle className="text-sm font-black uppercase tracking-widest text-gold flex items-center justify-between">
+                    <span>Últimos Lances</span>
+                    <div className="h-2 w-2 rounded-full bg-live animate-pulse" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {bids.length > 0 ? (
+                      <div className="divide-y divide-white/10">
+                        {bids.map((bid, i) => (
+                          <div key={bid.id} className={`p-3 flex items-center justify-between text-xs transition-colors ${i === 0 ? "bg-gold/5" : ""}`}>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-white">
+                                  {bid.is_phone_bid ? (bid.phone_bidder_identifier || "Telefone") : (bid.profile?.full_name || "Licitante")}
+                                </span>
+                                {bid.profile?.risk_level === 'high' && <div className="h-1.5 w-1.5 rounded-full bg-red-500" />}
+                              </div>
+                              <div className="flex items-center gap-2 text-[10px] text-white/50">
+                                <span>{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</span>
+                                <span className="uppercase">{bid.bid_type}</span>
+                              </div>
+                            </div>
+                            <span className={`font-mono font-black ${i === 0 ? "text-gold text-sm" : "text-white/80"}`}>
+                              {formatBRL(bid.amount)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-white/20 italic text-xs">
+                        Aguardando lances...
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-gold/50 bg-emerald-deep text-white">
                <CardHeader className="pb-2">
                  <CardTitle className="text-lg text-gold flex items-center gap-2">
                    <Gavel className="h-5 w-5" /> Lance por Telefone
