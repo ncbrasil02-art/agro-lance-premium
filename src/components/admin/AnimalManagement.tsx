@@ -958,7 +958,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                     <TableHead>Nome</TableHead>
                      <TableHead>Categoria/Raça</TableHead>
                      <TableHead>Venda Direta</TableHead>
-                   <TableHead>Registro</TableHead>
+                    <TableHead>Nº Registro</TableHead>
                    <TableHead>Sexo</TableHead>
                    <TableHead className="text-right">Ações</TableHead>
                  </TableRow>
