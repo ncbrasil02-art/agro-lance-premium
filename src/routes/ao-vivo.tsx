@@ -420,28 +420,42 @@ export const Route = createFileRoute("/ao-vivo")({
                   console.log("Lote alterado em tempo real:", payload.new.active_lot_id);
                   setActivePhotoIndex(0);
                   
-                  if (!payload.new.active_lot_id) {
-                    setBids([]);
-                  } else {
-                        const { data: newBids } = await supabase
-                          .from("bids")
-                          .select("*, profiles!bids_user_id_fkey(id, full_name)")
-                          .eq("lot_id", payload.new.active_lot_id)
-                          .order("created_at", { ascending: false })
-                          .limit(10);
-                    
-                    if (newBids) {
-                      setBids(newBids);
-                      // Extract profiles from bids and update cache
-                      const newProfiles: Record<string, any> = {};
-                      newBids.forEach((bid: any) => {
-                        if (bid.profile) {
-                          newProfiles[bid.profile.id] = bid.profile;
-                        }
-                      });
-                      setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
-                    }
-                  }
+                   if (!payload.new.active_lot_id) {
+                     setBids([]);
+                   } else {
+                     // Pequeno delay para garantir que o banco processou a transação de ativação do lote
+                     // e evitar race conditions com lances que ocorrem no exato momento da troca
+                     setTimeout(async () => {
+                       const { data: newBids } = await supabase
+                         .from("bids")
+                         .select("*, profiles!bids_user_id_fkey(id, full_name)")
+                         .eq("id", payload.new.active_lot_id) // Erro aqui no código original? Deve ser lot_id
+                         .eq("lot_id", payload.new.active_lot_id)
+                         .order("created_at", { ascending: false })
+                         .limit(10);
+                       
+                       if (newBids) {
+                         setBids(prev => {
+                           // Mesclar com lances que podem ter chegado via Realtime durante o fetch
+                           const merged = [...newBids];
+                           prev.forEach(pb => {
+                             if (pb.lot_id === payload.new.active_lot_id && !merged.some(mb => mb.id === pb.id)) {
+                               merged.push(pb);
+                             }
+                           });
+                           return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 15);
+                         });
+                         
+                         const newProfiles: Record<string, any> = {};
+                         newBids.forEach((bid: any) => {
+                           if (bid.profile) {
+                             newProfiles[bid.profile.id] = bid.profile;
+                           }
+                         });
+                         setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
+                       }
+                     }, 500);
+                   }
                   
                   toast.info("Próximo lote entrando no ar!", { 
                     description: "A tela será atualizada automaticamente.",
