@@ -566,9 +566,12 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                 <CardDescription>Controle total da transmissão e dos lances em tempo real.</CardDescription>
               </div>
               {selectedEventId && liveEvent && (
-                <div className="flex items-center gap-2 bg-emerald-deep/5 px-4 py-2 rounded-full border border-gold/20">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-sm font-bold text-emerald-deep uppercase">{liveEvent.name}</span>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-2 bg-emerald-deep/5 px-4 py-2 rounded-full border border-gold/20">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-sm font-bold text-emerald-deep uppercase">{liveEvent.name}</span>
+                  </div>
+                  <StatusBadge status={liveEvent.status} urgent={liveEvent.status === 'live'} />
                 </div>
               )}
             </div>
