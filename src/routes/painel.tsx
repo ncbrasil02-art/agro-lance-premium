@@ -1,3 +1,87 @@
+ function PaymentDialog({ lot, profile }: { lot: any, profile: any }) {
+   const installments = 30; // default
+   const installmentValue = lot.current_price / installments;
+   const pixKey = "00020101021226830014br.gov.bcb.pix0136..."; // Placeholder
+ 
+   return (
+     <Dialog>
+       <DialogTrigger asChild>
+         <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
+           <CreditCard className="h-4 w-4" /> Realizar Pagamento
+         </Button>
+       </DialogTrigger>
+       <DialogContent className="max-w-2xl bg-white p-0">
+         <DialogHeader className="p-6 bg-emerald-deep text-white">
+           <DialogTitle className="text-xl flex items-center gap-2">
+             <Receipt className="h-6 w-6 text-gold" /> Carnê de Pagamento - Lote #{lot.lot_number}
+           </DialogTitle>
+         </DialogHeader>
+         
+         <div className="p-6 space-y-6">
+           <div className="grid grid-cols-2 gap-4">
+             <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+               <p className="text-[10px] font-bold uppercase text-gray-400 mb-1">Total do Arremate</p>
+               <p className="text-2xl font-black text-emerald-deep">{formatBRL(lot.current_price)}</p>
+             </div>
+             <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-right">
+               <p className="text-[10px] font-bold uppercase text-gray-400 mb-1">Parcelamento</p>
+               <p className="text-xl font-bold text-gray-800">{installments}x {formatBRL(installmentValue)}</p>
+             </div>
+           </div>
+ 
+           <div className="space-y-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+             <h4 className="text-xs font-black uppercase tracking-widest text-emerald-deep">Mensalidades (Boletas)</h4>
+             {[...Array(installments)].map((_, i) => {
+               const dueDate = new Date(lot.updated_at);
+               dueDate.setMonth(dueDate.getMonth() + i + 1);
+               return (
+                 <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-white hover:border-emerald-200 transition-colors">
+                   <div className="flex items-center gap-4">
+                     <div className="h-10 w-10 rounded-full bg-emerald-deep/5 flex items-center justify-center font-bold text-emerald-deep text-xs"> {String(i + 1).padStart(2, '0')} </div>
+                     <div>
+                       <p className="text-sm font-bold text-gray-800">Vencimento: {dueDate.toLocaleDateString('pt-BR')}</p>
+                       <p className="text-[10px] text-gray-400">Status: Pendente</p>
+                     </div>
+                   </div>
+                   <div className="flex items-center gap-4">
+                     <p className="font-bold text-emerald-600">{formatBRL(installmentValue)}</p>
+                     <Dialog>
+                       <DialogTrigger asChild>
+                         <Button size="sm" variant="outline" className="h-8 text-[10px] font-bold border-gold text-gold hover:bg-gold hover:text-white">PAGAR COM PIX</Button>
+                       </DialogTrigger>
+                       <DialogContent className="max-w-sm bg-white p-6 text-center">
+                         <DialogHeader>
+                           <DialogTitle className="text-center text-emerald-deep">Pagamento via PIX</DialogTitle>
+                         </DialogHeader>
+                         <div className="flex flex-col items-center gap-4 mt-4">
+                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                             <div className="h-48 w-48 bg-gray-200 flex items-center justify-center">
+                               <BadgeCheck className="h-12 w-12 text-emerald-deep/20" />
+                             </div>
+                           </div>
+                           <div className="space-y-2 w-full">
+                             <p className="text-xs text-gray-500 font-medium">Copie e cole a chave abaixo no seu banco:</p>
+                             <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100" onClick={() => {
+                               navigator.clipboard.writeText(pixKey);
+                               toast.success("Chave PIX copiada!");
+                             }}>
+                               {pixKey}
+                             </div>
+                             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold mt-4" onClick={() => toast.info("Aguardando confirmação do banco...")}>JÁ REALIZEI O PAGAMENTO</Button>
+                           </div>
+                         </div>
+                       </DialogContent>
+                     </Dialog>
+                   </div>
+                 </div>
+               );
+             })}
+           </div>
+         </div>
+       </DialogContent>
+     </Dialog>
+   );
+ }
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { 
   User, Gavel, FileText, Receipt, CreditCard, Clock, 
