@@ -2,7 +2,26 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { 
   User, Gavel, FileText, Receipt, CreditCard, Clock, 
   ChevronRight, BadgeCheck, Download, ExternalLink, 
-  ShieldCheck, AlertCircle, Info, Printer
+  ShieldCheck, AlertCircle, Info, Printer, MessageSquare
+          <TabsTrigger value="mensagens" className="gap-2">
+            <MessageSquare className="h-4 w-4" /> Mensagens
+          </TabsTrigger>
+        <TabsContent value="mensagens">
+          <Card>
+            <CardHeader>
+              <CardTitle>Canal de Comunicação</CardTitle>
+              <CardDescription>Mensagens trocadas com a leiloaria sobre seus arremates.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <MessageSquare className="h-12 w-12 text-muted-foreground/30 mb-4" />
+              <CardTitle className="text-xl">Nenhuma mensagem</CardTitle>
+              <CardDescription className="max-w-xs mx-auto mt-2">
+                Você ainda não possui mensagens trocadas com nossa equipe de pós-venda.
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
