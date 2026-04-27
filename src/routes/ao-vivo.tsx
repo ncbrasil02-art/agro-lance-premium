@@ -184,6 +184,52 @@ export const Route = createFileRoute("/ao-vivo")({
    const [reconnectTrigger, setReconnectTrigger] = useState(0);
    const [isFavorite, setIsFavorite] = useState(false);
    const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
+ 
+   useEffect(() => {
+     if (user && liveEvent?.active_lot_id) {
+       supabase
+         .from("followed_lots")
+         .select("id")
+         .eq("user_id", user.id)
+         .eq("lot_id", liveEvent.active_lot_id)
+         .maybeSingle()
+         .then(r => setIsFavorite(!!r.data));
+     }
+   }, [user, liveEvent?.active_lot_id]);
+ 
+   const toggleFavorite = async () => {
+     if (!user) {
+       toast.error("Faça login para seguir lotes.");
+       return;
+     }
+     if (!liveEvent?.active_lot_id) return;
+     
+     setIsFavoriteLoading(true);
+     try {
+       if (isFavorite) {
+         await supabase
+           .from("followed_lots")
+           .delete()
+           .eq("user_id", user.id)
+           .eq("lot_id", liveEvent.active_lot_id);
+         setIsFavorite(false);
+         toast.success("Lote removido dos seus favoritos.");
+       } else {
+         await supabase
+           .from("followed_lots")
+           .insert({
+             user_id: user.id,
+             lot_id: liveEvent.active_lot_id
+           });
+         setIsFavorite(true);
+         toast.success("Lote adicionado aos seus favoritos!");
+       }
+     } catch (e) {
+       toast.error("Erro ao processar favorito.");
+     } finally {
+       setIsFavoriteLoading(false);
+     }
+   };
 
   useEffect(() => {
     const handleOnline = () => {
@@ -240,7 +286,7 @@ export const Route = createFileRoute("/ao-vivo")({
     const [showConfirmBid, setShowConfirmBid] = useState(false);
     const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   const nextPhoto = (photos: string[]) => {
     setActivePhotoIndex((prev) => (prev + 1) % photos.length);
@@ -1068,12 +1114,47 @@ export const Route = createFileRoute("/ao-vivo")({
                        `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
                     </Button>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
-                          <Info className="h-5 w-5" />
-                        </Button>
-                      </DialogTrigger>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className={`h-12 w-12 p-0 transition-colors ${isFavorite ? 'border-gold text-gold bg-gold/5' : 'border-emerald-deep/20 text-emerald-deep hover:bg-emerald-deep hover:text-white'}`}
+                        onClick={toggleFavorite}
+                        disabled={isFavoriteLoading || !liveEvent?.active_lot_id}
+                      >
+                        {isFavoriteLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <BadgeCheck className={`h-5 w-5 ${isFavorite ? 'fill-gold' : ''}`} />}
+                      </Button>
+
+                      <Button 
+                        variant="outline" 
+                        className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors"
+                        onClick={() => {
+                          const url = `${window.location.origin}/lotes/${liveEvent?.active_lot_id}`;
+                          const text = `Veja agora o lote #${liveEvent?.active_lot?.lot_number} - ${liveEvent?.active_lot?.animal?.name} no leilão ao vivo!`;
+                          const shareData = { title: liveEvent?.active_lot?.animal?.name, text, url };
+
+                          if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                            navigator.share(shareData).catch(() => {
+                              navigator.clipboard.writeText(url);
+                              window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+                              toast.success("Link copiado e WhatsApp aberto!");
+                            });
+                          } else {
+                            navigator.clipboard.writeText(url);
+                            window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+                            toast.success("Link copiado e WhatsApp aberto!");
+                          }
+                        }}
+                        disabled={!liveEvent?.active_lot_id}
+                      >
+                        <Share2 className="h-5 w-5" />
+                      </Button>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
+                            <Info className="h-5 w-5" />
+                          </Button>
+                        </DialogTrigger>
                       <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
                         <DialogHeader className="border-b pb-4">
                           <DialogTitle className="flex items-center gap-2 text-2xl font-black text-emerald-deep tracking-tight">
@@ -1186,6 +1267,7 @@ export const Route = createFileRoute("/ao-vivo")({
                         </div>
                       </DialogContent>
                     </Dialog>
+                  </div>
                   </div>
                 </div>
               </div>
