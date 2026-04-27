@@ -634,6 +634,20 @@ export const Route = createFileRoute("/ao-vivo")({
     }, [realtimeStatus, isOffline]);
  
    const liveLot = liveEvent?.active_lot;
+
+  // Atualizar título da aba dinamicamente conforme o status do lote
+  useEffect(() => {
+    const baseTitle = liveEvent?.name || "Ao Vivo";
+    if (liveLot?.status === 'sold') {
+      document.title = `LOTE ARREMATADO! — ${baseTitle}`;
+    } else if (liveLot?.status === 'passed') {
+      document.title = `LOTE FINALIZADO — ${baseTitle}`;
+    } else if (liveLot?.status === 'active') {
+      document.title = `🔴 AO VIVO: ${liveLot.animal?.name || baseTitle}`;
+    } else {
+      document.title = `${baseTitle} — Premium Agro Leilões`;
+    }
+  }, [liveLot?.status, liveLot?.animal?.name, liveEvent?.name]);
  
     const executeBid = async (amount: number) => {
       setIsBidding(true);
@@ -787,7 +801,11 @@ export const Route = createFileRoute("/ao-vivo")({
       </AlertDialog>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <StatusBadge status="live" />
+          <StatusBadge 
+            status={liveLot?.status === 'sold' || liveLot?.status === 'passed' ? liveLot.status : 'live'} 
+            urgent={liveLot?.status !== 'sold' && liveLot?.status !== 'passed'}
+            className="px-4 py-1.5"
+          />
           <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{liveEvent.name}</h1>
            <div className="flex flex-col gap-1">
              <p className="text-sm text-muted-foreground italic line-clamp-1">{liveEvent.description || "Transmissão ao vivo do leilão premium."}</p>
@@ -962,10 +980,11 @@ export const Route = createFileRoute("/ao-vivo")({
               <div className="p-6 flex flex-col">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">Lote #{String(liveLot.lot_number).padStart(2, "0")}</span>
+                      <StatusBadge status={liveLot.status} className="h-5 text-[9px] px-2 border-emerald/20" />
                       {liveLot.animal?.registration_number && (
-                        <span className="text-[10px] text-muted-foreground">REG: {liveLot.animal.registration_number}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">REG: {liveLot.animal.registration_number}</span>
                       )}
                     </div>
                     <h2 className="text-2xl font-black text-emerald-deep tracking-tighter leading-none">{liveLot.animal?.name}</h2>
