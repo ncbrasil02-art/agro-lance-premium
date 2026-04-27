@@ -377,7 +377,7 @@ import {
                   <SelectItem value="active">No Ar / Ativo</SelectItem>
                   <SelectItem value="sold">Arrematados</SelectItem>
                   <SelectItem value="passed">Não Vendidos (Passou)</SelectItem>
-                  <SelectItem value="upcoming">Agendados</SelectItem>
+                  <SelectItem value="upcoming">Aceita pré-lance</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -710,7 +710,7 @@ import {
                                     lot.status === 'paused' ? 'Pausado' :
                                    lot.status === 'sold' ? 'Arrematado' :
                                    lot.status === 'passed' ? 'Passou' : 
-                                   lot.status === 'upcoming' ? 'Agendado' : 'Finalizado'}
+                                   lot.status === 'upcoming' ? 'Aceita pré-lance' : 'Finalizado'}
                                 </span>
                                  {lot.status === 'sold' && (
                                    <Button 

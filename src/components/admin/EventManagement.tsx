@@ -271,7 +271,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
    const getStatusLabel = (status: string) => {
       switch (status) {
         case 'live': return 'Ao Vivo';
-        case 'scheduled': return 'Agendado';
+        case 'scheduled': return 'Aceita pré-lance';
         case 'em_loteamento': return 'Em Loteamento';
         case 'recebendo_lances': return 'Recebendo Lances';
         case 'em_condicional': return 'Em Condicional';
@@ -299,11 +299,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
     const statusDescriptions = [
       { id: 'em_loteamento', label: 'Em Loteamento', color: 'text-amber-500 bg-amber-500/10', desc: 'Fase inicial de cadastro de animais. O evento não fica aberto para lances no site.' },
-      { id: 'scheduled', label: 'Agendado', color: 'text-blue-500 bg-blue-500/10', desc: 'O evento está pronto e aguardando a data de início oficial.' },
+      { id: 'scheduled', label: 'Aceita pré-lance', color: 'text-blue-500 bg-blue-500/10', desc: 'O evento está pronto e aguardando a data de início oficial.' },
       { id: 'recebendo_lances', label: 'Recebendo Lances', color: 'text-purple-500 bg-purple-500/10', desc: 'Evento aberto e aceitando lances em todos os lotes simultaneamente.' },
       { id: 'live', label: 'Ao Vivo', color: 'text-emerald-500 bg-emerald-500/10', desc: 'Evento acontecendo em tempo real com transmissão ao vivo e lances simultâneos.' },
       { id: 'em_condicional', label: 'Em Condicional', color: 'text-orange-500 bg-orange-500/10', desc: 'O maior lance não atingiu o preço de reserva e está em negociação.' },
-      { id: 'incondicional', label: 'Incondicional', color: 'text-emerald-600 bg-emerald-600/10', desc: 'A venda foi confirmada e o martelo batido sem restrições.' },
+      { id: 'incondicional', label: 'Evento Confirmado', color: 'text-emerald-600 bg-emerald-600/10', desc: 'A venda foi confirmada e o martelo batido sem restrições.' },
       { id: 'evento_adiado', label: 'Evento Adiado', color: 'text-red-500 bg-red-500/10', desc: 'O evento foi postergado para uma nova data/horário.' },
       { id: 'finished', label: 'Finalizado', color: 'text-muted-foreground bg-muted', desc: 'O leilão encerrou completamente e todos os lotes foram processados.' },
     ];
@@ -419,7 +419,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
                       <SelectItem value="condicional">Em Condicional</SelectItem>
                       <SelectItem value="adiado">Evento Adiado</SelectItem>
-                     <SelectItem value="scheduled">Agendados</SelectItem>
+                     <SelectItem value="scheduled">Aceita pré-lance</SelectItem>
                      <SelectItem value="finished">Encerrados</SelectItem>
                    </SelectContent>
                  </Select>
@@ -509,11 +509,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                              <p className="font-bold text-xs uppercase border-b pb-1 mb-1">Guia Rápido de Status</p>
                              <div className="space-y-2 text-[11px]">
                                <p><strong>Loteamento:</strong> Cadastro interno. Não visível para lances.</p>
-                               <p><strong>Agendado:</strong> Pronto para o site. Aceita pré-lance se configurado.</p>
+                               <p><strong>Aceita pré-lance:</strong> Pronto para o site. Aceita pré-lance se configurado.</p>
                                <p><strong>Recebendo Lances:</strong> Aberto para lances (Leilão Online).</p>
                                <p><strong>Ao Vivo:</strong> Acontecendo agora com transmissão.</p>
                                <p><strong>Condicional:</strong> Em negociação após o fim.</p>
-                               <p><strong>Incondicional:</strong> Venda batida e confirmada.</p>
+                               <p><strong>Evento Confirmado:</strong> Venda batida e confirmada.</p>
                              </div>
                            </TooltipContent>
                          </Tooltip>
@@ -525,9 +525,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                           <SelectItem value="em_loteamento">Em Loteamento</SelectItem>
                           <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
                            <SelectItem value="em_condicional">Em Condicional</SelectItem>
-                           <SelectItem value="incondicional">Incondicional</SelectItem>
-                          <SelectItem value="evento_adiado">Evento Adiado</SelectItem>
-                          <SelectItem value="scheduled">Agendado</SelectItem>
+                            <SelectItem value="incondicional">Evento Confirmado</SelectItem>
+                           <SelectItem value="evento_adiado">Evento Adiado</SelectItem>
+                           <SelectItem value="scheduled">Aceita pré-lance</SelectItem>
                           <SelectItem value="live">Ao Vivo</SelectItem>
                           <SelectItem value="finished">Finalizado</SelectItem>
                         </SelectContent>
