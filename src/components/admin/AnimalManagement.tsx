@@ -503,14 +503,14 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                       <Input id="reg_main" value={formData.registration_number} onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })} />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="reg1cc">Registro 1cc</Label>
-                      <Input id="reg1cc" value={formData.registration_1cc} onChange={(e) => setFormData({ ...formData, registration_1cc: e.target.value })} />
+                       <Label htmlFor="reg1cc">Registro 1</Label>
+                       <Input id="reg1cc" value={formData.registration_1cc} onChange={(e) => setFormData({ ...formData, registration_1cc: e.target.value })} placeholder="Registro secundário" />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="reg2">Registro 2</Label>
-                      <Input id="reg2" value={formData.registration_2} onChange={(e) => setFormData({ ...formData, registration_2: e.target.value })} />
+                       <Label htmlFor="reg2">Registro Auxiliar</Label>
+                       <Input id="reg2" value={formData.registration_2} onChange={(e) => setFormData({ ...formData, registration_2: e.target.value })} placeholder="Outros registros" />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="chip">Informe o Chip</Label>
