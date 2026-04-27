@@ -196,22 +196,16 @@ export const Route = createFileRoute("/ao-vivo")({
       }
     }, [liveEvent?.id]);
 
-    // Fetch profiles for initial bids
+    // Pre-populate profile cache from initial bids to avoid extra queries
     useEffect(() => {
-      if (initialBids && initialBids.length > 0) {
-        const userIds = [...new Set(initialBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
-        if (userIds.length > 0) {
-          supabase
-            .from("profiles")
-            .select("id, full_name")
-            .in("id", userIds)
-            .then(({ data }) => {
-              if (data) {
-                const map = data.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
-                setBidderProfiles(prev => ({ ...prev, ...map }));
-              }
-            });
-        }
+      if (initialBids?.length > 0) {
+        const initialProfiles: Record<string, any> = {};
+        initialBids.forEach((bid: any) => {
+          if (bid.profile) {
+            initialProfiles[bid.profile.id] = bid.profile;
+          }
+        });
+        setBidderProfiles(prev => ({ ...prev, ...initialProfiles }));
       }
     }, [initialBids]);
 
