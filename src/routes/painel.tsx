@@ -510,8 +510,8 @@ function DocumentButton({ title, lot, profile, type }: { title: string, lot: any
                 <div className="space-y-4">
                   <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">Dados do Arrematante</h3>
                   <div className="space-y-2 text-sm">
-                    <p><span className="text-gray-500">Nome:</span> <span className="font-bold">{profile?.full_name}</span></p>
-                    <p><span className="text-gray-500">CPF/CNPJ:</span> <span className="font-bold">{profile?.cpf || "---"}</span></p>
+                     <p><span className="text-gray-500">Nome:</span> <span className="font-bold">{profile?.full_name}</span></p>
+                     <p><span className="text-gray-500">CPF/CNPJ:</span> <span className="font-bold">{profile?.cnpj || profile?.cpf || "---"}</span></p>
                     <p><span className="text-gray-500">Telefone:</span> <span className="font-bold">{profile?.phone || "---"}</span></p>
                   </div>
                 </div>

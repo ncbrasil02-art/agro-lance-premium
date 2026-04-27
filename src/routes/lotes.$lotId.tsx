@@ -331,18 +331,84 @@ function LotDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="hidden print:block p-12 text-black bg-white min-h-screen">
-        <h1 className="text-4xl font-black uppercase text-emerald-900">{lot.animal?.name}</h1>
-        <p className="text-xl text-gray-600 font-bold uppercase">Lote #{lot.lot_number} - {lot.animal?.breed}</p>
-        <div className="mt-8 grid grid-cols-2 gap-8">
-          <img src={lot.animal?.photos?.[0]} className="rounded-2xl" />
-          <div className="space-y-4">
-             <p><b>Peso:</b> {lot.animal?.weight}kg</p>
-             <p><b>Nascimento:</b> {new Date(lot.animal?.birth_date).toLocaleDateString()}</p>
-             <p><b>Valor:</b> {formatBRL(currentPrice)}</p>
-          </div>
-        </div>
-      </div>
+       <div className="hidden print:block p-8 text-black bg-white min-h-screen">
+         <div className="border-b-4 border-emerald-900 pb-4 mb-8 flex justify-between items-end">
+           <div>
+             <h1 className="text-5xl font-black uppercase text-emerald-900 leading-none">{lot.animal?.name}</h1>
+             <p className="text-2xl text-emerald-700 font-bold uppercase tracking-widest mt-2">Lote #{lot.lot_number} — {lot.animal?.breed}</p>
+           </div>
+           <div className="text-right">
+             <p className="font-black text-emerald-900 uppercase">Gado Elite</p>
+             <p className="text-xs text-gray-500 uppercase font-bold">{lot.event?.name}</p>
+           </div>
+         </div>
+ 
+         <div className="grid grid-cols-[1.5fr_1fr] gap-8">
+           <div className="space-y-6">
+             <img src={lot.animal?.photos?.[0]} className="rounded-3xl shadow-xl w-full aspect-video object-cover" />
+             
+             <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+               <h2 className="text-lg font-black text-emerald-900 uppercase mb-4 border-b border-emerald-200 pb-2">Informações Técnicas</h2>
+               <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                 <div>
+                   <p className="text-[10px] text-emerald-600 uppercase font-bold">Vendedor</p>
+                   <p className="font-bold text-gray-900">{lot.animal?.seller?.name || "Não informado"}</p>
+                 </div>
+                 <div>
+                   <p className="text-[10px] text-emerald-600 uppercase font-bold">Peso</p>
+                   <p className="font-bold text-gray-900">{lot.animal?.weight ? `${lot.animal.weight}kg` : "—"}</p>
+                 </div>
+                 <div>
+                   <p className="text-[10px] text-emerald-600 uppercase font-bold">Idade</p>
+                   <p className="font-bold text-gray-900">{getAge(lot.animal?.birth_date) || "—"}</p>
+                 </div>
+                 <div>
+                   <p className="text-[10px] text-emerald-600 uppercase font-bold">Data de Nasc.</p>
+                   <p className="font-bold text-gray-900">{lot.animal?.birth_date ? new Date(lot.animal.birth_date).toLocaleDateString('pt-BR') : "—"}</p>
+                 </div>
+               </div>
+             </div>
+ 
+             <div>
+               <h2 className="text-lg font-black text-emerald-900 uppercase mb-3 border-b border-emerald-100 pb-1">Descrição</h2>
+               <p className="text-sm text-gray-700 leading-relaxed italic">{lot.animal?.description || "Sem descrição disponível."}</p>
+             </div>
+           </div>
+ 
+           <div className="space-y-6">
+             <div className="bg-emerald-900 text-white p-6 rounded-3xl shadow-lg">
+               <p className="text-[10px] text-emerald-200 uppercase font-black tracking-widest mb-1">Avaliação do Lote</p>
+               <p className="text-4xl font-black italic">{formatBRL(currentPrice)}</p>
+               <div className="mt-4 pt-4 border-t border-emerald-800 space-y-2">
+                 <p className="text-xs text-emerald-100"><b>Plano Sugerido:</b> 30 parcelas de {formatBRL(installmentValue)}</p>
+                 <p className="text-xs text-emerald-100"><b>Comissão:</b> {COMMISSION_RATE}% sobre o arremate</p>
+               </div>
+             </div>
+ 
+             <div className="p-6 border-2 border-dashed border-emerald-100 rounded-3xl">
+               <h2 className="text-lg font-black text-emerald-900 uppercase mb-4 text-center">Genealogia Simplificada</h2>
+               <div className="space-y-4">
+                 <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                   <p className="text-[8px] text-gray-400 uppercase font-bold">Pai (Sire)</p>
+                   <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.father || "Não informado"}</p>
+                 </div>
+                 <div className="flex justify-center h-4">
+                   <div className="w-px bg-gray-200" />
+                 </div>
+                 <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                   <p className="text-[8px] text-gray-400 uppercase font-bold">Mãe (Dam)</p>
+                   <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.mother || "Não informado"}</p>
+                 </div>
+               </div>
+             </div>
+ 
+             <div className="p-6 bg-gray-50 rounded-3xl text-[9px] text-gray-400 leading-tight space-y-2">
+               <p className="font-bold uppercase text-gray-500">Condições Gerais</p>
+               <p>Este documento é um encarte informativo do animal. Os valores apresentados referem-se à última oferta registrada no momento da impressão. O arremate final está sujeito às regras do leilão.</p>
+             </div>
+           </div>
+         </div>
+       </div>
 
       <div className="min-h-screen bg-background print:hidden">
         <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50">
@@ -383,11 +449,11 @@ function LotDetail() {
                          <p className="text-[10px] text-gold/40 uppercase font-black">Raça</p>
                          <p className="font-bold text-white">{lot.animal?.breed}</p>
                        </div>
-                       <div className="p-4 bg-white/5 rounded-2xl text-center">
-                         <p className="text-[10px] text-gold/40 uppercase font-black">Idade</p>
-                         <p className="font-bold text-white">{getAge(lot.animal?.birth_date)}</p>
-                       </div>
-                     </div>
+                        <div className="p-4 bg-white/5 rounded-2xl text-center">
+                          <p className="text-[10px] text-gold/40 uppercase font-black">Idade</p>
+                          <p className="font-bold text-white">{getAge(lot.animal?.birth_date)}</p>
+                        </div>
+                      </div>
                    </Card>
                  </TabsContent>
                  <TabsContent value="genealogia" className="mt-6">
@@ -418,13 +484,37 @@ function LotDetail() {
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
                      </Button>
-                     <Button variant="outline" className="h-14 rounded-2xl text-white" onClick={() => { navigator.share({title: lot.animal?.name, url: window.location.href}).catch(() => toast.success("Copiado!")) }}>
+                     <Button 
+                       variant="outline" 
+                       className="h-14 rounded-2xl text-white" 
+                       onClick={() => { 
+                         if (navigator.share) {
+                           navigator.share({
+                             title: lot.animal?.name,
+                             text: `Confira este animal de elite: ${lot.animal?.name}`,
+                             url: window.location.href
+                           }).catch(() => {
+                             navigator.clipboard.writeText(window.location.href);
+                             toast.success("Link copiado!");
+                           });
+                         } else {
+                           navigator.clipboard.writeText(window.location.href);
+                           toast.success("Link copiado para a área de transferência!");
+                         }
+                       }}
+                     >
                        <Share2 className="mr-2 h-4 w-4" /> COMPARTILHAR
                      </Button>
                    </div>
-                   <Button variant="ghost" className="w-full text-white/40 text-[10px]" onClick={() => window.print()}>BAIXAR ENCARTE (PDF)</Button>
-                 </div>
-               </Card>
+                   <Button 
+                     variant="ghost" 
+                     className="w-full h-14 rounded-2xl text-white/60 hover:text-white hover:bg-white/5 border border-white/10 mt-2 gap-2" 
+                     onClick={() => window.print()}
+                   >
+                     <Download className="h-4 w-4" /> BAIXAR ENCARTE COMPLETO (PDF)
+                    </Button>
+                  </div>
+                </Card>
                <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
                  <h3 className="text-white font-black uppercase text-sm mb-4">Pagamento & Envio</h3>
                  <ul className="text-white/60 text-xs space-y-2">
