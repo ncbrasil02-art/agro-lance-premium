@@ -264,7 +264,8 @@ function LotDetail() {
   const [isBidding, setIsBidding] = useState(false);
   const [showConfirmBid, setShowConfirmBid] = useState(false);
   const [pendingBidAmount, setPendingBidAmount] = useState<number | null>(null);
-  const [activePhoto, setActivePhoto] = useState(0);
+   const [activePhoto, setActivePhoto] = useState(0);
+   const [activeTab, setActiveTab] = useState("detalhes");
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
 
@@ -273,10 +274,23 @@ function LotDetail() {
       .channel(`lot-${lot.id}`)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lots", filter: "id=eq." + lot.id }, (p) => setLot((prev:any) => ({...prev, ...p.new})))
       .subscribe();
+
+    const bidsChannel = supabase
+      .channel(`bids-${lot.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, async (p) => {
+        const { data } = await supabase.from("profiles").select("full_name").eq("id", p.new.user_id).single();
+        const newBid = { ...p.new, profile: data };
+        setRecentBids(prev => [newBid, ...prev].slice(0, 10));
+      })
+      .subscribe();
+
     if (user) {
       supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lot.id).maybeSingle().then(r => setIsFavorite(!!r.data));
     }
-    return () => { supabase.removeChannel(lotChannel); };
+    return () => { 
+      supabase.removeChannel(lotChannel); 
+      supabase.removeChannel(bidsChannel);
+    };
   }, [lot.id, user]);
 
   const placeBid = (amount: number) => {
@@ -439,11 +453,13 @@ function LotDetail() {
                    </button>
                  ))}
                </div>
-                <Tabs defaultValue="detalhes" className="w-full">
+                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                  <TabsList className="bg-emerald-deep/20">
                    <TabsTrigger value="detalhes">Descrição</TabsTrigger>
                    <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
-                   <TabsTrigger value="videos">Vídeo</TabsTrigger>
+                    <TabsTrigger value="videos">Vídeo</TabsTrigger>
+                    <TabsTrigger value="saude">Saúde</TabsTrigger>
+                    <TabsTrigger value="historico">Lances</TabsTrigger>
                  </TabsList>
                  <TabsContent value="detalhes" className="mt-6">
                    <Card className="bg-card/50 border-white/5 p-8">
@@ -471,22 +487,24 @@ function LotDetail() {
                         )}
                       </div>
  
-                       {(lot.animal?.vaccination_records || lot.animal?.health_info) && (
+                      {lot.animal?.vaccination_records && lot.animal.vaccination_records.length > 0 && (
                         <div className="mt-8">
                           <h3 className="text-sm font-black uppercase text-gold/60 mb-4 flex items-center gap-2">
                             <Stethoscope className="h-4 w-4" /> Registro de Vacinação
                           </h3>
-                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                             {(lot.animal?.vaccination_records || lot.animal?.health_info)?.map?.((v: any, idx: number) => (
-                               <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
-                                 <div className="flex items-center gap-2">
-                                   <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                                   <span className="text-xs font-bold text-white/80">{v.vaccine || v.name || v.label}</span>
-                                 </div>
-                                 <span className="text-[10px] text-white/40">{v.date}</span>
-                               </div>
-                             ))}
-                           </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {lot.animal.vaccination_records.map((v: any, idx: number) => (
+                              <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                                  <span className="text-xs font-bold text-white/80">
+                                    {typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}
+                                  </span>
+                                </div>
+                                {v.date && <span className="text-[10px] text-white/40">{v.date}</span>}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                    </Card>
@@ -494,11 +512,126 @@ function LotDetail() {
                  <TabsContent value="genealogia" className="mt-6">
                    <GenealogyTree genealogy={lot.animal?.genealogy} />
                  </TabsContent>
-                 <TabsContent value="videos" className="mt-6">
-                    <div className="aspect-video rounded-3xl overflow-hidden bg-black">
-                      {lot.animal?.youtube_url && <iframe src={lot.animal.youtube_url.replace("watch?v=", "embed/")} className="w-full h-full" allowFullScreen />}
+                  <TabsContent value="videos" className="mt-6">
+                    <div className="aspect-video rounded-3xl overflow-hidden bg-black flex items-center justify-center">
+                      {lot.animal?.youtube_url ? (
+                        <iframe 
+                          src={lot.animal.youtube_url.includes('v=') 
+                            ? lot.animal.youtube_url.replace("watch?v=", "embed/") 
+                            : lot.animal.youtube_url.includes('youtu.be/') 
+                              ? lot.animal.youtube_url.replace("youtu.be/", "youtube.com/embed/")
+                              : lot.animal.youtube_url} 
+                          className="w-full h-full" 
+                          allowFullScreen 
+                        />
+                      ) : (
+                        <div className="text-center space-y-4">
+                          <Video className="h-12 w-12 text-white/20 mx-auto" />
+                          <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum vídeo disponível</p>
+                        </div>
+                      )}
                     </div>
-                 </TabsContent>
+                  </TabsContent>
+                  <TabsContent value="saude" className="mt-6">
+                    <Card className="bg-card/50 border-white/5 p-8">
+                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4" /> Histórico Veterinário e Saúde
+                      </h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Checklist de Saúde</p>
+                          <div className="grid grid-cols-1 gap-2">
+                            {[
+                              { id: "prognata", label: "Prognata" },
+                              { id: "aerofagico", label: "Aerofágico" },
+                              { id: "criptorquidico", label: "Criptorquídico" },
+                              { id: "cirurgia_neurectomia", label: "Cirurgia de neurectomia" },
+                              { id: "laminite", label: "Laminite" },
+                              { id: "cirurgia_colica", label: "Cirurgia de Cólica" },
+                              { id: "dpco", label: "DPCO" },
+                              { id: "cirurgia_grave", label: "Cirurgia Grave" },
+                              { id: "cicatrizes", label: "Cicatrizes" },
+                              { id: "hypp", label: "HYPP" },
+                            ].map(item => {
+                              const val = lot.animal?.veterinary_history?.[item.id];
+                              return (
+                                <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                                  <span className="text-xs text-white/80">{item.label}</span>
+                                  {val ? (
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                  ) : (
+                                    <AlertCircle className="h-4 w-4 text-white/10" />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-6">
+                          <div>
+                            <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Observações Adicionais</p>
+                            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-white/60 italic">
+                              {lot.animal?.veterinary_history?.other_info || "Nenhuma observação adicional registrada."}
+                            </div>
+                          </div>
+                          {lot.animal?.health_info && Object.keys(lot.animal.health_info).length > 0 && (
+                            <div>
+                              <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Informações de Saúde</p>
+                              <div className="space-y-2">
+                                {Object.entries(lot.animal.health_info).map(([key, val]: [string, any]) => (
+                                  <div key={key} className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                    <p className="text-[10px] text-gold/40 uppercase font-black mb-1">{key}</p>
+                                    <p className="text-xs text-white/80">{String(val)}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="historico" className="mt-6">
+                    <Card className="bg-card/50 border-white/5 p-8">
+                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                        <Gavel className="h-4 w-4" /> Histórico de Lances
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        {recentBids.length > 0 ? (
+                          recentBids.map((bid, idx) => (
+                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-white/5 border-white/5'}`}>
+                              <div className="flex items-center gap-4">
+                                <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-white">{bid.profile?.full_name || "Usuário"}</p>
+                                  <p className="text-[10px] text-white/40 uppercase font-bold">
+                                    {new Date(bid.created_at).toLocaleString('pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className={`text-lg font-black italic ${idx === 0 ? 'text-gold' : 'text-white'}`}>
+                                  {formatBRL(bid.amount)}
+                                </p>
+                                {idx === 0 && <span className="text-[8px] font-black uppercase bg-gold text-emerald-deep px-2 py-0.5 rounded-full">LANCE ATUAL</span>}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="py-12 text-center space-y-4">
+                            <Gavel className="h-12 w-12 text-white/10 mx-auto" />
+                            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Ainda não há lances para este lote</p>
+                            <p className="text-white/20 text-[10px]">Seja o primeiro a ofertar!</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  </TabsContent>
                 </Tabs>
               </div>
 
@@ -506,11 +639,14 @@ function LotDetail() {
                 <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full">
                   <div className="flex justify-between items-start mb-6">
                     <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
-                    {lot.animal?.youtube_url && (
-                      <Button variant="ghost" size="sm" className="text-gold hover:text-gold-bright hover:bg-gold/10 gap-2 font-bold h-auto p-2" onClick={() => document.querySelector('[value="videos"]')?.dispatchEvent(new MouseEvent('click', {bubbles:true}))}>
-                        <Video className="h-5 w-5" /> VER VÍDEO
-                      </Button>
-                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gold hover:text-gold-bright hover:bg-gold/10 gap-2 font-bold h-auto p-2" 
+                      onClick={() => setActiveTab("videos")}
+                    >
+                      <Video className="h-5 w-5" /> VER VÍDEO
+                    </Button>
                   </div>
                   
                   <div className="mt-4 p-8 bg-black/40 rounded-[2rem] border border-white/5">
@@ -521,7 +657,24 @@ function LotDetail() {
                      <InstallmentSimulator price={currentPrice} commissionRate={COMMISSION_RATE} />
                    </div>
                  </div>
-                   <div className="mt-8 space-y-4">
+                   <div className="mt-8 space-y-6">
+                     {!isSold && (
+                       <div className="space-y-3">
+                         <p className="text-[10px] font-black text-gold/60 uppercase tracking-widest text-center">Sugestões de Lance</p>
+                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                           {[100, 250, 500, lot.bid_increment || 1000].map((inc) => (
+                             <Button 
+                               key={inc} 
+                               variant="outline" 
+                               className="h-12 border-white/10 bg-white/5 hover:bg-gold/20 hover:border-gold/50 text-white font-black text-xs"
+                               onClick={() => placeBid(currentPrice + inc)}
+                             >
+                               +{formatBRL(inc).replace('R$', '').trim()}
+                             </Button>
+                           ))}
+                         </div>
+                       </div>
+                     )}
                      <Button 
                        size="lg" 
                        className={`w-full h-20 font-black text-2xl rounded-2xl ${isSold ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep'}`} 
