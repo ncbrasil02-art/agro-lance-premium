@@ -1111,5 +1111,7 @@ function LotDetail() {
       </div>
     </div>
       </div>
+    </div>
+    </div>
   );
 }
