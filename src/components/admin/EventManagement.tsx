@@ -102,7 +102,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       try {
         const { data, error } = await supabase
           .from("events")
-          .select("*, seller:sellers(name)");
+          .select("*, sellers!events_seller_id_fkey(name)");
 
         if (error) throw error;
         
