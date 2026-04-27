@@ -497,8 +497,86 @@ function LotDetail() {
     return `${years} anos e ${months} meses`;
   };
 
-  return (
-    <div className="min-h-screen bg-background">
+   return (
+     <div className="min-h-screen bg-background">
+       {/* Printable Area - Hidden on Screen */}
+       <div className="hidden print:block p-12 text-black bg-white min-h-screen">
+         <div className="flex justify-between items-start mb-12 border-b-2 border-emerald-900 pb-8">
+           <div>
+             <h1 className="text-4xl font-black uppercase text-emerald-900">{lot.animal?.name}</h1>
+             <p className="text-xl text-gray-600 font-bold uppercase tracking-widest">{lot.animal?.breed} · Lote #{lot.lot_number}</p>
+           </div>
+           <div className="text-right">
+             <p className="font-black text-2xl text-emerald-900">PREMIUM AGRO</p>
+             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Encarte Técnico do Animal</p>
+           </div>
+         </div>
+ 
+         <div className="grid grid-cols-2 gap-12 mb-12">
+           <div className="space-y-6">
+             <div className="aspect-[4/3] rounded-3xl overflow-hidden border-4 border-emerald-900/10">
+               <img src={lot.animal?.photos?.[0]} alt={lot.animal?.name} className="w-full h-full object-cover" />
+             </div>
+             <div className="p-6 rounded-3xl bg-emerald-900/5 border border-emerald-900/10">
+               <h3 className="text-sm font-black uppercase text-emerald-900 mb-4 tracking-widest border-b border-emerald-900/10 pb-2">Genealogia</h3>
+               <div className="space-y-2 text-sm">
+                 <p><span className="font-bold">PAI:</span> {lot.animal?.genealogy?.father || "Não informado"}</p>
+                 <p><span className="font-bold">MÃE:</span> {lot.animal?.genealogy?.mother || "Não informado"}</p>
+               </div>
+             </div>
+           </div>
+           
+           <div className="space-y-8">
+             <div className="grid grid-cols-2 gap-4">
+               <div className="p-4 rounded-xl border border-gray-100">
+                 <p className="text-[10px] font-bold text-gray-400 uppercase">Sexo</p>
+                 <p className="font-bold">{lot.animal?.sex === 'M' ? 'Macho' : 'Fêmea'}</p>
+               </div>
+               <div className="p-4 rounded-xl border border-gray-100">
+                 <p className="text-[10px] font-bold text-gray-400 uppercase">Nascimento</p>
+                 <p className="font-bold">{new Date(lot.animal?.birth_date).toLocaleDateString('pt-BR')}</p>
+               </div>
+               <div className="p-4 rounded-xl border border-gray-100">
+                 <p className="text-[10px] font-bold text-gray-400 uppercase">Peso</p>
+                 <p className="font-bold">{lot.animal?.weight} kg</p>
+               </div>
+               <div className="p-4 rounded-xl border border-gray-100">
+                 <p className="text-[10px] font-bold text-gray-400 uppercase">Pelagem</p>
+                 <p className="font-bold">{lot.animal?.color}</p>
+               </div>
+             </div>
+ 
+             <div className="space-y-4">
+               <h3 className="text-sm font-black uppercase text-emerald-900 tracking-widest border-b border-emerald-900/10 pb-2">Descrição do Exemplar</h3>
+               <p className="text-sm text-gray-600 leading-relaxed italic">
+                 {lot.animal?.description || "Exemplar de alta linhagem, com características genéticas superiores e morfologia equilibrada."}
+               </p>
+             </div>
+ 
+             <div className="p-8 rounded-3xl bg-emerald-900 text-white shadow-2xl">
+               <p className="text-xs font-bold uppercase text-gold tracking-widest mb-2">Valor Base</p>
+               <p className="text-4xl font-black italic">{formatBRL(currentPrice)}</p>
+               <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-end">
+                 <div>
+                   <p className="text-[10px] uppercase font-bold text-white/60">Plano Sugerido</p>
+                   <p className="text-lg font-bold">30 parcelas de {formatBRL(installmentValue)}</p>
+                 </div>
+                 <div className="text-right">
+                   <p className="text-[10px] uppercase font-bold text-white/60">Arremate</p>
+                   <p className="text-xs">Lote #{lot.lot_number}</p>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+ 
+         <div className="mt-auto pt-12 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400 uppercase font-black tracking-widest">
+           <span>Premium Agro Leilões - Documento Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
+           <span>auditor-lances.lovable.app</span>
+         </div>
+       </div>
+ 
+       <div className="min-h-screen bg-background print:hidden">
       <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
