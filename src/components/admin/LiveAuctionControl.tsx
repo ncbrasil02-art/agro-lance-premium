@@ -361,23 +361,33 @@
 
        let finalWinnerId = lastBid?.user_id || null;
        
-       // If it was a bid by the admin (phone/manual), or if we want to confirm/override
-       if (lastBid?.user_id === currentUserId || lastBid?.is_phone_bid) {
-         const promptText = lastBid?.is_phone_bid 
-           ? `Lote arrematado por lance de TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`
-           : `Lote arrematado por lance MANUAL no auditório.\n\nDeseja vincular este arremate a um cadastro real agora?`;
-           
-         if (confirm(promptText)) {
+        // If there's no winner, we can't sell
+        if (!lastBid) {
+          toast.error("Não há lances para este lote.");
+          return;
+        }
+
+        // If the bid is already linked to a user (not a generic phone bid without profile)
+        // we don't need to ask to link it, just a simple confirmation of the sale.
+        const isGenericPhoneBid = lastBid.is_phone_bid && !lastBid.user_id;
+        const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
+
+        if (isGenericPhoneBid) {
+          if (confirm(`Lote arrematado via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`)) {
             if (phoneBid.profileId) {
               finalWinnerId = phoneBid.profileId;
             } else {
-              toast.info("Por favor, selecione o 'Cadastro Real' no formulário lateral antes de clicar em Arrematar para vincular automaticamente.");
+              toast.info("Selecione um 'Cadastro Real' no formulário lateral para vincular.");
               return;
             }
-         }
-       } else {
-         if (!confirm(`Confirmar ARREMATE deste lote para ${lastBid?.profile?.full_name || 'o maior lance'} no valor de ${formatBRL(lastBid?.amount || 0)}?`)) return;
-       }
+          }
+        } else if (isAdminBid) {
+          // Admin bidding for himself or as a placeholder
+          if (!confirm(`Confirmar ARREMATE para você (Administrador) no valor de ${formatBRL(lastBid.amount)}?`)) return;
+        } else {
+          // Normal registered user
+          if (!confirm(`Confirmar ARREMATE para ${lastBid.profile?.full_name || 'o maior lance'} no valor de ${formatBRL(lastBid.amount)}?`)) return;
+        }
 
        setIsActionLoading(true);
        try {
