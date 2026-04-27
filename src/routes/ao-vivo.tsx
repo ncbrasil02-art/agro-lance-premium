@@ -650,6 +650,11 @@ export const Route = createFileRoute("/ao-vivo")({
   }, [liveLot?.status, liveLot?.animal?.name, liveEvent?.name]);
  
     const executeBid = async (amount: number) => {
+      if (liveLot?.status === 'sold' || liveLot?.status === 'passed') {
+        toast.error("Lote já finalizado. Não é mais possível dar lances.");
+        return;
+      }
+
       setIsBidding(true);
       try {
         const { data, error } = await supabase.rpc("place_bid_safe", {
