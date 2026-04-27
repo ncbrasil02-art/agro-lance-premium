@@ -99,7 +99,7 @@ function DirectSalePage() {
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-gradient shadow-gold">
             <ShoppingCart className="h-6 w-6 text-emerald-deep" />
           </span>
-          <h1 className="text-4xl font-bold tracking-tight md:text-5xl text-gradient-gold">Compra de Animais</h1>
+          <h1 className="text-4xl font-bold tracking-tight md:text-5xl text-gradient-gold">Catálogo de Venda</h1>
         </div>
         <p className="text-muted-foreground text-lg max-w-2xl">
           Venda direta de animais selecionados. Escolha seu animal e faça sua reserva de forma rápida e segura.
