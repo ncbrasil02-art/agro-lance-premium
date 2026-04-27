@@ -1,3 +1,4 @@
+import { StatusBadge } from "@/components/auctions/status-badge";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -653,10 +654,11 @@
             {/* Destaque do Lote Ativo para o Narrador */}
             {activeLot && (
               <Card className="border-gold border-2 bg-emerald-deep shadow-2xl overflow-hidden">
-                <div className="bg-gold/10 px-6 py-3 border-b border-gold/30 flex justify-between items-center">
+                <div className="bg-gold/10 px-6 py-3 border-b border-gold/30 flex flex-wrap justify-between items-center gap-4">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-gold animate-pulse" />
                     <span className="text-gold font-black uppercase tracking-widest text-sm">Lote no Ar agora</span>
+                    <StatusBadge status={activeLot.status} className="h-5 text-[9px] px-2 bg-white/10 text-white border-white/20" />
                   </div>
                   <div className="flex items-center gap-4 text-white/60 text-xs font-bold uppercase">
                     <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {liveEvent.viewers || 0} assistindo</span>
