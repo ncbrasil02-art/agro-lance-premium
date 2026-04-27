@@ -360,12 +360,12 @@ function LotDetail() {
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
             <div className="space-y-8">
                <div className="rounded-3xl overflow-hidden border border-white/10">
-                 <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} width={1200} aspectRatio="landscape" />
+                <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
                </div>
                <div className="grid grid-cols-5 gap-3">
                  {lot.animal?.photos?.map((s:string, i:number) => (
                    <button key={i} onClick={() => setActivePhoto(i)} className={`rounded-xl overflow-hidden border-2 ${activePhoto === i ? 'border-gold' : 'border-transparent'}`}>
-                     <OptimizedImage src={s} width={200} aspectRatio="square" />
+                    <OptimizedImage src={s} alt={`${lot.animal?.name} - foto ${i + 1}`} width={200} aspectRatio="square" />
                    </button>
                  ))}
                </div>
