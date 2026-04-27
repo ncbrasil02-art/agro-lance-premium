@@ -31,6 +31,20 @@
     const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
     const [profiles, setProfiles] = useState<any[]>([]);
     const [searchProfile, setSearchProfile] = useState("");
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
+  const [pollingRetryCount, setPollingRetryCount] = useState(0);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
  
    const quickMessages = [
      "Alguém dá mais algum lance?",
