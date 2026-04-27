@@ -1171,6 +1171,25 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                     </Button>
                   </div>
 
+                  <div className="mb-2">
+                    {activeLot && (
+                      <div className={`text-[10px] px-2 py-1 rounded flex items-center gap-1.5 font-bold ${
+                        activeLot.status === 'active' || activeLot.status === 'live'
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : activeLot.allows_pre_bidding 
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "bg-red-500/20 text-red-400"
+                      }`}>
+                        <Info className="h-3 w-3" />
+                        {activeLot.status === 'active' || activeLot.status === 'live'
+                          ? "LOTE ATIVO: Recebendo lances ao vivo"
+                          : activeLot.allows_pre_bidding 
+                            ? "PRÉ-LANCE: Aceitando lances antecipados"
+                            : "LOTE BLOQUEADO: Abra o lote para aceitar lances"}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label className="text-xs text-white/80">Valor do Lance</Label>
                     <Input 

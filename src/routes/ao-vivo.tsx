@@ -763,23 +763,12 @@ export const Route = createFileRoute("/ao-vivo")({
     };
 
     const placeBid = (amount: number) => {
-      if (liveLot?.status === 'sold' || liveLot?.status === 'passed') {
-        toast.error("Lote finalizado. Lances encerrados.");
-        return;
-      }
-
       if (!user) {
         toast.error("Você precisa estar logado para dar lances.");
         return;
       }
       if (!profile?.is_approved) {
         toast.error("Sua conta ainda não foi aprovada para dar lances.");
-        return;
-      }
-      if (profile?.is_blocked) {
-        toast.error("Sua conta está bloqueada para dar lances.", {
-          description: profile.block_reason || "Entre em contato com o suporte."
-        });
         return;
       }
       setPendingBidAmount(amount);
