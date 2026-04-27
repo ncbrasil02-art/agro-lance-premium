@@ -116,9 +116,13 @@ import {
          fetchData();
        }, [initialEventId]);
  
-       useRealtimeLots(() => {
-         fetchData();
-       });
+        useRealtimeLots(() => {
+          fetchData();
+          if (expandedLotId) {
+            fetchLotBids(expandedLotId, true);
+            fetchLotOffers(expandedLotId);
+          }
+        });
 
       const resetForm = () => {
         setEditingLot(null);
