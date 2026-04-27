@@ -854,32 +854,41 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                    {lots.map((lot) => (
                      <div 
                        key={lot.id} 
-                       className={`relative rounded-xl border p-4 transition-all ${
+                        className={`relative rounded-xl border p-4 transition-all group ${
                          lot.id === liveEvent.active_lot_id 
-                         ? "border-gold bg-gold/5 ring-1 ring-gold shadow-gold-sm" 
+                          ? "border-gold bg-gold/10 ring-2 ring-gold shadow-gold-lg" 
                           : (lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished')
                          ? "opacity-50 bg-muted" 
-                         : "hover:border-gold/50 cursor-pointer"
+                          : "hover:border-gold/50 cursor-pointer bg-white"
                        }`}
                      >
                        <div className="flex items-center justify-between mb-2">
-                         <span className="text-xs font-bold text-muted-foreground">Lote {lot.lot_number}</span>
+                          <span className="text-xs font-black text-emerald-deep bg-emerald-deep/5 px-2 py-0.5 rounded">LOTE {lot.lot_number}</span>
                          {lot.id === liveEvent.active_lot_id && (
-                           <span className="flex items-center gap-1 text-[10px] font-black uppercase text-gold animate-pulse">
+                            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-gold animate-pulse bg-gold/10 px-2 py-0.5 rounded-full">
                              <div className="h-1.5 w-1.5 rounded-full bg-gold" /> Ao Vivo
                            </span>
                          )}
                        </div>
-                       <h4 className="font-bold truncate">{lot.animal?.name}</h4>
+                        <h4 className="font-bold truncate text-emerald-deep">{lot.animal?.name || "Animal não vinculado"}</h4>
+                        <div className="mt-1 flex items-center gap-2 text-[10px] text-muted-foreground font-medium">
+                          <span>{formatBRL(lot.current_price || lot.starting_price)}</span>
+                          {lot.status === 'upcoming' && (
+                            <span className="text-blue-600 flex items-center gap-0.5">
+                              <Info className="h-3 w-3" /> {lot.allows_pre_bidding ? 'Aceita Pré-lance' : 'Em Loteamento'}
+                            </span>
+                          )}
+                        </div>
+
                         <div className="mt-4 flex flex-col gap-2">
                           {lot.id !== liveEvent.active_lot_id && lot.status !== 'sold' && lot.status !== 'passed' && lot.status !== 'finished' && (
                             <Button 
                               size="sm" 
-                              className="w-full bg-gold/10 text-gold hover:bg-gold/20"
+                              className="w-full bg-emerald-deep text-white hover:bg-emerald-deep/90 font-bold shadow-sm"
                               onClick={() => activateLot(lot.id)}
                               disabled={isActionLoading}
                             >
-                              <Play className="mr-1 h-3 w-3" /> Entrar no Ar
+                              <Play className="mr-1 h-3 w-3 fill-current" /> Colocar na Tela
                             </Button>
                           )}
                           {lot.id === liveEvent.active_lot_id && (
