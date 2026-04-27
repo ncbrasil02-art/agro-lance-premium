@@ -221,8 +221,10 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
   );
 }
 
-function InstallmentSimulator({ price }: { price: number }) {
-  const options = [1, 10, 20, 30, 40, 50];
+ function InstallmentSimulator({ price, commissionRate }: { price: number, commissionRate: number }) {
+   const options = [1, 12, 24, 30, 36, 48, 60, 72];
+   const buyerCommission = price * (commissionRate / 100);
+   
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -237,13 +239,53 @@ function InstallmentSimulator({ price }: { price: number }) {
             Veja as condições de parcelamento para este lote.
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-4 space-y-3">
-          {options.map((opt) => (
-            <div key={opt} className="flex items-center justify-between border-b border-white/10 pb-2 last:border-0">
-              <span className="text-sm font-medium">{opt === 1 ? "À vista (PIX/TED)" : `${opt} parcelas mensais`}</span>
-              <span className="font-bold text-gold">{formatBRL(price / opt)}</span>
-            </div>
-          ))}
+         <div className="mt-4 space-y-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+           <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-4">
+             <div className="flex justify-between text-xs text-white/60 mb-1">
+               <span>Valor do Animal:</span>
+               <span>{formatBRL(price)}</span>
+             </div>
+             <div className="flex justify-between text-xs text-white/60 mb-1">
+               <span>Comissão ({commissionRate}%):</span>
+               <span>{formatBRL(buyerCommission)}</span>
+             </div>
+             <div className="flex justify-between text-sm font-bold text-gold pt-2 border-t border-white/10">
+               <span>Total do Investimento:</span>
+               <span>{formatBRL(price + buyerCommission)}</span>
+             </div>
+           </div>
+ 
+           <div className="text-[10px] uppercase font-black text-white/40 mb-2 tracking-widest">Planos de Parcelamento</div>
+           
+           <div className="flex items-center justify-between p-3 rounded-lg bg-gold/10 border border-gold/20 mb-2">
+             <div className="flex flex-col">
+               <span className="text-sm font-bold text-gold">À Vista (PIX/TED)</span>
+               <span className="text-[10px] text-gold/60">Com 5% de desconto no valor do lote</span>
+             </div>
+             <span className="font-black text-lg text-gold">{formatBRL((price * 0.95) + buyerCommission)}</span>
+           </div>
+ 
+           <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mb-2">
+             <div className="flex flex-col">
+               <span className="text-sm font-bold text-white">Plano 33x (1+2+30)</span>
+               <span className="text-[10px] text-white/40">3 iniciais + 30 parcelas mensais</span>
+             </div>
+             <div className="text-right">
+               <div className="font-black text-white">{formatBRL(price / 33)}</div>
+               <div className="text-[10px] text-white/40">p/ parcela</div>
+             </div>
+           </div>
+ 
+           {options.filter(o => o !== 1).map((opt) => (
+             <div key={opt} className="flex items-center justify-between p-3 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors rounded-lg">
+               <span className="text-sm font-medium text-white/80">{opt} parcelas iguais</span>
+               <span className="font-bold text-white">{formatBRL(price / opt)}</span>
+             </div>
+           ))}
+           
+           <p className="text-[9px] text-white/40 italic mt-4 text-center">
+             * Valores baseados no lance atual. A comissão de compra é fixa e calculada sobre o valor do arremate.
+           </p>
         </div>
       </DialogContent>
     </Dialog>
