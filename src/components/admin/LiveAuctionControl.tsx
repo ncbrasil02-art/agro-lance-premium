@@ -157,7 +157,10 @@
                 .single();
               
               if (bidWithProfile) {
-                setBids(prev => [bidWithProfile, ...prev].slice(0, 10));
+                setBids(prev => {
+                  if (prev.some(b => b.id === bidWithProfile.id)) return prev;
+                  return [bidWithProfile, ...prev].slice(0, 10);
+                });
                 
                 // Update local active lot price immediately
                 setActiveLot((prev: any) => {
