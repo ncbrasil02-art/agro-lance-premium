@@ -101,7 +101,7 @@ function EventsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <header>
           <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Calendário de eventos</h1>
-          <p className="mt-2 text-muted-foreground">Acompanhe todos os leilões em andamento e agendados.</p>
+          <p className="mt-2 text-muted-foreground">Acompanhe todos os leilões em andamento e os que aceitam pré-lance.</p>
         </header>
         <EventRequestDialog />
       </div>
