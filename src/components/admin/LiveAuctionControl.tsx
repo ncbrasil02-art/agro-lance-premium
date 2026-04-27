@@ -115,10 +115,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
   }, [selectedEventId]);
 
     useEffect(() => {
-      if (!activeLot?.id) {
-        setBids([]);
-        return;
-      }
+       if (!activeLot?.id) return;
 
       // Fetch initial bids for the active lot
       const fetchInitialBids = async () => {
