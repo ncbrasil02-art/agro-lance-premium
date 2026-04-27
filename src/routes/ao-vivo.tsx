@@ -660,14 +660,24 @@ export const Route = createFileRoute("/ao-vivo")({
               .order("created_at", { ascending: false })
               .limit(10);
             
-            if (latestBids) {
-              setBids(latestBids);
-              const newProfiles: Record<string, any> = {};
-              latestBids.forEach((bid: any) => {
-                if (bid.profile) newProfiles[bid.profile.id] = bid.profile;
-              });
-              setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
-            }
+             if (latestBids) {
+               setBids(prev => {
+                 // Mesclar para não perder lances que chegaram via Realtime durante o fetch
+                 const merged = [...latestBids];
+                 prev.forEach(pb => {
+                   if (pb.lot_id === activeLotId && !merged.some(mb => mb.id === pb.id)) {
+                     merged.push(pb);
+                   }
+                 });
+                 return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 15);
+               });
+ 
+               const newProfiles: Record<string, any> = {};
+               latestBids.forEach((bid: any) => {
+                 if (bid.profile) newProfiles[bid.profile.id] = bid.profile;
+               });
+               setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
+             }
           }
           setLastSyncAt(new Date());
           setPollingRetryCount(0); // Reset retry count on success
