@@ -402,7 +402,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           updated_at: new Date().toISOString()
         }).eq("id", lotId);
          
-         await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
+          await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!", activeLot?.lot_number);
        } catch (error) {
          toast.error("Erro ao arrematar lote");
        } finally {
@@ -418,7 +418,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           is_currently_live: false,
           updated_at: new Date().toISOString()
         }).eq("id", lotId);
-        await handleAfterLotFinalized(lotId, "Lote finalizado sem venda.");
+        await handleAfterLotFinalized(lotId, "Lote finalizado sem venda.", activeLot?.lot_number);
       } catch (error) {
         toast.error("Erro ao finalizar lote");
       } finally {
