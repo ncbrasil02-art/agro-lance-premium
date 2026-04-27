@@ -1222,6 +1222,7 @@ export const Route = createFileRoute("/ao-vivo")({
                       </DialogContent>
                     </Dialog>
                   </div>
+                  </div>
                 </div>
               </div>
             </div>
