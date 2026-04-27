@@ -193,7 +193,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
           const baseSlug = formData.name.toLowerCase().trim()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
             .replace(/ /g, "-").replace(/[^\w-]+/g, "");
-          const slug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
+           const slug = `${baseSlug}-${Math.floor(Math.random() * 1000000)}`;
           
           const { error } = await supabase.from("events").insert({
             name: formData.name,
