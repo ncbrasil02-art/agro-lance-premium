@@ -1179,7 +1179,17 @@ export const Route = createFileRoute("/ao-vivo")({
 
         {/* Chat / Histórico de lances */}
         <aside className="rounded-2xl border border-border bg-card">
-          <div className="border-b border-border p-4">
+          <div className="border-b border-border p-4 space-y-3">
+            {statusMessage && (
+              <div className="bg-gold/10 border border-gold/30 rounded-xl p-3 animate-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center gap-2 text-gold">
+                  <MessageSquare className="h-4 w-4" />
+                  <span className="text-xs font-black uppercase tracking-wider">Aviso do Leiloeiro</span>
+                </div>
+                <p className="mt-1 text-sm font-bold text-emerald-deep leading-tight">{statusMessage}</p>
+              </div>
+            )}
+            
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold">Histórico de lances</h3>
