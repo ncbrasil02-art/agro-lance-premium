@@ -1068,12 +1068,47 @@ export const Route = createFileRoute("/ao-vivo")({
                        `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
                     </Button>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
-                          <Info className="h-5 w-5" />
-                        </Button>
-                      </DialogTrigger>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className={`h-12 w-12 p-0 transition-colors ${isFavorite ? 'border-gold text-gold bg-gold/5' : 'border-emerald-deep/20 text-emerald-deep hover:bg-emerald-deep hover:text-white'}`}
+                        onClick={toggleFavorite}
+                        disabled={isFavoriteLoading || !liveEvent?.active_lot_id}
+                      >
+                        {isFavoriteLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <BadgeCheck className={`h-5 w-5 ${isFavorite ? 'fill-gold' : ''}`} />}
+                      </Button>
+
+                      <Button 
+                        variant="outline" 
+                        className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors"
+                        onClick={() => {
+                          const url = `${window.location.origin}/lotes/${liveEvent?.active_lot_id}`;
+                          const text = `Veja agora o lote #${liveEvent?.active_lot?.lot_number} - ${liveEvent?.active_lot?.animal?.name} no leilão ao vivo!`;
+                          const shareData = { title: liveEvent?.active_lot?.animal?.name, text, url };
+
+                          if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                            navigator.share(shareData).catch(() => {
+                              navigator.clipboard.writeText(url);
+                              window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+                              toast.success("Link copiado e WhatsApp aberto!");
+                            });
+                          } else {
+                            navigator.clipboard.writeText(url);
+                            window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+                            toast.success("Link copiado e WhatsApp aberto!");
+                          }
+                        }}
+                        disabled={!liveEvent?.active_lot_id}
+                      >
+                        <Share2 className="h-5 w-5" />
+                      </Button>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
+                            <Info className="h-5 w-5" />
+                          </Button>
+                        </DialogTrigger>
                       <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
                         <DialogHeader className="border-b pb-4">
                           <DialogTitle className="flex items-center gap-2 text-2xl font-black text-emerald-deep tracking-tight">
