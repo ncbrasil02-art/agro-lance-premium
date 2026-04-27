@@ -181,6 +181,7 @@ export const Route = createFileRoute("/ao-vivo")({
   const [lastSyncAt, setLastSyncAt] = useState<Date>(new Date());
   const [syncTrigger, setSyncTrigger] = useState(0);
   const [pollingRetryCount, setPollingRetryCount] = useState(0);
+  const [reconnectTrigger, setReconnectTrigger] = useState(0);
 
   useEffect(() => {
     const handleOnline = () => {
