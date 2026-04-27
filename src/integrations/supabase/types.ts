@@ -647,6 +647,8 @@ export type Database = {
           end_date: string | null
           event_id: string | null
           id: string
+          installment_count: number | null
+          installment_interval: string | null
           is_currently_live: boolean | null
           is_featured: boolean | null
           last_bid_ip: string | null
@@ -673,6 +675,8 @@ export type Database = {
           end_date?: string | null
           event_id?: string | null
           id?: string
+          installment_count?: number | null
+          installment_interval?: string | null
           is_currently_live?: boolean | null
           is_featured?: boolean | null
           last_bid_ip?: string | null
@@ -699,6 +703,8 @@ export type Database = {
           end_date?: string | null
           event_id?: string | null
           id?: string
+          installment_count?: number | null
+          installment_interval?: string | null
           is_currently_live?: boolean | null
           is_featured?: boolean | null
           last_bid_ip?: string | null
