@@ -373,19 +373,23 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         const isGenericPhoneBid = lastBid.is_phone_bid && !lastBid.user_id;
         const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
 
+        // Automatic linking logic:
         if (isGenericPhoneBid) {
-          // Only for generic phone bids we ask to link, as we don't know who it is
-          if (confirm(`Lote arrematado via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`)) {
-            if (phoneBid.profileId) {
-              finalWinnerId = phoneBid.profileId;
-            } else {
-              toast.info("Selecione um 'Cadastro Real' no formulário lateral para vincular.");
+          if (phoneBid.profileId) {
+            // If a profile is already selected in the sidebar, link it automatically
+            finalWinnerId = phoneBid.profileId;
+            toast.info(`Vinculando arremate ao perfil selecionado: ${profiles.find(p => p.id === phoneBid.profileId)?.full_name || '... '}`);
+          } else {
+            // Only prompt if it's a generic bid AND no profile is selected to link
+            if (confirm(`Lote arrematado via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`)) {
+              toast.info("Por favor, selecione um 'Cadastro Real' no formulário lateral e clique em Arrematar novamente.");
               return;
             }
           }
-        } else {
-          // For registered users (including admin), we proceed automatically as requested
-          // No second confirmation dialog after clicking "Arrematar"
+        } else if (lastBid.user_id) {
+          // Registered user (online bid or admin bid linked to profile)
+          // We use the bidder's ID directly as the winner
+          finalWinnerId = lastBid.user_id;
           console.log("Arrematando automaticamente para usuário registrado:", lastBid.profile?.full_name);
         }
 
