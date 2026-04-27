@@ -312,7 +312,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       }
       
       setIsActionLoading(true);
-      setIsActionLoading(true);
       try {
         const { error } = await supabase
           .from("events")
