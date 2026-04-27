@@ -1,4 +1,4 @@
-import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -333,16 +333,19 @@ export const Route = createFileRoute("/ao-vivo")({
                 .single();
               
                if (data) {
-                 // Detect if it was a force refresh from admin (updated_at changed but active_lot_id same)
-                 const lotChanged = payload.new.active_lot_id !== payload.old?.active_lot_id;
-                 const isForceRefresh = !lotChanged && payload.new.updated_at !== payload.old?.updated_at;
+                 // Detect if it was a force refresh or just an event update
+                 const newActiveLotId = payload.new.active_lot_id;
+                 const currentActiveLotId = liveEvent.active_lot_id;
+                 const lotChanged = newActiveLotId !== currentActiveLotId;
 
                  setLiveEvent(data as any);
 
-                 if (isForceRefresh) {
-                   console.log("Comando de atualização forçada recebido.");
-                   toast.info("Atualizando dados do leilão...", { duration: 2000 });
-                   // Logic to ensure state is fresh
+                 if (!lotChanged) {
+                   console.log("Comando de atualização ou sincronização recebido do Administrador.", payload.new.updated_at);
+                   toast.info("Sincronizando dados em tempo real...", { 
+                     icon: <RefreshCw className="h-4 w-4 animate-spin text-emerald-600" />,
+                     duration: 2000 
+                   });
                    setSyncTrigger(prev => prev + 1);
                  }
                 

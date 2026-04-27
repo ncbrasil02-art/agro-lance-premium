@@ -312,7 +312,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       }
       
       setIsActionLoading(true);
-      setIsActionLoading(true);
       try {
         const { error } = await supabase
           .from("events")
@@ -430,10 +429,16 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       if (!selectedEventId) return;
       setIsActionLoading(true);
       try {
-        await supabase.from("events").update({ 
-          updated_at: new Date().toISOString() 
+        const { error } = await supabase.from("events").update({ 
+          updated_at: new Date().toISOString(),
+          // Dummy change to ensure realtime trigger even if updated_at was just updated by a database trigger
+          live_status_message: liveEvent.live_status_message 
         }).eq("id", selectedEventId);
+
+        if (error) throw error;
+
         toast.success("Comando de atualização enviado para todos os usuários!");
+        await fetchEventDetails(selectedEventId);
       } catch (error) {
         toast.error("Erro ao atualizar tela dos usuários");
       } finally {
