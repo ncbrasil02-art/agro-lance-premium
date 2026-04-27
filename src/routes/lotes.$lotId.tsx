@@ -546,8 +546,7 @@ function LotDetail() {
                  </TabsContent>
                   <TabsContent value="videos" className="mt-6">
                     <div className="aspect-video rounded-3xl overflow-hidden bg-black flex items-center justify-center">
-                      {lot.animal?.youtube_url ? (
-                        {(() => {
+                       {lot.animal?.youtube_url ? (() => {
                           let embedUrl = lot.animal.youtube_url;
                           try {
                             const url = new URL(lot.animal.youtube_url);
@@ -571,8 +570,8 @@ function LotDetail() {
                               allowFullScreen 
                             />
                           );
-                        })()}
-                      ) : (
+                         })()
+                       ) : (
                         <div className="text-center space-y-4">
                           <Video className="h-12 w-12 text-white/20 mx-auto" />
                           <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum vídeo disponível</p>
