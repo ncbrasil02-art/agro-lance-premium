@@ -416,12 +416,12 @@ export const Route = createFileRoute("/ao-vivo")({
                   if (!payload.new.active_lot_id) {
                     setBids([]);
                   } else {
-                    const { data: newBids } = await supabase
-                      .from("bids")
-                      .select("*, profile:profiles(id, full_name)")
-                      .eq("lot_id", payload.new.active_lot_id)
-                      .order("created_at", { ascending: false })
-                      .limit(10);
+                        const { data: newBids } = await supabase
+                          .from("bids")
+                          .select("*, profile:profiles(id, full_name)")
+                          .eq("lot_id", payload.new.active_lot_id)
+                          .order("created_at", { ascending: false })
+                          .limit(10);
                     
                     if (newBids) {
                       setBids(newBids);
@@ -1350,17 +1350,11 @@ export const Route = createFileRoute("/ao-vivo")({
                    <div className="font-semibold flex items-center gap-2">
                        <div className="flex flex-col">
                          <span className="text-sm font-bold">
-                           {bid.is_phone_bid ? (
-                             bid.phone_bidder_identifier || "Telefone"
-                           ) : bid.bid_type === 'security' ? (
-                             "Lance do Auditório"
-                           ) : bidderProfiles[bid.user_id]?.full_name ? (
-                             bidderProfiles[bid.user_id].full_name
-                           ) : bid.user_id ? (
-                             `Comprador ...${bid.user_id.slice(-4)}`
-                           ) : (
-                             "Licitante"
-                           )}
+                           {bid.is_phone_bid && bid.phone_bidder_identifier
+                             ? bid.phone_bidder_identifier
+                             : (bid.bid_type === 'security' || bid.is_manual)
+                               ? (bid.phone_bidder_identifier || "Auditório")
+                               : (bidderProfiles[bid.user_id]?.full_name || bid.profile?.full_name || (bid.user_id ? `Comprador ...${bid.user_id.slice(-4)}` : "Licitante"))}
                          </span>
                          <div className="flex items-center gap-2 mt-0.5">
                            {bid.is_phone_bid ? (
