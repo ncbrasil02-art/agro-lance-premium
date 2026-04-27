@@ -476,17 +476,17 @@ function LotDetail() {
                           <h3 className="text-sm font-black uppercase text-gold/60 mb-4 flex items-center gap-2">
                             <Stethoscope className="h-4 w-4" /> Registro de Vacinação
                           </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {lot.animal.vaccination_records.map((v: any, idx: number) => (
-                              <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                                  <span className="text-xs font-bold text-white/80">{v.vaccine || v.name}</span>
-                                </div>
-                                <span className="text-[10px] text-white/40">{v.date}</span>
-                              </div>
-                            ))}
-                          </div>
+                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                             {(lot.animal?.vaccination_records || lot.animal?.health_info)?.map?.((v: any, idx: number) => (
+                               <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
+                                 <div className="flex items-center gap-2">
+                                   <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                                   <span className="text-xs font-bold text-white/80">{v.vaccine || v.name || v.label}</span>
+                                 </div>
+                                 <span className="text-[10px] text-white/40">{v.date}</span>
+                               </div>
+                             ))}
+                           </div>
                         </div>
                       )}
                    </Card>
