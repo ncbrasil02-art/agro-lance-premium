@@ -1,4 +1,4 @@
- import { createFileRoute, Link } from "@tanstack/react-router";
+  import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2 } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
@@ -77,14 +77,31 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
     errorComponent: ErrorFallback,
   });
 
-function Home() {
+ function Home() {
+     const router = useRouter();
     const { events, lots, pastEvents, announcement } = Route.useLoaderData();
     const [now, setNow] = useState(Date.now());
 
-    useEffect(() => {
-      const interval = setInterval(() => setNow(Date.now()), 1000);
-      return () => clearInterval(interval);
-    }, []);
+     useEffect(() => {
+       const interval = setInterval(() => setNow(Date.now()), 1000);
+       
+       const channel = supabase
+         .channel('home-updates')
+         .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+           logger.info("Evento alterado, atualizando home...");
+           router.invalidate();
+         })
+         .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
+           logger.info("Lote alterado, atualizando home...");
+           router.invalidate();
+         })
+         .subscribe();
+ 
+       return () => {
+         clearInterval(interval);
+         supabase.removeChannel(channel);
+       };
+     }, [router]);
 
     const mapEvent = (e: ValidatedEvent) => ({
      id: e.id,
