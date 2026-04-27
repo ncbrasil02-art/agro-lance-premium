@@ -471,7 +471,7 @@ function LotDetail() {
                         )}
                       </div>
  
-                      {lot.animal?.vaccination_records && Array.isArray(lot.animal.vaccination_records) && lot.animal.vaccination_records.length > 0 && (
+                       {(lot.animal?.vaccination_records || lot.animal?.health_info) && (
                         <div className="mt-8">
                           <h3 className="text-sm font-black uppercase text-gold/60 mb-4 flex items-center gap-2">
                             <Stethoscope className="h-4 w-4" /> Registro de Vacinação
