@@ -597,6 +597,18 @@ export const Route = createFileRoute("/ao-vivo")({
 
       return () => clearInterval(interval);
     }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger, pollingRetryCount]);
+
+    // Monitor realtime status and nudge reconnection if stuck
+    useEffect(() => {
+      if (realtimeStatus !== "SUBSCRIBED" && !isOffline) {
+        // If we are not subscribed but we ARE online, wait a bit and then nudge reconnection
+        const nudgeTimeout = setTimeout(() => {
+          console.log("Realtime connection seems stuck, nudging...");
+          setReconnectTrigger(prev => prev + 1);
+        }, 15000); // 15 seconds of "stuck" state
+        return () => clearTimeout(nudgeTimeout);
+      }
+    }, [realtimeStatus, isOffline]);
  
    const liveLot = liveEvent?.active_lot;
  
