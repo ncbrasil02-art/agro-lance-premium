@@ -601,11 +601,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
 
     const statusLegend = [
       { label: 'Loteamento', desc: 'Fase de cadastro. O evento não aceita lances.' },
-      { label: 'Agendado', desc: 'Aguardando data oficial de início.' },
+      { label: 'Aceita pré-lance', desc: 'Aguardando data oficial de início.' },
       { label: 'Recebendo Lances', desc: 'Aberto para lances em todos os lotes (Online).' },
       { label: 'Ao Vivo', desc: 'Evento em tempo real com transmissão e martelo.' },
       { label: 'Condicional', desc: 'Maior lance em negociação com o vendedor.' },
-      { label: 'Incondicional', desc: 'Venda confirmada e finalizada.' },
+      { label: 'Evento Confirmado', desc: 'Venda confirmada e finalizada.' },
     ];
 
     return (
@@ -710,14 +710,14 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                           const { error } = await supabase.from("events").update({ status: 'scheduled' }).eq("id", selectedEventId);
                           if (error) toast.error(error.message);
                           else {
-                            toast.success("Evento pausado (Agendado)");
+                            toast.success("Evento pausado (Aceita pré-lance)");
                             fetchEventDetails(selectedEventId);
                           }
                           setIsActionLoading(false);
                         }}
                         disabled={isActionLoading}
                       >
-                        <Timer className="mr-2 h-4 w-4" /> Pausar / Voltar p/ Agendado
+                        <Timer className="mr-2 h-4 w-4" /> Pausar / Voltar p/ Aceita pré-lance
                       </Button>
                     )}
                      <div className="flex gap-2">
