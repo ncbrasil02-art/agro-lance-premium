@@ -47,9 +47,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
        banner_url: "",
        promoter_company: "",
         auctioneer_name: "",
-        seller_id: "none",
-        seller_name: "",
-        regulation: ""
+         seller_id: "none",
+         seller_name: "",
+         regulation: "",
+         viewers: 0
      });
 
      const resetForm = () => {
