@@ -317,7 +317,7 @@ function LotDetail() {
   const [isUrgent, setIsUrgent] = useState(false);
   const installments = 30;
   const installmentValue = currentPrice / installments;
-  const COMMISSION_RATE = lot.event?.commission_rate || 5;
+   const COMMISSION_RATE = lot.event?.commission_rate ?? 5;
   const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
 
   const getAge = (birthDate: string) => {
