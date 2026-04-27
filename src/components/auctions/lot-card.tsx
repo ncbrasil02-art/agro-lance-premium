@@ -38,6 +38,7 @@ import { Countdown } from "./countdown";
       eventStartDate?: string; 
       eventEndDate?: string; 
       allowsPreBidding?: boolean; 
+      eventType?: string;
       eventStatus?: string;
       father?: string;
       mother?: string;
@@ -89,12 +90,12 @@ import { Countdown } from "./countdown";
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
         <div className="absolute left-3 top-3 flex flex-col gap-2.5 items-start">
-           {dynamicStatus === 'recebendo_lances' && (
-             <div className="flex items-center gap-1.5 rounded-full bg-live px-3 py-1.5 text-[10px] font-black text-white shadow-[0_0_25px_rgba(239,68,68,0.6)] animate-blink-fast border border-white/40 ring-2 ring-live/20">
-               <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-               AO VIVO
-             </div>
-           )}
+            {dynamicStatus === 'recebendo_lances' && (
+              <div className={`flex items-center gap-1.5 rounded-full ${lot.eventType === 'ao_vivo' ? 'bg-live shadow-[0_0_25px_rgba(239,68,68,0.6)]' : 'bg-blue-600 shadow-[0_0_25px_rgba(37,99,235,0.6)]'} px-3 py-1.5 text-[10px] font-black text-white animate-blink-fast border border-white/40 ring-2 ${lot.eventType === 'ao_vivo' ? 'ring-live/20' : 'ring-blue-600/20'}`}>
+                <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                {lot.eventType === 'ao_vivo' ? 'AO VIVO' : 'ONLINE'}
+              </div>
+            )}
            <StatusBadge status={dynamicStatus} urgent={isUrgent} />
           {dynamicStatus === 'loteamento' && (
             <div className="group/info relative">
@@ -115,8 +116,13 @@ import { Countdown } from "./countdown";
         <div className="absolute right-3 top-3 z-10 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur shadow-sm">
           LOTE {lot?.number ? String(lot.number).padStart(2, "0") : "--"}
         </div>
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white/90" aria-label={`${lot?.viewers || 0} visualizações, ${lot?.bidsCount || 0} lances`}>
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white/90 z-10" aria-label={`${lot?.viewers || 0} visualizações, ${lot?.bidsCount || 0} lances`}>
           <span className="flex items-center gap-1"><Eye className="h-3 w-3" aria-hidden="true" /> {lot?.viewers || 0}</span>
+          {dynamicStatus === 'recebendo_lances' && (
+            <span className="bg-emerald-500/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider animate-pulse">
+              Recebendo Lance
+            </span>
+          )}
           <span className="flex items-center gap-1"><Gavel className="h-3 w-3" aria-hidden="true" /> {lot?.bidsCount || 0} lances</span>
         </div>
       </div>
