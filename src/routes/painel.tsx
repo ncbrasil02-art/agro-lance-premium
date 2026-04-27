@@ -371,9 +371,7 @@ function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
               profile={profile}
               type="contrato"
             />
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
-              <CreditCard className="h-4 w-4" /> Realizar Pagamento
-            </Button>
+            <PaymentDialog lot={lot} profile={profile} />
           </div>
         </div>
       </div>
