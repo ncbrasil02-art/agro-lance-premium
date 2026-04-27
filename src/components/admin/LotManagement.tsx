@@ -646,7 +646,6 @@ import {
                         return (
                           <>
                           <TableRow 
-                            key={lot.id} 
                             className={`${lot.status === 'active' ? 'bg-emerald-50/30' : lot.status === 'paused' ? 'bg-amber-50/30' : ''} ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50`}
                             onClick={() => toggleExpand(lot.id)}
                           >
@@ -882,7 +881,7 @@ import {
                                         <History className="h-4 w-4 text-emerald-600" />
                                         Lances em Tempo Real
                                       </h4>
-                                      <Button variant="outline" size="xs" className="text-[10px]" onClick={() => fetchLotBids(lot.id)}>
+                              <Button variant="outline" size="sm" className="h-6 text-[10px] px-2" onClick={() => fetchLotBids(lot.id)}>
                                         Atualizar
                                       </Button>
                                     </div>
@@ -946,7 +945,7 @@ import {
                                                   <div className="text-[9px] text-muted-foreground line-clamp-1">{offer.description}</div>
                                                 </TableCell>
                                                 <TableCell className="py-1 text-[10px]">
-                                                  <Button variant="ghost" size="xs" className="h-6 w-6 text-emerald-600">
+                                                  <Button variant="ghost" size="sm" className="h-6 w-6 text-emerald-600">
                                                     <ShieldCheck className="h-3 w-3" />
                                                   </Button>
                                                 </TableCell>
