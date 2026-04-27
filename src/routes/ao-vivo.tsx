@@ -377,32 +377,65 @@ export const Route = createFileRoute("/ao-vivo")({
           .subscribe();
       }
 
-      // Specific bids channel for the active lot
+      // Specific bids channel for the active lot - listens for ALL changes (INSERT, UPDATE)
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
+        console.log("Subscribing to bids for lot:", liveEvent.active_lot_id);
         bidsChannel = supabase
           .channel(`live-bids-${liveEvent.active_lot_id}`)
           .on(
             "postgres_changes",
-            { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${liveEvent.active_lot_id}` },
+            { 
+              event: "*", 
+              schema: "public", 
+              table: "bids", 
+              filter: `lot_id=eq.${liveEvent.active_lot_id}` 
+            },
             async (payload) => {
-              const newBid = payload.new;
-              setBids((prev: any) => [newBid, ...prev].slice(0, 10));
+              console.log("Bid change detected:", payload.eventType, payload.new);
               
-              // Fetch profile if not already loaded
-              if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
-                const { data } = await supabase
-                  .from("profiles")
-                  .select("id, full_name")
-                  .eq("id", newBid.user_id)
-                  .single();
-                if (data) {
-                  setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+              if (payload.eventType === "INSERT") {
+                const newBid = payload.new;
+                setBids((prev: any) => {
+                  // Prevent duplicates just in case
+                  if (prev.some(b => b.id === newBid.id)) return prev;
+                  return [newBid, ...prev].slice(0, 10);
+                });
+                
+                // Fetch profile if not already loaded
+                if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
+                  const { data } = await supabase
+                    .from("profiles")
+                    .select("id, full_name")
+                    .eq("id", newBid.user_id)
+                    .single();
+                  if (data) {
+                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                  }
+                }
+              } else if (payload.eventType === "UPDATE") {
+                const updatedBid = payload.new;
+                setBids((prev: any) => 
+                  prev.map(b => b.id === updatedBid.id ? { ...b, ...updatedBid } : b)
+                );
+                
+                // If user_id was added in update, fetch profile
+                if (updatedBid.user_id && !bidderProfiles[updatedBid.user_id]) {
+                  const { data } = await supabase
+                    .from("profiles")
+                    .select("id, full_name")
+                    .eq("id", updatedBid.user_id)
+                    .single();
+                  if (data) {
+                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                  }
                 }
               }
             }
           )
-          .subscribe();
+          .subscribe((status) => {
+            console.log("Bid channel status:", status);
+          });
       }
 
       return () => {
