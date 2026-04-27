@@ -235,6 +235,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                 accepts_offers: formData.accepts_offers,
                sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
                sale_status: formData.sale_status
+             })
+             .eq("id", editingAnimal.id)
+             .neq("sale_status", "sold"); // Extra safety on client side
             })
             .eq("id", editingAnimal.id);
           if (error) throw error;
