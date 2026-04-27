@@ -356,8 +356,90 @@ function LotDetail() {
      checkUrgency();
      return () => clearInterval(timer);
    }, [lot.end_date, lot.event?.end_date]);
-  const installments = 30;
-  const installmentValue = currentPrice / installments;
+   const COMMISSION_RATE = lot.event?.commission_rate || 5; // default 5%
+   const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
+   const TOTAL_WITH_COMMISSION = currentPrice + BUYER_COMMISSION;
+   
+   // Common auction installment types
+   const installments = 30; // standard
+   const installmentValue = currentPrice / installments;
+   
+   // For "1+2 and then 30 equal payments" (Total of 33 installments)
+   // The formula is: Price / 33
+   const specialInstallments = 33;
+   const specialInstallmentValue = currentPrice / specialInstallments;
+ 
+   const [isFavorite, setIsFavorite] = useState(false);
+   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
+ 
+   useEffect(() => {
+     if (user) {
+       const checkFavorite = async () => {
+         const { data } = await supabase
+           .from("followed_lots")
+           .select("id")
+           .eq("user_id", user.id)
+           .eq("lot_id", lot.id)
+           .maybeSingle();
+         setIsFavorite(!!data);
+       };
+       checkFavorite();
+     }
+   }, [user, lot.id]);
+ 
+   const toggleFavorite = async () => {
+     if (!user) {
+       toast.error("Faça login para favoritar este lote.");
+       return;
+     }
+     setIsFavoriteLoading(true);
+     try {
+       if (isFavorite) {
+         await supabase
+           .from("followed_lots")
+           .delete()
+           .eq("user_id", user.id)
+           .eq("lot_id", lot.id);
+         setIsFavorite(false);
+         toast.success("Lote removido dos favoritos.");
+       } else {
+         await supabase
+           .from("followed_lots")
+           .insert({ user_id: user.id, lot_id: lot.id });
+         setIsFavorite(true);
+         toast.success("Lote adicionado aos favoritos!");
+       }
+     } catch (error) {
+       toast.error("Erro ao processar favorito.");
+     } finally {
+       setIsFavoriteLoading(false);
+     }
+   };
+ 
+   const handleShare = async () => {
+     const shareData = {
+       title: `Lote #${lot.lot_number} - ${lot.animal?.name}`,
+       text: `Confira este exemplar de ${lot.animal?.breed} no Auditor de Lances!`,
+       url: window.location.href,
+     };
+ 
+     if (navigator.share) {
+       try {
+         await navigator.share(shareData);
+       } catch (err) {
+         if ((err as Error).name !== 'AbortError') {
+           toast.error("Erro ao compartilhar.");
+         }
+       }
+     } else {
+       await navigator.clipboard.writeText(window.location.href);
+       toast.success("Link copiado para a área de transferência!");
+     }
+   };
+ 
+   const handlePrint = () => {
+     window.print();
+   };
 
   const getAge = (birthDate: string) => {
     if (!birthDate) return null;
