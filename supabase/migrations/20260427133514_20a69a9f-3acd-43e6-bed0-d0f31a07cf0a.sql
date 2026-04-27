@@ -1,0 +1,27 @@
+CREATE OR REPLACE FUNCTION public.fn_auto_link_lot_winner()
+RETURNS TRIGGER AS $$
+DECLARE
+    highest_bid RECORD;
+BEGIN
+    -- Se o status mudou para 'sold' e não há vencedor definido
+    IF NEW.status = 'sold' AND NEW.winner_id IS NULL THEN
+        -- Busca o maior lance para este lote
+        SELECT user_id, amount, is_phone_bid INTO highest_bid
+        FROM public.bids
+        WHERE lot_id = NEW.id
+        ORDER BY amount DESC, created_at ASC
+        LIMIT 1;
+
+        -- Se houver um lance, vincula o usuário como vencedor e registra o motivo
+        IF highest_bid.user_id IS NOT NULL THEN
+            NEW.winner_id := highest_bid.user_id;
+            NEW.current_price := highest_bid.amount;
+            NEW.winner_link_reason := CASE 
+                WHEN highest_bid.is_phone_bid THEN 'Vínculo automático pelo maior lance (Telefone)'
+                ELSE 'Vínculo automático pelo maior lance (Online)'
+            END;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
