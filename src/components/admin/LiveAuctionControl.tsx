@@ -361,23 +361,32 @@
 
        let finalWinnerId = lastBid?.user_id || null;
        
-       // If it was a bid by the admin (phone/manual), or if we want to confirm/override
-       if (lastBid?.user_id === currentUserId || lastBid?.is_phone_bid) {
-         const promptText = lastBid?.is_phone_bid 
-           ? `Lote arrematado por lance de TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`
-           : `Lote arrematado por lance MANUAL no auditório.\n\nDeseja vincular este arremate a um cadastro real agora?`;
-           
-         if (confirm(promptText)) {
+        // If there's no winner, we can't sell
+        if (!lastBid) {
+          toast.error("Não há lances para este lote.");
+          return;
+        }
+
+        // If the bid is already linked to a user (not a generic phone bid without profile)
+        // we don't need to ask to link it, just a simple confirmation of the sale.
+        const isGenericPhoneBid = lastBid.is_phone_bid && !lastBid.user_id;
+        const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
+
+        if (isGenericPhoneBid) {
+          // Only for generic phone bids we ask to link, as we don't know who it is
+          if (confirm(`Lote arrematado via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`)) {
             if (phoneBid.profileId) {
               finalWinnerId = phoneBid.profileId;
             } else {
-              toast.info("Por favor, selecione o 'Cadastro Real' no formulário lateral antes de clicar em Arrematar para vincular automaticamente.");
+              toast.info("Selecione um 'Cadastro Real' no formulário lateral para vincular.");
               return;
             }
-         }
-       } else {
-         if (!confirm(`Confirmar ARREMATE deste lote para ${lastBid?.profile?.full_name || 'o maior lance'} no valor de ${formatBRL(lastBid?.amount || 0)}?`)) return;
-       }
+          }
+        } else {
+          // For registered users (including admin), we proceed automatically as requested
+          // No second confirmation dialog after clicking "Arrematar"
+          console.log("Arrematando automaticamente para usuário registrado:", lastBid.profile?.full_name);
+        }
 
        setIsActionLoading(true);
        try {

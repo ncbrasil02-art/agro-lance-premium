@@ -219,7 +219,7 @@ export const Route = createFileRoute("/ao-vivo")({
           p_entity_type: 'event'
         }).then(() => console.log("Viewer count incremented"));
       }
-    }, [liveEvent?.id]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id]);
 
     // Pre-populate profile cache from initial bids to avoid extra queries
     useEffect(() => {
@@ -894,7 +894,24 @@ export const Route = createFileRoute("/ao-vivo")({
                    category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
                  />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+
+                {/* Carimbo de VENDIDO/FINALIZADO sobre a foto */}
+                {(liveLot.status === 'sold' || liveLot.status === 'passed') && (
+                  <div className="absolute inset-0 z-30 flex items-center justify-center p-4 pointer-events-none group-hover:opacity-100 transition-opacity">
+                    <div className={`
+                      ${liveLot.status === 'sold' ? 'bg-emerald-600/90 shadow-[0_0_50px_rgba(5,150,105,0.5)]' : 'bg-destructive/90 shadow-[0_0_50px_rgba(239,68,68,0.5)]'}
+                      w-full py-6 text-center transform -rotate-12 border-y-8 border-white shadow-2xl backdrop-blur-sm
+                    `}>
+                      <span className="text-white text-4xl md:text-6xl font-black uppercase tracking-tighter drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+                        {liveLot.status === 'sold' ? 'ARREMATADO!' : 'NÃO VENDIDO'}
+                      </span>
+                      {liveLot.status === 'sold' && (
+                        <div className="text-white/90 text-sm md:text-xl font-bold mt-1 uppercase tracking-widest">{formatBRL(currentPrice)}</div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 
                 {liveLot.animal?.photos?.length > 1 && (
                   <>
