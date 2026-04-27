@@ -326,13 +326,35 @@ export const Route = createFileRoute("/ao-vivo")({
                 if (payload.new.active_lot_id !== payload.old?.active_lot_id) {
                   console.log("Lote alterado em tempo real:", payload.new.active_lot_id);
                   setActivePhotoIndex(0);
-                  const { data: newBids } = await supabase
-                    .from("bids")
-                    .select("*")
-                    .eq("lot_id", payload.new.active_lot_id)
-                    .order("created_at", { ascending: false })
-                    .limit(10);
-                  if (newBids) setBids(newBids);
+                  
+                  if (!payload.new.active_lot_id) {
+                    setBids([]);
+                  } else {
+                    const { data: newBids } = await supabase
+                      .from("bids")
+                      .select("*")
+                      .eq("lot_id", payload.new.active_lot_id)
+                      .order("created_at", { ascending: false })
+                      .limit(10);
+                    
+                    if (newBids) {
+                      setBids(newBids);
+                      // Fetch profiles for these new bids
+                      const userIds = [...new Set(newBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
+                      const missingUserIds = userIds.filter(id => !bidderProfiles[id]);
+                      
+                      if (missingUserIds.length > 0) {
+                        const { data: profiles } = await supabase
+                          .from("profiles")
+                          .select("id, full_name")
+                          .in("id", missingUserIds);
+                        if (profiles) {
+                          const map = profiles.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
+                          setBidderProfiles(prev => ({ ...prev, ...map }));
+                        }
+                      }
+                    }
+                  }
                   
                   toast.info("Próximo lote entrando no ar!", { 
                     description: "A tela será atualizada automaticamente.",
