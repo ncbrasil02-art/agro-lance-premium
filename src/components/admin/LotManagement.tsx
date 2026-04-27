@@ -300,11 +300,12 @@ import {
                 lot_number: formData.lot_number,
                 starting_price: formData.starting_price,
                 bid_increment: formData.bid_increment,
-                status: formData.status,
-                allows_pre_bidding: formData.allows_pre_bidding,
-                is_featured: formData.is_featured,
-                payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : []
-              })
+                 status: formData.status,
+                 allows_pre_bidding: formData.allows_pre_bidding,
+                 is_featured: formData.is_featured,
+                 payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
+                 viewers: formData.viewers
+               })
               .eq("id", editingLot.id);
             if (error) throw error;
             toast.success("Lote atualizado com sucesso");
@@ -316,12 +317,13 @@ import {
               starting_price: formData.starting_price,
               current_price: formData.starting_price,
               bid_increment: formData.bid_increment,
-              status: formData.status,
-              allows_pre_bidding: formData.allows_pre_bidding,
-              is_featured: formData.is_featured,
-              payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
-              end_date: null // Lotes agora seguem a data de término do evento por padrão
-            });
+               status: formData.status,
+               allows_pre_bidding: formData.allows_pre_bidding,
+               is_featured: formData.is_featured,
+               payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
+               viewers: formData.viewers,
+               end_date: null // Lotes agora seguem a data de término do evento por padrão
+             });
             if (error) throw error;
             toast.success("Lote alocado com sucesso");
           }
@@ -545,14 +547,24 @@ import {
                      onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="payments">Condições de Pagamento / Parcelamento</Label>
-                  <Input 
-                    value={formData.payment_methods} 
-                    onChange={(e) => setFormData({ ...formData, payment_methods: e.target.value })} 
-                    placeholder="Ex: 30 parcelas (2+2+26), À vista com 10% desc"
-                  />
-                </div>
+                 <div className="grid grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                     <Label htmlFor="payments">Condições de Pagamento</Label>
+                     <Input 
+                       value={formData.payment_methods} 
+                       onChange={(e) => setFormData({ ...formData, payment_methods: e.target.value })} 
+                       placeholder="Ex: 30 parcelas (2+2+26)"
+                     />
+                   </div>
+                   <div className="grid gap-2">
+                     <Label htmlFor="viewers">Visualizações Iniciais</Label>
+                     <Input 
+                       type="number"
+                       value={formData.viewers} 
+                       onChange={(e) => setFormData({ ...formData, viewers: parseInt(e.target.value) || 0 })} 
+                     />
+                   </div>
+                 </div>
                 <div className="grid grid-cols-2 gap-4 py-2">
                   <div className="flex items-center space-x-2">
                     <input 
