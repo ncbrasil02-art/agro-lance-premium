@@ -659,6 +659,7 @@ export type Database = {
           updated_at: string
           viewers: number | null
           winner_id: string | null
+          winner_link_reason: string | null
         }
         Insert: {
           allows_pre_bidding?: boolean | null
@@ -682,6 +683,7 @@ export type Database = {
           updated_at?: string
           viewers?: number | null
           winner_id?: string | null
+          winner_link_reason?: string | null
         }
         Update: {
           allows_pre_bidding?: boolean | null
@@ -705,6 +707,7 @@ export type Database = {
           updated_at?: string
           viewers?: number | null
           winner_id?: string | null
+          winner_link_reason?: string | null
         }
         Relationships: [
           {
