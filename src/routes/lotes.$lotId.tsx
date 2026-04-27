@@ -82,8 +82,8 @@ export const Route = createFileRoute("/lotes/$lotId")({
 function GenealogyTree({ genealogy }: { genealogy: any }) {
   if (!genealogy) return <div className="py-10 text-center text-muted-foreground">Informação de genealogia não disponível.</div>;
 
-  const pai = genealogy.father || genealogy.pai || "Não informado";
-  const mae = genealogy.mother || genealogy.mae || "Não informado";
+   const pai = genealogy.father || genealogy.pai || "Não informado";
+   const mae = genealogy.mother || genealogy.mae || "Não informado";
   
   const avos = [
     genealogy.grandfather_paternal || genealogy.avo_paterno || "A definir",
@@ -134,8 +134,8 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
 
         <div className="flex flex-col justify-around gap-12 relative w-56">
           <div className="absolute -left-4 top-[25%] bottom-[25%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          <Node title="Pai (Sire)" name={pai} />
-          <Node title="Mãe (Dam)" name={mae} />
+           <Node title="Pai" name={pai} />
+           <Node title="Mãe" name={mae} />
         </div>
 
         <div className="flex flex-col justify-around gap-6 relative w-44">
@@ -165,15 +165,15 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
             <div className="space-y-3">
               <Node title="Pai" name={pai} />
               <div className="grid gap-2 pl-2 border-l border-gold/20">
-                <Node title="Avô Pat." name={avos[0]} variant="tertiary" />
-                <Node title="Avó Pat." name={avos[1]} variant="tertiary" />
+                 <Node title="Avô Paterno" name={avos[0]} variant="tertiary" />
+                 <Node title="Avó Paterna" name={avos[1]} variant="tertiary" />
               </div>
             </div>
             <div className="space-y-3">
               <Node title="Mãe" name={mae} />
               <div className="grid gap-2 pl-2 border-l border-gold/20">
-                <Node title="Avô Mat." name={avos[2]} variant="tertiary" />
-                <Node title="Avó Mat." name={avos[3]} variant="tertiary" />
+                 <Node title="Avô Materno" name={avos[2]} variant="tertiary" />
+                 <Node title="Avó Materna" name={avos[3]} variant="tertiary" />
               </div>
             </div>
           </div>
