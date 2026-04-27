@@ -712,35 +712,57 @@ import {
                                    lot.status === 'passed' ? 'Passou' : 
                                    lot.status === 'upcoming' ? 'Agendado' : 'Finalizado'}
                                 </span>
-                                {(lot.status === 'sold' || lot.status === 'passed') && (
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 gap-1 border-emerald-500/50 hover:bg-emerald-50 text-emerald-600 text-[10px] font-bold"
-                                    onClick={async () => {
-                                      if (!confirm("Deseja REABRIR este lote? O arremate anterior será cancelado e o lote voltará a ficar disponível para lances.")) return;
-                                      setIsLoading(true);
-                                      try {
-                                        const { error } = await supabase
-                                          .from("lots")
-                                          .update({ 
-                                            status: 'active', 
-                                            winner_id: null 
-                                          })
-                                          .eq("id", lot.id);
-                                        if (error) throw error;
-                                        toast.success("Lote reaberto com sucesso!");
-                                        fetchData();
-                                      } catch (error: any) {
-                                        toast.error("Erro ao reabrir lote: " + error.message);
-                                      } finally {
-                                        setIsLoading(false);
-                                      }
-                                    }}
-                                  >
-                                    <History className="h-3 w-3" /> Reabrir
-                                  </Button>
-                                )}
+                                 {lot.status === 'sold' && (
+                                   <Button 
+                                     variant="outline" 
+                                     size="sm" 
+                                     className="h-8 gap-1 border-emerald-500/50 hover:bg-emerald-50 text-emerald-600 text-[10px] font-bold"
+                                     onClick={async () => {
+                                       if (!confirm("Atenção: Para que este animal volte ao catálogo de vendas, é necessário reverter o lote arrematado. Deseja reverter este lote agora?")) return;
+                                       setIsLoading(true);
+                                       try {
+                                         const { error } = await supabase.rpc("revert_sold_lot", {
+                                           p_lot_id: lot.id
+                                         });
+                                         if (error) throw error;
+                                         toast.success("Lote revertido com sucesso! O animal voltou ao catálogo.");
+                                         fetchData();
+                                       } catch (error: any) {
+                                         toast.error("Erro ao reverter lote: " + error.message);
+                                       } finally {
+                                         setIsLoading(false);
+                                       }
+                                     }}
+                                   >
+                                     <History className="h-3 w-3" /> Reverter Lote
+                                   </Button>
+                                 )}
+                                 {lot.status === 'passed' && (
+                                   <Button 
+                                     variant="outline" 
+                                     size="sm" 
+                                     className="h-8 gap-1 border-emerald-500/50 hover:bg-emerald-50 text-emerald-600 text-[10px] font-bold"
+                                     onClick={async () => {
+                                       if (!confirm("Deseja REATIVAR este lote que não foi vendido?")) return;
+                                       setIsLoading(true);
+                                       try {
+                                         const { error } = await supabase
+                                           .from("lots")
+                                           .update({ status: 'active' })
+                                           .eq("id", lot.id);
+                                         if (error) throw error;
+                                         toast.success("Lote reativado com sucesso!");
+                                         fetchData();
+                                       } catch (error: any) {
+                                         toast.error("Erro ao reativar lote: " + error.message);
+                                       } finally {
+                                         setIsLoading(false);
+                                       }
+                                     }}
+                                   >
+                                     <History className="h-3 w-3" /> Reativar
+                                   </Button>
+                                 )}
                                {isUrgent && (
                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center bg-live/10 text-live border border-live/20 animate-blink-fast">
                                    Encerrando!
