@@ -180,6 +180,8 @@ export const Route = createFileRoute("/ao-vivo")({
   const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
   const [lastSyncAt, setLastSyncAt] = useState<Date>(new Date());
   const [syncTrigger, setSyncTrigger] = useState(0);
+  const [pollingRetryCount, setPollingRetryCount] = useState(0);
+  const [reconnectTrigger, setReconnectTrigger] = useState(0);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -517,19 +519,21 @@ export const Route = createFileRoute("/ao-vivo")({
         if (bidsChannel) supabase.removeChannel(bidsChannel);
         supabase.removeChannel(profilesChannel);
       };
-    }, [liveEvent?.id, liveEvent?.active_lot_id]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, reconnectTrigger]);
 
-    // Centralized refresh function
+    // Centralized refresh function with error tracking
     const refreshAllData = async () => {
       if (!liveEvent?.id) return;
       
       try {
-        const { data: eventData } = await supabase
+        const { data: eventData, error: eventError } = await supabase
           .from("events")
           .select("viewers, active_lot:lots!active_lot_id(id, current_price, bids_count)")
           .eq("id", liveEvent.id)
           .single();
         
+        if (eventError) throw eventError;
+
         if (eventData) {
           setLiveEvent((prev: any) => {
             if (!prev) return prev;
@@ -563,17 +567,28 @@ export const Route = createFileRoute("/ao-vivo")({
             }
           }
           setLastSyncAt(new Date());
+          setPollingRetryCount(0); // Reset retry count on success
         }
       } catch (err) {
         console.error("Erro ao sincronizar dados:", err);
+        setPollingRetryCount(prev => prev + 1);
       }
     };
 
-    // Periodically refresh event data and act as a fallback for bids if realtime fails
+    // Periodically refresh event data with exponential backoff if realtime fails or offline
     useEffect(() => {
       if (!liveEvent?.id) return;
       
-      const intervalTime = (realtimeStatus !== "SUBSCRIBED" || isOffline) ? 5000 : 30000;
+      let intervalTime = 30000; // Default: 30s
+
+      if (realtimeStatus !== "SUBSCRIBED" || isOffline) {
+        // Faster polling when realtime is down (starting at 3s)
+        // but with exponential backoff to avoid hammering the server if the user is truly offline for a long time
+        // 3s, 6s, 12s, 24s... max 60s
+        intervalTime = Math.min(3000 * Math.pow(2, pollingRetryCount), 60000);
+      }
+      
+      console.log(`Setting refresh interval to ${intervalTime}ms (retry count: ${pollingRetryCount}, status: ${realtimeStatus})`);
       const interval = setInterval(refreshAllData, intervalTime);
 
       if (syncTrigger > 0) {
@@ -581,7 +596,19 @@ export const Route = createFileRoute("/ao-vivo")({
       }
 
       return () => clearInterval(interval);
-    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger, pollingRetryCount]);
+
+    // Monitor realtime status and nudge reconnection if stuck
+    useEffect(() => {
+      if (realtimeStatus !== "SUBSCRIBED" && !isOffline) {
+        // If we are not subscribed but we ARE online, wait a bit and then nudge reconnection
+        const nudgeTimeout = setTimeout(() => {
+          console.log("Realtime connection seems stuck, nudging...");
+          setReconnectTrigger(prev => prev + 1);
+        }, 15000); // 15 seconds of "stuck" state
+        return () => clearTimeout(nudgeTimeout);
+      }
+    }, [realtimeStatus, isOffline]);
  
    const liveLot = liveEvent?.active_lot;
  
