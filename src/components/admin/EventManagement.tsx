@@ -193,7 +193,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
           const baseSlug = formData.name.toLowerCase().trim()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
             .replace(/ /g, "-").replace(/[^\w-]+/g, "");
-          const slug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
+           const slug = `${baseSlug}-${Math.floor(Math.random() * 1000000)}`;
           
           const { error } = await supabase.from("events").insert({
             name: formData.name,
@@ -234,8 +234,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       if (statusFilter === "finished") return matchesSearch && event.status === "finished";
       if (statusFilter === "loteamento") return matchesSearch && event.status === "em_loteamento";
       if (statusFilter === "recebendo_lances") return matchesSearch && event.status === "recebendo_lances";
-      if (statusFilter === "condicional") return matchesSearch && event.status === "em_condicional";
-      if (statusFilter === "adiado") return matchesSearch && event.status === "evento_adiado";
+       if (statusFilter === "condicional") return matchesSearch && event.status === "em_condicional";
+       if (statusFilter === "adiado") return matchesSearch && event.status === "evento_adiado";
+       if (statusFilter === "incondicional") return matchesSearch && event.status === "incondicional";
       if (statusFilter === "pre-bidding") return matchesSearch && event.status === "scheduled" && event.allows_pre_bidding;
       if (statusFilter === "scheduled") return matchesSearch && event.status === "scheduled" && !event.allows_pre_bidding;
       
@@ -418,7 +419,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       <SelectItem value="loteamento">Loteamento</SelectItem>
                       <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
                       <SelectItem value="condicional">Em Condicional</SelectItem>
-                      <SelectItem value="adiado">Evento Adiado</SelectItem>
+                       <SelectItem value="adiado">Evento Adiado</SelectItem>
+                       <SelectItem value="incondicional">Evento Confirmado</SelectItem>
                      <SelectItem value="scheduled">Aceita pré-lance</SelectItem>
                      <SelectItem value="finished">Encerrados</SelectItem>
                    </SelectContent>
@@ -492,8 +494,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       <Select onValueChange={(v) => setFormData({ ...formData, event_type: v })} value={formData.event_type}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="online">Online</SelectItem>
-                          <SelectItem value="ao_vivo">Ao Vivo</SelectItem>
+                           <SelectItem value="online">Online</SelectItem>
+                           <SelectItem value="ao_vivo">Ao Vivo</SelectItem>
+                           <SelectItem value="presencial">Presencial</SelectItem>
+                           <SelectItem value="hibrido">Híbrido</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
