@@ -304,8 +304,9 @@ function LotDetail() {
     } finally { setIsFavoriteLoading(false); }
   };
 
-  const currentPrice = lot?.current_price || lot?.starting_price || 0;
-  const nextBid = currentPrice + (lot?.bid_increment || 0);
+   const currentPrice = lot?.current_price || lot?.starting_price || 0;
+   const isSold = lot?.status === 'sold';
+   const nextBid = currentPrice + (lot?.bid_increment || 0);
   const dynamicStatus = useEffectiveLotStatus({
      status: lot.status,
      event_status: lot.event?.status,
@@ -316,7 +317,7 @@ function LotDetail() {
   const [isUrgent, setIsUrgent] = useState(false);
   const installments = 30;
   const installmentValue = currentPrice / installments;
-  const COMMISSION_RATE = lot.event?.commission_rate || 5;
+   const COMMISSION_RATE = lot.event?.commission_rate ?? 5;
   const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
 
   const getAge = (birthDate: string) => {
@@ -470,22 +471,22 @@ function LotDetail() {
                         )}
                       </div>
  
-                      {lot.animal?.vaccination_records && Array.isArray(lot.animal.vaccination_records) && lot.animal.vaccination_records.length > 0 && (
+                       {(lot.animal?.vaccination_records || lot.animal?.health_info) && (
                         <div className="mt-8">
                           <h3 className="text-sm font-black uppercase text-gold/60 mb-4 flex items-center gap-2">
                             <Stethoscope className="h-4 w-4" /> Registro de Vacinação
                           </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {lot.animal.vaccination_records.map((v: any, idx: number) => (
-                              <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                                  <span className="text-xs font-bold text-white/80">{v.vaccine || v.name}</span>
-                                </div>
-                                <span className="text-[10px] text-white/40">{v.date}</span>
-                              </div>
-                            ))}
-                          </div>
+                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                             {(lot.animal?.vaccination_records || lot.animal?.health_info)?.map?.((v: any, idx: number) => (
+                               <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
+                                 <div className="flex items-center gap-2">
+                                   <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                                   <span className="text-xs font-bold text-white/80">{v.vaccine || v.name || v.label}</span>
+                                 </div>
+                                 <span className="text-[10px] text-white/40">{v.date}</span>
+                               </div>
+                             ))}
+                           </div>
                         </div>
                       )}
                    </Card>
@@ -520,8 +521,15 @@ function LotDetail() {
                      <InstallmentSimulator price={currentPrice} commissionRate={COMMISSION_RATE} />
                    </div>
                  </div>
-                 <div className="mt-8 space-y-4">
-                   <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl rounded-2xl" onClick={() => placeBid(nextBid)}>CONFIRMAR LANCE</Button>
+                   <div className="mt-8 space-y-4">
+                     <Button 
+                       size="lg" 
+                       className={`w-full h-20 font-black text-2xl rounded-2xl ${isSold ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep'}`} 
+                       onClick={() => !isSold && placeBid(nextBid)}
+                       disabled={isSold}
+                     >
+                       {isSold ? 'LOTE ARREMATADO' : 'CONFIRMAR LANCE'}
+                     </Button>
                    <div className="grid grid-cols-2 gap-4">
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
