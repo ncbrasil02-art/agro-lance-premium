@@ -541,11 +541,27 @@ import {
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <Input 
-                    type="number" 
-                     value={formData.starting_price} 
-                     onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
-                  />
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <Input 
+                        type="number" 
+                        value={formData.starting_price} 
+                        onChange={(e) => setFormData({ ...formData, starting_price: parseFloat(e.target.value) })} 
+                      />
+                    </div>
+                    <div className="w-[120px]">
+                      <Label htmlFor="viewers" className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                        <Eye className="h-3 w-3" /> Views Base
+                      </Label>
+                      <Input 
+                        id="viewers"
+                        type="number" 
+                        value={formData.viewers} 
+                        onChange={(e) => setFormData({ ...formData, viewers: parseInt(e.target.value) })} 
+                        className="h-10 mt-1"
+                      />
+                    </div>
+                  </div>
                 </div>
                  <div className="grid grid-cols-2 gap-4">
                    <div className="grid gap-2">
