@@ -546,32 +546,22 @@ function LotDetail() {
                  </TabsContent>
                   <TabsContent value="videos" className="mt-6">
                     <div className="aspect-video rounded-3xl overflow-hidden bg-black flex items-center justify-center">
-                       {lot.animal?.youtube_url ? (() => {
-                          let embedUrl = lot.animal.youtube_url;
-                          try {
-                            const url = new URL(lot.animal.youtube_url);
-                            let videoId = "";
-                            if (url.hostname.includes('youtube.com')) {
-                              videoId = url.searchParams.get('v') || "";
-                            } else if (url.hostname.includes('youtu.be')) {
-                              videoId = url.pathname.substring(1);
+                      {lot.animal?.youtube_url ? (
+                        <iframe 
+                          src={(() => {
+                            try {
+                              const url = new URL(lot.animal.youtube_url);
+                              if (url.hostname.includes('youtube.com')) return `https://www.youtube.com/embed/${url.searchParams.get('v')}`;
+                              if (url.hostname.includes('youtu.be')) return `https://www.youtube.com/embed/${url.pathname.substring(1)}`;
+                              return lot.animal.youtube_url;
+                            } catch (e) {
+                              return lot.animal.youtube_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
                             }
-                            if (videoId) {
-                              embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                            }
-                          } catch (e) {
-                            // Fallback to simple replace if URL parsing fails
-                            embedUrl = lot.animal.youtube_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
-                          }
-                          return (
-                            <iframe 
-                              src={embedUrl} 
-                              className="w-full h-full" 
-                              allowFullScreen 
-                            />
-                          );
-                         })()
-                       ) : (
+                          })()} 
+                          className="w-full h-full" 
+                          allowFullScreen 
+                        />
+                      ) : (
                         <div className="text-center space-y-4">
                           <Video className="h-12 w-12 text-white/20 mx-auto" />
                           <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum vídeo disponível</p>
