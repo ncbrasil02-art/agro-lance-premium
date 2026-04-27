@@ -787,7 +787,11 @@ export const Route = createFileRoute("/ao-vivo")({
       </AlertDialog>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <StatusBadge status="live" />
+          <StatusBadge 
+            status={liveLot?.status === 'sold' || liveLot?.status === 'passed' ? liveLot.status : 'live'} 
+            urgent={liveLot?.status !== 'sold' && liveLot?.status !== 'passed'}
+            className="px-4 py-1.5"
+          />
           <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{liveEvent.name}</h1>
            <div className="flex flex-col gap-1">
              <p className="text-sm text-muted-foreground italic line-clamp-1">{liveEvent.description || "Transmissão ao vivo do leilão premium."}</p>
