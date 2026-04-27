@@ -509,11 +509,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                              <p className="font-bold text-xs uppercase border-b pb-1 mb-1">Guia Rápido de Status</p>
                              <div className="space-y-2 text-[11px]">
                                <p><strong>Loteamento:</strong> Cadastro interno. Não visível para lances.</p>
-                               <p><strong>Agendado:</strong> Pronto para o site. Aceita pré-lance se configurado.</p>
+                               <p><strong>Aceita pré-lance:</strong> Pronto para o site. Aceita pré-lance se configurado.</p>
                                <p><strong>Recebendo Lances:</strong> Aberto para lances (Leilão Online).</p>
                                <p><strong>Ao Vivo:</strong> Acontecendo agora com transmissão.</p>
                                <p><strong>Condicional:</strong> Em negociação após o fim.</p>
-                               <p><strong>Incondicional:</strong> Venda batida e confirmada.</p>
+                               <p><strong>Evento Confirmado:</strong> Venda batida e confirmada.</p>
                              </div>
                            </TooltipContent>
                          </Tooltip>
@@ -525,9 +525,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                           <SelectItem value="em_loteamento">Em Loteamento</SelectItem>
                           <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
                            <SelectItem value="em_condicional">Em Condicional</SelectItem>
-                           <SelectItem value="incondicional">Incondicional</SelectItem>
-                          <SelectItem value="evento_adiado">Evento Adiado</SelectItem>
-                          <SelectItem value="scheduled">Agendado</SelectItem>
+                            <SelectItem value="incondicional">Evento Confirmado</SelectItem>
+                           <SelectItem value="evento_adiado">Evento Adiado</SelectItem>
+                           <SelectItem value="scheduled">Aceita pré-lance</SelectItem>
                           <SelectItem value="live">Ao Vivo</SelectItem>
                           <SelectItem value="finished">Finalizado</SelectItem>
                         </SelectContent>
