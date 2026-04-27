@@ -584,9 +584,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       />
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="location">Localização</Label>
-                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="location">Localização</Label>
+                      <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="viewers" className="flex items-center gap-1">
+                        Visualizações Base
+                      </Label>
+                      <Input 
+                        type="number" 
+                        value={formData.viewers} 
+                        onChange={(e) => setFormData({ ...formData, viewers: parseInt(e.target.value) })} 
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/20">
                     <div className="flex items-center space-x-2">
