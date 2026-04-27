@@ -1219,30 +1219,64 @@ export const Route = createFileRoute("/ao-vivo")({
                               </div>
                             </section>
 
-                            {/* Saúde / Vacinação */}
-                            <section>
-                              <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gold mb-3">
+                            {/* Saúde e Vacinação */}
+                            <section className="col-span-full">
+                              <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gold mb-4 border-b pb-2">
                                 <Syringe className="h-4 w-4" /> Saúde e Vacinação
                               </h3>
-                              {liveLot.animal?.vaccination_records ? (
-                                <div className="bg-emerald-deep/5 rounded-lg p-3 space-y-2">
-                                   {Array.isArray(liveLot.animal.vaccination_records) ? (
-                                     liveLot.animal.vaccination_records.map((v: any, i: number) => (
-                                       <div key={i} className="flex items-center gap-2 text-xs">
-                                         <BadgeCheck className="h-3 w-3 text-emerald-600" />
-                                         <span className="font-medium">{v.vaccine || v.name}</span>
-                                         <span className="text-muted-foreground ml-auto">{v.date}</span>
-                                       </div>
-                                     ))
-                                   ) : (
-                                     <p className="text-xs text-muted-foreground">Registros disponíveis no catálogo físico.</p>
-                                   )}
+                              
+                              <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                  <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Registros de Vacinação</p>
+                                  {liveLot.animal?.vaccination_records && liveLot.animal.vaccination_records.length > 0 ? (
+                                    <div className="bg-emerald-deep/5 rounded-xl p-3 space-y-2 border border-emerald-deep/10">
+                                      {liveLot.animal.vaccination_records.map((v: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                                          <div className="flex items-center gap-2">
+                                            <BadgeCheck className="h-4 w-4 text-emerald-600" />
+                                            <span className="text-sm font-medium">{typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}</span>
+                                          </div>
+                                          {v.date && <span className="text-xs text-muted-foreground font-mono">{v.date}</span>}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div className="text-center py-6 border-2 border-dashed border-muted rounded-xl">
+                                      <p className="text-xs text-muted-foreground">Nenhum registro de vacinação encontrado.</p>
+                                    </div>
+                                  )}
                                 </div>
-                              ) : (
-                                <div className="text-center py-4 border-2 border-dashed border-border rounded-lg">
-                                   <p className="text-xs text-muted-foreground">Nenhum registro de vacinação cadastrado.</p>
+
+                                <div className="space-y-4">
+                                  <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Histórico Veterinário</p>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {[
+                                      { id: "prognata", label: "Prognata" },
+                                      { id: "aerofagico", label: "Aerofágico" },
+                                      { id: "criptorquidico", label: "Criptorquídico" },
+                                      { id: "cirurgia_neurectomia", label: "Neurectomia" },
+                                      { id: "laminite", label: "Laminite" },
+                                      { id: "cirurgia_colica", label: "Cirurgia Cólica" },
+                                      { id: "dpco", label: "DPCO" },
+                                      { id: "hypp", label: "HYPP" },
+                                    ].map(item => {
+                                      const val = liveLot.animal?.veterinary_history?.[item.id];
+                                      return (
+                                        <div key={item.id} className={`flex items-center justify-between p-2 rounded-lg border ${val ? 'bg-emerald-50 border-emerald-200' : 'bg-muted/30 border-muted'}`}>
+                                          <span className="text-[10px] font-bold">{item.label}</span>
+                                          {val ? <BadgeCheck className="h-3 w-3 text-emerald-600" /> : <div className="h-3 w-3 rounded-full border border-muted" />}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  {liveLot.animal?.veterinary_history?.other_info && (
+                                    <div className="mt-4 p-3 bg-gold/5 border border-gold/10 rounded-lg">
+                                      <p className="text-[10px] font-black uppercase text-gold/60 mb-1">Observações:</p>
+                                      <p className="text-xs italic text-muted-foreground">{liveLot.animal.veterinary_history.other_info}</p>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
+                              </div>
                             </section>
                           </div>
 
