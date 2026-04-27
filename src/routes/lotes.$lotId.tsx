@@ -218,7 +218,6 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
         </div>
       </div>
        </div>
-     </div>
    );
  }
 
