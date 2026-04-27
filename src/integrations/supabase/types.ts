@@ -683,7 +683,7 @@ export type Database = {
           starting_price: number
           status: string | null
           updated_at: string
-          viewers: number | null
+          viewers: number
           winner_id: string | null
           winner_link_reason: string | null
         }
@@ -711,7 +711,7 @@ export type Database = {
           starting_price: number
           status?: string | null
           updated_at?: string
-          viewers?: number | null
+          viewers?: number
           winner_id?: string | null
           winner_link_reason?: string | null
         }
@@ -739,7 +739,7 @@ export type Database = {
           starting_price?: number
           status?: string | null
           updated_at?: string
-          viewers?: number | null
+          viewers?: number
           winner_id?: string | null
           winner_link_reason?: string | null
         }
@@ -1089,6 +1089,7 @@ export type Database = {
       check_user_risk: { Args: { p_user_id: string }; Returns: boolean }
       close_lot: { Args: { p_lot_id: string }; Returns: Json }
       delete_bid_safe: { Args: { p_bid_id: string }; Returns: Json }
+      increment_lot_viewers: { Args: { p_lot_id: string }; Returns: undefined }
       increment_viewer_count: {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: undefined
