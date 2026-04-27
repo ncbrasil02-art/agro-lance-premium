@@ -834,18 +834,38 @@ export const Route = createFileRoute("/ao-vivo")({
                </div>
              )}
              
-            {statusMessage && (
-              <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-                <div className="bg-gold/95 backdrop-blur-md px-10 py-8 rounded-3xl shadow-[0_0_100px_rgba(212,175,55,0.6)] border-4 border-emerald-deep/20 animate-in zoom-in duration-300">
-                  <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="h-20 w-20 rounded-full bg-emerald-deep flex items-center justify-center shadow-inner">
-                      <Gavel className="h-10 w-10 text-gold animate-bounce" />
+            {(statusMessage || liveLot.status === 'sold' || liveLot.status === 'passed') && (
+              <div className="absolute inset-0 flex items-center justify-center z-[100] pointer-events-none p-4">
+                <div className={`
+                  ${liveLot.status === 'sold' ? 'bg-emerald-600/95 shadow-[0_0_100px_rgba(5,150,105,0.6)]' : 
+                    liveLot.status === 'passed' ? 'bg-destructive/95 shadow-[0_0_100px_rgba(239,68,68,0.6)]' : 
+                    'bg-gold/95 shadow-[0_0_100px_rgba(212,175,55,0.6)]'} 
+                  backdrop-blur-md px-12 py-10 rounded-[40px] border-4 border-white/20 animate-in zoom-in duration-300 w-full max-w-lg
+                `}>
+                  <div className="flex flex-col items-center gap-6 text-center">
+                    <div className="h-24 w-24 rounded-full bg-white/20 flex items-center justify-center shadow-xl backdrop-blur-sm border border-white/30">
+                      {liveLot.status === 'sold' ? (
+                        <BadgeCheck className="h-14 w-14 text-white animate-pulse" />
+                      ) : liveLot.status === 'passed' ? (
+                        <Ban className="h-14 w-14 text-white" />
+                      ) : (
+                        <Gavel className="h-14 w-14 text-emerald-deep animate-bounce" />
+                      )}
                     </div>
                     <div>
-                      <p className="text-emerald-deep font-black text-4xl uppercase tracking-tighter drop-shadow-sm">{statusMessage}</p>
-                      <div className="mt-2 h-1.5 w-full bg-emerald-deep/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-deep animate-progress-shrink" />
-                      </div>
+                      <p className="text-white font-black text-5xl md:text-6xl uppercase tracking-tighter drop-shadow-lg">
+                        {liveLot.status === 'sold' ? 'ARREMATADO!' : 
+                         liveLot.status === 'passed' ? 'NÃO VENDIDO' : 
+                         statusMessage}
+                      </p>
+                      {liveLot.status === 'sold' && (
+                        <p className="text-white/90 font-bold text-xl mt-2 uppercase tracking-tight">Vendido por {formatBRL(currentPrice)}</p>
+                      )}
+                      {!(liveLot.status === 'sold' || liveLot.status === 'passed') && (
+                        <div className="mt-4 h-2 w-full bg-emerald-deep/20 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-deep animate-progress-shrink" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
