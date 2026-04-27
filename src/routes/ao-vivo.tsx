@@ -426,13 +426,12 @@ export const Route = createFileRoute("/ao-vivo")({
                      // Pequeno delay para garantir que o banco processou a transação de ativação do lote
                      // e evitar race conditions com lances que ocorrem no exato momento da troca
                      setTimeout(async () => {
-                       const { data: newBids } = await supabase
-                         .from("bids")
-                         .select("*, profiles!bids_user_id_fkey(id, full_name)")
-                         .eq("id", payload.new.active_lot_id) // Erro aqui no código original? Deve ser lot_id
-                         .eq("lot_id", payload.new.active_lot_id)
-                         .order("created_at", { ascending: false })
-                         .limit(10);
+                        const { data: newBids } = await supabase
+                          .from("bids")
+                          .select("*, profiles!bids_user_id_fkey(id, full_name)")
+                          .eq("lot_id", payload.new.active_lot_id)
+                          .order("created_at", { ascending: false })
+                          .limit(15);
                        
                        if (newBids) {
                          setBids(prev => {
