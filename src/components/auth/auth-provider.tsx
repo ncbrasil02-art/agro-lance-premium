@@ -45,6 +45,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Real-time profile updates
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel(`profile-updates-${user.id}`)
+      .on(
+        "postgres_changes",
+        { 
+          event: "UPDATE", 
+          schema: "public", 
+          table: "profiles", 
+          filter: `id=eq.${user.id}` 
+        },
+        (payload) => {
+          console.log("Current user profile updated in real-time:", payload.new);
+          setProfile(payload.new);
+          
+          // Notify user if they were blocked
+          if (payload.new.is_blocked && !payload.old?.is_blocked) {
+            import("sonner").then(({ toast }) => {
+              toast.error("Sua conta foi bloqueada", {
+                description: payload.new.block_reason || "Entre em contato com o suporte.",
+                duration: 10000
+              });
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
+
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
