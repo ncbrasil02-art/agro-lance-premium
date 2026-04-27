@@ -11,28 +11,32 @@
    link: z.string().nullable().optional(),
  });
  
- export const eventSchema = z.object({
-   id: z.string().uuid(),
-   slug: z.string(),
-   name: z.string(),
-   description: z.string().nullable().optional(),
-   start_date: z.string(),
-   location: z.string().nullable().optional(),
-   banner_url: z.string().nullable().optional(),
-     status: z.string().default("scheduled"),
-     regulation: z.string().nullable().optional(),
+  export const eventSchema = z.object({
+    id: z.string().uuid(),
+    slug: z.string().nullable().optional().default(""),
+    name: z.string(),
+    description: z.string().nullable().optional(),
+    start_date: z.string(),
+    location: z.string().nullable().optional(),
+    banner_url: z.string().nullable().optional(),
+    status: z.string().default("scheduled"),
+    event_type: z.string().nullable().optional(),
+    regulation: z.string().nullable().optional(),
     lots: z.array(z.any()).optional(),
     end_date: z.string().nullable().optional(),
     active_lot_id: z.string().uuid().nullable().optional(),
     active_lot: z.any().nullable().optional(),
-    viewers: z.preprocess((val) => val === null ? 0 : val, z.number().int().nonnegative().default(0)),
-   auctioneer_name: z.string().nullable().optional(),
-   promoter_company: z.string().nullable().optional(),
-   transmission_link: z.string().nullable().optional(),
-   live_status_message: z.string().nullable().optional(),
-     show_countdown: z.preprocess((val) => val === null ? true : val, z.boolean().default(true)),
-     photos: z.array(z.string()).nullable().optional().default([]),
- });
+    viewers: z.preprocess((val) => (val === null || val === undefined) ? 0 : val, z.number().int().nonnegative().default(0)),
+    auctioneer_name: z.string().nullable().optional(),
+    promoter_company: z.string().nullable().optional(),
+    transmission_link: z.string().nullable().optional(),
+    live_status_message: z.string().nullable().optional(),
+    show_countdown: z.preprocess((val) => (val === null || val === undefined) ? true : val, z.boolean().default(true)),
+    photos: z.array(z.string()).nullable().optional().default([]),
+    seller_id: z.string().uuid().nullable().optional(),
+    seller_name: z.string().nullable().optional(),
+    allows_pre_bidding: z.boolean().nullable().optional().default(true),
+  }).passthrough();
  
  export const animalSchema = z.object({
    id: z.string().uuid(),
@@ -60,21 +64,23 @@
     blood_percentage: z.string().nullable().optional(),
  });
  
- export const lotSchema = z.object({
-   id: z.string().uuid(),
-   event_id: z.string().uuid(),
-   lot_number: z.number().int().positive(),
-   animal_id: z.string().uuid(),
-   starting_price: z.number().nonnegative().optional(),
-   current_price: z.number().nonnegative().nullable().optional(),
-   bid_increment: z.number().nonnegative().default(0),
-   status: z.enum(["upcoming", "active", "sold", "passed"]).default("upcoming"),
-    bids_count: z.preprocess((val) => val === null ? 0 : val, z.number().int().nonnegative().default(0)),
-    viewers: z.preprocess((val) => val === null ? 0 : val, z.number().int().nonnegative().default(0)),
-   end_date: z.string().nullable().optional(),
-   animal: animalSchema.nullable().optional(),
-   event: eventSchema.nullable().optional(),
- });
+  export const lotSchema = z.object({
+    id: z.string().uuid(),
+    event_id: z.string().uuid(),
+    lot_number: z.number().int().nullable().optional(),
+    animal_id: z.string().uuid(),
+    starting_price: z.number().nonnegative().nullable().optional(),
+    current_price: z.number().nonnegative().nullable().optional(),
+    bid_increment: z.number().nonnegative().nullable().optional().default(0),
+    status: z.string().default("upcoming"),
+    bids_count: z.preprocess((val) => (val === null || val === undefined) ? 0 : val, z.number().int().nonnegative().default(0)),
+    viewers: z.preprocess((val) => (val === null || val === undefined) ? 0 : val, z.number().int().nonnegative().default(0)),
+    end_date: z.string().nullable().optional(),
+    is_featured: z.boolean().nullable().optional().default(false),
+    is_paused: z.boolean().nullable().optional().default(false),
+    animal: animalSchema.nullable().optional(),
+    event: eventSchema.nullable().optional(),
+  }).passthrough();
  
  export type ValidatedEvent = z.infer<typeof eventSchema>;
  export type ValidatedLot = z.infer<typeof lotSchema>;
