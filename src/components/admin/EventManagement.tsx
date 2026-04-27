@@ -47,7 +47,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
        banner_url: "",
        promoter_company: "",
         auctioneer_name: "",
-        seller_id: "",
+        seller_id: "none",
         seller_name: "",
         regulation: ""
      });
@@ -68,7 +68,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          banner_url: "",
          promoter_company: "",
          auctioneer_name: "",
-          seller_id: "",
+          seller_id: "none",
           seller_name: "",
           regulation: ""
        });
@@ -90,7 +90,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          banner_url: event.banner_url || "",
          promoter_company: event.promoter_company || "",
          auctioneer_name: event.auctioneer_name || "",
-          seller_id: event.seller_id || "",
+          seller_id: event.seller_id || "none",
           seller_name: event.seller_name || "",
           regulation: event.regulation || ""
        });
@@ -182,7 +182,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                banner_url: formData.banner_url,
                promoter_company: formData.promoter_company,
                auctioneer_name: formData.auctioneer_name,
-                seller_id: formData.seller_id || null,
+                seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
                 seller_name: formData.seller_name,
                 regulation: formData.regulation
              })
@@ -209,7 +209,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             banner_url: formData.banner_url,
             promoter_company: formData.promoter_company,
             auctioneer_name: formData.auctioneer_name,
-            seller_id: formData.seller_id || null,
+            seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
             seller_name: formData.seller_name,
             slug: slug,
             regulation: formData.regulation
@@ -481,7 +481,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       <Select onValueChange={(v) => setFormData({ ...formData, seller_id: v })} value={formData.seller_id}>
                         <SelectTrigger><SelectValue placeholder="Selecione um vendedor" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Nenhum (Usar nome manual)</SelectItem>
+                          <SelectItem value="none">Nenhum (Usar nome manual)</SelectItem>
                           {sellers.map(seller => (
                             <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
                           ))}
