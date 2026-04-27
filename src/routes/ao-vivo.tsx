@@ -519,60 +519,69 @@ export const Route = createFileRoute("/ao-vivo")({
       };
     }, [liveEvent?.id, liveEvent?.active_lot_id]);
 
-    // Periodically refresh event data and act as a fallback for bids if realtime fails
-    useEffect(() => {
+    // Centralized refresh function
+    const refreshAllData = async () => {
       if (!liveEvent?.id) return;
       
-      const refreshData = async () => {
-        const { data } = await supabase
+      try {
+        const { data: eventData } = await supabase
           .from("events")
-          .select("viewers, active_lot:lots!active_lot_id(current_price, bids_count)")
+          .select("viewers, active_lot:lots!active_lot_id(id, current_price, bids_count)")
           .eq("id", liveEvent.id)
           .single();
         
-        if (data) {
+        if (eventData) {
           setLiveEvent((prev: any) => {
             if (!prev) return prev;
             return {
               ...prev,
-              viewers: data.viewers,
+              viewers: eventData.viewers,
               active_lot: prev.active_lot ? {
                 ...prev.active_lot,
-                current_price: (data.active_lot as any)?.current_price ?? prev.active_lot.current_price,
-                bids_count: (data.active_lot as any)?.bids_count ?? prev.active_lot.bids_count,
+                current_price: (eventData.active_lot as any)?.current_price ?? prev.active_lot.current_price,
+                bids_count: (eventData.active_lot as any)?.bids_count ?? prev.active_lot.bids_count,
               } : null
             };
           });
-        }
 
-        // Fallback for bids if realtime is not healthy
-        if (realtimeStatus !== "SUBSCRIBED" && liveEvent?.active_lot_id) {
-          console.log("Realtime not healthy, polling for bids as fallback...");
-          const { data: latestBids } = await supabase
-            .from("bids")
-            .select("*, profile:profiles(id, full_name)")
-            .eq("lot_id", liveEvent.active_lot_id)
-            .order("created_at", { ascending: false })
-            .limit(10);
-          
-          if (latestBids) {
-            setBids(latestBids);
-            // Update profile cache
-            const newProfiles: Record<string, any> = {};
-            latestBids.forEach((bid: any) => {
-              if (bid.profile) newProfiles[bid.profile.id] = bid.profile;
-            });
-            setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
+          const activeLotId = (eventData.active_lot as any)?.id || liveEvent.active_lot_id;
+          if (activeLotId) {
+            const { data: latestBids } = await supabase
+              .from("bids")
+              .select("*, profile:profiles(id, full_name)")
+              .eq("lot_id", activeLotId)
+              .order("created_at", { ascending: false })
+              .limit(10);
+            
+            if (latestBids) {
+              setBids(latestBids);
+              const newProfiles: Record<string, any> = {};
+              latestBids.forEach((bid: any) => {
+                if (bid.profile) newProfiles[bid.profile.id] = bid.profile;
+              });
+              setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
+            }
           }
+          setLastSyncAt(new Date());
         }
-      };
+      } catch (err) {
+        console.error("Erro ao sincronizar dados:", err);
+      }
+    };
 
-      // Use a faster interval if realtime is down or user is/was offline
+    // Periodically refresh event data and act as a fallback for bids if realtime fails
+    useEffect(() => {
+      if (!liveEvent?.id) return;
+      
       const intervalTime = (realtimeStatus !== "SUBSCRIBED" || isOffline) ? 5000 : 30000;
-      const interval = setInterval(refreshData, intervalTime);
+      const interval = setInterval(refreshAllData, intervalTime);
+
+      if (syncTrigger > 0) {
+        refreshAllData();
+      }
 
       return () => clearInterval(interval);
-    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger]);
  
    const liveLot = liveEvent?.active_lot;
  
