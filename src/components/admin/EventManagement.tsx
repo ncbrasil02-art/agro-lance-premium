@@ -48,7 +48,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
        promoter_company: "",
         auctioneer_name: "",
         seller_id: "",
-        seller_name: ""
+        seller_name: "",
+        regulation: ""
      });
 
      const resetForm = () => {
@@ -67,8 +68,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          banner_url: "",
          promoter_company: "",
          auctioneer_name: "",
-         seller_id: "",
-         seller_name: ""
+          seller_id: "",
+          seller_name: "",
+          regulation: ""
        });
      };
 
@@ -88,8 +90,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          banner_url: event.banner_url || "",
          promoter_company: event.promoter_company || "",
          auctioneer_name: event.auctioneer_name || "",
-         seller_id: event.seller_id || "",
-         seller_name: event.seller_name || ""
+          seller_id: event.seller_id || "",
+          seller_name: event.seller_name || "",
+          regulation: event.regulation || ""
        });
        setIsDialogOpen(true);
      };
@@ -179,8 +182,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                banner_url: formData.banner_url,
                promoter_company: formData.promoter_company,
                auctioneer_name: formData.auctioneer_name,
-               seller_id: formData.seller_id || null,
-               seller_name: formData.seller_name
+                seller_id: formData.seller_id || null,
+                seller_name: formData.seller_name,
+                regulation: formData.regulation
              })
              .eq("id", editingEvent.id);
           if (error) throw error;
@@ -207,7 +211,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             auctioneer_name: formData.auctioneer_name,
             seller_id: formData.seller_id || null,
             seller_name: formData.seller_name,
-            slug: slug
+            slug: slug,
+            regulation: formData.regulation
           });
           if (error) throw error;
           toast.success("Evento criado com sucesso");
@@ -431,6 +436,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
                       placeholder="Fale um pouco sobre o evento, linhagens, etc."
                       className="min-h-[120px]"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="regulation">Regulamento do Evento</Label>
+                    <Textarea 
+                      id="regulation"
+                      value={formData.regulation} 
+                      onChange={(e) => setFormData({ ...formData, regulation: e.target.value })} 
+                      placeholder="Insira as regras e condições do leilão..."
+                      className="min-h-[150px]"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">

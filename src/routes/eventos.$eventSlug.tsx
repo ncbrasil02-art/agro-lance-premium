@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { EventDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
-import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw, Maximize2, Image as ImageIcon } from "lucide-react";
+import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw, Maximize2, Image as ImageIcon, FileText } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
  import { useRealtimeEvent } from "@/hooks/useRealtimeEvent";
 import { Countdown } from "@/components/auctions/countdown";
@@ -10,7 +10,7 @@ import { eventSchema } from "@/lib/schemas";
 import { LotCard } from "@/components/auctions/lot-card";
 import { StatusBadge } from "@/components/auctions/status-badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 
 export const Route = createFileRoute("/eventos/$eventSlug")({
@@ -200,9 +200,32 @@ function EventDetail() {
                     </div>
                   </div>
                 )}
-                   <Button variant="outline" size="lg" className="h-20 px-8 border-border bg-card/10 text-foreground hover:bg-card/20 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs">
-                  Contatar Assessoria
-                </Button>
+                  <Button variant="outline" size="lg" className="h-20 px-8 border-border bg-card/10 text-foreground hover:bg-card/20 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs">
+                    Contatar Assessoria
+                  </Button>
+
+                  {event.regulation && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="lg" className="h-20 px-8 border-gold/30 bg-gold/5 text-gold hover:bg-gold/10 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Ver Regulamento
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
+                        <DialogHeader className="p-6 border-b border-border/10">
+                          <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Regulamento do Evento</DialogTitle>
+                        </DialogHeader>
+                        <div className="flex-1 overflow-y-auto p-8 bg-card/50">
+                          <div className="prose prose-invert max-w-none">
+                            <p className="whitespace-pre-wrap text-foreground/80 leading-relaxed font-medium">
+                              {event.regulation}
+                            </p>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  )}
               </div>
             </div>
           </div>
