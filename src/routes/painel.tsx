@@ -87,7 +87,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
    User, Gavel, FileText, Receipt, CreditCard, Clock,
    ChevronRight, BadgeCheck, Download, ExternalLink,
    ShieldCheck, AlertCircle, Info, Printer, MessageSquare,
-   CalendarDays, Scissors, Barcode, Landmark
+   CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp
  } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -106,8 +106,9 @@ export const Route = createFileRoute("/painel")({
   component: UserDashboard,
 });
 
-function UserDashboard() {
-  const { user, profile } = useAuth();
+ function UserDashboard() {
+   const { user, profile } = useAuth();
+   const [activeTab, setActiveTab] = useState("arremates");
    const [myLots, setMyLots] = useState<any[]>([]);
    const [myBids, setMyBids] = useState<any[]>([]);
    const [myFavorites, setMyFavorites] = useState<any[]>([]);
