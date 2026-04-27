@@ -827,6 +827,7 @@ export type Database = {
           auto_unlock_at: string | null
           avatar_url: string | null
           block_reason: string | null
+          cnpj: string | null
           cpf: string | null
           created_at: string
           full_name: string | null
@@ -845,6 +846,7 @@ export type Database = {
           auto_unlock_at?: string | null
           avatar_url?: string | null
           block_reason?: string | null
+          cnpj?: string | null
           cpf?: string | null
           created_at?: string
           full_name?: string | null
@@ -863,6 +865,7 @@ export type Database = {
           auto_unlock_at?: string | null
           avatar_url?: string | null
           block_reason?: string | null
+          cnpj?: string | null
           cpf?: string | null
           created_at?: string
           full_name?: string | null
