@@ -5,6 +5,7 @@ export type AuctionStatus = 'loteamento' | 'pre_lance' | 'recebendo_lances' | 's
 export function useEffectiveLotStatus(lot: {
   status: string;
   event_status?: string;
+  event_type?: string;
   event_start_date?: string | null;
   event_end_date?: string | null;
   allows_pre_bidding?: boolean;
