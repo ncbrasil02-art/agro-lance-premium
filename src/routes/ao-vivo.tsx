@@ -176,6 +176,26 @@ export const Route = createFileRoute("/ao-vivo")({
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      toast.success("Conexão restabelecida", { description: "Sincronizando dados..." });
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+      toast.error("Você está offline", { description: "Os lances podem não estar atualizados." });
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
     // Preload animal photos
     useEffect(() => {
@@ -468,6 +488,7 @@ export const Route = createFileRoute("/ao-vivo")({
           )
           .subscribe((status) => {
             console.log("Bid channel status:", status);
+            setRealtimeStatus(status);
           });
       }
 
@@ -495,11 +516,11 @@ export const Route = createFileRoute("/ao-vivo")({
       };
     }, [liveEvent?.id, liveEvent?.active_lot_id]);
 
-    // Periodically refresh event data (viewers, etc)
+    // Periodically refresh event data and act as a fallback for bids if realtime fails
     useEffect(() => {
       if (!liveEvent?.id) return;
       
-      const interval = setInterval(async () => {
+      const refreshData = async () => {
         const { data } = await supabase
           .from("events")
           .select("viewers, active_lot:lots!active_lot_id(current_price, bids_count)")
@@ -520,10 +541,35 @@ export const Route = createFileRoute("/ao-vivo")({
             };
           });
         }
-      }, 30000); // 30 seconds
+
+        // Fallback for bids if realtime is not healthy
+        if (realtimeStatus !== "SUBSCRIBED" && liveEvent?.active_lot_id) {
+          console.log("Realtime not healthy, polling for bids as fallback...");
+          const { data: latestBids } = await supabase
+            .from("bids")
+            .select("*, profile:profiles(id, full_name)")
+            .eq("lot_id", liveEvent.active_lot_id)
+            .order("created_at", { ascending: false })
+            .limit(10);
+          
+          if (latestBids) {
+            setBids(latestBids);
+            // Update profile cache
+            const newProfiles: Record<string, any> = {};
+            latestBids.forEach((bid: any) => {
+              if (bid.profile) newProfiles[bid.profile.id] = bid.profile;
+            });
+            setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
+          }
+        }
+      };
+
+      // Use a faster interval if realtime is down or user is/was offline
+      const intervalTime = (realtimeStatus !== "SUBSCRIBED" || isOffline) ? 5000 : 30000;
+      const interval = setInterval(refreshData, intervalTime);
 
       return () => clearInterval(interval);
-    }, [liveEvent?.id]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline]);
  
    const liveLot = liveEvent?.active_lot;
  
@@ -998,8 +1044,21 @@ export const Route = createFileRoute("/ao-vivo")({
         {/* Chat / Histórico de lances */}
         <aside className="rounded-2xl border border-border bg-card">
           <div className="border-b border-border p-4">
-            <h3 className="font-semibold">Histórico de lances</h3>
-            <p className="text-xs text-muted-foreground">Atualização em tempo real</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold">Histórico de lances</h3>
+                <p className="text-xs text-muted-foreground">
+                  {realtimeStatus === "SUBSCRIBED" && !isOffline 
+                    ? "Sincronização em tempo real" 
+                    : "Modo de atualização segura (polling)"}
+                </p>
+              </div>
+              <div className={`h-2 w-2 rounded-full ${
+                isOffline ? "bg-red-500" : 
+                realtimeStatus === "SUBSCRIBED" ? "bg-emerald-500 animate-pulse" : 
+                "bg-amber-500 animate-pulse"
+              }`} />
+            </div>
           </div>
           <ul className="max-h-[600px] overflow-auto p-4 text-sm">
               {bids?.map((bid: any, i: number) => (
