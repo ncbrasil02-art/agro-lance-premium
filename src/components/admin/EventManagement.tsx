@@ -47,9 +47,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
        banner_url: "",
        promoter_company: "",
         auctioneer_name: "",
-        seller_id: "none",
-        seller_name: "",
-        regulation: ""
+         seller_id: "none",
+         seller_name: "",
+         regulation: "",
+         viewers: 0
      });
 
      const resetForm = () => {
@@ -68,9 +69,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          banner_url: "",
          promoter_company: "",
          auctioneer_name: "",
-          seller_id: "none",
-          seller_name: "",
-          regulation: ""
+         seller_id: "none",
+         seller_name: "",
+         regulation: "",
+         viewers: 0
        });
      };
 
@@ -90,9 +92,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          banner_url: event.banner_url || "",
          promoter_company: event.promoter_company || "",
          auctioneer_name: event.auctioneer_name || "",
-          seller_id: event.seller_id || "none",
-          seller_name: event.seller_name || "",
-          regulation: event.regulation || ""
+           seller_id: event.seller_id || "none",
+           seller_name: event.seller_name || "",
+           regulation: event.regulation || "",
+           viewers: event.viewers || 0
        });
        setIsDialogOpen(true);
      };
@@ -183,8 +186,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                promoter_company: formData.promoter_company,
                auctioneer_name: formData.auctioneer_name,
                 seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
-                seller_name: formData.seller_name,
-                regulation: formData.regulation
+                 seller_name: formData.seller_name,
+                 regulation: formData.regulation,
+                 viewers: formData.viewers
              })
              .eq("id", editingEvent.id);
           if (error) throw error;
@@ -210,9 +214,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             promoter_company: formData.promoter_company,
             auctioneer_name: formData.auctioneer_name,
             seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
-            seller_name: formData.seller_name,
-            slug: slug,
-            regulation: formData.regulation
+             seller_name: formData.seller_name,
+             slug: slug,
+             regulation: formData.regulation,
+             viewers: formData.viewers
           });
           if (error) throw error;
           toast.success("Evento criado com sucesso");
@@ -579,9 +584,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       />
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="location">Localização</Label>
-                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="location">Localização</Label>
+                      <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Ex: São Paulo - SP" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="viewers" className="flex items-center gap-1">
+                        Visualizações Base
+                      </Label>
+                      <Input 
+                        type="number" 
+                        value={formData.viewers} 
+                        onChange={(e) => setFormData({ ...formData, viewers: parseInt(e.target.value) })} 
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/20">
                     <div className="flex items-center space-x-2">
