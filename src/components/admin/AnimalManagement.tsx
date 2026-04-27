@@ -1021,30 +1021,45 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                          </TableCell>
                        <TableCell>{animal.registration_number}</TableCell>
                        <TableCell>{animal.sex === 'M' ? 'Macho' : 'Fêmea'}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
-                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(animal)}>
-                                   <Pencil className="h-4 w-4" />
-                                 </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>Editar informações do animal</TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
-                                 <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(animal.id)}>
-                                   <Trash2 className="h-4 w-4" />
-                                 </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>Excluir registro permanentemente</TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
-                         </div>
-                      </TableCell>
+                          <TableCell className="text-right">
+                         <div className="flex justify-end gap-2">
+                            {animal.sale_status === 'sold' ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                                      <ShieldCheck className="h-3 w-3" /> VENDIDO
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Histórico preservado. Reverter lote para editar.</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              <>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" onClick={() => handleEdit(animal)}>
+                                        <Pencil className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Editar informações do animal</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(animal.id)}>
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Excluir registro permanentemente</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </>
+                            )}
+                          </div>
+                       </TableCell>
                      </TableRow>
                    ))
                  )}
