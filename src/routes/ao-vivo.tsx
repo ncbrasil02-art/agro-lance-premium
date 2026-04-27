@@ -1059,11 +1059,16 @@ export const Route = createFileRoute("/ao-vivo")({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold">Histórico de lances</h3>
-                <p className="text-xs text-muted-foreground">
-                  {realtimeStatus === "SUBSCRIBED" && !isOffline 
-                    ? "Sincronização em tempo real" 
-                    : "Modo de atualização segura (polling)"}
-                </p>
+                <div className="flex flex-col">
+                  <p className="text-xs text-muted-foreground">
+                    {realtimeStatus === "SUBSCRIBED" && !isOffline 
+                      ? "Sincronização em tempo real" 
+                      : "Modo de atualização segura (polling)"}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/60">
+                    Sincronizado às {lastSyncAt.toLocaleTimeString("pt-BR")}
+                  </p>
+                </div>
               </div>
               <div className={`h-2 w-2 rounded-full ${
                 isOffline ? "bg-red-500" : 
