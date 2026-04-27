@@ -141,9 +141,9 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
         <div className="flex flex-col justify-around gap-6 relative w-44">
           <div className="absolute -left-4 top-[12%] bottom-[62%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
           <div className="absolute -left-4 top-[62%] bottom-[12%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          {avos.map((name, i) => (
-            <Node key={i} title={i === 0 ? "Avô Pat." : i === 1 ? "Avó Pat." : i === 2 ? "Avô Mat." : "Avó Mat."} name={name} variant="tertiary" />
-          ))}
+           {avos.map((name, i) => (
+             <Node key={i} title={i === 0 ? "Avô Paterno" : i === 1 ? "Avó Paterna" : i === 2 ? "Avô Materno" : "Avó Materna"} name={name} variant="tertiary" />
+           ))}
         </div>
 
         <div className="flex flex-col justify-around gap-2 relative w-40">
@@ -435,17 +435,17 @@ function LotDetail() {
              <div className="p-6 border-2 border-dashed border-emerald-100 rounded-3xl">
                <h2 className="text-lg font-black text-emerald-900 uppercase mb-4 text-center">Genealogia Simplificada</h2>
                <div className="space-y-4">
-                 <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
-                   <p className="text-[8px] text-gray-400 uppercase font-bold">Pai (Sire)</p>
-                   <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.father || "Não informado"}</p>
-                 </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-[8px] text-gray-400 uppercase font-bold">Pai</p>
+                    <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.father || "Não informado"}</p>
+                  </div>
                  <div className="flex justify-center h-4">
                    <div className="w-px bg-gray-200" />
                  </div>
-                 <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
-                   <p className="text-[8px] text-gray-400 uppercase font-bold">Mãe (Dam)</p>
-                   <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.mother || "Não informado"}</p>
-                 </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-[8px] text-gray-400 uppercase font-bold">Mãe</p>
+                    <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.mother || "Não informado"}</p>
+                  </div>
                </div>
              </div>
  
