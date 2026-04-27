@@ -427,16 +427,24 @@ export const Route = createFileRoute("/ao-vivo")({
                   };
                 });
                 
-                // Fetch profile if not already loaded
-                if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
-                  const { data } = await supabase
-                    .from("profiles")
-                    .select("id, full_name")
-                    .eq("id", newBid.user_id)
-                    .single();
-                  if (data) {
-                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
-                  }
+                // Only fetch profile if not in cache
+                if (newBid.user_id) {
+                  setBidderProfiles(currentCache => {
+                    if (!currentCache[newBid.user_id]) {
+                      // Profile not in cache, fetch it
+                      supabase
+                        .from("profiles")
+                        .select("id, full_name")
+                        .eq("id", newBid.user_id)
+                        .single()
+                        .then(({ data }) => {
+                          if (data) {
+                            setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                          }
+                        });
+                    }
+                    return currentCache;
+                  });
                 }
               } else if (payload.eventType === "UPDATE") {
                 const updatedBid = payload.new;
