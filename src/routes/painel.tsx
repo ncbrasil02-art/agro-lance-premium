@@ -83,11 +83,12 @@
    );
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { 
-  User, Gavel, FileText, Receipt, CreditCard, Clock, 
-  ChevronRight, BadgeCheck, Download, ExternalLink, 
-  ShieldCheck, AlertCircle, Info, Printer, MessageSquare
-} from "lucide-react";
+ import {
+   User, Gavel, FileText, Receipt, CreditCard, Clock,
+   ChevronRight, BadgeCheck, Download, ExternalLink,
+   ShieldCheck, AlertCircle, Info, Printer, MessageSquare,
+   CalendarDays, Scissors, Barcode, Landmark
+ } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/auth-provider";
