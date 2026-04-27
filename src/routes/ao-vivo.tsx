@@ -579,6 +579,12 @@ export const Route = createFileRoute("/ao-vivo")({
         toast.error("Sua conta ainda não foi aprovada para dar lances.");
         return;
       }
+      if (profile?.is_blocked) {
+        toast.error("Sua conta está bloqueada para dar lances.", {
+          description: profile.block_reason || "Entre em contato com o suporte."
+        });
+        return;
+      }
       setPendingBidAmount(amount);
       setShowConfirmBid(true);
     };
