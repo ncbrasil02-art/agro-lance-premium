@@ -184,6 +184,52 @@ export const Route = createFileRoute("/ao-vivo")({
    const [reconnectTrigger, setReconnectTrigger] = useState(0);
    const [isFavorite, setIsFavorite] = useState(false);
    const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
+ 
+   useEffect(() => {
+     if (user && liveEvent?.active_lot_id) {
+       supabase
+         .from("followed_lots")
+         .select("id")
+         .eq("user_id", user.id)
+         .eq("lot_id", liveEvent.active_lot_id)
+         .maybeSingle()
+         .then(r => setIsFavorite(!!r.data));
+     }
+   }, [user, liveEvent?.active_lot_id]);
+ 
+   const toggleFavorite = async () => {
+     if (!user) {
+       toast.error("Faça login para seguir lotes.");
+       return;
+     }
+     if (!liveEvent?.active_lot_id) return;
+     
+     setIsFavoriteLoading(true);
+     try {
+       if (isFavorite) {
+         await supabase
+           .from("followed_lots")
+           .delete()
+           .eq("user_id", user.id)
+           .eq("lot_id", liveEvent.active_lot_id);
+         setIsFavorite(false);
+         toast.success("Lote removido dos seus favoritos.");
+       } else {
+         await supabase
+           .from("followed_lots")
+           .insert({
+             user_id: user.id,
+             lot_id: liveEvent.active_lot_id
+           });
+         setIsFavorite(true);
+         toast.success("Lote adicionado aos seus favoritos!");
+       }
+     } catch (e) {
+       toast.error("Erro ao processar favorito.");
+     } finally {
+       setIsFavoriteLoading(false);
+     }
+   };
 
   useEffect(() => {
     const handleOnline = () => {
