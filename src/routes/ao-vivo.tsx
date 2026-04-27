@@ -396,9 +396,9 @@ export const Route = createFileRoute("/ao-vivo")({
               
               if (payload.eventType === "INSERT") {
                 const newBid = payload.new;
-                setBids((prev: any) => {
+                setBids((prev: any[]) => {
                   // Prevent duplicates just in case
-                  if (prev.some(b => b.id === newBid.id)) return prev;
+                  if (prev.some((b: any) => b.id === newBid.id)) return prev;
                   return [newBid, ...prev].slice(0, 10);
                 });
                 
@@ -415,8 +415,8 @@ export const Route = createFileRoute("/ao-vivo")({
                 }
               } else if (payload.eventType === "UPDATE") {
                 const updatedBid = payload.new;
-                setBids((prev: any) => 
-                  prev.map(b => b.id === updatedBid.id ? { ...b, ...updatedBid } : b)
+                setBids((prev: any[]) => 
+                  prev.map((b: any) => b.id === updatedBid.id ? { ...b, ...updatedBid } : b)
                 );
                 
                 // If user_id was added in update, fetch profile
