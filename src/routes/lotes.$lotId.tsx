@@ -500,8 +500,16 @@ function LotDetail() {
 
             <div className="space-y-6">
                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem]">
-                 <h2 className="text-4xl font-black text-white italic">{lot.animal?.name}</h2>
-                 <div className="mt-8 p-8 bg-black/40 rounded-[2rem] border border-white/5">
+                  <div className="flex justify-between items-start mb-6">
+                    <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
+                    {lot.animal?.youtube_url && (
+                      <Button variant="ghost" size="sm" className="text-gold hover:text-gold-bright hover:bg-gold/10 gap-2 font-bold h-auto p-2" onClick={() => document.querySelector('[value="videos"]')?.dispatchEvent(new MouseEvent('click', {bubbles:true}))}>
+                        <Video className="h-5 w-5" /> VER VÍDEO
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 p-8 bg-black/40 rounded-[2rem] border border-white/5">
                    <p className="text-gold font-black uppercase text-[10px]">Oferta Atual</p>
                    <p className="text-5xl font-black text-white italic">{formatBRL(currentPrice)}</p>
                    <div className="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
