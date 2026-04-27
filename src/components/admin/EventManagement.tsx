@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
+    const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
@@ -45,7 +46,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
        transmission_link: "",
        banner_url: "",
        promoter_company: "",
-       auctioneer_name: ""
+        auctioneer_name: "",
+        seller_id: "",
+        seller_name: ""
      });
 
      const resetForm = () => {
@@ -63,7 +66,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          transmission_link: "",
          banner_url: "",
          promoter_company: "",
-         auctioneer_name: ""
+         auctioneer_name: "",
+         seller_id: "",
+         seller_name: ""
        });
      };
 
@@ -82,18 +87,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
          transmission_link: event.transmission_link || "",
          banner_url: event.banner_url || "",
          promoter_company: event.promoter_company || "",
-         auctioneer_name: event.auctioneer_name || ""
+         auctioneer_name: event.auctioneer_name || "",
+         seller_id: event.seller_id || "",
+         seller_name: event.seller_name || ""
        });
        setIsDialogOpen(true);
      };
  
     const fetchEvents = async () => {
       setIsLoading(true);
-      console.log("Fetching events...");
       try {
         const { data, error } = await supabase
           .from("events")
-          .select("*");
+          .select("*, seller:sellers(name)");
 
         if (error) throw error;
         
@@ -117,15 +123,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
         console.log("Events loaded:", data?.length || 0);
         setEvents(data || []);
       } catch (error: any) {
-        console.error("Catch error fetching events:", error);
         toast.error("Erro ao carregar eventos: " + error.message);
       } finally {
         setIsLoading(false);
       }
     };
+
+    const fetchSellers = async () => {
+      try {
+        const { data, error } = await supabase.from("sellers").select("id, name");
+        if (error) throw error;
+        setSellers(data || []);
+      } catch (error: any) {
+        console.error("Error fetching sellers:", error);
+      }
+    };
  
    useEffect(() => {
      fetchEvents();
+      fetchSellers();
    }, []);
  
     const handleSave = async () => {
@@ -162,7 +178,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                transmission_link: formData.transmission_link,
                banner_url: formData.banner_url,
                promoter_company: formData.promoter_company,
-               auctioneer_name: formData.auctioneer_name
+               auctioneer_name: formData.auctioneer_name,
+               seller_id: formData.seller_id || null,
+               seller_name: formData.seller_name
              })
              .eq("id", editingEvent.id);
           if (error) throw error;
@@ -187,6 +205,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             banner_url: formData.banner_url,
             promoter_company: formData.promoter_company,
             auctioneer_name: formData.auctioneer_name,
+            seller_id: formData.seller_id || null,
+            seller_name: formData.seller_name,
             slug: slug
           });
           if (error) throw error;
@@ -207,6 +227,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       if (statusFilter === "all") return matchesSearch;
       if (statusFilter === "live") return matchesSearch && event.status === "live";
       if (statusFilter === "finished") return matchesSearch && event.status === "finished";
+      if (statusFilter === "loteamento") return matchesSearch && event.status === "em_loteamento";
+      if (statusFilter === "recebendo_lances") return matchesSearch && event.status === "recebendo_lances";
+      if (statusFilter === "condicional") return matchesSearch && event.status === "em_condicional";
+      if (statusFilter === "adiado") return matchesSearch && event.status === "evento_adiado";
       if (statusFilter === "pre-bidding") return matchesSearch && event.status === "scheduled" && event.allows_pre_bidding;
       if (statusFilter === "scheduled") return matchesSearch && event.status === "scheduled" && !event.allows_pre_bidding;
       
@@ -230,6 +254,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       switch (status) {
         case 'live': return 'text-emerald-500 bg-emerald-500/10';
         case 'scheduled': return 'text-blue-500 bg-blue-500/10';
+        case 'em_loteamento': return 'text-amber-500 bg-amber-500/10';
+        case 'recebendo_lances': return 'text-purple-500 bg-purple-500/10';
+        case 'em_condicional': return 'text-orange-500 bg-orange-500/10';
+        case 'evento_adiado': return 'text-red-500 bg-red-500/10';
         case 'finished': return 'text-muted-foreground bg-muted';
         default: return 'text-muted-foreground bg-muted';
       }
@@ -239,6 +267,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       switch (status) {
         case 'live': return 'Ao Vivo';
         case 'scheduled': return 'Agendado';
+        case 'em_loteamento': return 'Em Loteamento';
+        case 'recebendo_lances': return 'Recebendo Lances';
+        case 'em_condicional': return 'Em Condicional';
+        case 'evento_adiado': return 'Evento Adiado';
         case 'finished': return 'Finalizado';
         default: return status;
       }
@@ -334,13 +366,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
                  <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                   <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[140px] text-xs">
+                    <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[180px] text-xs">
                      <SelectValue placeholder="Filtrar Status" />
                    </SelectTrigger>
                    <SelectContent>
                      <SelectItem value="all">Todos os Status</SelectItem>
                      <SelectItem value="live">Ao Vivo</SelectItem>
-                     <SelectItem value="pre-bidding">Loteamento</SelectItem>
+                      <SelectItem value="loteamento">Loteamento</SelectItem>
+                      <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
+                      <SelectItem value="condicional">Em Condicional</SelectItem>
+                      <SelectItem value="adiado">Evento Adiado</SelectItem>
                      <SelectItem value="scheduled">Agendados</SelectItem>
                      <SelectItem value="finished">Encerrados</SelectItem>
                    </SelectContent>
@@ -405,20 +440,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="online">Online</SelectItem>
-                          <SelectItem value="presencial">Presencial</SelectItem>
-                          <SelectItem value="hibrido">Híbrido</SelectItem>
+                          <SelectItem value="ao_vivo">Ao Vivo</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="status">Status Inicial</Label>
+                      <Label htmlFor="status">Status do Evento</Label>
                       <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="em_loteamento">Em Loteamento</SelectItem>
+                          <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
+                          <SelectItem value="em_condicional">Em Condicional</SelectItem>
+                          <SelectItem value="evento_adiado">Evento Adiado</SelectItem>
                           <SelectItem value="scheduled">Agendado</SelectItem>
                           <SelectItem value="live">Ao Vivo</SelectItem>
+                          <SelectItem value="finished">Finalizado</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="seller_id">Vendedor (Perfil)</Label>
+                      <Select onValueChange={(v) => setFormData({ ...formData, seller_id: v })} value={formData.seller_id}>
+                        <SelectTrigger><SelectValue placeholder="Selecione um vendedor" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Nenhum (Usar nome manual)</SelectItem>
+                          {sellers.map(seller => (
+                            <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="seller_name">Nome do Vendedor (Manual)</Label>
+                      <Input value={formData.seller_name} onChange={(e) => setFormData({ ...formData, seller_name: e.target.value })} placeholder="Ex: João da Silva" />
                     </div>
                   </div>
                 </TabsContent>
@@ -552,8 +609,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                <TableHeader>
                  <TableRow>
                    <TableHead>Evento</TableHead>
-                   <TableHead>Data de Início</TableHead>
-                   <TableHead>Local/Promotor</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Local/Promotor/Vendedor</TableHead>
                    <TableHead>Status</TableHead>
                    <TableHead className="text-right">Ações</TableHead>
                  </TableRow>
@@ -570,7 +627,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                      <TableRow key={event.id}>
                        <TableCell className="font-medium">
                          <div>{event.name}</div>
-                         <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Presencial'}</div>
+                          <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Ao Vivo'}</div>
                        </TableCell>
                        <TableCell>
                          <div className="flex items-center gap-1">
@@ -581,6 +638,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                        <TableCell>
                          <div>{event.location}</div>
                          <div className="text-xs text-muted-foreground">{event.promoter_company}</div>
+                          <div className="text-[10px] text-gold font-medium">{event.seller?.name || event.seller_name || ''}</div>
                        </TableCell>
                        <TableCell>
                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor(event.status)}`}>
