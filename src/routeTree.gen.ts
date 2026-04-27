@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as PainelRouteImport } from './routes/painel'
 import { Route as LotesRouteImport } from './routes/lotes'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -26,6 +27,11 @@ import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlu
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LotesRoute = LotesRouteImport.update({
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
   '/lotes': typeof LotesRouteWithChildren
+  '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
   '/lotes': typeof LotesRouteWithChildren
+  '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/login'
     | '/lotes'
+    | '/painel'
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/ao-vivo'
     | '/cadastro'
     | '/login'
+    | '/painel'
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/login'
     | '/lotes'
+    | '/painel'
     | '/sobre'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRouteWithChildren
   LoginRoute: typeof LoginRoute
   LotesRoute: typeof LotesRouteWithChildren
+  PainelRoute: typeof PainelRoute
   SobreRoute: typeof SobreRoute
   CompraDiretaIndexRoute: typeof CompraDiretaIndexRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lotes': {
@@ -320,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRouteWithChildren,
   LoginRoute: LoginRoute,
   LotesRoute: LotesRouteWithChildren,
+  PainelRoute: PainelRoute,
   SobreRoute: SobreRoute,
   CompraDiretaIndexRoute: CompraDiretaIndexRoute,
 }

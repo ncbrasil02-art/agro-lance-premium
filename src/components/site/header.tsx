@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
- import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn } from "lucide-react";
+ import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
@@ -80,7 +80,14 @@ export function Header() {
                     <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                 <DropdownMenuSeparator />
+                 <Link to="/painel">
+                   <DropdownMenuItem className="cursor-pointer">
+                     <UserCircle className="mr-2 h-4 w-4" />
+                     <span>Minha Conta</span>
+                   </DropdownMenuItem>
+                 </Link>
+                 <DropdownMenuSeparator />
                 {profile?.role === "admin" && (
                   <>
                     <Link to="/admin">
