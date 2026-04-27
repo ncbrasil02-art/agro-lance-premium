@@ -666,7 +666,7 @@ function LotDetail() {
                        <div className="space-y-3">
                          <p className="text-[10px] font-black text-gold/60 uppercase tracking-widest text-center">Sugestões de Lance</p>
                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                           {[100, 250, 500, lot.bid_increment || 1000].map((inc) => (
+                           {[lot.bid_increment || 100, (lot.bid_increment || 100) * 2, (lot.bid_increment || 100) * 5, (lot.bid_increment || 100) * 10].map((inc) => (
                              <Button 
                                key={inc} 
                                variant="outline" 
