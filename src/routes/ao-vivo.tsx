@@ -694,6 +694,11 @@ export const Route = createFileRoute("/ao-vivo")({
     };
 
     const placeBid = (amount: number) => {
+      if (liveLot?.status === 'sold' || liveLot?.status === 'passed') {
+        toast.error("Lote finalizado. Lances encerrados.");
+        return;
+      }
+
       if (!user) {
         toast.error("Você precisa estar logado para dar lances.");
         return;
