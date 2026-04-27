@@ -802,12 +802,12 @@ function LotDetail() {
                   </div>
 
                   <div className="space-y-4">
-                    {lot.animal?.youtube_url && (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
+                     {lot.animal?.youtube_url && (
+                       <Dialog>
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <DialogTrigger asChild>
                                  <Button 
                                    variant="ghost" 
                                    className="w-full h-10 rounded-xl bg-white/5 text-white/60 hover:text-gold flex items-center justify-center gap-2 mb-2 border border-white/5"
@@ -815,22 +815,22 @@ function LotDetail() {
                                    <PlayCircle className="h-4 w-4" />
                                    <span className="text-[10px] font-bold uppercase tracking-wider">Ver vídeo do animal</span>
                                  </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>Abrir player de vídeo do YouTube</TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[800px] bg-black p-0 border-white/10 overflow-hidden">
-                          <div className="aspect-video">
-                            <iframe 
-                              src={lot.animal.youtube_url.replace("watch?v=", "embed/").split("&")[0]} 
-                              className="h-full w-full" 
-                              allowFullScreen 
-                            />
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    )}
+                               </DialogTrigger>
+                             </TooltipTrigger>
+                             <TooltipContent>Abrir player de vídeo do YouTube</TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
+                         <DialogContent className="sm:max-w-[800px] bg-black p-0 border-white/10 overflow-hidden">
+                           <div className="aspect-video">
+                             <iframe 
+                               src={lot.animal.youtube_url.includes('youtube.com/embed') ? lot.animal.youtube_url : lot.animal.youtube_url.replace("watch?v=", "embed/").split("&")[0]} 
+                               className="h-full w-full" 
+                               allowFullScreen 
+                             />
+                           </div>
+                         </DialogContent>
+                       </Dialog>
+                     )}
                     {dynamicStatus === 'loteamento' && (
                       <div className="p-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                         <Info className="h-5 w-5 text-gold shrink-0 mt-0.5" />
@@ -959,10 +959,24 @@ function LotDetail() {
               </Card>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="h-14 rounded-2xl border-white/10 bg-card text-white hover:bg-white/5"><Heart className="mr-2 h-4 w-4" /> SEGUIR</Button>
-              <Button variant="outline" className="h-14 rounded-2xl border-white/10 bg-card text-white hover:bg-white/5"><Share2 className="mr-2 h-4 w-4" /> COMPARTILHAR</Button>
-            </div>
+             <div className="grid grid-cols-2 gap-3">
+               <Button 
+                 variant="outline" 
+                 className={`h-14 rounded-2xl border-white/10 bg-card hover:bg-white/5 transition-all ${isFavorite ? 'text-gold border-gold/50 bg-gold/5' : 'text-white'}`}
+                 onClick={toggleFavorite}
+                 disabled={isFavoriteLoading}
+               >
+                 {isFavoriteLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} />}
+                 {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
+               </Button>
+               <Button 
+                 variant="outline" 
+                 className="h-14 rounded-2xl border-white/10 bg-card text-white hover:bg-white/5"
+                 onClick={handleShare}
+               >
+                 <Share2 className="mr-2 h-4 w-4" /> COMPARTILHAR
+               </Button>
+             </div>
 
             <Card className="rounded-[2rem] border-white/5 bg-card overflow-hidden">
               <div className="p-6 border-b border-white/5 flex items-center gap-2">
@@ -985,14 +999,37 @@ function LotDetail() {
               </div>
             </Card>
 
-            <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
-              <h2 className="text-white font-black text-sm uppercase tracking-widest mb-4">Pagamento & Envio</h2>
-              <ul className="space-y-3 text-sm text-white/60">
-                <li className="flex gap-2"> <span className="text-gold">•</span> À vista com 5% de desconto no PIX/TED. </li>
-                <li className="flex gap-2"> <span className="text-gold">•</span> Parcelamento em 30x (2+2+26). </li>
-                <li className="flex gap-2"> <span className="text-gold">•</span> Frete por conta do comprador. </li>
-              </ul>
-            </div>
+             <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
+               <h2 className="text-white font-black text-sm uppercase tracking-widest mb-4">Pagamento & Envio</h2>
+               <div className="space-y-4">
+                 <div className="p-4 rounded-xl bg-black/20 border border-white/5">
+                   <div className="flex items-center gap-2 mb-2">
+                     <Calculator className="h-4 w-4 text-gold" />
+                     <span className="text-[10px] font-black uppercase text-white/80">Condições de Venda</span>
+                   </div>
+                   <ul className="space-y-3 text-xs text-white/70">
+                     <li className="flex justify-between items-center pb-2 border-b border-white/5">
+                       <span>À vista (5% OFF):</span>
+                       <span className="font-bold text-gold">{formatBRL((currentPrice * 0.95) + BUYER_COMMISSION)}</span>
+                     </li>
+                     <li className="flex justify-between items-center pb-2 border-b border-white/5">
+                       <span>Plano 1+2+30:</span>
+                       <span className="font-bold text-white">3x {formatBRL(price/33)} + 30x {formatBRL(price/33)}</span>
+                     </li>
+                     <li className="flex justify-between items-center">
+                       <span>Comissão Comprador:</span>
+                       <span className="font-bold text-amber-500">{formatBRL(BUYER_COMMISSION)} ({COMMISSION_RATE}%)</span>
+                     </li>
+                   </ul>
+                 </div>
+                 
+                 <ul className="space-y-3 text-[11px] text-white/60">
+                   <li className="flex gap-2"> <span className="text-gold font-bold">•</span> Após o arremate, o contrato e as boletas (com QR Code PIX) estarão disponíveis em seu painel. </li>
+                   <li className="flex gap-2"> <span className="text-gold font-bold">•</span> O pagamento pode ser mensal (30 dias) ou quinzenal, conforme acordado no fechamento. </li>
+                   <li className="flex gap-2"> <span className="text-gold font-bold">•</span> A liberação do animal ocorre após a assinatura do contrato e confirmação do primeiro pagamento. </li>
+                 </ul>
+               </div>
+             </div>
           </div>
         </div>
       </div>
