@@ -168,65 +168,65 @@ function EventDetail() {
 
               <div className="grid grid-cols-2 gap-4 mb-12">
                 {[
-                  { icon: Calendar, label: "Cronograma", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
-                  { icon: MapPin, label: "Recinto/Local", value: event.location || "Arena Digital" },
-                  { icon: Gavel, label: "Martelo", value: event.auctioneer_name || "Convidado Especial" },
-                  { icon: Trophy, label: "Fomento", value: event.promoter_company || "Premium Agro" },
-                ].map((m) => (
-                  <div key={m.label} className="p-5 md:p-6 rounded-[2rem] bg-emerald-deep/40 border border-white/5 backdrop-blur-xl group hover:bg-gold/5 hover:border-gold/20 transition-all flex flex-col justify-center">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-8 w-8 rounded-full bg-gold/10 flex items-center justify-center">
-                        <m.icon className="h-4 w-4 text-gold" />
-                      </div>
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60">{m.label}</span>
-                    </div>
-                     <div className="text-base md:text-lg font-black text-foreground leading-tight uppercase tracking-tight">{m.value}</div>
-                  </div>
-                ))}
+                   { icon: Calendar, label: "Cronograma", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
+                   { icon: MapPin, label: "Local", value: event.location || "Arena Digital" },
+                   { icon: Gavel, label: "Responsável", value: event.auctioneer_name || "Convidado Especial" },
+                   { icon: FileText, label: "Regulamento", value: "Ver Regulamento", isRegulation: true },
+                 ].map((m) => m.isRegulation ? (
+                   <Dialog key="regulation-trigger">
+                     <DialogTrigger asChild>
+                       <button className="p-5 md:p-6 rounded-[2rem] bg-gold/20 border border-gold/50 shadow-[0_0_20px_rgba(212,175,55,0.3)] backdrop-blur-xl animate-blink-fast flex flex-col justify-center text-left hover:bg-gold/30 transition-all group">
+                         <div className="flex items-center gap-3 mb-3">
+                           <div className="h-8 w-8 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/40 transition-colors">
+                             <FileText className="h-4 w-4 text-gold" />
+                           </div>
+                           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Regulamento</span>
+                         </div>
+                         <div className="text-base md:text-lg font-black text-foreground leading-tight uppercase tracking-tight">Ver Regulamento</div>
+                       </button>
+                     </DialogTrigger>
+                     <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
+                       <DialogHeader className="p-6 border-b border-border/10">
+                         <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Regulamento do Evento</DialogTitle>
+                       </DialogHeader>
+                       <div className="flex-1 overflow-y-auto p-8 bg-card/50">
+                         <div className="prose prose-invert max-w-none">
+                           <p className="whitespace-pre-wrap text-foreground/80 leading-relaxed font-medium">
+                             {event.regulation || "O regulamento para este evento ainda não foi disponibilizado."}
+                           </p>
+                         </div>
+                       </div>
+                     </DialogContent>
+                   </Dialog>
+                 ) : (
+                   <div key={m.label} className="p-5 md:p-6 rounded-[2rem] bg-emerald-deep/40 border border-white/5 backdrop-blur-xl group hover:bg-gold/5 hover:border-gold/20 transition-all flex flex-col justify-center">
+                     <div className="flex items-center gap-3 mb-3">
+                       <div className="h-8 w-8 rounded-full bg-gold/10 flex items-center justify-center">
+                         <m.icon className="h-4 w-4 text-gold" />
+                       </div>
+                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60">{m.label}</span>
+                     </div>
+                      <div className="text-base md:text-lg font-black text-foreground leading-tight uppercase tracking-tight">{m.value}</div>
+                   </div>
+                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                {event.status === "live" ? (
-                  <Link to="/ao-vivo" className="flex-1">
-                    <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl shadow-[0_10px_40px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all rounded-[1.5rem] tracking-tighter italic">
-                      ASSISTIR AGORA
-                    </Button>
-                  </Link>
-                ) : (
-                  <div className="flex-1">
-                    <div className="flex flex-col h-20 justify-center p-6 rounded-[1.5rem] border border-gold/20 bg-gold/5">
-                      <div className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">Faltam para o início</div>
-                      <Countdown endsAt={event.start_date} variant="segmented" className="text-white" />
-                    </div>
-                  </div>
-                )}
-                  <Button variant="outline" size="lg" className="h-20 px-8 border-border bg-card/10 text-foreground hover:bg-card/20 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs">
-                    Contatar Assessoria
-                  </Button>
-
-                  {event.regulation && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="lg" className="h-20 px-8 border-gold/30 bg-gold/5 text-gold hover:bg-gold/10 font-bold rounded-[1.5rem] flex-1 sm:flex-none uppercase tracking-widest text-xs flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Ver Regulamento
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
-                        <DialogHeader className="p-6 border-b border-border/10">
-                          <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Regulamento do Evento</DialogTitle>
-                        </DialogHeader>
-                        <div className="flex-1 overflow-y-auto p-8 bg-card/50">
-                          <div className="prose prose-invert max-w-none">
-                            <p className="whitespace-pre-wrap text-foreground/80 leading-relaxed font-medium">
-                              {event.regulation}
-                            </p>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-              </div>
+               <div className="flex flex-col sm:flex-row gap-4">
+                 {event.status === "live" ? (
+                   <Link to="/ao-vivo" className="flex-1">
+                     <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl shadow-[0_10px_40px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all rounded-[1.5rem] tracking-tighter italic">
+                       ASSISTIR AGORA
+                     </Button>
+                   </Link>
+                 ) : (
+                   <div className="flex-1">
+                     <div className="flex flex-col h-20 justify-center p-6 rounded-[1.5rem] border border-gold/20 bg-gold/5">
+                       <div className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">Faltam para o início</div>
+                       <Countdown endsAt={event.start_date} variant="segmented" className="text-white" />
+                     </div>
+                   </div>
+                 )}
+               </div>
             </div>
           </div>
         </div>

@@ -3,18 +3,21 @@
 
  export function Countdown({ endsAt, className, variant = "default" }: { endsAt: string; className?: string; variant?: "default" | "segmented" }) {
    const [mounted, setMounted] = useState(false);
-   const [now, setNow] = useState(() => new Date(endsAt).getTime());
+   const [now, setNow] = useState(0);
  
    useEffect(() => {
      setMounted(true);
-     setNow(Date.now());
-     const id = setInterval(() => setNow(Date.now()), 1000);
+     const updateNow = () => setNow(Date.now());
+     updateNow();
+     const id = setInterval(updateNow, 1000);
      return () => clearInterval(id);
    }, []);
 
    const endTime = new Date(endsAt).getTime();
    if (isNaN(endTime)) return <span className={className}>Data inválida</span>;
-   const diff = mounted ? Math.max(0, endTime - now) : Math.max(0, endTime - now);
+    if (!mounted) return <span className={className} suppressHydrationWarning>--:--:--</span>;
+    
+    const diff = Math.max(0, endTime - now);
   const d = Math.floor(diff / 86_400_000);
   const h = Math.floor((diff % 86_400_000) / 3_600_000);
   const m = Math.floor((diff % 3_600_000) / 60_000);
