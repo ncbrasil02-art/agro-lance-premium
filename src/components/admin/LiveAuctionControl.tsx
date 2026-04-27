@@ -372,24 +372,21 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         const isGenericPhoneBid = lastBid.is_phone_bid && !lastBid.user_id;
         const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
 
-        // Automatic linking logic:
-        if (isGenericPhoneBid) {
-          if (phoneBid.profileId) {
-            // If a profile is already selected in the sidebar, link it automatically
-            finalWinnerId = phoneBid.profileId;
-            toast.info(`Vinculando arremate ao perfil selecionado: ${profiles.find(p => p.id === phoneBid.profileId)?.full_name || '... '}`);
-          } else {
-            // Only prompt if it's a generic bid AND no profile is selected to link
-            if (confirm(`Lote arrematado via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vincular este arremate a um cadastro real agora?`)) {
-              toast.info("Por favor, selecione um 'Cadastro Real' no formulário lateral e clique em Arrematar novamente.");
-              return;
-            }
-          }
+        // Automatic linking logic (Refined):
+        // If the bid is from phone but we have a profile selected in the UI, auto-link it
+        if (isGenericPhoneBid && phoneBid.profileId) {
+          finalWinnerId = phoneBid.profileId;
+          // Also update the bid itself to be linked to this profile for auditing
+          await supabase.from("bids").update({ user_id: finalWinnerId }).eq("id", lastBid.id);
+          toast.info(`Vinculando arremate automaticamente ao perfil: ${profiles.find(p => p.id === phoneBid.profileId)?.full_name}`);
         } else if (lastBid.user_id) {
-          // Registered user (online bid or admin bid linked to profile)
-          // We use the bidder's ID directly as the winner
           finalWinnerId = lastBid.user_id;
-          console.log("Arrematando automaticamente para usuário registrado:", lastBid.profile?.full_name);
+        } else if (isGenericPhoneBid && !phoneBid.profileId) {
+          // Still generic, ask if they want to link it first
+          if (confirm(`Este arremate foi via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vinculá-lo a um perfil cadastrado agora?`)) {
+            toast.info("Selecione um 'Cadastro Real' na barra lateral e clique em Arrematar novamente.");
+            return;
+          }
         }
 
        setIsActionLoading(true);
