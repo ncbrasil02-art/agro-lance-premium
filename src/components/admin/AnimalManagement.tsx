@@ -444,7 +444,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                          Disponível para Venda Direta
                        </Label>
                        <p className="text-xs text-muted-foreground">
-                         Ao marcar esta opção, o animal aparecerá na área de "Compra de Animais" do site.
+                         Ao marcar esta opção, o animal aparecerá na área de "Catálogo de Venda" do site.
                        </p>
                      </div>
                    </div>
