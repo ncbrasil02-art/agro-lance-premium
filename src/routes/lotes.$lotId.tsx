@@ -278,8 +278,8 @@ function LotDetail() {
     const bidsChannel = supabase
       .channel(`bids-${lot.id}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, async (p) => {
-        const { data } = await supabase.from("profiles").select("full_name").eq("id", p.new.user_id).single();
-        const newBid = { ...p.new, profile: data };
+         const { data: profileData } = await supabase.from("profiles").select("id, full_name").eq("id", p.new.user_id).single();
+         const newBid = { ...p.new, profile: profileData };
         setRecentBids(prev => [newBid, ...prev].slice(0, 10));
       })
       .subscribe();
@@ -608,7 +608,11 @@ function LotDetail() {
                                   {idx + 1}
                                 </div>
                                 <div>
-                                  <p className="font-bold text-white">{bid.profile?.full_name || "Usuário"}</p>
+                                   <p className="font-bold text-white">
+                                     {bid.is_phone_bid && bid.phone_bidder_identifier 
+                                       ? bid.phone_bidder_identifier 
+                                       : (bid.profile?.full_name || "Usuário")}
+                                   </p>
                                   <p className="text-[10px] text-white/40 uppercase font-bold">
                                     {new Date(bid.created_at).toLocaleString('pt-BR')}
                                   </p>
