@@ -579,13 +579,15 @@ export const Route = createFileRoute("/ao-vivo")({
     useEffect(() => {
       if (!liveEvent?.id) return;
       
-      let intervalTime = 30000; // Default: 30s
+      let intervalTime = 30000; // Sincronização padrão (30s)
 
-      if (realtimeStatus !== "SUBSCRIBED" || isOffline) {
-        // Faster polling when realtime is down (starting at 3s)
-        // but with exponential backoff to avoid hammering the server if the user is truly offline for a long time
-        // 3s, 6s, 12s, 24s... max 60s
-        intervalTime = Math.min(3000 * Math.pow(2, pollingRetryCount), 60000);
+      if (realtimeStatus !== "SUBSCRIBED" && !isOffline) {
+        // Online mas sem Realtime: Polling agressivo para não perder lances
+        // Começa em 2s e aumenta levemente se houver erros (backoff suave)
+        intervalTime = Math.min(2000 * Math.pow(1.5, pollingRetryCount), 10000);
+      } else if (isOffline) {
+        // Modo Offline: Backoff pesado para economizar recursos
+        intervalTime = Math.min(10000 * Math.pow(2, pollingRetryCount), 60000);
       }
       
       console.log(`Setting refresh interval to ${intervalTime}ms (retry count: ${pollingRetryCount}, status: ${realtimeStatus})`);
