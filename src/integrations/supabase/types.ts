@@ -25,6 +25,7 @@ export type Database = {
           chip_number: string | null
           color: string | null
           created_at: string
+          default_bid_increment: number | null
           description: string | null
           genealogy: Json | null
           health_info: Json | null
@@ -61,6 +62,7 @@ export type Database = {
           chip_number?: string | null
           color?: string | null
           created_at?: string
+          default_bid_increment?: number | null
           description?: string | null
           genealogy?: Json | null
           health_info?: Json | null
@@ -97,6 +99,7 @@ export type Database = {
           chip_number?: string | null
           color?: string | null
           created_at?: string
+          default_bid_increment?: number | null
           description?: string | null
           genealogy?: Json | null
           health_info?: Json | null
