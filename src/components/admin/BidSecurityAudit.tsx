@@ -41,13 +41,36 @@ export function BidSecurityAudit() {
   useEffect(() => {
     fetchBids();
 
-    // Realtime subscription for new bids
+    // Realtime subscription for new bids - optimize to avoid full re-fetches
     const channel = supabase
       .channel("bid-security-audit")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "bids" },
-        () => fetchBids()
+        async (payload) => {
+          console.log("New bid in audit:", payload.new);
+          // Fetch the bid with its relations to keep the UI consistent
+          const { data: bidWithDetails } = await supabase
+            .from("bids")
+            .select(`
+              *,
+              profile:profiles(full_name, risk_level, is_blocked, cpf),
+              lot:lots(lot_number, animal:animals(name))
+            `)
+            .eq("id", payload.new.id)
+            .single();
+          
+          if (bidWithDetails) {
+            setBids(prev => [bidWithDetails, ...prev].slice(0, 100));
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "bids" },
+        (payload) => {
+          setBids(prev => prev.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b));
+        }
       )
       .subscribe();
 

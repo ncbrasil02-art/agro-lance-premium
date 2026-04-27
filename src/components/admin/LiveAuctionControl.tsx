@@ -20,6 +20,7 @@
    const [liveEvent, setLiveEvent] = useState<any>(null);
    const [lots, setLots] = useState<any[]>([]);
    const [activeLot, setActiveLot] = useState<any>(null);
+    const [bids, setBids] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -79,30 +80,74 @@
     };
   }, [selectedEventId]);
 
-  useEffect(() => {
-    if (!activeLot?.id) return;
+    useEffect(() => {
+      if (!activeLot?.id) {
+        setBids([]);
+        return;
+      }
 
-    const lotChannel = supabase
-      .channel(`admin-lot-realtime-${activeLot.id}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${activeLot.id}` },
+      // Fetch initial bids for the active lot
+      const fetchInitialBids = async () => {
+        const { data } = await supabase
+          .from("bids")
+          .select("*, profile:profiles(full_name, risk_level, is_blocked)")
+          .eq("lot_id", activeLot.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        setBids(data || []);
+      };
+      fetchInitialBids();
+
+      const lotChannel = supabase
+        .channel(`admin-lot-realtime-${activeLot.id}`)
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${activeLot.id}` },
           (payload) => {
             setActiveLot((prev: any) => {
-            if (!prev || prev.id !== payload.new.id) return prev;
-            return { ...prev, ...payload.new };
-          });
-          
-            // Also update the lots list for consistency
+              if (!prev || prev.id !== payload.new.id) return prev;
+              return { ...prev, ...payload.new };
+            });
             setLots((prev: any[]) => prev.map(l => l.id === payload.new.id ? { ...l, ...payload.new } : l));
-        }
-      )
-      .subscribe();
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "bids", filter: `lot_id=eq.${activeLot.id}` },
+          async (payload) => {
+            if (payload.eventType === "INSERT") {
+              const newBid = payload.new;
+              // Fetch profile for the new bid
+              const { data: bidWithProfile } = await supabase
+                .from("bids")
+                .select("*, profile:profiles(full_name, risk_level, is_blocked)")
+                .eq("id", newBid.id)
+                .single();
+              
+              if (bidWithProfile) {
+                setBids(prev => [bidWithProfile, ...prev].slice(0, 10));
+                
+                // Update local active lot price immediately
+                setActiveLot((prev: any) => {
+                  if (!prev || prev.id !== newBid.lot_id) return prev;
+                  return {
+                    ...prev,
+                    current_price: Math.max(prev.current_price || 0, newBid.amount),
+                    bids_count: (prev.bids_count || 0) + 1
+                  };
+                });
+              }
+            } else if (payload.eventType === "UPDATE") {
+              setBids(prev => prev.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b));
+            }
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(lotChannel);
-    };
-  }, [activeLot?.id]);
+      return () => {
+        supabase.removeChannel(lotChannel);
+      };
+    }, [activeLot?.id]);
 
     const fetchEvents = async () => {
       const { data } = await supabase
@@ -699,8 +744,48 @@
            </div>
  
            {/* Sidebar de Lance Ativo */}
-           <div className="space-y-6">
-             <Card className="border-gold/50 bg-emerald-deep text-white">
+            <div className="space-y-4">
+              <Card className="border-gold/50 bg-emerald-deep text-white shadow-lg overflow-hidden">
+                <CardHeader className="pb-2 bg-gold/10 border-b border-gold/20">
+                  <CardTitle className="text-sm font-black uppercase tracking-widest text-gold flex items-center justify-between">
+                    <span>Últimos Lances</span>
+                    <div className="h-2 w-2 rounded-full bg-live animate-pulse" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {bids.length > 0 ? (
+                      <div className="divide-y divide-white/10">
+                        {bids.map((bid, i) => (
+                          <div key={bid.id} className={`p-3 flex items-center justify-between text-xs transition-colors ${i === 0 ? "bg-gold/5" : ""}`}>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-white">
+                                  {bid.is_phone_bid ? (bid.phone_bidder_identifier || "Telefone") : (bid.profile?.full_name || "Licitante")}
+                                </span>
+                                {bid.profile?.risk_level === 'high' && <div className="h-1.5 w-1.5 rounded-full bg-red-500" />}
+                              </div>
+                              <div className="flex items-center gap-2 text-[10px] text-white/50">
+                                <span>{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</span>
+                                <span className="uppercase">{bid.bid_type}</span>
+                              </div>
+                            </div>
+                            <span className={`font-mono font-black ${i === 0 ? "text-gold text-sm" : "text-white/80"}`}>
+                              {formatBRL(bid.amount)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-white/20 italic text-xs">
+                        Aguardando lances...
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-gold/50 bg-emerald-deep text-white">
                <CardHeader className="pb-2">
                  <CardTitle className="text-lg text-gold flex items-center gap-2">
                    <Gavel className="h-5 w-5" /> Lance por Telefone
