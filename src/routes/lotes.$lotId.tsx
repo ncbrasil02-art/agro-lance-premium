@@ -218,9 +218,8 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
         </div>
       </div>
        </div>
-     </div>
-   );
- }
+     );
+   }
 
  function InstallmentSimulator({ price, commissionRate }: { price: number, commissionRate: number }) {
    const options = [1, 12, 24, 30, 36, 48, 60, 72];
