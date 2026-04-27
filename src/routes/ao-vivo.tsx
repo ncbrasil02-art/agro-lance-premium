@@ -1,4 +1,4 @@
-import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -969,12 +969,12 @@ export const Route = createFileRoute("/ao-vivo")({
                     
                     <div className="mt-4 grid grid-cols-3 gap-2">
                       {[1, 5, 10].map((mult) => (
-                        <Button 
-                          key={mult} 
-                          variant="outline" 
+                        <Button
+                          key={mult}
+                          variant="outline"
                           size="sm"
                           className="border-gold/30 hover:bg-gold/10 h-8 text-[11px] font-bold"
-                          disabled={isBidding}
+                          disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
                           onClick={() => placeBid(currentPrice + (liveLot.bid_increment * mult))}
                         >
                           +{formatBRL(liveLot.bid_increment * mult)}
@@ -984,13 +984,21 @@ export const Route = createFileRoute("/ao-vivo")({
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] gap-2">
-                    <Button 
-                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider" 
-                      disabled={isBidding}
+                    <Button
+                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
+                      disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
                       onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
                     >
-                      {isBidding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
-                      DAR LANCE ({formatBRL(currentPrice + liveLot.bid_increment)})
+                      {isBidding ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
+                        <Ban className="mr-2 h-4 w-4" />
+                      ) : (
+                        <Gavel className="mr-2 h-4 w-4" />
+                      )}
+                      {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
+                       liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
+                       `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
                     </Button>
 
                     <Dialog>
