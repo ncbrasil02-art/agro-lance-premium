@@ -966,10 +966,11 @@ export const Route = createFileRoute("/ao-vivo")({
               <div className="p-6 flex flex-col">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">Lote #{String(liveLot.lot_number).padStart(2, "0")}</span>
+                      <StatusBadge status={liveLot.status} className="h-5 text-[9px] px-2 border-emerald/20" />
                       {liveLot.animal?.registration_number && (
-                        <span className="text-[10px] text-muted-foreground">REG: {liveLot.animal.registration_number}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">REG: {liveLot.animal.registration_number}</span>
                       )}
                     </div>
                     <h2 className="text-2xl font-black text-emerald-deep tracking-tighter leading-none">{liveLot.animal?.name}</h2>
