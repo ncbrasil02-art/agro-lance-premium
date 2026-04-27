@@ -178,11 +178,14 @@ export const Route = createFileRoute("/ao-vivo")({
    const [liveEvent, setLiveEvent] = useState(initialEvent);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
+  const [lastSyncAt, setLastSyncAt] = useState<Date>(new Date());
+  const [syncTrigger, setSyncTrigger] = useState(0);
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOffline(false);
       toast.success("Conexão restabelecida", { description: "Sincronizando dados..." });
+      setSyncTrigger(prev => prev + 1); // Trigger immediate refresh
     };
     const handleOffline = () => {
       setIsOffline(true);
