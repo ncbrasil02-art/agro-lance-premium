@@ -452,8 +452,7 @@ function LotDetail() {
                        <div className="p-4 bg-white/5 rounded-2xl text-center">
                          <p className="text-[10px] text-gold/40 uppercase font-black">Idade</p>
                          <p className="font-bold text-white">{getAge(lot.animal?.birth_date)}</p>
-                       </div>
-                     </div>
+                </div>
                    </Card>
                  </TabsContent>
                  <TabsContent value="genealogia" className="mt-6">
