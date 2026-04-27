@@ -3,12 +3,13 @@
 
  export function Countdown({ endsAt, className, variant = "default" }: { endsAt: string; className?: string; variant?: "default" | "segmented" }) {
    const [mounted, setMounted] = useState(false);
-   const [now, setNow] = useState(() => new Date(endsAt).getTime());
+   const [now, setNow] = useState(0);
  
    useEffect(() => {
      setMounted(true);
-     setNow(Date.now());
-     const id = setInterval(() => setNow(Date.now()), 1000);
+     const updateNow = () => setNow(Date.now());
+     updateNow();
+     const id = setInterval(updateNow, 1000);
      return () => clearInterval(id);
    }, []);
 
