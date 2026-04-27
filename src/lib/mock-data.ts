@@ -23,6 +23,7 @@ export interface AuctionEvent {
   bidsCount: number;
   auctioneer: string;
   promoter: string;
+  event_type?: string;
 }
 
 export interface Lot {
