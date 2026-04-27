@@ -406,10 +406,13 @@ import { StatusBadge } from "@/components/auctions/status-badge";
      };
 
     const passLot = async (lotId: string) => {
-      if (!confirm("Finalizar lote sem venda? (Passou)")) return;
       setIsActionLoading(true);
       try {
-        await supabase.from("lots").update({ status: 'passed', is_currently_live: false }).eq("id", lotId);
+        await supabase.from("lots").update({ 
+          status: 'passed', 
+          is_currently_live: false,
+          updated_at: new Date().toISOString()
+        }).eq("id", lotId);
         await handleAfterLotFinalized(lotId, "Lote finalizado sem venda.");
       } catch (error) {
         toast.error("Erro ao finalizar lote");
