@@ -521,6 +521,7 @@ export type Database = {
           name: string
           photos: string[] | null
           promoter_company: string | null
+          regulation: string | null
           seller_id: string | null
           seller_name: string | null
           show_countdown: boolean | null
@@ -551,6 +552,7 @@ export type Database = {
           name: string
           photos?: string[] | null
           promoter_company?: string | null
+          regulation?: string | null
           seller_id?: string | null
           seller_name?: string | null
           show_countdown?: boolean | null
@@ -581,6 +583,7 @@ export type Database = {
           name?: string
           photos?: string[] | null
           promoter_company?: string | null
+          regulation?: string | null
           seller_id?: string | null
           seller_name?: string | null
           show_countdown?: boolean | null
