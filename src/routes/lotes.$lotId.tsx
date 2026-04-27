@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -508,12 +508,12 @@ function LotDetail() {
                         <Share2 className="mr-2 h-4 w-4 text-emerald-400" /> COMPARTILHAR
                       </Button>
                    </div>
-                   <Button 
-                     variant="ghost" 
-                     className="w-full h-14 rounded-2xl text-white/60 hover:text-white hover:bg-white/5 border border-white/10 mt-2 gap-2" 
-                     onClick={() => window.print()}
-                   >
-                     <Download className="h-4 w-4" /> BAIXAR ENCARTE COMPLETO (PDF)
+                    <Button
+                      variant="outline"
+                      className="w-full h-14 rounded-2xl bg-white/5 text-white hover:bg-white/10 border-gold/20 mt-2 gap-2 font-bold"
+                      onClick={() => window.print()}
+                    >
+                      <Printer className="h-4 w-4 text-gold" /> IMPRIMIR ENCARTE (PDF)
                     </Button>
                   </div>
                 </Card>
