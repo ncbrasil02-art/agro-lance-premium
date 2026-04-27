@@ -109,15 +109,15 @@ function UserDashboard() {
           <TabsTrigger value="arremates" className="gap-2">
             <Gavel className="h-4 w-4" /> Meus Arremates
           </TabsTrigger>
-          <TabsTrigger value="lances" className="gap-2">
-            <Clock className="h-4 w-4" /> Meus Lances
-          </TabsTrigger>
-          <TabsTrigger value="mensagens" className="gap-2">
-            <MessageSquare className="h-4 w-4" /> Mensagens
-          </TabsTrigger>
-          <TabsTrigger value="lances" className="gap-2">
-            <Clock className="h-4 w-4" /> Meus Lances
-          </TabsTrigger>
+           <TabsTrigger value="lances" className="gap-2">
+             <Clock className="h-4 w-4" /> Meus Lances
+           </TabsTrigger>
+           <TabsTrigger value="favoritos" className="gap-2">
+             <BadgeCheck className="h-4 w-4" /> Meus Favoritos
+           </TabsTrigger>
+           <TabsTrigger value="mensagens" className="gap-2">
+             <MessageSquare className="h-4 w-4" /> Mensagens
+           </TabsTrigger>
           <TabsTrigger value="perfil" className="gap-2">
             <User className="h-4 w-4" /> Dados Cadastrais
           </TabsTrigger>
