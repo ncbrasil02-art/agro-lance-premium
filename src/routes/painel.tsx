@@ -34,12 +34,13 @@ function UserDashboard() {
 
   const fetchDashboardData = async () => {
     setIsLoading(true);
+    if (!user?.id) return;
     try {
       // Fetch lots won by the user
       const { data: wonLots } = await supabase
         .from("lots")
         .select("*, animal:animals(*), event:events(*)")
-        .eq("winner_id", user?.id)
+        .eq("winner_id", user.id)
         .order("updated_at", { ascending: false });
       
       setMyLots(wonLots || []);
@@ -48,7 +49,7 @@ function UserDashboard() {
       const { data: userBids } = await supabase
         .from("bids")
         .select("*, lot:lots(*, animal:animals(name))")
-        .eq("user_id", user?.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(10);
       
@@ -81,7 +82,10 @@ function UserDashboard() {
           <p className="text-muted-foreground">Olá, {profile?.full_name}. Bem-vindo ao seu painel de arremates.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={profile?.is_approved ? "success" : "warning"} className="px-3 py-1">
+          <Badge 
+            variant="outline" 
+            className={`px-3 py-1 ${profile?.is_approved ? "bg-emerald-500/10 text-emerald-600 border-emerald-200" : "bg-amber-500/10 text-amber-600 border-amber-200"}`}
+          >
             {profile?.is_approved ? (
               <span className="flex items-center gap-1"><BadgeCheck className="h-3 w-3" /> Cadastro Aprovado</span>
             ) : (
