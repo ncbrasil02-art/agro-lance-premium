@@ -373,7 +373,20 @@ import {
                       Cadastrar Novo Animal
                     </Button>
                   </div>
-                   <Select onValueChange={(v) => setFormData({ ...formData, animal_id: v })} value={formData.animal_id}>
+                   <Select 
+                     onValueChange={async (v) => {
+                       const animal = availableAnimals.find(a => a.id === v);
+                       let increment = formData.bid_increment;
+                       if (animal) {
+                         const { data: animalData } = await supabase.from("animals").select("default_bid_increment").eq("id", v).single();
+                         if (animalData?.default_bid_increment) {
+                           increment = animalData.default_bid_increment;
+                         }
+                       }
+                       setFormData({ ...formData, animal_id: v, bid_increment: increment });
+                     }} 
+                     value={formData.animal_id}
+                   >
                      <SelectTrigger>
                        <SelectValue placeholder={isLoading ? "Carregando animais..." : "Selecione o animal"} />
                      </SelectTrigger>
