@@ -312,7 +312,6 @@ function LotDetail() {
     finally { setIsBidding(false); setShowConfirmBid(false); }
   };
 
-  const toggleFavorite = async () => {
   const handleSendOffer = async () => {
     if (!user) { toast.error("Faça login para enviar uma proposta."); return; }
     if (!offerData.amount) { toast.error("Informe o valor da proposta."); return; }
@@ -337,6 +336,7 @@ function LotDetail() {
     }
   };
 
+  const toggleFavorite = async () => {
     if (!user) { toast.error("Faça login."); return; }
     setIsFavoriteLoading(true);
     try {
