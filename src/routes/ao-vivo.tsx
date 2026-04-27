@@ -519,7 +519,7 @@ export const Route = createFileRoute("/ao-vivo")({
         if (bidsChannel) supabase.removeChannel(bidsChannel);
         supabase.removeChannel(profilesChannel);
       };
-    }, [liveEvent?.id, liveEvent?.active_lot_id]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, reconnectTrigger]);
 
     // Centralized refresh function with error tracking
     const refreshAllData = async () => {
