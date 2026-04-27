@@ -114,7 +114,7 @@ import { Countdown } from "@/components/auctions/countdown";
              {(['recebendo_lances', 'incondicional', 'em_condicional', 'live'].includes(effectiveStatus)) && (
                <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-emerald-500/90 backdrop-blur-md px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-[0.2em] border border-white/20 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                  <Gavel className="h-3 w-3" />
-                 {effectiveStatus === 'incondicional' ? 'Incondicional' : 
+                 {effectiveStatus === 'incondicional' ? 'Evento Confirmado' : 
                   effectiveStatus === 'em_condicional' ? 'Em Condicional' : 
                   'Recebendo Lance'}
                </div>
