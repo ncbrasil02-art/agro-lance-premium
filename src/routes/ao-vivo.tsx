@@ -147,7 +147,7 @@ export const Route = createFileRoute("/ao-vivo")({
         if (liveEvent.active_lot_id) {
           const { data: bids, error: bidsError } = await supabase
             .from("bids")
-            .select("*")
+            .select("*, profile:profiles(id, full_name)")
             .eq("lot_id", liveEvent.active_lot_id)
             .order("created_at", { ascending: false })
             .limit(10);
