@@ -165,7 +165,14 @@ import { Countdown } from "./countdown";
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-3">
           <div>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lance atual</div>
-            <div className="text-xl font-bold text-gradient-gold">{formatBRL(lot?.currentBid || 0)}</div>
+          <div className="text-xl font-bold text-gradient-gold">
+            {formatBRL(lot?.currentBid || 0)}
+          </div>
+          {lot.minIncrement > 0 && (
+            <div className="text-[9px] text-muted-foreground italic -mt-1">
+              Incremento: {formatBRL(lot.minIncrement)}
+            </div>
+          )}
           </div>
           <div className="text-right">
              {dynamicStatus === 'loteamento' ? (
