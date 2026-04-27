@@ -162,7 +162,7 @@ function Home() {
             start_date: e.date, 
             end_date: e.end_date 
           });
-          return status === 'scheduled' && e.show_countdown;
+          return (status === 'scheduled' || status === 'live') && e.show_countdown;
         })
         .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
