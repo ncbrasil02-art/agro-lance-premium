@@ -395,6 +395,22 @@ export const Route = createFileRoute("/ao-vivo")({
             },
             (payload) => {
               console.log("Lote atualizado em tempo real:", payload.new);
+              
+              // Notify if status changed
+              if (payload.new.status !== payload.old?.status) {
+                if (payload.new.status === 'sold') {
+                  toast.success("LOTE ARREMATADO!", {
+                    description: `O lote #${payload.new.lot_number} foi vendido com sucesso.`,
+                    duration: 5000
+                  });
+                } else if (payload.new.status === 'passed') {
+                  toast.info("LOTE FINALIZADO", {
+                    description: `O lote #${payload.new.lot_number} foi finalizado sem venda.`,
+                    duration: 5000
+                  });
+                }
+              }
+
               setLiveEvent((prev: any) => {
                 if (!prev || !prev.active_lot) return prev;
                 return {
