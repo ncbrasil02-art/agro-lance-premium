@@ -404,19 +404,23 @@
     };
 
     const handleAfterLotFinalized = async (lotId: string, successMessage: string) => {
-      // Check if there are more lots to be auctioned
-      const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'sold' && l.status !== 'passed' && l.status !== 'finished');
+      toast.success(successMessage);
       
-      if (remainingLots.length === 0) {
-        await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
-        toast.success(successMessage + " Evento encerrado!");
-      } else {
-        await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
-        toast.success(successMessage);
-      }
-      
-      fetchEventDetails(selectedEventId);
-      setActiveLot(null);
+      // Give some time (4 seconds) for users to see the "Sold/Passed" status on screen 
+      // before we clear or change the active lot
+      setTimeout(async () => {
+        // Check if there are more lots to be auctioned
+        const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'sold' && l.status !== 'passed' && l.status !== 'finished');
+        
+        if (remainingLots.length === 0) {
+          await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
+        } else {
+          await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
+        }
+        
+        fetchEventDetails(selectedEventId);
+        setActiveLot(null);
+      }, 4000);
     };
 
     const finalizeLot = async (lotId: string) => {
