@@ -335,10 +335,15 @@ export const Route = createFileRoute("/ao-vivo")({
               if (data) {
                 setLiveEvent(data as any);
                 
-                // Handle status messages
-                if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
-                  setStatusMessage(payload.new.live_status_message);
-                  setTimeout(() => setStatusMessage(null), 8000);
+                // Handle status messages - trigger even if message is the same to allow repeating "Dou-lhe uma!"
+                if (payload.new.live_status_message) {
+                  // Small trick: if it's the same message, clear it first to re-trigger the animation
+                  setStatusMessage(null);
+                  setTimeout(() => {
+                    setStatusMessage(payload.new.live_status_message);
+                    // Auto-clear after 8 seconds
+                    setTimeout(() => setStatusMessage(null), 8000);
+                  }, 50);
                 }
                 
                 // If active lot changed, fetch bids for the new lot and reset state
