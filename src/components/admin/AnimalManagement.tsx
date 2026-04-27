@@ -75,8 +75,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
            genealogy_great_grandmother_mm: "",
            description: "",
           is_direct_sale: false,
-          sale_price: "",
-          sale_status: "available"
+           sale_price: "",
+           sale_status: "available",
+           accepts_offers: false
     });
 
      const resetForm = () => {
@@ -122,8 +123,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
            genealogy_great_grandmother_mm: "",
            description: "",
           is_direct_sale: false,
-          sale_price: "",
-          sale_status: "available"
+           sale_price: "",
+           sale_status: "available",
+           accepts_offers: false
       });
     };
 
@@ -170,8 +172,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
           genealogy_great_grandmother_mm: animal.genealogy?.great_grandmother_mm || "",
          description: animal.description || "",
          is_direct_sale: animal.is_direct_sale || false,
-         sale_price: animal.sale_price || "",
-         sale_status: animal.sale_status || "available"
+          sale_price: animal.sale_price || "",
+          sale_status: animal.sale_status || "available",
+          accepts_offers: animal.accepts_offers || false
       });
       setIsDialogOpen(true);
     };
@@ -228,7 +231,8 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                },
                photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
                description: formData.description,
-               is_direct_sale: formData.is_direct_sale,
+                is_direct_sale: formData.is_direct_sale,
+                accepts_offers: formData.accepts_offers,
                sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
                sale_status: formData.sale_status
             })
@@ -279,7 +283,8 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
              internal_code: `AN-${Math.floor(Math.random() * 10000)}`,
              photos: formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
              description: formData.description,
-             is_direct_sale: formData.is_direct_sale,
+              is_direct_sale: formData.is_direct_sale,
+              accepts_offers: formData.accepts_offers,
              sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
              sale_status: formData.sale_status
           });
@@ -444,7 +449,23 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                      </div>
                    </div>
 
-                   {formData.is_direct_sale && (
+                    <div className="flex items-center space-x-2 border p-4 rounded-md bg-muted/20">
+                      <Checkbox 
+                        id="accepts_offers" 
+                        checked={formData.accepts_offers}
+                        onCheckedChange={(checked) => setFormData({ ...formData, accepts_offers: !!checked })}
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="accepts_offers" className="text-sm font-medium leading-none cursor-pointer">
+                          Habilitar Ofertas Informais
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Permite que usuários enviem propostas de compra para este animal.
+                        </p>
+                      </div>
+                    </div>
+
+                    {formData.is_direct_sale && (
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                        <div className="grid gap-2">
                          <Label htmlFor="sale_price">Preço de Venda (R$)</Label>

@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       animals: {
         Row: {
+          accepts_offers: boolean | null
           birth_date: string | null
           blood_percentage: string | null
           blood_typing: string | null
@@ -53,6 +54,7 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          accepts_offers?: boolean | null
           birth_date?: string | null
           blood_percentage?: string | null
           blood_typing?: string | null
@@ -90,6 +92,7 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          accepts_offers?: boolean | null
           birth_date?: string | null
           blood_percentage?: string | null
           blood_typing?: string | null
@@ -791,6 +794,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offers: {
+        Row: {
+          amount: number | null
+          created_at: string
+          description: string | null
+          id: string
+          lot_id: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lot_id?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lot_id?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
             referencedColumns: ["id"]
           },
         ]

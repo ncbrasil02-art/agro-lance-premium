@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History, ChevronDown, ChevronRight, Printer, MessageSquare, Play, PauseCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -39,7 +39,9 @@ import {
        const [statusFilter, setStatusFilter] = useState<string>("all");
       const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
+      const [expandedLotId, setExpandedLotId] = useState<string | null>(null);
       const [selectedLotBids, setSelectedLotBids] = useState<any[]>([]);
+      const [selectedLotOffers, setSelectedLotOffers] = useState<any[]>([]);
       const [isBidsDialogOpen, setIsBidsDialogOpen] = useState(false);
       const [isBidsLoading, setIsBidsLoading] = useState(false);
       
@@ -114,9 +116,13 @@ import {
          fetchData();
        }, [initialEventId]);
  
-       useRealtimeLots(() => {
-         fetchData();
-       });
+        useRealtimeLots(() => {
+          fetchData();
+          if (expandedLotId) {
+            fetchLotBids(expandedLotId, true);
+            fetchLotOffers(expandedLotId);
+          }
+        });
 
       const resetForm = () => {
         setEditingLot(null);
@@ -149,9 +155,11 @@ import {
         setIsDialogOpen(true);
       };
    
-       const fetchLotBids = async (lotId: string) => {
-         setIsBidsLoading(true);
-         setIsBidsDialogOpen(true);
+      const fetchLotBids = async (lotId: string, silent = false) => {
+          if (!silent) {
+            setIsBidsLoading(true);
+            setIsBidsDialogOpen(true);
+          }
          try {
            const { data, error } = await supabase
              .from("bids")
@@ -162,13 +170,92 @@ import {
              .eq("lot_id", lotId)
              .order("created_at", { ascending: false });
 
-           if (error) throw error;
-           setSelectedLotBids(data || []);
+            if (error) throw error;
+            setSelectedLotBids(data || []);
+            return data || [];
          } catch (error: any) {
            toast.error("Erro ao carregar lances: " + error.message);
-         } finally {
-           setIsBidsLoading(false);
-         }
+          } finally {
+            if (!silent) setIsBidsLoading(false);
+          }
+        };
+
+        const fetchLotOffers = async (lotId: string) => {
+          try {
+            const { data, error } = await supabase
+              .from("offers")
+              .select(`
+                *,
+                profile:profiles(full_name)
+              `)
+              .eq("lot_id", lotId)
+              .order("created_at", { ascending: false });
+
+            if (error) throw error;
+            setSelectedLotOffers(data || []);
+          } catch (error: any) {
+            console.error("Error fetching offers:", error);
+          }
+        };
+
+        const toggleExpand = (lotId: string) => {
+          if (expandedLotId === lotId) {
+            setExpandedLotId(null);
+            setSelectedLotBids([]);
+            setSelectedLotOffers([]);
+          } else {
+            setExpandedLotId(lotId);
+            fetchLotBids(lotId, true);
+            fetchLotOffers(lotId);
+          }
+        };
+
+        const handlePrintPlaqueta = (lot: any) => {
+          const printWindow = window.open('', '_blank');
+          if (!printWindow) return;
+
+          const html = `
+            <html>
+              <head>
+                <title>Plaqueta do Lote ${lot.lot_number}</title>
+                <style>
+                  body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+                  .plaque { border: 10px solid #c5a059; padding: 40px; border-radius: 20px; }
+                  .lot-number { font-size: 120px; font-weight: bold; margin: 0; color: #064e3b; }
+                  .animal-name { font-size: 48px; margin: 20px 0; text-transform: uppercase; }
+                  .event-name { font-size: 24px; color: #666; }
+                  .footer { margin-top: 50px; border-top: 2px solid #eee; padding-top: 20px; }
+                </style>
+              </head>
+              <body>
+                <div class="plaque">
+                  <div class="event-name">${lot.event?.name}</div>
+                  <div class="lot-number">LOTE ${String(lot.lot_number).padStart(2, '0')}</div>
+                  <div class="animal-name">${lot.animal?.name}</div>
+                  <div class="footer">AGRO NC BRASIL</div>
+                </div>
+                <script>window.print(); window.close();</script>
+              </body>
+            </html>
+          `;
+          printWindow.document.write(html);
+          printWindow.document.close();
+        };
+
+        const handleTogglePause = async (lot: any) => {
+          const newStatus = lot.status === 'paused' ? 'active' : 'paused';
+          try {
+            const { error } = await supabase
+              .from("lots")
+              .update({ status: newStatus })
+              .eq("id", lot.id);
+            
+            if (error) throw error;
+            toast.success(newStatus === 'paused' ? "Lote pausado com sucesso" : "Lote reativado com sucesso");
+            fetchData();
+          } catch (error: any) {
+            toast.error("Erro ao alterar status: " + error.message);
+          }
        };
 
         const handleDeleteBid = async (bid: any) => {
@@ -533,6 +620,7 @@ import {
              <Table>
                <TableHeader>
                   <TableRow className="bg-muted/50">
+                    <TableHead className="w-[40px]"></TableHead>
                     <TableHead className="w-[70px] font-bold">Nº</TableHead>
                     <TableHead className="font-bold">Animal</TableHead>
                     <TableHead className="font-bold">Evento</TableHead>
@@ -559,12 +647,18 @@ import {
                        const currentPrice = lot.current_price || lot.starting_price || 0;
                        const isPriceLow = currentPrice <= lot.starting_price;
 
-                       return (
-                         <TableRow 
-                           key={lot.id} 
-                           className={`${lot.status === 'active' ? 'bg-emerald-50/30' : ''} ${isUrgent ? 'animate-neon border-live/30' : ''}`}
-                         >
-                           <TableCell className="font-bold">
+                        return (
+                          <>
+                          <TableRow 
+                            className={`${lot.status === 'active' ? 'bg-emerald-50/30' : lot.status === 'paused' ? 'bg-amber-50/30' : ''} ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50`}
+                            onClick={() => toggleExpand(lot.id)}
+                          >
+                            <TableCell onClick={(e) => e.stopPropagation()}>
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand(lot.id)}>
+                                {expandedLotId === lot.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                              </Button>
+                            </TableCell>
+                            <TableCell className="font-bold">
                              <div className="flex flex-col">
                                <span>{String(lot.lot_number).padStart(2, '0')}</span>
                                {lot.is_featured && <Zap className="h-3 w-3 text-gold fill-gold" />}
@@ -606,12 +700,14 @@ import {
                            <TableCell>
                              <div className="flex flex-col gap-1">
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-center ${
-                                  lot.status === 'active' ? 'text-emerald-bright bg-emerald-bright/10 border border-emerald-bright/20' : 
+                                   lot.status === 'active' ? 'text-emerald-bright bg-emerald-bright/10 border border-emerald-bright/20' : 
+                                   lot.status === 'paused' ? 'text-amber-600 bg-amber-50 border border-amber-200' :
                                   lot.status === 'sold' ? 'text-gold bg-gold/10 border border-gold/20' :
                                   lot.status === 'passed' ? 'text-destructive bg-destructive/10 border border-destructive/20' :
                                   'text-muted-foreground bg-muted border border-border'
                                 }`}>
-                                  {lot.status === 'active' ? 'No Ar' : 
+                                   {lot.status === 'active' ? 'No Ar' : 
+                                    lot.status === 'paused' ? 'Pausado' :
                                    lot.status === 'sold' ? 'Arrematado' :
                                    lot.status === 'passed' ? 'Passou' : 
                                    lot.status === 'upcoming' ? 'Agendado' : 'Finalizado'}
@@ -653,8 +749,19 @@ import {
                              </div>
                            </TableCell>
                            <TableCell className="text-right">
-                             <div className="flex justify-end gap-2">
-                               {lot.status === 'active' && (
+                               <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                                {(lot.status === 'active' || lot.status === 'paused') && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className={`h-8 gap-1 ${lot.status === 'active' ? 'border-amber-500/50 text-amber-600' : 'border-emerald-500/50 text-emerald-600'} text-[10px] font-bold`}
+                                    onClick={() => handleTogglePause(lot)}
+                                  >
+                                    {lot.status === 'active' ? <PauseCircle className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                                    {lot.status === 'active' ? 'Pausar' : 'Ativar'}
+                                  </Button>
+                                )}
+                                {lot.status === 'active' && (
                                  <AlertDialog>
                                    <AlertDialogTrigger asChild>
                                      <Button 
@@ -767,7 +874,120 @@ import {
                                </TooltipProvider>
                              </div>
                            </TableCell>
-                         </TableRow>
+                          </TableRow>
+                          {expandedLotId === lot.id && (
+                            <TableRow className="bg-muted/30 border-t-0">
+                              <TableCell colSpan={9} className="p-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-bold flex items-center gap-2">
+                                        <History className="h-4 w-4 text-emerald-600" />
+                                        Lances em Tempo Real
+                                      </h4>
+                              <Button variant="outline" size="sm" className="h-6 text-[10px] px-2" onClick={() => fetchLotBids(lot.id)}>
+                                        Atualizar
+                                      </Button>
+                                    </div>
+                                    <div className="max-h-[200px] overflow-y-auto border rounded-md bg-white">
+                                      <Table>
+                                        <TableHeader className="bg-muted/50 sticky top-0">
+                                          <TableRow>
+                                            <TableHead className="h-8 text-[10px]">Licitante</TableHead>
+                                            <TableHead className="h-8 text-[10px]">Valor</TableHead>
+                                            <TableHead className="h-8 text-[10px]">Hora</TableHead>
+                                          </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                          {selectedLotBids.length === 0 ? (
+                                            <TableRow><TableCell colSpan={3} className="text-center text-[10px] py-4">Sem lances</TableCell></TableRow>
+                                          ) : (
+                                            selectedLotBids.map(bid => (
+                                              <TableRow key={bid.id}>
+                                                <TableCell className="py-1 text-[10px]">{bid.profile?.full_name || 'Auditório'}</TableCell>
+                                                <TableCell className="py-1 text-[10px] font-bold text-emerald-600">
+                                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
+                                                </TableCell>
+                                                <TableCell className="py-1 text-[10px] text-muted-foreground">
+                                                  {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
+                                                </TableCell>
+                                              </TableRow>
+                                            ))
+                                          )}
+                                        </TableBody>
+                                      </Table>
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-bold flex items-center gap-2">
+                                        <MessageSquare className="h-4 w-4 text-gold" />
+                                        Ofertas Informais
+                                      </h4>
+                                    </div>
+                                    <div className="max-h-[200px] overflow-y-auto border rounded-md bg-white">
+                                      <Table>
+                                        <TableHeader className="bg-muted/50 sticky top-0">
+                                          <TableRow>
+                                            <TableHead className="h-8 text-[10px]">Usuário</TableHead>
+                                            <TableHead className="h-8 text-[10px]">Oferta</TableHead>
+                                            <TableHead className="h-8 text-[10px]">Ações</TableHead>
+                                          </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                          {selectedLotOffers.length === 0 ? (
+                                            <TableRow><TableCell colSpan={3} className="text-center text-[10px] py-4">Sem ofertas</TableCell></TableRow>
+                                          ) : (
+                                            selectedLotOffers.map(offer => (
+                                              <TableRow key={offer.id}>
+                                                <TableCell className="py-1 text-[10px]">{offer.profile?.full_name}</TableCell>
+                                                <TableCell className="py-1 text-[10px]">
+                                                  <div className="font-bold text-emerald-600">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(offer.amount)}
+                                                  </div>
+                                                  <div className="text-[9px] text-muted-foreground line-clamp-1">{offer.description}</div>
+                                                </TableCell>
+                                                <TableCell className="py-1 text-[10px]">
+                                                  <Button variant="ghost" size="sm" className="h-6 w-6 text-emerald-600">
+                                                    <ShieldCheck className="h-3 w-3" />
+                                                  </Button>
+                                                </TableCell>
+                                              </TableRow>
+                                            ))
+                                          )}
+                                        </TableBody>
+                                      </Table>
+                                    </div>
+                                    
+                                    <div className="flex gap-2">
+                                      <Button 
+                                        variant="outline" 
+                                        className="flex-1 gap-2 border-emerald-600/50 text-emerald-700 hover:bg-emerald-50"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handlePrintPlaqueta(lot);
+                                        }}
+                                      >
+                                        <Printer className="h-4 w-4" /> Imprimir Plaqueta
+                                      </Button>
+                                      <Button 
+                                        variant="outline" 
+                                        className="flex-1 gap-2 border-destructive/50 text-destructive hover:bg-destructive/10"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDelete(lot.id);
+                                        }}
+                                      >
+                                        <Trash2 className="h-4 w-4" /> Retirar do Evento
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                          </>
                         );
                       })
                     )}
