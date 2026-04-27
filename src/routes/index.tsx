@@ -23,9 +23,9 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
         const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
           supabase.from("events")
             .select("*, lots!lots_event_id_fkey(id)")
-            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances")
+            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
             .order("start_date", { ascending: true })
-            .limit(6),
+            .limit(10),
           supabase.from("lots")
             .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
             .eq("is_featured", true)
@@ -153,35 +153,35 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
       location: (l as any).animal?.location,
     }));
  
-      const liveEvents = mappedEvents.filter((e: any) => {
-        const status = getEffectiveEventStatus({ 
-          status: e.status, 
-          start_date: e.date, 
-          end_date: e.end_date 
-        });
-        return status === "live" || e.status === "recebendo_lances";
+    const liveEvents = mappedEvents.filter((e: any) => {
+      const status = getEffectiveEventStatus({ 
+        status: e.status, 
+        start_date: e.date, 
+        end_date: e.end_date 
       });
+      return status === "live" || status === "recebendo_lances" || status === "incondicional" || status === "em_condicional";
+    });
 
-      const upcomingEvents = mappedEvents.filter((e: any) => {
+    const upcomingEvents = mappedEvents.filter((e: any) => {
+      const status = getEffectiveEventStatus({ 
+        status: e.status, 
+        start_date: e.date, 
+        end_date: e.end_date 
+      });
+      return status === "scheduled" || status === "em_loteamento";
+    });
+    
+    const nextEvent = mappedEvents
+      .filter((e: any) => {
         const status = getEffectiveEventStatus({ 
           status: e.status, 
           start_date: e.date, 
           end_date: e.end_date 
         });
-        return status === "scheduled" && e.status !== "recebendo_lances";
-      });
-     
-     // Find the closest upcoming event with countdown enabled
-      const nextEvent = mappedEvents
-        .filter((e: any) => {
-          const status = getEffectiveEventStatus({ 
-            status: e.status, 
-            start_date: e.date, 
-            end_date: e.end_date 
-          });
-          return (status === 'scheduled' || status === 'live') && e.show_countdown;
-        })
-        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+        // Consider upcoming events for the hero countdown
+        return (status === 'scheduled' || status === 'em_loteamento') && e.show_countdown;
+      })
+      .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
  
    const stats = {
@@ -226,18 +226,39 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
               A nova era dos leilões agropecuários
             </div>
             {nextEvent && (
-              <div className="mt-8 flex flex-col gap-2 rounded-2xl border border-gold/20 bg-gold/5 p-4 backdrop-blur-sm md:w-fit mb-8">
-                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-gold">
-                  <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
-                  Oportunidade Imperdível: <span className="text-white px-2 py-0.5 rounded bg-gold/20 border border-gold/30 shadow-[0_0_10px_rgba(212,175,55,0.2)]">{nextEvent.name}</span>
+              <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-gold/30 bg-black/40 p-6 backdrop-blur-xl md:w-fit mb-12 shadow-[0_0_40px_rgba(212,175,55,0.1)] border-l-4 border-l-gold">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/20 text-gold">
+                    <Calendar className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/80">Próximo Evento de Elite</div>
+                    <div className="text-xl font-black text-white uppercase italic tracking-tighter">{nextEvent.name}</div>
+                  </div>
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-6">
-                  <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
-                  <div className="h-10 w-px bg-white/10" />
-                  <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }} className="group/btn flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                    Garantir Vaga
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                  </Link>
+                
+                <div className="flex flex-wrap items-center gap-8">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/40">Inicia em</span>
+                    <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <Link 
+                      to="/eventos/$eventSlug" 
+                      params={{ eventSlug: nextEvent.slug }} 
+                      className="group/btn flex items-center gap-2 rounded-xl bg-gold px-6 py-3 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                    >
+                      Ver Catálogo
+                      <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
+                    </Link>
+                    <Link 
+                      to="/cadastro" 
+                      className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-xs font-black uppercase text-white transition-all hover:bg-white/10 active:scale-95"
+                    >
+                      Garantir Vaga
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
