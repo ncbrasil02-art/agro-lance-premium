@@ -124,76 +124,91 @@ function GenealogyTree({ genealogy }: { genealogy: any }) {
   );
 
   return (
-    <div className="relative overflow-hidden py-6 md:py-10 bg-black/40 rounded-[2rem] border border-white/5 shadow-inner">
-      <div className="hidden md:flex justify-center items-stretch gap-8 px-12 overflow-x-auto scrollbar-hide min-w-[900px]">
-        <div className="flex flex-col justify-center">
-          <div className="w-44">
+    <div className="relative overflow-hidden py-6 lg:py-10 bg-black/40 rounded-[2rem] border border-white/5 shadow-inner">
+      {/* Desktop/Wide Version - Horizontal Tree */}
+      <div className="hidden lg:block">
+        <div className="flex justify-center items-stretch gap-4 xl:gap-8 px-4 xl:px-12 w-full max-w-full overflow-hidden">
+          <div className="flex flex-col justify-center flex-1 min-w-0 max-w-[180px]">
             <Node title="Animal" name="Principal" variant="primary" />
           </div>
-        </div>
 
-        <div className="flex flex-col justify-around gap-12 relative w-56">
-          <div className="absolute -left-4 top-[25%] bottom-[25%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-           <Node title="Pai" name={pai} />
-           <Node title="Mãe" name={mae} />
-        </div>
+          <div className="flex flex-col justify-around gap-8 relative flex-1 min-w-0 max-w-[220px]">
+            <div className="absolute -left-2 xl:-left-4 top-[25%] bottom-[25%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+             <Node title="Pai" name={pai} />
+             <Node title="Mãe" name={mae} />
+          </div>
 
-        <div className="flex flex-col justify-around gap-6 relative w-44">
-          <div className="absolute -left-4 top-[12%] bottom-[62%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          <div className="absolute -left-4 top-[62%] bottom-[12%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-           {avos.map((name, i) => (
-             <Node key={i} title={i === 0 ? "Avô Paterno" : i === 1 ? "Avó Paterna" : i === 2 ? "Avô Materno" : "Avó Materna"} name={name} variant="tertiary" />
-           ))}
-        </div>
+          <div className="flex flex-col justify-around gap-4 relative flex-1 min-w-0 max-w-[180px]">
+            <div className="absolute -left-2 xl:-left-4 top-[12%] bottom-[62%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+            <div className="absolute -left-2 xl:-left-4 top-[62%] bottom-[12%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+             {avos.map((name, i) => (
+               <Node key={i} title={i === 0 ? "Avô Paterno" : i === 1 ? "Avó Paterna" : i === 2 ? "Avô Materno" : "Avó Materna"} name={name} variant="tertiary" />
+             ))}
+          </div>
 
-        <div className="flex flex-col justify-around gap-2 relative w-40">
-          <div className="absolute -left-4 top-[6%] bottom-[81%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          <div className="absolute -left-4 top-[31%] bottom-[56%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          <div className="absolute -left-4 top-[56%] bottom-[31%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          <div className="absolute -left-4 top-[81%] bottom-[6%] w-4 border-y border-r border-white/20 rounded-r-2xl" />
-          {bisavos.map((name, i) => (
-            <Node key={i} title={i % 2 === 0 ? "Bisavô" : "Bisavó"} name={name} variant="tertiary" />
-          ))}
+          <div className="flex flex-col justify-around gap-1 relative flex-1 min-w-0 max-w-[160px]">
+            <div className="absolute -left-2 xl:-left-4 top-[6%] bottom-[81%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+            <div className="absolute -left-2 xl:-left-4 top-[31%] bottom-[56%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+            <div className="absolute -left-2 xl:-left-4 top-[56%] bottom-[31%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+            <div className="absolute -left-2 xl:-left-4 top-[81%] bottom-[6%] w-2 xl:w-4 border-y border-r border-white/20 rounded-r-2xl" />
+            {bisavos.map((name, i) => (
+              <Node key={i} title={i % 2 === 0 ? "Bisavô" : "Bisavó"} name={name} variant="tertiary" />
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="flex md:hidden flex-col gap-6 px-4">
+      {/* Tablet/Mobile Version - Vertical Tree */}
+      <div className="flex lg:hidden flex-col gap-6 px-4">
         <div className="space-y-4">
           <Node title="Animal" name="Principal" variant="primary" />
           
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Paternal Side */}
+            <div className="space-y-4">
+              <div className="text-[10px] font-black text-blue-400/60 uppercase tracking-widest pl-2 border-l-2 border-blue-400/20">Linhagem Paterna</div>
               <Node title="Pai" name={pai} />
-              <div className="grid gap-2 pl-2 border-l border-gold/20">
-                 <Node title="Avô Paterno" name={avos[0]} variant="tertiary" />
-                 <Node title="Avó Paterna" name={avos[1]} variant="tertiary" />
+              <div className="grid grid-cols-2 gap-2 pl-4 border-l border-white/10">
+                 <div className="space-y-2">
+                   <Node title="Avô Paterno" name={avos[0]} variant="tertiary" />
+                   <div className="space-y-1 pl-2 border-l border-white/5">
+                      <div className="text-[7px] text-white/30 uppercase">Bisavós</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[0]}</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[1]}</div>
+                   </div>
+                 </div>
+                 <div className="space-y-2">
+                   <Node title="Avó Paterna" name={avos[1]} variant="tertiary" />
+                   <div className="space-y-1 pl-2 border-l border-white/5">
+                      <div className="text-[7px] text-white/30 uppercase">Bisavós</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[2]}</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[3]}</div>
+                   </div>
+                 </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <Node title="Mãe" name={mae} />
-              <div className="grid gap-2 pl-2 border-l border-gold/20">
-                 <Node title="Avô Materno" name={avos[2]} variant="tertiary" />
-                 <Node title="Avó Materna" name={avos[3]} variant="tertiary" />
-              </div>
-            </div>
-          </div>
 
-          <div className="pt-4 space-y-2">
-            <div className="text-[8px] font-black text-gold/40 uppercase tracking-widest text-center">Bisavós</div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                {bisavos.slice(0, 4).map((name, i) => (
-                  <div key={i} className="bg-white/5 p-2 rounded-lg border border-white/5 text-[9px] text-white/70 italic truncate">
-                    {name}
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-1">
-                {bisavos.slice(4, 8).map((name, i) => (
-                  <div key={i} className="bg-white/5 p-2 rounded-lg border border-white/5 text-[9px] text-white/70 italic truncate">
-                    {name}
-                  </div>
-                ))}
+            {/* Maternal Side */}
+            <div className="space-y-4">
+              <div className="text-[10px] font-black text-pink-400/60 uppercase tracking-widest pl-2 border-l-2 border-pink-400/20">Linhagem Materna</div>
+              <Node title="Mãe" name={mae} />
+              <div className="grid grid-cols-2 gap-2 pl-4 border-l border-white/10">
+                 <div className="space-y-2">
+                   <Node title="Avô Materno" name={avos[2]} variant="tertiary" />
+                   <div className="space-y-1 pl-2 border-l border-white/5">
+                      <div className="text-[7px] text-white/30 uppercase">Bisavós</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[4]}</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[5]}</div>
+                   </div>
+                 </div>
+                 <div className="space-y-2">
+                   <Node title="Avó Materna" name={avos[3]} variant="tertiary" />
+                   <div className="space-y-1 pl-2 border-l border-white/5">
+                      <div className="text-[7px] text-white/30 uppercase">Bisavós</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[6]}</div>
+                      <div className="text-[9px] text-white/70 italic bg-white/5 p-1 rounded">{bisavos[7]}</div>
+                   </div>
+                 </div>
               </div>
             </div>
           </div>
