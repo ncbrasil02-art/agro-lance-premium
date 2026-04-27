@@ -484,27 +484,29 @@ function LotDetail() {
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
                      </Button>
-                     <Button 
-                       variant="outline" 
-                       className="h-14 rounded-2xl text-white" 
-                       onClick={() => { 
-                         if (navigator.share) {
-                           navigator.share({
-                             title: lot.animal?.name,
-                             text: `Confira este animal de elite: ${lot.animal?.name}`,
-                             url: window.location.href
-                           }).catch(() => {
-                             navigator.clipboard.writeText(window.location.href);
-                             toast.success("Link copiado!");
-                           });
-                         } else {
-                           navigator.clipboard.writeText(window.location.href);
-                           toast.success("Link copiado para a área de transferência!");
-                         }
-                       }}
-                     >
-                       <Share2 className="mr-2 h-4 w-4" /> COMPARTILHAR
-                     </Button>
+                      <Button
+                        variant="outline"
+                        className="h-14 rounded-2xl text-white"
+                        onClick={() => {
+                          const url = window.location.href;
+                          const text = `Confira o lote #${lot.lot_number} - ${lot.animal?.name} na Premium Agro!`;
+                          const shareData = { title: lot.animal?.name, text, url };
+
+                          if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                            navigator.share(shareData).catch(() => {
+                              navigator.clipboard.writeText(url);
+                              window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+                              toast.success("Link copiado e WhatsApp aberto!");
+                            });
+                          } else {
+                            navigator.clipboard.writeText(url);
+                            window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+                            toast.success("Link copiado e WhatsApp aberto!");
+                          }
+                        }}
+                      >
+                        <Share2 className="mr-2 h-4 w-4 text-emerald-400" /> COMPARTILHAR
+                      </Button>
                    </div>
                    <Button 
                      variant="ghost" 
