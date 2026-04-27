@@ -492,8 +492,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       <Select onValueChange={(v) => setFormData({ ...formData, event_type: v })} value={formData.event_type}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="online">Online</SelectItem>
-                          <SelectItem value="ao_vivo">Ao Vivo</SelectItem>
+                           <SelectItem value="online">Online</SelectItem>
+                           <SelectItem value="ao_vivo">Ao Vivo</SelectItem>
+                           <SelectItem value="presencial">Presencial</SelectItem>
+                           <SelectItem value="hibrido">Híbrido</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
