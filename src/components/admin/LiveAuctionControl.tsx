@@ -286,16 +286,21 @@
      }
    };
  
-   const setLiveStatusMessage = async (msg: string) => {
-     if (!selectedEventId) return;
-     const { error } = await supabase
-       .from("events")
-       .update({ live_status_message: msg })
-       .eq("id", selectedEventId);
-     
-     if (error) toast.error("Erro ao enviar mensagem");
-     else toast.success("Mensagem enviada!");
-   };
+    const setLiveStatusMessage = async (msg: string) => {
+      if (!selectedEventId) return;
+      
+      // Update with the message and a fresh updated_at to ensure Realtime triggers
+      const { error } = await supabase
+        .from("events")
+        .update({ 
+          live_status_message: msg,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", selectedEventId);
+      
+      if (error) toast.error("Erro ao enviar mensagem");
+      else toast.success(`Mensagem "${msg}" enviada!`);
+    };
  
     const updateTransmissionLink = async () => {
       if (!selectedEventId) return;
@@ -404,19 +409,23 @@
     };
 
     const handleAfterLotFinalized = async (lotId: string, successMessage: string) => {
-      // Check if there are more lots to be auctioned
-      const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'sold' && l.status !== 'passed' && l.status !== 'finished');
+      toast.success(successMessage);
       
-      if (remainingLots.length === 0) {
-        await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
-        toast.success(successMessage + " Evento encerrado!");
-      } else {
-        await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
-        toast.success(successMessage);
-      }
-      
-      fetchEventDetails(selectedEventId);
-      setActiveLot(null);
+      // Give some time (4 seconds) for users to see the "Sold/Passed" status on screen 
+      // before we clear or change the active lot
+      setTimeout(async () => {
+        // Check if there are more lots to be auctioned
+        const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'sold' && l.status !== 'passed' && l.status !== 'finished');
+        
+        if (remainingLots.length === 0) {
+          await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
+        } else {
+          await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
+        }
+        
+        fetchEventDetails(selectedEventId);
+        setActiveLot(null);
+      }, 4000);
     };
 
     const finalizeLot = async (lotId: string) => {

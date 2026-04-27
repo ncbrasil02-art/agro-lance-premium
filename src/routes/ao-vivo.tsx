@@ -1,4 +1,4 @@
-import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -335,10 +335,15 @@ export const Route = createFileRoute("/ao-vivo")({
               if (data) {
                 setLiveEvent(data as any);
                 
-                // Handle status messages
-                if (payload.new.live_status_message && payload.new.live_status_message !== payload.old?.live_status_message) {
-                  setStatusMessage(payload.new.live_status_message);
-                  setTimeout(() => setStatusMessage(null), 8000);
+                // Handle status messages - trigger even if message is the same to allow repeating "Dou-lhe uma!"
+                if (payload.new.live_status_message) {
+                  // Small trick: if it's the same message, clear it first to re-trigger the animation
+                  setStatusMessage(null);
+                  setTimeout(() => {
+                    setStatusMessage(payload.new.live_status_message);
+                    // Auto-clear after 8 seconds
+                    setTimeout(() => setStatusMessage(null), 8000);
+                  }, 50);
                 }
                 
                 // If active lot changed, fetch bids for the new lot and reset state
@@ -834,18 +839,38 @@ export const Route = createFileRoute("/ao-vivo")({
                </div>
              )}
              
-            {statusMessage && (
-              <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-                <div className="bg-gold/95 backdrop-blur-md px-10 py-8 rounded-3xl shadow-[0_0_100px_rgba(212,175,55,0.6)] border-4 border-emerald-deep/20 animate-in zoom-in duration-300">
-                  <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="h-20 w-20 rounded-full bg-emerald-deep flex items-center justify-center shadow-inner">
-                      <Gavel className="h-10 w-10 text-gold animate-bounce" />
+            {(statusMessage || liveLot.status === 'sold' || liveLot.status === 'passed') && (
+              <div className="absolute inset-0 flex items-center justify-center z-[100] pointer-events-none p-4">
+                <div className={`
+                  ${liveLot.status === 'sold' ? 'bg-emerald-600/95 shadow-[0_0_100px_rgba(5,150,105,0.6)]' : 
+                    liveLot.status === 'passed' ? 'bg-destructive/95 shadow-[0_0_100px_rgba(239,68,68,0.6)]' : 
+                    'bg-gold/95 shadow-[0_0_100px_rgba(212,175,55,0.6)]'} 
+                  backdrop-blur-md px-12 py-10 rounded-[40px] border-4 border-white/20 animate-in zoom-in duration-300 w-full max-w-lg
+                `}>
+                  <div className="flex flex-col items-center gap-6 text-center">
+                    <div className="h-24 w-24 rounded-full bg-white/20 flex items-center justify-center shadow-xl backdrop-blur-sm border border-white/30">
+                      {liveLot.status === 'sold' ? (
+                        <BadgeCheck className="h-14 w-14 text-white animate-pulse" />
+                      ) : liveLot.status === 'passed' ? (
+                        <Ban className="h-14 w-14 text-white" />
+                      ) : (
+                        <Gavel className="h-14 w-14 text-emerald-deep animate-bounce" />
+                      )}
                     </div>
                     <div>
-                      <p className="text-emerald-deep font-black text-4xl uppercase tracking-tighter drop-shadow-sm">{statusMessage}</p>
-                      <div className="mt-2 h-1.5 w-full bg-emerald-deep/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-deep animate-progress-shrink" />
-                      </div>
+                      <p className="text-white font-black text-5xl md:text-6xl uppercase tracking-tighter drop-shadow-lg">
+                        {liveLot.status === 'sold' ? 'ARREMATADO!' : 
+                         liveLot.status === 'passed' ? 'NÃO VENDIDO' : 
+                         statusMessage}
+                      </p>
+                      {liveLot.status === 'sold' && (
+                        <p className="text-white/90 font-bold text-xl mt-2 uppercase tracking-tight">Vendido por {formatBRL(currentPrice)}</p>
+                      )}
+                      {!(liveLot.status === 'sold' || liveLot.status === 'passed') && (
+                        <div className="mt-4 h-2 w-full bg-emerald-deep/20 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-deep animate-progress-shrink" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -949,12 +974,12 @@ export const Route = createFileRoute("/ao-vivo")({
                     
                     <div className="mt-4 grid grid-cols-3 gap-2">
                       {[1, 5, 10].map((mult) => (
-                        <Button 
-                          key={mult} 
-                          variant="outline" 
+                        <Button
+                          key={mult}
+                          variant="outline"
                           size="sm"
                           className="border-gold/30 hover:bg-gold/10 h-8 text-[11px] font-bold"
-                          disabled={isBidding}
+                          disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
                           onClick={() => placeBid(currentPrice + (liveLot.bid_increment * mult))}
                         >
                           +{formatBRL(liveLot.bid_increment * mult)}
@@ -964,13 +989,21 @@ export const Route = createFileRoute("/ao-vivo")({
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] gap-2">
-                    <Button 
-                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider" 
-                      disabled={isBidding}
+                    <Button
+                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
+                      disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
                       onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
                     >
-                      {isBidding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Gavel className="mr-2 h-4 w-4" />}
-                      DAR LANCE ({formatBRL(currentPrice + liveLot.bid_increment)})
+                      {isBidding ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
+                        <Ban className="mr-2 h-4 w-4" />
+                      ) : (
+                        <Gavel className="mr-2 h-4 w-4" />
+                      )}
+                      {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
+                       liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
+                       `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
                     </Button>
 
                     <Dialog>
