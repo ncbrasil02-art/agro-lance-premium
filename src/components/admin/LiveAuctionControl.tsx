@@ -47,6 +47,22 @@
       fetchEvents();
       fetchProfiles();
       supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null));
+
+      // Real-time profiles subscription to keep the dropdown and data fresh
+      const profilesChannel = supabase
+        .channel("admin-profiles-sync")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "profiles" },
+          () => {
+            fetchProfiles(); // Simpler to re-fetch for the dropdown to maintain order
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(profilesChannel);
+      };
     }, []);
  
    useEffect(() => {

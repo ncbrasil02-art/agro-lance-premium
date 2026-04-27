@@ -475,10 +475,27 @@ export const Route = createFileRoute("/ao-vivo")({
           });
       }
 
+      // Real-time profiles subscription to update names in the history
+      const profilesChannel = supabase
+        .channel("live-profiles-sync")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "profiles" },
+          (payload) => {
+            const updatedProfile = payload.new;
+            setBidderProfiles(prev => {
+              if (!prev[updatedProfile.id]) return prev;
+              return { ...prev, [updatedProfile.id]: updatedProfile };
+            });
+          }
+        )
+        .subscribe();
+
       return () => {
         supabase.removeChannel(globalChannel);
         if (lotChannel) supabase.removeChannel(lotChannel);
         if (bidsChannel) supabase.removeChannel(bidsChannel);
+        supabase.removeChannel(profilesChannel);
       };
     }, [liveEvent?.id, liveEvent?.active_lot_id]);
 

@@ -72,6 +72,19 @@ export function BidSecurityAudit() {
           setBids(prev => prev.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b));
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles" },
+        (payload) => {
+          // Update the profile info in existing bids
+          setBids(prev => prev.map(bid => {
+            if (bid.user_id === payload.new.id) {
+              return { ...bid, profile: { ...bid.profile, ...payload.new } };
+            }
+            return bid;
+          }));
+        }
+      )
       .subscribe();
 
     return () => {
