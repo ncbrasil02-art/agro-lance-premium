@@ -326,27 +326,21 @@ export const Route = createFileRoute("/ao-vivo")({
                   } else {
                     const { data: newBids } = await supabase
                       .from("bids")
-                      .select("*")
+                      .select("*, profile:profiles(id, full_name)")
                       .eq("lot_id", payload.new.active_lot_id)
                       .order("created_at", { ascending: false })
                       .limit(10);
                     
                     if (newBids) {
                       setBids(newBids);
-                      // Fetch profiles for these new bids
-                      const userIds = [...new Set(newBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
-                      const missingUserIds = userIds.filter(id => !bidderProfiles[id]);
-                      
-                      if (missingUserIds.length > 0) {
-                        const { data: profiles } = await supabase
-                          .from("profiles")
-                          .select("id, full_name")
-                          .in("id", missingUserIds);
-                        if (profiles) {
-                          const map = profiles.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
-                          setBidderProfiles(prev => ({ ...prev, ...map }));
+                      // Extract profiles from bids and update cache
+                      const newProfiles: Record<string, any> = {};
+                      newBids.forEach((bid: any) => {
+                        if (bid.profile) {
+                          newProfiles[bid.profile.id] = bid.profile;
                         }
-                      }
+                      });
+                      setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
                     }
                   }
                   
