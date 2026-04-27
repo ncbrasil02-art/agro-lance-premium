@@ -147,7 +147,7 @@ export const Route = createFileRoute("/ao-vivo")({
         if (liveEvent.active_lot_id) {
           const { data: bids, error: bidsError } = await supabase
             .from("bids")
-            .select("*")
+            .select("*, profile:profiles(id, full_name)")
             .eq("lot_id", liveEvent.active_lot_id)
             .order("created_at", { ascending: false })
             .limit(10);
@@ -196,22 +196,16 @@ export const Route = createFileRoute("/ao-vivo")({
       }
     }, [liveEvent?.id]);
 
-    // Fetch profiles for initial bids
+    // Pre-populate profile cache from initial bids to avoid extra queries
     useEffect(() => {
-      if (initialBids && initialBids.length > 0) {
-        const userIds = [...new Set(initialBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
-        if (userIds.length > 0) {
-          supabase
-            .from("profiles")
-            .select("id, full_name")
-            .in("id", userIds)
-            .then(({ data }) => {
-              if (data) {
-                const map = data.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
-                setBidderProfiles(prev => ({ ...prev, ...map }));
-              }
-            });
-        }
+      if (initialBids?.length > 0) {
+        const initialProfiles: Record<string, any> = {};
+        initialBids.forEach((bid: any) => {
+          if (bid.profile) {
+            initialProfiles[bid.profile.id] = bid.profile;
+          }
+        });
+        setBidderProfiles(prev => ({ ...prev, ...initialProfiles }));
       }
     }, [initialBids]);
 
@@ -332,27 +326,21 @@ export const Route = createFileRoute("/ao-vivo")({
                   } else {
                     const { data: newBids } = await supabase
                       .from("bids")
-                      .select("*")
+                      .select("*, profile:profiles(id, full_name)")
                       .eq("lot_id", payload.new.active_lot_id)
                       .order("created_at", { ascending: false })
                       .limit(10);
                     
                     if (newBids) {
                       setBids(newBids);
-                      // Fetch profiles for these new bids
-                      const userIds = [...new Set(newBids.map((b: any) => b.user_id).filter(Boolean))] as string[];
-                      const missingUserIds = userIds.filter(id => !bidderProfiles[id]);
-                      
-                      if (missingUserIds.length > 0) {
-                        const { data: profiles } = await supabase
-                          .from("profiles")
-                          .select("id, full_name")
-                          .in("id", missingUserIds);
-                        if (profiles) {
-                          const map = profiles.reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
-                          setBidderProfiles(prev => ({ ...prev, ...map }));
+                      // Extract profiles from bids and update cache
+                      const newProfiles: Record<string, any> = {};
+                      newBids.forEach((bid: any) => {
+                        if (bid.profile) {
+                          newProfiles[bid.profile.id] = bid.profile;
                         }
-                      }
+                      });
+                      setBidderProfiles(prev => ({ ...prev, ...newProfiles }));
                     }
                   }
                   
@@ -439,16 +427,24 @@ export const Route = createFileRoute("/ao-vivo")({
                   };
                 });
                 
-                // Fetch profile if not already loaded
-                if (newBid.user_id && !bidderProfiles[newBid.user_id]) {
-                  const { data } = await supabase
-                    .from("profiles")
-                    .select("id, full_name")
-                    .eq("id", newBid.user_id)
-                    .single();
-                  if (data) {
-                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
-                  }
+                // Only fetch profile if not in cache
+                if (newBid.user_id) {
+                  setBidderProfiles(currentCache => {
+                    if (!currentCache[newBid.user_id]) {
+                      // Profile not in cache, fetch it
+                      supabase
+                        .from("profiles")
+                        .select("id, full_name")
+                        .eq("id", newBid.user_id)
+                        .single()
+                        .then(({ data }) => {
+                          if (data) {
+                            setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
+                          }
+                        });
+                    }
+                    return currentCache;
+                  });
                 }
               } else if (payload.eventType === "UPDATE") {
                 const updatedBid = payload.new;
