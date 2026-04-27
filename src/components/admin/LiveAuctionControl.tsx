@@ -115,10 +115,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
   }, [selectedEventId]);
 
     useEffect(() => {
-      if (!activeLot?.id) {
-        setBids([]);
-        return;
-      }
+       if (!activeLot?.id) return;
 
       // Fetch initial bids for the active lot
       const fetchInitialBids = async () => {
@@ -128,7 +125,17 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           .eq("lot_id", activeLot.id)
           .order("created_at", { ascending: false })
           .limit(10);
-        setBids(data || []);
+         if (data) {
+           setBids(prev => {
+             const merged = [...data];
+             prev.forEach(pb => {
+               if (pb.lot_id === activeLot.id && !merged.some(mb => mb.id === pb.id)) {
+                 merged.push(pb);
+               }
+             });
+             return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 15);
+           });
+         }
       };
       fetchInitialBids();
 
@@ -149,32 +156,36 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           "postgres_changes",
           { event: "*", schema: "public", table: "bids", filter: `lot_id=eq.${activeLot.id}` },
           async (payload) => {
-            if (payload.eventType === "INSERT") {
-              const newBid = payload.new;
-              // Fetch profile for the new bid
-              const { data: bidWithProfile } = await supabase
-                .from("bids")
-                .select("*, profile:profiles(full_name, risk_level, is_blocked)")
-                .eq("id", newBid.id)
-                .single();
-              
-              if (bidWithProfile) {
-                setBids(prev => {
-                  if (prev.some(b => b.id === bidWithProfile.id)) return prev;
-                  return [bidWithProfile, ...prev].slice(0, 10);
-                });
-                
-                // Update local active lot price immediately
-                setActiveLot((prev: any) => {
-                  if (!prev || prev.id !== newBid.lot_id) return prev;
-                  return {
-                    ...prev,
-                    current_price: Math.max(prev.current_price || 0, newBid.amount),
-                    bids_count: (prev.bids_count || 0) + 1
-                  };
-                });
-              }
-            } else if (payload.eventType === "UPDATE") {
+             if (payload.eventType === "INSERT") {
+               const newBid = payload.new;
+               
+               // Adicionar o lance imediatamente para evitar atrasos na percepção do usuário
+               setBids(prev => {
+                 if (prev.some(b => b.id === newBid.id)) return prev;
+                 return [newBid, ...prev].slice(0, 15);
+               });
+ 
+               // Atualizar preço do lote localmente de imediato
+               setActiveLot((prev: any) => {
+                 if (!prev || prev.id !== newBid.lot_id) return prev;
+                 return {
+                   ...prev,
+                   current_price: Math.max(prev.current_price || 0, newBid.amount),
+                   bids_count: (prev.bids_count || 0) + 1
+                 };
+               });
+ 
+               // Buscar perfil em segundo plano para preencher os nomes
+               const { data: bidWithProfile } = await supabase
+                 .from("bids")
+                 .select("*, profile:profiles(full_name, risk_level, is_blocked)")
+                 .eq("id", newBid.id)
+                 .single();
+               
+               if (bidWithProfile) {
+                 setBids(prev => prev.map(b => b.id === bidWithProfile.id ? bidWithProfile : b));
+               }
+             } else if (payload.eventType === "UPDATE") {
               setBids(prev => prev.map(b => b.id === payload.new.id ? { ...b, ...payload.new } : b));
             }
           }
