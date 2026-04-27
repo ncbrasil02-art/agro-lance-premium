@@ -91,14 +91,14 @@ import { Countdown } from "@/components/auctions/countdown";
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
           
           <div className="absolute left-4 top-4 z-10 flex flex-col gap-2.5 items-start">
-            {(effectiveStatus === 'live' || event.status === 'recebendo_lances') && (
-              <div className={`flex items-center gap-1.5 rounded-full ${event.event_type === 'ao_vivo' ? 'bg-live shadow-[0_0_25px_rgba(239,68,68,0.6)]' : 'bg-blue-600 shadow-[0_0_25px_rgba(37,99,235,0.6)]'} px-3 py-1.5 text-[10px] font-black text-white animate-blink-fast border border-white/40 ring-2 ${event.event_type === 'ao_vivo' ? 'ring-live/20' : 'ring-blue-600/20'}`}>
+            {((effectiveStatus === 'live' || event.status === 'recebendo_lances') && event.event_type === 'ao_vivo') && (
+              <div className="flex items-center gap-1.5 rounded-full bg-live shadow-[0_0_25px_rgba(239,68,68,0.6)] px-3 py-1.5 text-[10px] font-black text-white animate-blink-fast border border-white/40 ring-2 ring-live/20">
                 <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                {event.event_type === 'ao_vivo' ? 'AO VIVO' : 'ONLINE'}
+                AO VIVO
               </div>
             )}
             <StatusBadge status={effectiveStatus} urgent={isUrgent} />
-            <div className="rounded-full bg-white/10 backdrop-blur-md px-2.5 py-1 text-[8px] font-black text-white/80 border border-white/10 uppercase tracking-widest">
+            <div className="rounded-full bg-white/20 backdrop-blur-md px-2.5 py-1 text-[10px] font-black text-white border border-white/20 uppercase tracking-widest shadow-lg">
               {event.event_type === 'ao_vivo' ? 'Ao Vivo' : 'Online'}
             </div>
             {effectiveStatus === 'scheduled' && event?.date && (
@@ -109,7 +109,13 @@ import { Countdown } from "@/components/auctions/countdown";
             )}
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent z-10">
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent z-20">
+            {event.status === 'recebendo_lances' && (
+              <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-emerald-500/90 backdrop-blur-md px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-[0.2em] animate-pulse border border-white/20 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                <Gavel className="h-3 w-3" />
+                Recebendo Lance
+              </div>
+            )}
             <div className="flex items-center gap-3 mb-2">
               <AnimalIcon name={event.name} description={event.description} />
               <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter italic">
