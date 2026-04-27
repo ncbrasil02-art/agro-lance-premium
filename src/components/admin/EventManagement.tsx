@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -297,8 +297,46 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       }
     };
 
-   return (
-     <div className="space-y-6">
+    const statusDescriptions = [
+      { id: 'em_loteamento', label: 'Em Loteamento', color: 'text-amber-500 bg-amber-500/10', desc: 'Fase inicial de cadastro de animais. O evento não fica aberto para lances no site.' },
+      { id: 'scheduled', label: 'Agendado', color: 'text-blue-500 bg-blue-500/10', desc: 'O evento está pronto e aguardando a data de início oficial.' },
+      { id: 'recebendo_lances', label: 'Recebendo Lances', color: 'text-purple-500 bg-purple-500/10', desc: 'Evento aberto e aceitando lances em todos os lotes simultaneamente.' },
+      { id: 'live', label: 'Ao Vivo', color: 'text-emerald-500 bg-emerald-500/10', desc: 'Evento acontecendo em tempo real com transmissão ao vivo e lances simultâneos.' },
+      { id: 'em_condicional', label: 'Em Condicional', color: 'text-orange-500 bg-orange-500/10', desc: 'O maior lance não atingiu o preço de reserva e está em negociação.' },
+      { id: 'incondicional', label: 'Incondicional', color: 'text-emerald-600 bg-emerald-600/10', desc: 'A venda foi confirmada e o martelo batido sem restrições.' },
+      { id: 'evento_adiado', label: 'Evento Adiado', color: 'text-red-500 bg-red-500/10', desc: 'O evento foi postergado para uma nova data/horário.' },
+      { id: 'finished', label: 'Finalizado', color: 'text-muted-foreground bg-muted', desc: 'O leilão encerrou completamente e todos os lotes foram processados.' },
+    ];
+
+    return (
+      <div className="space-y-6">
+          {/* Status Legend */}
+          <Card className="border-gold/20 bg-gold/5">
+            <CardHeader className="py-3 px-6 border-b border-gold/10 flex flex-row items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-gold" />
+                <CardTitle className="text-sm font-bold uppercase tracking-wider text-gold">Legenda de Status dos Eventos</CardTitle>
+              </div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Guia de Referência</p>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {statusDescriptions.map((status) => (
+                  <div key={status.id} className="space-y-1 p-2 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${status.color}`}>
+                        {status.label}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      {status.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
          <div className="flex flex-col gap-6">
            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-gold/5 p-4 rounded-2xl border border-gold/10">
              <div className="space-y-1">
@@ -460,7 +498,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="status">Status do Evento</Label>
+                     <div className="flex items-center gap-2">
+                       <Label htmlFor="status">Status do Evento</Label>
+                       <TooltipProvider>
+                         <Tooltip>
+                           <TooltipTrigger asChild>
+                             <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                           </TooltipTrigger>
+                           <TooltipContent className="max-w-[300px] p-3 space-y-2">
+                             <p className="font-bold text-xs uppercase border-b pb-1 mb-1">Guia Rápido de Status</p>
+                             <div className="space-y-2 text-[11px]">
+                               <p><strong>Loteamento:</strong> Cadastro interno. Não visível para lances.</p>
+                               <p><strong>Agendado:</strong> Pronto para o site. Aceita pré-lance se configurado.</p>
+                               <p><strong>Recebendo Lances:</strong> Aberto para lances (Leilão Online).</p>
+                               <p><strong>Ao Vivo:</strong> Acontecendo agora com transmissão.</p>
+                               <p><strong>Condicional:</strong> Em negociação após o fim.</p>
+                               <p><strong>Incondicional:</strong> Venda batida e confirmada.</p>
+                             </div>
+                           </TooltipContent>
+                         </Tooltip>
+                       </TooltipProvider>
+                     </div>
                       <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>

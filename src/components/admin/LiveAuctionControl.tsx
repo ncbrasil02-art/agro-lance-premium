@@ -1,7 +1,8 @@
 import { StatusBadge } from "@/components/auctions/status-badge";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
- import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
  import { toast } from "sonner";
  import { 
    Play, Square, MessageSquare, Phone, Timer, Gavel, Check, RefreshCw,
-   Video, Users, Loader2, AlertTriangle, CheckCircle2, Ban, FastForward
+    Video, Users, Loader2, AlertTriangle, CheckCircle2, Ban, FastForward, Info
  } from "lucide-react";
   import { formatBRL, validateLiveLink } from "@/utils/format";
   import { TrendingUp, History } from "lucide-react";
@@ -598,8 +599,45 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       }
     };
 
-   return (
-     <div className="space-y-6">
+    const statusLegend = [
+      { label: 'Loteamento', desc: 'Fase de cadastro. O evento não aceita lances.' },
+      { label: 'Agendado', desc: 'Aguardando data oficial de início.' },
+      { label: 'Recebendo Lances', desc: 'Aberto para lances em todos os lotes (Online).' },
+      { label: 'Ao Vivo', desc: 'Evento em tempo real com transmissão e martelo.' },
+      { label: 'Condicional', desc: 'Maior lance em negociação com o vendedor.' },
+      { label: 'Incondicional', desc: 'Venda confirmada e finalizada.' },
+    ];
+
+    return (
+      <div className="space-y-6">
+          <div className="flex justify-end">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 text-[10px] font-bold border-gold/30 bg-gold/5 text-gold hover:bg-gold/10">
+                  <Info className="h-3 w-3" /> LEGENDA DE STATUS
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[400px]">
+                <DialogHeader>
+                  <DialogTitle className="text-gold flex items-center gap-2">
+                    <Info className="h-5 w-5" /> Legenda de Status
+                  </DialogTitle>
+                  <DialogDescription>
+                    Entenda como cada status afeta o comportamento do leilão no site.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  {statusLegend.map((s) => (
+                    <div key={s.label} className="flex flex-col gap-1 pb-3 border-b border-white/5 last:border-0">
+                      <span className="text-xs font-black uppercase text-white tracking-tighter italic">{s.label}</span>
+                      <p className="text-[11px] text-muted-foreground">{s.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
        <Card className="border-gold/30">
           <CardHeader className="pb-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
