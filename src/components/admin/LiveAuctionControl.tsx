@@ -179,6 +179,53 @@
       };
     }, [activeLot?.id]);
 
+    // Centralized refresh for the admin panel (Narrator view)
+    const refreshAdminData = async () => {
+      if (!activeLot?.id) return;
+      try {
+        const { data: latestLot, error: lotError } = await supabase
+          .from("lots")
+          .select("*")
+          .eq("id", activeLot.id)
+          .single();
+        
+        if (lotError) throw lotError;
+        
+        if (latestLot) {
+          setActiveLot((prev: any) => prev ? { ...prev, ...latestLot } : latestLot);
+          setLots((prev: any[]) => prev.map(l => l.id === latestLot.id ? { ...l, ...latestLot } : l));
+        }
+
+        const { data: latestBids } = await supabase
+          .from("bids")
+          .select("*, profile:profiles(full_name, risk_level, is_blocked)")
+          .eq("lot_id", activeLot.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        
+        if (latestBids) setBids(latestBids);
+        setPollingRetryCount(0);
+      } catch (err) {
+        console.error("Erro na sincronização do narrador:", err);
+        setPollingRetryCount(prev => prev + 1);
+      }
+    };
+
+    // Adaptive polling for the narrator view
+    useEffect(() => {
+      if (!activeLot?.id) return;
+      
+      let intervalTime = 30000;
+      if (realtimeStatus !== "SUBSCRIBED" && !isOffline) {
+        intervalTime = Math.min(2000 * Math.pow(1.5, pollingRetryCount), 10000);
+      } else if (isOffline) {
+        intervalTime = Math.min(10000 * Math.pow(2, pollingRetryCount), 60000);
+      }
+      
+      const interval = setInterval(refreshAdminData, intervalTime);
+      return () => clearInterval(interval);
+    }, [activeLot?.id, realtimeStatus, isOffline, pollingRetryCount]);
+
     const fetchEvents = async () => {
       const { data } = await supabase
         .from("events")
