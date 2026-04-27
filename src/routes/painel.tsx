@@ -106,8 +106,9 @@ export const Route = createFileRoute("/painel")({
   component: UserDashboard,
 });
 
-function UserDashboard() {
-  const { user, profile } = useAuth();
+ function UserDashboard() {
+   const { user, profile } = useAuth();
+   const [activeTab, setActiveTab] = useState("arremates");
    const [myLots, setMyLots] = useState<any[]>([]);
    const [myBids, setMyBids] = useState<any[]>([]);
    const [myFavorites, setMyFavorites] = useState<any[]>([]);
