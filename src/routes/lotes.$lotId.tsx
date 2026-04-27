@@ -548,11 +548,16 @@ function LotDetail() {
                     <div className="aspect-video rounded-3xl overflow-hidden bg-black flex items-center justify-center">
                       {lot.animal?.youtube_url ? (
                         <iframe 
-                          src={lot.animal.youtube_url.includes('v=') 
-                            ? lot.animal.youtube_url.replace("watch?v=", "embed/") 
-                            : lot.animal.youtube_url.includes('youtu.be/') 
-                              ? lot.animal.youtube_url.replace("youtu.be/", "youtube.com/embed/")
-                              : lot.animal.youtube_url} 
+                          src={(() => {
+                            try {
+                              const url = new URL(lot.animal.youtube_url);
+                              if (url.hostname.includes('youtube.com')) return `https://www.youtube.com/embed/${url.searchParams.get('v')}`;
+                              if (url.hostname.includes('youtu.be')) return `https://www.youtube.com/embed/${url.pathname.substring(1)}`;
+                              return lot.animal.youtube_url;
+                            } catch (e) {
+                              return lot.animal.youtube_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
+                            }
+                          })()} 
                           className="w-full h-full" 
                           allowFullScreen 
                         />
@@ -641,9 +646,11 @@ function LotDetail() {
                                 </div>
                                 <div>
                                    <p className="font-bold text-white">
-                                     {bid.is_phone_bid && bid.phone_bidder_identifier 
-                                       ? bid.phone_bidder_identifier 
-                                       : (bid.profile?.full_name || "Usuário")}
+                                      {bid.bid_type === 'security'
+                                        ? "Auditório/Mesa"
+                                        : (bid.is_phone_bid && bid.phone_bidder_identifier 
+                                          ? bid.phone_bidder_identifier 
+                                          : (bid.profile?.full_name || "Licitante"))}
                                    </p>
                                   <p className="text-[10px] text-white/40 uppercase font-bold">
                                     {new Date(bid.created_at).toLocaleString('pt-BR')}
