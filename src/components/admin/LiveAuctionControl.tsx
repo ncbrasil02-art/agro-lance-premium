@@ -8,9 +8,8 @@ import { StatusBadge } from "@/components/auctions/status-badge";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  import { toast } from "sonner";
  import { 
-    Play, Square, MessageSquare, Phone, Timer, Gavel, Check,
-    Video, Users, Loader2, AlertTriangle, CheckCircle2,
-    Ban
+   Play, Square, MessageSquare, Phone, Timer, Gavel, Check, RefreshCw,
+   Video, Users, Loader2, AlertTriangle, CheckCircle2, Ban, FastForward
  } from "lucide-react";
   import { formatBRL, validateLiveLink } from "@/utils/format";
   import { TrendingUp, History } from "lucide-react";
@@ -31,7 +30,8 @@ import { StatusBadge } from "@/components/auctions/status-badge";
     const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "", profileId: "" });
     const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
     const [profiles, setProfiles] = useState<any[]>([]);
-    const [searchProfile, setSearchProfile] = useState("");
+     const [searchProfile, setSearchProfile] = useState("");
+     const [isAutoAdvancing, setIsAutoAdvancing] = useState(true);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
   const [pollingRetryCount, setPollingRetryCount] = useState(0);
@@ -426,6 +426,21 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       }
     };
 
+    const updateLiveView = async () => {
+      if (!selectedEventId) return;
+      setIsActionLoading(true);
+      try {
+        await supabase.from("events").update({ 
+          updated_at: new Date().toISOString() 
+        }).eq("id", selectedEventId);
+        toast.success("Comando de atualização enviado para todos os usuários!");
+      } catch (error) {
+        toast.error("Erro ao atualizar tela dos usuários");
+      } finally {
+        setIsActionLoading(false);
+      }
+    };
+
     const handleAfterLotFinalized = async (lotId: string, successMessage: string, lotNumber?: number) => {
       toast.success(successMessage);
 
@@ -436,7 +451,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         updated_at: new Date().toISOString()
       }).eq("id", selectedEventId);
       
-      // Give some time (6 seconds) for users to see the "Sold/Passed" status and the final overlay 
+       // Give some time (10 seconds) for users to see the "Sold/Passed" status and the final overlay 
       // before we clear the active lot from the screen
       setTimeout(async () => {
         // Clear the status message after the delay
@@ -445,15 +460,21 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         // Check if there are more lots to be auctioned
         const remainingLots = lots.filter(l => l.id !== lotId && l.status !== 'sold' && l.status !== 'passed' && l.status !== 'finished');
         
-        if (remainingLots.length === 0) {
-          await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
-        } else {
-          await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
-        }
-        
-        fetchEventDetails(selectedEventId);
-        setActiveLot(null);
-      }, 6000);
+         // If auto-advance is on, find the next lot
+         if (isAutoAdvancing && remainingLots.length > 0) {
+           const nextLot = remainingLots.sort((a, b) => a.lot_number - b.lot_number)[0];
+           toast.info(`Avançando automaticamente para o Lote #${nextLot.lot_number}...`);
+           await activateLot(nextLot.id);
+         } else {
+           if (remainingLots.length === 0) {
+             await supabase.from("events").update({ active_lot_id: null, status: 'finished' }).eq("id", selectedEventId);
+           } else {
+             await supabase.from("events").update({ active_lot_id: null }).eq("id", selectedEventId);
+           }
+           fetchEventDetails(selectedEventId);
+           setActiveLot(null);
+         }
+       }, 10000);
     };
 
     const finalizeLot = async (lotId: string) => {
@@ -656,13 +677,24 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                         <Timer className="mr-2 h-4 w-4" /> Pausar / Voltar p/ Agendado
                       </Button>
                     )}
-                    <Button 
-                      variant="destructive" 
-                      onClick={finalizeEvent}
-                      disabled={isActionLoading}
-                    >
-                      <Square className="mr-2 h-4 w-4" /> Encerrar Evento
-                    </Button>
+                     <div className="flex gap-2">
+                       <Button 
+                         variant="outline"
+                         className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                         onClick={updateLiveView}
+                         disabled={isActionLoading}
+                         title="Forçar atualização da tela para todos os usuários"
+                       >
+                         <RefreshCw className={`mr-2 h-4 w-4 ${isActionLoading ? 'animate-spin' : ''}`} /> Atualizar Usuários
+                       </Button>
+                       <Button 
+                         variant="destructive" 
+                         onClick={finalizeEvent}
+                         disabled={isActionLoading}
+                       >
+                         <Square className="mr-2 h-4 w-4" /> Encerrar Evento
+                       </Button>
+                     </div>
                   </div>
                 )}
               </div>
@@ -681,10 +713,19 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                     <span className="text-gold font-black uppercase tracking-widest text-sm">Lote no Ar agora</span>
                     <StatusBadge status={activeLot.status} className="h-5 text-[9px] px-2 bg-white/10 text-white border-white/20" />
                   </div>
-                  <div className="flex items-center gap-4 text-white/60 text-xs font-bold uppercase">
-                    <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {liveEvent.viewers || 0} assistindo</span>
-                    <span className="flex items-center gap-1"><History className="h-3 w-3" /> {activeLot.bids_count || 0} lances</span>
-                  </div>
+                   <div className="flex items-center gap-6 text-white/60 text-xs font-bold uppercase">
+                     <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+                       <span className="text-[9px]">Avanço Automático</span>
+                       <input 
+                         type="checkbox" 
+                         checked={isAutoAdvancing} 
+                         onChange={(e) => setIsAutoAdvancing(e.target.checked)}
+                         className="accent-gold h-3 w-3"
+                       />
+                     </div>
+                     <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {liveEvent.viewers || 0} assistindo</span>
+                     <span className="flex items-center gap-1"><History className="h-3 w-3" /> {activeLot.bids_count || 0} lances</span>
+                   </div>
                 </div>
                 <CardContent className="p-6 md:p-8">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
