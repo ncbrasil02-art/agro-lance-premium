@@ -259,15 +259,22 @@ export const Route = createFileRoute("/ao-vivo")({
 
   const [bids, setBids] = useState<any[]>(initialBids || []);
   const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
-    // Increment viewer count when page loads
-    useEffect(() => {
-      if (liveEvent?.id) {
-        supabase.rpc("increment_viewer_count", {
-          p_entity_id: liveEvent.id,
-          p_entity_type: 'event'
-        }).then(() => console.log("Viewer count incremented"));
-      }
-    }, [liveEvent?.id, liveEvent?.active_lot_id]);
+     // Increment viewer count when page loads or lot changes
+     useEffect(() => {
+       if (liveEvent?.id) {
+         supabase.rpc("increment_viewer_count", {
+           p_entity_id: liveEvent.id,
+           p_entity_type: 'event'
+         });
+       }
+       
+       if (liveEvent?.active_lot_id) {
+         // @ts-ignore
+         supabase.rpc("increment_lot_viewers", {
+           p_lot_id: liveEvent.active_lot_id
+         });
+       }
+     }, [liveEvent?.id, liveEvent?.active_lot_id]);
 
     // Pre-populate profile cache from initial bids to avoid extra queries
     useEffect(() => {

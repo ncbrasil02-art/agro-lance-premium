@@ -274,7 +274,8 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
 function LotDetail() {
   const { lot: initialLot, initialBids } = Route.useLoaderData() as any;
   const { user, profile } = useAuth();
-  const [lot, setLot] = useState(initialLot);
+   const [lot, setLot] = useState(initialLot);
+   const [viewIncremented, setViewIncremented] = useState(false);
   const [recentBids, setRecentBids] = useState<any[]>(initialBids);
   const [isBidding, setIsBidding] = useState(false);
   const [showConfirmBid, setShowConfirmBid] = useState(false);
@@ -302,9 +303,32 @@ function LotDetail() {
       })
       .subscribe();
 
-    if (user) {
-      supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lot.id).maybeSingle().then(r => setIsFavorite(!!r.data));
-    }
+     if (user) {
+       supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lot.id).maybeSingle().then(r => setIsFavorite(!!r.data));
+     }
+
+     // Increment viewers count
+     if (!viewIncremented) {
+       const incrementViewers = async () => {
+         try {
+           // @ts-ignore - The RPC might not be in the types yet
+           const { error } = await supabase.rpc('increment_lot_viewers', { p_lot_id: lot.id });
+           if (error) {
+             console.error("Error incrementing viewers:", error);
+             // Fallback to manual update if RPC fails
+             await supabase
+               .from('lots')
+               .update({ viewers: (lot.viewers || 0) + 1 })
+               .eq('id', lot.id);
+           }
+           setViewIncremented(true);
+         } catch (e) {
+           console.error("Failed to increment viewers:", e);
+         }
+       };
+       incrementViewers();
+     }
+
     return () => { 
       supabase.removeChannel(lotChannel); 
       supabase.removeChannel(bidsChannel);
