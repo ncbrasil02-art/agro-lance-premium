@@ -311,10 +311,11 @@ function LotDetail() {
      if (!viewIncremented) {
        const incrementViewers = async () => {
          try {
+           // @ts-ignore - The RPC might not be in the types yet
            const { error } = await supabase.rpc('increment_lot_viewers', { p_lot_id: lot.id });
            if (error) {
              console.error("Error incrementing viewers:", error);
-             // Fallback to manual update if RPC doesn't exist yet
+             // Fallback to manual update if RPC fails
              await supabase
                .from('lots')
                .update({ viewers: (lot.viewers || 0) + 1 })
