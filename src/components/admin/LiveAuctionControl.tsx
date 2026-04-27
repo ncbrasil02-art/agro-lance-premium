@@ -394,7 +394,8 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         await supabase.from("lots").update({ 
           status: 'sold', 
           is_currently_live: false,
-          winner_id: finalWinnerId,
+           winner_id: finalWinnerId,
+           winner_link_reason: lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)',
           updated_at: new Date().toISOString()
         }).eq("id", lotId);
          
