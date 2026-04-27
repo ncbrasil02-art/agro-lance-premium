@@ -1044,8 +1044,21 @@ export const Route = createFileRoute("/ao-vivo")({
         {/* Chat / Histórico de lances */}
         <aside className="rounded-2xl border border-border bg-card">
           <div className="border-b border-border p-4">
-            <h3 className="font-semibold">Histórico de lances</h3>
-            <p className="text-xs text-muted-foreground">Atualização em tempo real</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold">Histórico de lances</h3>
+                <p className="text-xs text-muted-foreground">
+                  {realtimeStatus === "SUBSCRIBED" && !isOffline 
+                    ? "Sincronização em tempo real" 
+                    : "Modo de atualização segura (polling)"}
+                </p>
+              </div>
+              <div className={`h-2 w-2 rounded-full ${
+                isOffline ? "bg-red-500" : 
+                realtimeStatus === "SUBSCRIBED" ? "bg-emerald-500 animate-pulse" : 
+                "bg-amber-500 animate-pulse"
+              }`} />
+            </div>
           </div>
           <ul className="max-h-[600px] overflow-auto p-4 text-sm">
               {bids?.map((bid: any, i: number) => (
