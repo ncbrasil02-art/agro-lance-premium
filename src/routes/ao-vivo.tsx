@@ -520,17 +520,19 @@ export const Route = createFileRoute("/ao-vivo")({
       };
     }, [liveEvent?.id, liveEvent?.active_lot_id]);
 
-    // Centralized refresh function
+    // Centralized refresh function with error tracking
     const refreshAllData = async () => {
       if (!liveEvent?.id) return;
       
       try {
-        const { data: eventData } = await supabase
+        const { data: eventData, error: eventError } = await supabase
           .from("events")
           .select("viewers, active_lot:lots!active_lot_id(id, current_price, bids_count)")
           .eq("id", liveEvent.id)
           .single();
         
+        if (eventError) throw eventError;
+
         if (eventData) {
           setLiveEvent((prev: any) => {
             if (!prev) return prev;
@@ -564,9 +566,11 @@ export const Route = createFileRoute("/ao-vivo")({
             }
           }
           setLastSyncAt(new Date());
+          setPollingRetryCount(0); // Reset retry count on success
         }
       } catch (err) {
         console.error("Erro ao sincronizar dados:", err);
+        setPollingRetryCount(prev => prev + 1);
       }
     };
 
