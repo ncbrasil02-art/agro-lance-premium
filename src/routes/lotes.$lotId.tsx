@@ -484,11 +484,36 @@ function LotDetail() {
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
                      </Button>
-                     <Button variant="outline" className="h-14 rounded-2xl text-white" onClick={() => { navigator.share({title: lot.animal?.name, url: window.location.href}).catch(() => toast.success("Copiado!")) }}>
+                     <Button 
+                       variant="outline" 
+                       className="h-14 rounded-2xl text-white" 
+                       onClick={() => { 
+                         if (navigator.share) {
+                           navigator.share({
+                             title: lot.animal?.name,
+                             text: `Confira este animal de elite: ${lot.animal?.name}`,
+                             url: window.location.href
+                           }).catch(() => {
+                             navigator.clipboard.writeText(window.location.href);
+                             toast.success("Link copiado!");
+                           });
+                         } else {
+                           navigator.clipboard.writeText(window.location.href);
+                           toast.success("Link copiado para a área de transferência!");
+                         }
+                       }}
+                     >
                        <Share2 className="mr-2 h-4 w-4" /> COMPARTILHAR
                      </Button>
                    </div>
-                   <Button variant="ghost" className="w-full text-white/40 text-[10px]" onClick={() => window.print()}>BAIXAR ENCARTE (PDF)</Button>
+                   <Button 
+                     variant="ghost" 
+                     className="w-full h-14 rounded-2xl text-white/60 hover:text-white hover:bg-white/5 border border-white/10 mt-2 gap-2" 
+                     onClick={() => window.print()}
+                   >
+                     <Download className="h-4 w-4" /> BAIXAR ENCARTE COMPLETO (PDF)
+                   </Button>
+                 </div>
                  </div>
                </Card>
                <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
