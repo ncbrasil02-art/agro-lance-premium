@@ -593,10 +593,21 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                        </SelectContent>
                      </Select>
                    </div>
-                 </div>
-               </TabsContent>
-               
-                <TabsContent value="genealogia" className="space-y-6 pt-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="default_bid_increment">Incremento Padrão de Lance (R$)</Label>
+                      <Input 
+                        id="default_bid_increment" 
+                        type="number" 
+                        value={formData.default_bid_increment} 
+                        onChange={(e) => setFormData({ ...formData, default_bid_increment: e.target.value })} 
+                        placeholder="1000" 
+                      />
+                      <p className="text-[10px] text-muted-foreground">Valor sugerido para lances quando este animal for alocado em um lote.</p>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                 <TabsContent value="genealogia" className="space-y-6 pt-4 max-h-[60vh] overflow-y-auto pr-2">
                   <div className="space-y-4">
                     <h3 className="font-bold text-sm border-b pb-1">1ª Geração (Pais)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
