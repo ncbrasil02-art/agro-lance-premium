@@ -286,16 +286,21 @@
      }
    };
  
-   const setLiveStatusMessage = async (msg: string) => {
-     if (!selectedEventId) return;
-     const { error } = await supabase
-       .from("events")
-       .update({ live_status_message: msg })
-       .eq("id", selectedEventId);
-     
-     if (error) toast.error("Erro ao enviar mensagem");
-     else toast.success("Mensagem enviada!");
-   };
+    const setLiveStatusMessage = async (msg: string) => {
+      if (!selectedEventId) return;
+      
+      // Update with the message and a fresh updated_at to ensure Realtime triggers
+      const { error } = await supabase
+        .from("events")
+        .update({ 
+          live_status_message: msg,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", selectedEventId);
+      
+      if (error) toast.error("Erro ao enviar mensagem");
+      else toast.success(`Mensagem "${msg}" enviada!`);
+    };
  
     const updateTransmissionLink = async () => {
       if (!selectedEventId) return;
