@@ -425,8 +425,11 @@ function LotDetail() {
         <div className="container mx-auto px-4 py-8">
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
             <div className="space-y-8">
-               <div className="rounded-3xl overflow-hidden border border-white/10">
+               <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
                 <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
+                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <Expand className="h-12 w-12 text-white/50" />
+                 </div>
                </div>
                <div className="grid grid-cols-5 gap-3">
                  {lot.animal?.photos?.map((s:string, i:number) => (
