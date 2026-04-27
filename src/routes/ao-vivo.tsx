@@ -176,6 +176,26 @@ export const Route = createFileRoute("/ao-vivo")({
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      toast.success("Conexão restabelecida", { description: "Sincronizando dados..." });
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+      toast.error("Você está offline", { description: "Os lances podem não estar atualizados." });
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
     // Preload animal photos
     useEffect(() => {
