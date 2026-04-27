@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History, ChevronDown, ChevronRight, Printer, MessageSquare, Play, PauseCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -39,7 +39,9 @@ import {
        const [statusFilter, setStatusFilter] = useState<string>("all");
       const [searchQuery, setSearchQuery] = useState("");
       const [editingLot, setEditingLot] = useState<any>(null);
+      const [expandedLotId, setExpandedLotId] = useState<string | null>(null);
       const [selectedLotBids, setSelectedLotBids] = useState<any[]>([]);
+      const [selectedLotOffers, setSelectedLotOffers] = useState<any[]>([]);
       const [isBidsDialogOpen, setIsBidsDialogOpen] = useState(false);
       const [isBidsLoading, setIsBidsLoading] = useState(false);
       
@@ -149,9 +151,11 @@ import {
         setIsDialogOpen(true);
       };
    
-       const fetchLotBids = async (lotId: string) => {
-         setIsBidsLoading(true);
-         setIsBidsDialogOpen(true);
+      const fetchLotBids = async (lotId: string, silent = false) => {
+          if (!silent) {
+            setIsBidsLoading(true);
+            setIsBidsDialogOpen(true);
+          }
          try {
            const { data, error } = await supabase
              .from("bids")
@@ -162,13 +166,92 @@ import {
              .eq("lot_id", lotId)
              .order("created_at", { ascending: false });
 
-           if (error) throw error;
-           setSelectedLotBids(data || []);
+            if (error) throw error;
+            setSelectedLotBids(data || []);
+            return data || [];
          } catch (error: any) {
            toast.error("Erro ao carregar lances: " + error.message);
-         } finally {
-           setIsBidsLoading(false);
-         }
+          } finally {
+            if (!silent) setIsBidsLoading(false);
+          }
+        };
+
+        const fetchLotOffers = async (lotId: string) => {
+          try {
+            const { data, error } = await supabase
+              .from("offers")
+              .select(`
+                *,
+                profile:profiles(full_name)
+              `)
+              .eq("lot_id", lotId)
+              .order("created_at", { ascending: false });
+
+            if (error) throw error;
+            setSelectedLotOffers(data || []);
+          } catch (error: any) {
+            console.error("Error fetching offers:", error);
+          }
+        };
+
+        const toggleExpand = (lotId: string) => {
+          if (expandedLotId === lotId) {
+            setExpandedLotId(null);
+            setSelectedLotBids([]);
+            setSelectedLotOffers([]);
+          } else {
+            setExpandedLotId(lotId);
+            fetchLotBids(lotId, true);
+            fetchLotOffers(lotId);
+          }
+        };
+
+        const handlePrintPlaqueta = (lot: any) => {
+          const printWindow = window.open('', '_blank');
+          if (!printWindow) return;
+
+          const html = `
+            <html>
+              <head>
+                <title>Plaqueta do Lote ${lot.lot_number}</title>
+                <style>
+                  body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+                  .plaque { border: 10px solid #c5a059; padding: 40px; border-radius: 20px; }
+                  .lot-number { font-size: 120px; font-weight: bold; margin: 0; color: #064e3b; }
+                  .animal-name { font-size: 48px; margin: 20px 0; text-transform: uppercase; }
+                  .event-name { font-size: 24px; color: #666; }
+                  .footer { margin-top: 50px; border-top: 2px solid #eee; padding-top: 20px; }
+                </style>
+              </head>
+              <body>
+                <div class="plaque">
+                  <div class="event-name">${lot.event?.name}</div>
+                  <div class="lot-number">LOTE ${String(lot.lot_number).padStart(2, '0')}</div>
+                  <div class="animal-name">${lot.animal?.name}</div>
+                  <div class="footer">AGRO NC BRASIL</div>
+                </div>
+                <script>window.print(); window.close();</script>
+              </body>
+            </html>
+          `;
+          printWindow.document.write(html);
+          printWindow.document.close();
+        };
+
+        const handleTogglePause = async (lot: any) => {
+          const newStatus = lot.status === 'paused' ? 'active' : 'paused';
+          try {
+            const { error } = await supabase
+              .from("lots")
+              .update({ status: newStatus })
+              .eq("id", lot.id);
+            
+            if (error) throw error;
+            toast.success(newStatus === 'paused' ? "Lote pausado com sucesso" : "Lote reativado com sucesso");
+            fetchData();
+          } catch (error: any) {
+            toast.error("Erro ao alterar status: " + error.message);
+          }
        };
 
         const handleDeleteBid = async (bid: any) => {
