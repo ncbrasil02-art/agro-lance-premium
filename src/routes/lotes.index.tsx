@@ -112,7 +112,7 @@ export const Route = createFileRoute("/lotes/")({
            event_status: l.eventStatus,
            event_start_date: l.eventStartDate,
            event_end_date: l.eventEndDate,
-           allows_pre_bidding: l.allowsPreBidding || l.eventAllowsPreBidding
+           allows_pre_bidding: l.allowsPreBidding
          });
 
          if (filter === "live") {
