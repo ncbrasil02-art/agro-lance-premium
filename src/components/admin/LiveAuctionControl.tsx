@@ -125,7 +125,17 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           .eq("lot_id", activeLot.id)
           .order("created_at", { ascending: false })
           .limit(10);
-        setBids(data || []);
+         if (data) {
+           setBids(prev => {
+             const merged = [...data];
+             prev.forEach(pb => {
+               if (pb.lot_id === activeLot.id && !merged.some(mb => mb.id === pb.id)) {
+                 merged.push(pb);
+               }
+             });
+             return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 15);
+           });
+         }
       };
       fetchInitialBids();
 
