@@ -60,6 +60,7 @@ export function getEffectiveEventStatus(event: {
   const end = event.end_date ? new Date(event.end_date) : null;
 
   if (event.status === 'finished') return 'finished';
+  if (event.status === 'recebendo_lances' || event.status === 'live') return 'live';
   if (end && now >= end) return 'finished';
   
   // Safeguard: Se começou há mais de 48h e não tem data de fim nem status manual "live", 
