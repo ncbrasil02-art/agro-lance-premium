@@ -217,22 +217,30 @@ function EventDetail() {
                  ))}
               </div>
 
-               <div className="flex flex-col sm:flex-row gap-4">
-                 {['live', 'recebendo_lances', 'incondicional'].includes(effectiveStatus) ? (
-                   <Link to="/ao-vivo" className="flex-1">
-                     <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl shadow-[0_10px_40px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all rounded-[1.5rem] tracking-tighter italic">
-                       ASSISTIR AGORA
-                     </Button>
-                   </Link>
-                 ) : (
-                   <div className="flex-1">
-                     <div className="flex flex-col h-20 justify-center p-6 rounded-[1.5rem] border border-gold/20 bg-gold/5">
-                       <div className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">Faltam para o início</div>
-                       <Countdown endsAt={event.start_date} variant="segmented" className="text-foreground" />
-                     </div>
-                   </div>
-                 )}
-               </div>
+                <div className="flex flex-col gap-6">
+                  {/* Countdown Area - Show if event hasn't started yet */}
+                  {new Date(event.start_date).getTime() > Date.now() && (
+                    <div className="flex flex-col justify-center p-6 rounded-[2.5rem] border border-gold/20 bg-gold/5 backdrop-blur-sm shadow-inner">
+                      <div className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-3 text-center">Faltam para o início</div>
+                      <Countdown endsAt={event.start_date} variant="segmented" className="text-foreground justify-center" />
+                    </div>
+                  )}
+ 
+                  {/* Action Area */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {['live', 'recebendo_lances', 'incondicional'].includes(effectiveStatus) ? (
+                      <Link to="/ao-vivo" className="flex-1">
+                        <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl shadow-[0_10px_40px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all rounded-[1.5rem] tracking-tighter italic">
+                          ASSISTIR AGORA
+                        </Button>
+                      </Link>
+                    ) : (
+                      <div className="flex-1 p-6 rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 text-center">
+                        <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest italic">Aguardando Início do Evento</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
             </div>
           </div>
         </div>
