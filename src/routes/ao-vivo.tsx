@@ -341,7 +341,7 @@ export const Route = createFileRoute("/ao-vivo")({
                  setLiveEvent(data as any);
 
                  if (!lotChanged) {
-                   console.log("Comando de atualização ou sincronização recebido.");
+                   console.log("Comando de atualização ou sincronização recebido do Administrador.", payload.new.updated_at);
                    toast.info("Sincronizando dados em tempo real...", { 
                      icon: <RefreshCw className="h-4 w-4 animate-spin text-emerald-600" />,
                      duration: 2000 
