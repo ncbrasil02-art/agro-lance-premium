@@ -498,7 +498,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="status">Status do Evento</Label>
+                     <div className="flex items-center gap-2">
+                       <Label htmlFor="status">Status do Evento</Label>
+                       <TooltipProvider>
+                         <Tooltip>
+                           <TooltipTrigger asChild>
+                             <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                           </TooltipTrigger>
+                           <TooltipContent className="max-w-[300px] p-3 space-y-2">
+                             <p className="font-bold text-xs uppercase border-b pb-1 mb-1">Guia Rápido de Status</p>
+                             <div className="space-y-2 text-[11px]">
+                               <p><strong>Loteamento:</strong> Cadastro interno. Não visível para lances.</p>
+                               <p><strong>Agendado:</strong> Pronto para o site. Aceita pré-lance se configurado.</p>
+                               <p><strong>Recebendo Lances:</strong> Aberto para lances (Leilão Online).</p>
+                               <p><strong>Ao Vivo:</strong> Acontecendo agora com transmissão.</p>
+                               <p><strong>Condicional:</strong> Em negociação após o fim.</p>
+                               <p><strong>Incondicional:</strong> Venda batida e confirmada.</p>
+                             </div>
+                           </TooltipContent>
+                         </Tooltip>
+                       </TooltipProvider>
+                     </div>
                       <Select onValueChange={(v) => setFormData({ ...formData, status: v })} value={formData.status}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
