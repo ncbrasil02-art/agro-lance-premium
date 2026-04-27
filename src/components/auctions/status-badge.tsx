@@ -2,14 +2,16 @@ import { cn } from "@/lib/utils";
 import { logger } from "@/utils/logger";
 
  const map: Record<string, { label: string; cls: string; dot?: boolean }> = {
-    live: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)] animate-pulse", dot: true },
-    active: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)] animate-pulse", dot: true },
+     live: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)]", dot: true },
+     active: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)]", dot: true },
     open: { label: "ABERTO PARA LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_6px_rgba(16,185,129,0.1)]" },
     upcoming: { label: "EM BREVE", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_6px_rgba(234,179,8,0.1)]" },
     scheduled: { label: "AGENDADO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_6px_rgba(234,179,8,0.1)]" },
     loteamento: { label: "CATÁLOGO", cls: "bg-upcoming/15 text-upcoming border-upcoming/30 shadow-[0_0_6px_rgba(234,179,8,0.1)]" },
     pre_lance: { label: "PRÉ-LANCE ABERTO", cls: "bg-emerald/15 text-emerald-bright border-emerald/30 shadow-[0_0_6px_rgba(16,185,129,0.15)]", dot: true },
-    recebendo_lances: { label: "RECEBENDO LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)] animate-pulse", dot: true },
+     recebendo_lances: { label: "RECEBENDO LANCES", cls: "bg-emerald/15 text-emerald-bright border-emerald/50 shadow-[0_0_6px_rgba(16,185,129,0.15)]", dot: true },
+     incondicional: { label: "INCONDICIONAL", cls: "bg-gold/20 text-gold border-gold/50 shadow-[0_0_8px_rgba(212,175,55,0.3)]", dot: true },
+     em_condicional: { label: "EM CONDICIONAL", cls: "bg-orange-500/15 text-orange-500 border-orange-500/30" },
   closed: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   finished: { label: "ENCERRADO", cls: "bg-muted text-muted-foreground border-border" },
   passed: { label: "NÃO VENDIDO", cls: "bg-muted text-muted-foreground border-border" },
@@ -29,14 +31,6 @@ import { logger } from "@/utils/logger";
       cls: "bg-muted text-muted-foreground border-border" 
     };
 
-    if (urgent && (safeStatus === 'recebendo_lances' || safeStatus === 'live' || safeStatus === 'active')) {
-      s = { 
-        label: "ABERTO PARA LANCES", 
-        cls: "bg-live/20 text-live border-live shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-blink-fast", 
-        dot: true 
-      };
-    }
- 
     return (
       <span 
         role="status"

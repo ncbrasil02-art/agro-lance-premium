@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+ import { Link } from "@tanstack/react-router";
+ import { cn } from "@/lib/utils";
 import { Calendar, MapPin, Users, Gavel, Timer } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { AuctionEvent } from "@/lib/mock-data";
@@ -97,10 +98,10 @@ import { Countdown } from "@/components/auctions/countdown";
                 AO VIVO
               </div>
             )}
-            <StatusBadge status={effectiveStatus} urgent={isUrgent} />
-            <div className="rounded-full bg-white/20 backdrop-blur-md px-2.5 py-1 text-[10px] font-black text-white border border-white/20 uppercase tracking-widest shadow-lg">
-              {event.event_type === 'ao_vivo' ? 'Ao Vivo' : 'Online'}
-            </div>
+             <div className="rounded-full bg-white/20 backdrop-blur-md px-2.5 py-1.5 text-[10px] font-black text-white border border-white/20 uppercase tracking-widest shadow-lg flex items-center gap-2">
+               <span className={cn("h-1.5 w-1.5 rounded-full", event.event_type === 'ao_vivo' ? "bg-live animate-pulse" : "bg-emerald-bright")} />
+               {event.event_type === 'ao_vivo' ? 'Ao Vivo' : 'Online'}
+             </div>
             {effectiveStatus === 'scheduled' && event?.date && (
               <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg">
                 <Timer className="h-3 w-3" />
@@ -109,13 +110,15 @@ import { Countdown } from "@/components/auctions/countdown";
             )}
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent z-20">
-            {event.status === 'recebendo_lances' && (
-              <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-emerald-500/90 backdrop-blur-md px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-[0.2em] animate-pulse border border-white/20 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                <Gavel className="h-3 w-3" />
-                Recebendo Lance
-              </div>
-            )}
+           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-deep to-transparent z-20">
+             {(['recebendo_lances', 'incondicional', 'em_condicional', 'live'].includes(effectiveStatus)) && (
+               <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-emerald-500/90 backdrop-blur-md px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-[0.2em] border border-white/20 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                 <Gavel className="h-3 w-3" />
+                 {effectiveStatus === 'incondicional' ? 'Incondicional' : 
+                  effectiveStatus === 'em_condicional' ? 'Em Condicional' : 
+                  'Recebendo Lance'}
+               </div>
+             )}
             <div className="flex items-center gap-3 mb-2">
               <AnimalIcon name={event.name} description={event.description} />
               <h3 id={`event-title-${event.id}`} className="text-2xl font-black text-white uppercase leading-none tracking-tighter italic">

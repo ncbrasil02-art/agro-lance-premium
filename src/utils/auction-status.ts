@@ -59,9 +59,10 @@ export function getEffectiveEventStatus(event: {
   const start = new Date(event.start_date);
   const end = event.end_date ? new Date(event.end_date) : null;
 
-  if (event.status === 'finished') return 'finished';
-  if (event.status === 'recebendo_lances') return 'recebendo_lances';
-  if (event.status === 'live') return 'live';
+   // Manual statuses that the user explicitly sets in the admin panel should be respected
+   const manualStatuses = ['finished', 'recebendo_lances', 'live', 'incondicional', 'em_condicional', 'evento_adiado', 'em_loteamento'];
+   if (manualStatuses.includes(event.status)) return event.status;
+ 
   if (end && now >= end) return 'finished';
   
   // Safeguard: Se começou há mais de 48h e não tem data de fim nem status manual "live", 

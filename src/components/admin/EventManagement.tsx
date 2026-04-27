@@ -466,7 +466,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                         <SelectContent>
                           <SelectItem value="em_loteamento">Em Loteamento</SelectItem>
                           <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
-                          <SelectItem value="em_condicional">Em Condicional</SelectItem>
+                           <SelectItem value="em_condicional">Em Condicional</SelectItem>
+                           <SelectItem value="incondicional">Incondicional</SelectItem>
                           <SelectItem value="evento_adiado">Evento Adiado</SelectItem>
                           <SelectItem value="scheduled">Agendado</SelectItem>
                           <SelectItem value="live">Ao Vivo</SelectItem>
