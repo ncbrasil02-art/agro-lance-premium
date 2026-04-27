@@ -83,11 +83,12 @@
    );
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { 
-  User, Gavel, FileText, Receipt, CreditCard, Clock, 
-  ChevronRight, BadgeCheck, Download, ExternalLink, 
-  ShieldCheck, AlertCircle, Info, Printer, MessageSquare
-} from "lucide-react";
+ import {
+   User, Gavel, FileText, Receipt, CreditCard, Clock,
+   ChevronRight, BadgeCheck, Download, ExternalLink,
+   ShieldCheck, AlertCircle, Info, Printer, MessageSquare,
+   CalendarDays, Scissors, Barcode, Landmark
+ } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -122,11 +123,11 @@ function UserDashboard() {
     if (!user?.id) return;
     try {
       // Fetch lots won by the user
-      const { data: wonLots } = await supabase
-        .from("lots")
-        .select("*, animal:animals(*), event:events(*)")
-        .eq("winner_id", user.id)
-        .order("updated_at", { ascending: false });
+       const { data: wonLots } = await supabase
+         .from("lots")
+         .select("*, animal:animals(*, seller:sellers(name)), event:events(*)")
+         .eq("winner_id", user.id)
+         .order("updated_at", { ascending: false });
       
       setMyLots(wonLots || []);
 
