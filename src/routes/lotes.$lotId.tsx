@@ -512,10 +512,9 @@ function LotDetail() {
                      onClick={() => window.print()}
                    >
                      <Download className="h-4 w-4" /> BAIXAR ENCARTE COMPLETO (PDF)
-                   </Button>
-                 </div>
-                 </div>
-               </Card>
+                    </Button>
+                  </div>
+                </Card>
                <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
                  <h3 className="text-white font-black uppercase text-sm mb-4">Pagamento & Envio</h3>
                  <ul className="text-white/60 text-xs space-y-2">
