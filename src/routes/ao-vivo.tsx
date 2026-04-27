@@ -519,28 +519,28 @@ export const Route = createFileRoute("/ao-vivo")({
             async (payload) => {
               console.log("Bid change detected:", payload.eventType, payload.new);
               
-              if (payload.eventType === "INSERT") {
-                const newBid = payload.new;
-                setBids((prev: any[]) => {
-                  // Prevent duplicates just in case
-                  if (prev.some((b: any) => b.id === newBid.id)) return prev;
-                  return [newBid, ...prev].slice(0, 10);
-                });
-
-                // Update active lot price and bid count immediately
-                setLiveEvent((prev: any) => {
-                  if (!prev || !prev.active_lot || prev.active_lot.id !== newBid.lot_id) return prev;
-                  // Only update if the new bid is actually higher (standard case)
-                  const isNewer = newBid.amount > (prev.active_lot.current_price || 0);
-                  return {
-                    ...prev,
-                    active_lot: {
-                      ...prev.active_lot,
-                      current_price: isNewer ? newBid.amount : prev.active_lot.current_price,
-                      bids_count: (prev.active_lot.bids_count || 0) + 1
-                    }
-                  };
-                });
+               if (payload.eventType === "INSERT") {
+                 const newBid = payload.new;
+                 console.log("Processando novo lance (INSERT):", newBid);
+                 
+                 setBids((prev: any[]) => {
+                   if (prev.some((b: any) => b.id === newBid.id)) return prev;
+                   const updatedBids = [newBid, ...prev].slice(0, 15);
+                   return updatedBids;
+                 });
+ 
+                 setLiveEvent((prev: any) => {
+                   if (!prev || !prev.active_lot || prev.active_lot.id !== newBid.lot_id) return prev;
+                   const isNewer = newBid.amount > (prev.active_lot.current_price || 0);
+                   return {
+                     ...prev,
+                     active_lot: {
+                       ...prev.active_lot,
+                       current_price: isNewer ? newBid.amount : prev.active_lot.current_price,
+                       bids_count: (prev.active_lot.bids_count || 0) + 1
+                     }
+                   };
+                 });
                 
                 // Only fetch profile if not in cache
                 if (newBid.user_id) {
