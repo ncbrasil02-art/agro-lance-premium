@@ -488,6 +488,7 @@ export const Route = createFileRoute("/ao-vivo")({
           )
           .subscribe((status) => {
             console.log("Bid channel status:", status);
+            setRealtimeStatus(status);
           });
       }
 
