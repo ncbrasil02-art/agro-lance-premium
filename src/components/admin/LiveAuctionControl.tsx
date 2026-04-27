@@ -72,7 +72,9 @@
             fetchProfiles(); // Simpler to re-fetch for the dropdown to maintain order
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          setRealtimeStatus(status);
+        });
 
       return () => {
         supabase.removeChannel(profilesChannel);
