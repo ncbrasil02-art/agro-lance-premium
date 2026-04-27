@@ -6,7 +6,7 @@ import bull2 from "@/assets/animal-bull-2.jpg";
 import event1 from "@/assets/event-1.jpg";
 import event2 from "@/assets/event-2.jpg";
 
-export type EventStatus = "live" | "upcoming" | "closed";
+export type EventStatus = "live" | "upcoming" | "closed" | "recebendo_lances" | "scheduled";
 
 export interface AuctionEvent {
   id: string;

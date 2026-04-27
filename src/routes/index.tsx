@@ -21,11 +21,11 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
       logger.info("Iniciando carregamento da Home");
       try {
         const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
-         supabase.from("events")
-           .select("*, lots!lots_event_id_fkey(id)")
-           .or("status.eq.live,status.eq.scheduled")
-          .order("start_date", { ascending: true })
-          .limit(6),
+          supabase.from("events")
+            .select("*, lots!lots_event_id_fkey(id)")
+            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances")
+            .order("start_date", { ascending: true })
+            .limit(6),
           supabase.from("lots")
             .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
             .eq("is_featured", true)
@@ -126,6 +126,7 @@ function Home() {
       eventStartDate: (l as any).event?.start_date,
       eventEndDate: (l as any).event?.end_date,
       allowsPreBidding: (l as any).event?.allows_pre_bidding,
+      eventType: (l as any).event?.event_type,
       father: (l as any).animal?.genealogy?.father,
       mother: (l as any).animal?.genealogy?.mother,
       sex: (l as any).animal?.sex,
@@ -141,7 +142,7 @@ function Home() {
           start_date: e.date, 
           end_date: e.end_date 
         });
-        return status === "live";
+        return status === "live" || e.status === "recebendo_lances";
       });
 
       const upcomingEvents = mappedEvents.filter((e: any) => {
@@ -150,7 +151,7 @@ function Home() {
           start_date: e.date, 
           end_date: e.end_date 
         });
-        return status === "scheduled";
+        return status === "scheduled" && e.status !== "recebendo_lances";
       });
      
      // Find the closest upcoming event with countdown enabled
@@ -161,7 +162,7 @@ function Home() {
             start_date: e.date, 
             end_date: e.end_date 
           });
-          return status === 'scheduled' && e.show_countdown;
+          return (status === 'scheduled' || status === 'live') && e.show_countdown;
         })
         .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
    const featuredLots = mappedLots.slice(0, 6);
@@ -211,7 +212,7 @@ function Home() {
               <div className="mt-8 flex flex-col gap-2 rounded-2xl border border-gold/20 bg-gold/5 p-4 backdrop-blur-sm md:w-fit mb-8">
                 <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-gold">
                   <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
-                  Oportunidade Imperdível: {nextEvent.name}
+                  Oportunidade Imperdível: <span className="text-white px-2 py-0.5 rounded bg-gold/20 border border-gold/30 shadow-[0_0_10px_rgba(212,175,55,0.2)]">{nextEvent.name}</span>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-6">
                   <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />

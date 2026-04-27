@@ -91,10 +91,10 @@ import { Countdown } from "@/components/auctions/countdown";
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
           
           <div className="absolute left-4 top-4 z-10 flex flex-col gap-2.5 items-start">
-            {effectiveStatus === 'live' && (
-              <div className="flex items-center gap-1.5 rounded-full bg-live px-3 py-1.5 text-[10px] font-black text-white shadow-[0_0_25px_rgba(239,68,68,0.6)] animate-blink-fast border border-white/40 ring-2 ring-live/20">
+            {(effectiveStatus === 'live' || event.status === 'recebendo_lances') && (
+              <div className={`flex items-center gap-1.5 rounded-full ${event.event_type === 'ao_vivo' ? 'bg-live shadow-[0_0_25px_rgba(239,68,68,0.6)]' : 'bg-blue-600 shadow-[0_0_25px_rgba(37,99,235,0.6)]'} px-3 py-1.5 text-[10px] font-black text-white animate-blink-fast border border-white/40 ring-2 ${event.event_type === 'ao_vivo' ? 'ring-live/20' : 'ring-blue-600/20'}`}>
                 <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                AO VIVO
+                {event.event_type === 'ao_vivo' ? 'AO VIVO' : 'ONLINE'}
               </div>
             )}
             <StatusBadge status={effectiveStatus} urgent={isUrgent} />
