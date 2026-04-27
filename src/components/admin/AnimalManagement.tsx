@@ -237,9 +237,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                sale_status: formData.sale_status
              })
              .eq("id", editingAnimal.id)
-             .neq("sale_status", "sold"); // Extra safety on client side
-            })
-            .eq("id", editingAnimal.id);
+             .neq("sale_status", "sold");
           if (error) throw error;
           toast.success("Animal atualizado com sucesso");
         } else {
