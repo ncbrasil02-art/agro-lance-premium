@@ -1113,6 +1113,7 @@ export type Database = {
             }
             Returns: Json
           }
+      revert_sold_lot: { Args: { p_lot_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
