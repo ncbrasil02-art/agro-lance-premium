@@ -322,7 +322,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
       try {
          const { data, error } = await supabase
            .from("animals")
-           .select("*, categories(name)")
+           .select("*, categories!animals_category_id_fkey(name)")
            .order("created_at", { ascending: false });
 
         if (error) {

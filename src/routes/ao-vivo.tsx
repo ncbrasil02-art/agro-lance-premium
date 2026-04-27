@@ -147,7 +147,7 @@ export const Route = createFileRoute("/ao-vivo")({
         if (liveEvent.active_lot_id) {
           const { data: bids, error: bidsError } = await supabase
             .from("bids")
-            .select("*, profile:profiles(id, full_name)")
+            .select("*, profiles!bids_user_id_fkey(id, full_name)")
             .eq("lot_id", liveEvent.active_lot_id)
             .order("created_at", { ascending: false })
             .limit(10);
@@ -376,7 +376,7 @@ export const Route = createFileRoute("/ao-vivo")({
             if (liveEvent && payload.new.id === liveEvent.id) {
               const { data } = await supabase
                 .from("events")
-                .select("*, active_lot:lots!active_lot_id(*, animal:animals(*))")
+                .select("*, active_lot:lots!events_active_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(*))")
                 .eq("id", liveEvent.id)
                 .single();
               
@@ -418,7 +418,7 @@ export const Route = createFileRoute("/ao-vivo")({
                   } else {
                         const { data: newBids } = await supabase
                           .from("bids")
-                          .select("*, profile:profiles(id, full_name)")
+                          .select("*, profiles!bids_user_id_fkey(id, full_name)")
                           .eq("lot_id", payload.new.active_lot_id)
                           .order("created_at", { ascending: false })
                           .limit(10);
