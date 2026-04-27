@@ -742,16 +742,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                <TooltipContent>Editar configurações do evento</TooltipContent>
                              </Tooltip>
                            </TooltipProvider>
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
-                                 <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(event.id)}>
-                                   <Trash2 className="h-4 w-4" />
-                                 </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>Excluir evento permanentemente</TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
+                            {['draft', 'cancelled', 'scheduled', 'em_loteamento'].includes(event.status) ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(event.id)}>
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Excluir evento permanentemente</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center justify-center h-9 w-9 text-muted-foreground opacity-50 cursor-not-allowed">
+                                      <Trash2 className="h-4 w-4" />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Eventos iniciados/finalizados não podem ser excluídos.</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
                         </div>
                       </TableCell>
                      </TableRow>
