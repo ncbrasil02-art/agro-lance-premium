@@ -209,6 +209,20 @@ export const Route = createFileRoute("/ao-vivo")({
       }
     }, [liveEvent?.active_lot_id]);
 
+  // Atualizar título da aba dinamicamente conforme o status do lote
+  useEffect(() => {
+    const baseTitle = liveEvent?.name || "Ao Vivo";
+    if (liveLot?.status === 'sold') {
+      document.title = `LOTE ARREMATADO! — ${baseTitle}`;
+    } else if (liveLot?.status === 'passed') {
+      document.title = `LOTE FINALIZADO — ${baseTitle}`;
+    } else if (liveLot?.status === 'active') {
+      document.title = `🔴 AO VIVO: ${liveLot.animal?.name || baseTitle}`;
+    } else {
+      document.title = `${baseTitle} — Premium Agro Leilões`;
+    }
+  }, [liveLot?.status, liveLot?.animal?.name, liveEvent?.name]);
+
   const [bids, setBids] = useState<any[]>(initialBids || []);
   const [bidderProfiles, setBidderProfiles] = useState<Record<string, any>>({});
     // Increment viewer count when page loads
