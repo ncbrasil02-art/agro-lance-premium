@@ -1014,7 +1014,7 @@ function LotDetail() {
                      </li>
                      <li className="flex justify-between items-center pb-2 border-b border-white/5">
                        <span>Plano 1+2+30:</span>
-                       <span className="font-bold text-white">3x {formatBRL(price/33)} + 30x {formatBRL(price/33)}</span>
+                       <span className="font-bold text-white">3x {formatBRL(currentPrice/33)} + 30x {formatBRL(currentPrice/33)}</span>
                      </li>
                      <li className="flex justify-between items-center">
                        <span>Comissão Comprador:</span>
