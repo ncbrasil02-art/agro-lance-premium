@@ -51,11 +51,12 @@ import {
         lot_number: 1,
         starting_price: 0,
         bid_increment: 1000,
-        status: "active",
-        allows_pre_bidding: true,
-        is_featured: false,
-        payment_methods: ""
-      });
+         status: "active",
+         allows_pre_bidding: true,
+         is_featured: false,
+         payment_methods: "",
+         viewers: 0
+       });
 
       const fetchData = async () => {
         setIsLoading(true);
@@ -124,20 +125,21 @@ import {
           }
         });
 
-      const resetForm = () => {
-        setEditingLot(null);
-        setFormData({
-          event_id: initialEventId !== "all" ? initialEventId : "",
-          animal_id: "",
-          lot_number: 1,
-          starting_price: 0,
-          bid_increment: 1000,
-          status: "active",
-          allows_pre_bidding: true,
-          is_featured: false,
-          payment_methods: ""
-        });
-      };
+       const resetForm = () => {
+         setEditingLot(null);
+         setFormData({
+           event_id: initialEventId !== "all" ? initialEventId : "",
+           animal_id: "",
+           lot_number: 1,
+           starting_price: 0,
+           bid_increment: 1000,
+           status: "active",
+           allows_pre_bidding: true,
+           is_featured: false,
+           payment_methods: "",
+           viewers: 0
+         });
+       };
 
       const handleEdit = (lot: any) => {
         setEditingLot(lot);
@@ -147,11 +149,12 @@ import {
           lot_number: lot.lot_number || 1,
           starting_price: lot.starting_price || 0,
           bid_increment: lot.bid_increment || 1000,
-          status: lot.status || "active",
-          allows_pre_bidding: lot.allows_pre_bidding !== false,
-          is_featured: lot.is_featured || false,
-          payment_methods: lot.payment_methods?.join(", ") || ""
-        });
+           status: lot.status || "active",
+           allows_pre_bidding: lot.allows_pre_bidding !== false,
+           is_featured: lot.is_featured || false,
+           payment_methods: lot.payment_methods?.join(", ") || "",
+           viewers: lot.viewers || 0
+         });
         setIsDialogOpen(true);
       };
    
