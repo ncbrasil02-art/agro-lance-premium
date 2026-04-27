@@ -1,3 +1,87 @@
+ function PaymentDialog({ lot, profile }: { lot: any, profile: any }) {
+   const installments = 30; // default
+   const installmentValue = lot.current_price / installments;
+   const pixKey = "00020101021226830014br.gov.bcb.pix0136..."; // Placeholder
+ 
+   return (
+     <Dialog>
+       <DialogTrigger asChild>
+         <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
+           <CreditCard className="h-4 w-4" /> Realizar Pagamento
+         </Button>
+       </DialogTrigger>
+       <DialogContent className="max-w-2xl bg-white p-0">
+         <DialogHeader className="p-6 bg-emerald-deep text-white">
+           <DialogTitle className="text-xl flex items-center gap-2">
+             <Receipt className="h-6 w-6 text-gold" /> Carnê de Pagamento - Lote #{lot.lot_number}
+           </DialogTitle>
+         </DialogHeader>
+         
+         <div className="p-6 space-y-6">
+           <div className="grid grid-cols-2 gap-4">
+             <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+               <p className="text-[10px] font-bold uppercase text-gray-400 mb-1">Total do Arremate</p>
+               <p className="text-2xl font-black text-emerald-deep">{formatBRL(lot.current_price)}</p>
+             </div>
+             <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-right">
+               <p className="text-[10px] font-bold uppercase text-gray-400 mb-1">Parcelamento</p>
+               <p className="text-xl font-bold text-gray-800">{installments}x {formatBRL(installmentValue)}</p>
+             </div>
+           </div>
+ 
+           <div className="space-y-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+             <h4 className="text-xs font-black uppercase tracking-widest text-emerald-deep">Mensalidades (Boletas)</h4>
+             {[...Array(installments)].map((_, i) => {
+               const dueDate = new Date(lot.updated_at);
+               dueDate.setMonth(dueDate.getMonth() + i + 1);
+               return (
+                 <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-white hover:border-emerald-200 transition-colors">
+                   <div className="flex items-center gap-4">
+                     <div className="h-10 w-10 rounded-full bg-emerald-deep/5 flex items-center justify-center font-bold text-emerald-deep text-xs"> {String(i + 1).padStart(2, '0')} </div>
+                     <div>
+                       <p className="text-sm font-bold text-gray-800">Vencimento: {dueDate.toLocaleDateString('pt-BR')}</p>
+                       <p className="text-[10px] text-gray-400">Status: Pendente</p>
+                     </div>
+                   </div>
+                   <div className="flex items-center gap-4">
+                     <p className="font-bold text-emerald-600">{formatBRL(installmentValue)}</p>
+                     <Dialog>
+                       <DialogTrigger asChild>
+                         <Button size="sm" variant="outline" className="h-8 text-[10px] font-bold border-gold text-gold hover:bg-gold hover:text-white">PAGAR COM PIX</Button>
+                       </DialogTrigger>
+                       <DialogContent className="max-w-sm bg-white p-6 text-center">
+                         <DialogHeader>
+                           <DialogTitle className="text-center text-emerald-deep">Pagamento via PIX</DialogTitle>
+                         </DialogHeader>
+                         <div className="flex flex-col items-center gap-4 mt-4">
+                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                             <div className="h-48 w-48 bg-gray-200 flex items-center justify-center">
+                               <BadgeCheck className="h-12 w-12 text-emerald-deep/20" />
+                             </div>
+                           </div>
+                           <div className="space-y-2 w-full">
+                             <p className="text-xs text-gray-500 font-medium">Copie e cole a chave abaixo no seu banco:</p>
+                             <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100" onClick={() => {
+                               navigator.clipboard.writeText(pixKey);
+                               toast.success("Chave PIX copiada!");
+                             }}>
+                               {pixKey}
+                             </div>
+                             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold mt-4" onClick={() => toast.info("Aguardando confirmação do banco...")}>JÁ REALIZEI O PAGAMENTO</Button>
+                           </div>
+                         </div>
+                       </DialogContent>
+                     </Dialog>
+                   </div>
+                 </div>
+               );
+             })}
+           </div>
+         </div>
+       </DialogContent>
+     </Dialog>
+   );
+ }
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { 
   User, Gavel, FileText, Receipt, CreditCard, Clock, 
@@ -23,9 +107,10 @@ export const Route = createFileRoute("/painel")({
 
 function UserDashboard() {
   const { user, profile } = useAuth();
-  const [myLots, setMyLots] = useState<any[]>([]);
-  const [myBids, setMyBids] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+   const [myLots, setMyLots] = useState<any[]>([]);
+   const [myBids, setMyBids] = useState<any[]>([]);
+   const [myFavorites, setMyFavorites] = useState<any[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -53,7 +138,15 @@ function UserDashboard() {
         .order("created_at", { ascending: false })
         .limit(10);
       
-      setMyBids(userBids || []);
+       setMyBids(userBids || []);
+ 
+       // Fetch followed lots
+       const { data: followedData } = await supabase
+         .from("followed_lots")
+         .select("*, lot:lots(*, animal:animals(*), event:events(*))")
+         .eq("user_id", user.id);
+       
+       setMyFavorites(followedData || []);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Erro ao carregar dados do painel");
@@ -100,15 +193,15 @@ function UserDashboard() {
           <TabsTrigger value="arremates" className="gap-2">
             <Gavel className="h-4 w-4" /> Meus Arremates
           </TabsTrigger>
-          <TabsTrigger value="lances" className="gap-2">
-            <Clock className="h-4 w-4" /> Meus Lances
-          </TabsTrigger>
-          <TabsTrigger value="mensagens" className="gap-2">
-            <MessageSquare className="h-4 w-4" /> Mensagens
-          </TabsTrigger>
-          <TabsTrigger value="lances" className="gap-2">
-            <Clock className="h-4 w-4" /> Meus Lances
-          </TabsTrigger>
+           <TabsTrigger value="lances" className="gap-2">
+             <Clock className="h-4 w-4" /> Meus Lances
+           </TabsTrigger>
+           <TabsTrigger value="favoritos" className="gap-2">
+             <BadgeCheck className="h-4 w-4" /> Meus Favoritos
+           </TabsTrigger>
+           <TabsTrigger value="mensagens" className="gap-2">
+             <MessageSquare className="h-4 w-4" /> Mensagens
+           </TabsTrigger>
           <TabsTrigger value="perfil" className="gap-2">
             <User className="h-4 w-4" /> Dados Cadastrais
           </TabsTrigger>
@@ -219,7 +312,56 @@ function UserDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="mensagens">
+         <TabsContent value="favoritos" className="space-y-6">
+           {myFavorites.length === 0 ? (
+             <Card className="border-dashed border-2 bg-muted/20">
+               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                 <BadgeCheck className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                 <CardTitle className="text-xl">Nenhum animal favoritado</CardTitle>
+                 <CardDescription className="max-w-xs mx-auto mt-2">
+                   Acompanhe os lotes de seu interesse clicando no botão "Seguir" na página do animal.
+                 </CardDescription>
+                 <Link to="/lotes" className="mt-6">
+                   <Button variant="outline">Explorar Animais</Button>
+                 </Link>
+               </CardContent>
+             </Card>
+           ) : (
+             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+               {myFavorites.map((fav: any) => (
+                 <Link key={fav.id} to="/lotes/$lotId" params={{ lotId: fav.lot_id }}>
+                   <Card className="overflow-hidden hover:shadow-lg transition-all group">
+                     <div className="aspect-[4/3] relative overflow-hidden">
+                       <OptimizedImage 
+                         src={fav.lot?.animal?.photos?.[0]} 
+                         alt={fav.lot?.animal?.name} 
+                         className="group-hover:scale-105 transition-transform duration-500"
+                         width={400}
+                       />
+                       <div className="absolute top-2 right-2">
+                         <Badge className="bg-emerald-deep/80 backdrop-blur-sm border-gold/30 text-gold">#{fav.lot?.lot_number}</Badge>
+                       </div>
+                     </div>
+                     <CardHeader className="p-4">
+                       <div className="flex justify-between items-start">
+                         <div>
+                           <CardTitle className="text-lg text-emerald-deep">{fav.lot?.animal?.name}</CardTitle>
+                           <CardDescription>{fav.lot?.animal?.breed}</CardDescription>
+                         </div>
+                         <div className="text-right">
+                           <p className="text-[10px] uppercase font-bold text-muted-foreground">Lance Atual</p>
+                           <p className="text-sm font-bold text-emerald-600">{formatBRL(fav.lot?.current_price)}</p>
+                         </div>
+                       </div>
+                     </CardHeader>
+                   </Card>
+                 </Link>
+               ))}
+             </div>
+           )}
+         </TabsContent>
+ 
+         <TabsContent value="mensagens">
           <Card>
             <CardHeader>
               <CardTitle>Canal de Comunicação</CardTitle>
@@ -313,9 +455,7 @@ function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
               profile={profile}
               type="contrato"
             />
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
-              <CreditCard className="h-4 w-4" /> Realizar Pagamento
-            </Button>
+            <PaymentDialog lot={lot} profile={profile} />
           </div>
         </div>
       </div>

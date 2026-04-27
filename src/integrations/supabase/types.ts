@@ -607,6 +607,35 @@ export type Database = {
           },
         ]
       }
+      followed_lots: {
+        Row: {
+          created_at: string
+          id: string
+          lot_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lot_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followed_lots_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lots: {
         Row: {
           allows_pre_bidding: boolean | null
