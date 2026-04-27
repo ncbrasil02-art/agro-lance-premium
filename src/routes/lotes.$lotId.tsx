@@ -304,8 +304,9 @@ function LotDetail() {
     } finally { setIsFavoriteLoading(false); }
   };
 
-  const currentPrice = lot?.current_price || lot?.starting_price || 0;
-  const nextBid = currentPrice + (lot?.bid_increment || 0);
+   const currentPrice = lot?.current_price || lot?.starting_price || 0;
+   const isSold = lot?.status === 'sold';
+   const nextBid = currentPrice + (lot?.bid_increment || 0);
   const dynamicStatus = useEffectiveLotStatus({
      status: lot.status,
      event_status: lot.event?.status,
@@ -520,8 +521,15 @@ function LotDetail() {
                      <InstallmentSimulator price={currentPrice} commissionRate={COMMISSION_RATE} />
                    </div>
                  </div>
-                 <div className="mt-8 space-y-4">
-                   <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl rounded-2xl" onClick={() => placeBid(nextBid)}>CONFIRMAR LANCE</Button>
+                   <div className="mt-8 space-y-4">
+                     <Button 
+                       size="lg" 
+                       className={`w-full h-20 font-black text-2xl rounded-2xl ${isSold ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep'}`} 
+                       onClick={() => !isSold && placeBid(nextBid)}
+                       disabled={isSold}
+                     >
+                       {isSold ? 'LOTE ARREMATADO' : 'CONFIRMAR LANCE'}
+                     </Button>
                    <div className="grid grid-cols-2 gap-4">
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
