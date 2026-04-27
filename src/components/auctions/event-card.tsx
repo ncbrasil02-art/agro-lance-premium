@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+ import { Link } from "@tanstack/react-router";
+ import { cn } from "@/lib/utils";
 import { Calendar, MapPin, Users, Gavel, Timer } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { AuctionEvent } from "@/lib/mock-data";
