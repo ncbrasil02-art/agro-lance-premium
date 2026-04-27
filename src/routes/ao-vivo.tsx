@@ -1056,7 +1056,7 @@ export const Route = createFileRoute("/ao-vivo")({
                       <span className="inline-flex items-center rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">Lote #{String(liveLot.lot_number).padStart(2, "0")}</span>
                       <StatusBadge status={liveLot.status} className="h-5 text-[9px] px-2 border-emerald/20" />
                       {liveLot.animal?.registration_number && (
-                        <span className="text-[10px] text-muted-foreground font-mono">REG: {liveLot.animal.registration_number}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">Registro: {liveLot.animal.registration_number}</span>
                       )}
                     </div>
                     <h2 className="text-2xl font-black text-emerald-deep tracking-tighter leading-none">{liveLot.animal?.name}</h2>
@@ -1202,7 +1202,7 @@ export const Route = createFileRoute("/ao-vivo")({
                                 )}
                                 <div className="flex justify-between border-b border-border/40 pb-1">
                                   <span className="text-muted-foreground">Sexo</span>
-                                  <span className="font-bold uppercase">{liveLot.animal?.sex === 'male' ? 'Macho' : 'Fêmea'}</span>
+                                   <span className="font-bold uppercase">{liveLot.animal?.sex === 'M' || liveLot.animal?.sex === 'male' ? 'Macho' : 'Fêmea'}</span>
                                 </div>
                                 <div className="flex justify-between border-b border-border/40 pb-1">
                                   <span className="text-muted-foreground">Pelagem</span>
@@ -1292,8 +1292,8 @@ export const Route = createFileRoute("/ao-vivo")({
                                  </div>
                                  <div className="h-12 w-px bg-gold/30" />
                                  <div className="flex flex-col gap-4">
-                                   <div className="px-2 py-1 bg-white/80 border border-gold/20 rounded shadow-sm font-bold">Pai: {(liveLot.animal?.genealogy as any)?.father || "A definir"}</div>
-                                   <div className="px-2 py-1 bg-white/80 border border-gold/20 rounded shadow-sm font-bold">Mãe: {(liveLot.animal?.genealogy as any)?.mother || "A definir"}</div>
+                                   <div className="px-2 py-1 bg-white/80 border border-gold/20 rounded shadow-sm font-bold">Pai: {(liveLot.animal?.genealogy as any)?.father || (liveLot.animal?.genealogy as any)?.pai || "A definir"}</div>
+                                   <div className="px-2 py-1 bg-white/80 border border-gold/20 rounded shadow-sm font-bold">Mãe: {(liveLot.animal?.genealogy as any)?.mother || (liveLot.animal?.genealogy as any)?.mae || "A definir"}</div>
                                  </div>
                                </div>
                             </div>

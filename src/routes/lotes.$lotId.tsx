@@ -82,8 +82,8 @@ export const Route = createFileRoute("/lotes/$lotId")({
 function GenealogyTree({ genealogy }: { genealogy: any }) {
   if (!genealogy) return <div className="py-10 text-center text-muted-foreground">Informação de genealogia não disponível.</div>;
 
-   const pai = genealogy.father || genealogy.pai || "Não informado";
-   const mae = genealogy.mother || genealogy.mae || "Não informado";
+   const pai = genealogy.father || genealogy.pai || genealogy.genealogy_father || "Não informado";
+   const mae = genealogy.mother || genealogy.mae || genealogy.genealogy_mother || "Não informado";
   
   const avos = [
     genealogy.grandfather_paternal || genealogy.avo_paterno || "A definir",
@@ -437,14 +437,14 @@ function LotDetail() {
                <div className="space-y-4">
                   <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
                     <p className="text-[8px] text-gray-400 uppercase font-bold">Pai</p>
-                    <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.father || "Não informado"}</p>
+                    <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.father || lot.animal?.genealogy?.pai || "Não informado"}</p>
                   </div>
                  <div className="flex justify-center h-4">
                    <div className="w-px bg-gray-200" />
                  </div>
                   <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
                     <p className="text-[8px] text-gray-400 uppercase font-bold">Mãe</p>
-                    <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.mother || "Não informado"}</p>
+                    <p className="font-black text-sm uppercase italic">{lot.animal?.genealogy?.mother || lot.animal?.genealogy?.mae || "Não informado"}</p>
                   </div>
                </div>
              </div>
