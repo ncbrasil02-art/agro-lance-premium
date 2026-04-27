@@ -74,6 +74,7 @@ export function getEffectiveEventStatus(event: {
 export function getEffectiveLotStatus(lot: {
   status: string;
   event_status?: string;
+  event_type?: string;
   event_start_date?: string | null;
   event_end_date?: string | null;
   allows_pre_bidding?: boolean;
@@ -82,14 +83,26 @@ export function getEffectiveLotStatus(lot: {
   const eventStart = lot.event_start_date ? new Date(lot.event_start_date) : null;
   const eventEnd = lot.event_end_date ? new Date(lot.event_end_date) : null;
 
-  if (lot.status === 'sold' || lot.status === 'finished') return 'sold';
+  if (lot.status === 'sold' || lot.status === 'finished' || lot.status === 'arrematado') return 'sold';
   if (lot.status === 'passed') return 'passed';
+  if (lot.status === 'em_condicional') return 'passed'; // Treating conditional as passed for UI if it's not receiving bids
+  if (lot.status === 'evento_adiado') return 'scheduled';
+
    if (lot.event_status === 'finished' || (eventEnd && now >= eventEnd)) {
      if (lot.status === 'sold') return 'sold';
      if (lot.status === 'passed') return 'passed';
      // Se o evento acabou e o lote não foi vendido/passado manualmente, 
      // provavelmente encerrou sem lances ou não foi arrematado.
      return 'passed';
+   }
+
+   // Regras específicas para eventos "Ao Vivo" vs "Online"
+   if (lot.event_type === 'ao_vivo') {
+     // Em leilão ao vivo, o lote só recebe lances se estiver ativo no auditório
+     if (lot.status === 'active' || lot.status === 'live' || lot.status === 'recebendo_lances') return 'live';
+     if (lot.status === 'scheduled') return 'scheduled';
+     // Se o evento é ao vivo mas o lote não está ativo e nem vendido/passado, ele está em "loteamento"
+     return 'loteamento';
    }
 
   // Se a data de início do evento já passou há mais de 24h e não tem data de fim, 
