@@ -438,7 +438,7 @@ function LotDetail() {
                    </button>
                  ))}
                </div>
-               <Tabs defaultValue="detalhes">
+                <Tabs defaultValue="detalhes" className="w-full">
                  <TabsList className="bg-emerald-deep/20">
                    <TabsTrigger value="detalhes">Descrição</TabsTrigger>
                    <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
@@ -498,11 +498,11 @@ function LotDetail() {
                       {lot.animal?.youtube_url && <iframe src={lot.animal.youtube_url.replace("watch?v=", "embed/")} className="w-full h-full" allowFullScreen />}
                     </div>
                  </TabsContent>
-               </Tabs>
-            </div>
+                </Tabs>
+              </div>
 
-            <div className="space-y-6">
-               <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem]">
+              <div className="space-y-6">
+                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full">
                   <div className="flex justify-between items-start mb-6">
                     <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
                     {lot.animal?.youtube_url && (
