@@ -23,9 +23,10 @@ export const Route = createFileRoute("/painel")({
 
 function UserDashboard() {
   const { user, profile } = useAuth();
-  const [myLots, setMyLots] = useState<any[]>([]);
-  const [myBids, setMyBids] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+   const [myLots, setMyLots] = useState<any[]>([]);
+   const [myBids, setMyBids] = useState<any[]>([]);
+   const [myFavorites, setMyFavorites] = useState<any[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -53,7 +54,15 @@ function UserDashboard() {
         .order("created_at", { ascending: false })
         .limit(10);
       
-      setMyBids(userBids || []);
+       setMyBids(userBids || []);
+ 
+       // Fetch followed lots
+       const { data: followedData } = await supabase
+         .from("followed_lots")
+         .select("*, lot:lots(*, animal:animals(*), event:events(*))")
+         .eq("user_id", user.id);
+       
+       setMyFavorites(followedData || []);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Erro ao carregar dados do painel");
