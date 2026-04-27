@@ -332,8 +332,19 @@ export const Route = createFileRoute("/ao-vivo")({
                 .eq("id", liveEvent.id)
                 .single();
               
-              if (data) {
-                setLiveEvent(data as any);
+               if (data) {
+                 // Detect if it was a force refresh from admin (updated_at changed but active_lot_id same)
+                 const lotChanged = payload.new.active_lot_id !== payload.old?.active_lot_id;
+                 const isForceRefresh = !lotChanged && payload.new.updated_at !== payload.old?.updated_at;
+
+                 setLiveEvent(data as any);
+
+                 if (isForceRefresh) {
+                   console.log("Comando de atualização forçada recebido.");
+                   toast.info("Atualizando dados do leilão...", { duration: 2000 });
+                   // Logic to ensure state is fresh
+                   setSyncTrigger(prev => prev + 1);
+                 }
                 
                 // Handle status messages - trigger even if message is the same to allow repeating "Dou-lhe uma!"
                 if (payload.new.live_status_message) {
