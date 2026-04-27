@@ -13,7 +13,13 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/compra-direta/")({
+ export const Route = createFileRoute("/compra-direta/")({
+   head: () => ({
+     meta: [
+       { title: "Catálogo de Venda — Premium Agro Leilões" },
+       { name: "description", content: "Venda direta de animais selecionados. Escolha seu animal e faça sua reserva." },
+     ],
+   }),
   loader: async () => {
     const { data: animals, error: animalsError } = await supabase
       .from("animals")
