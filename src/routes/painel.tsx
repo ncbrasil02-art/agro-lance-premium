@@ -124,11 +124,11 @@ export const Route = createFileRoute("/painel")({
     if (!user?.id) return;
     try {
       // Fetch lots won by the user
-       const { data: wonLots } = await supabase
-         .from("lots")
-         .select("*, animal:animals(*, seller:sellers(name)), event:events(*)")
-         .eq("winner_id", user.id)
-         .order("updated_at", { ascending: false });
+        const { data: wonLots } = await supabase
+          .from("lots")
+          .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+          .eq("winner_id", user.id)
+          .order("updated_at", { ascending: false });
       
       setMyLots(wonLots || []);
 

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -425,8 +425,11 @@ function LotDetail() {
         <div className="container mx-auto px-4 py-8">
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
             <div className="space-y-8">
-               <div className="rounded-3xl overflow-hidden border border-white/10">
+               <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
                 <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
+                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <Expand className="h-12 w-12 text-white/50" />
+                 </div>
                </div>
                <div className="grid grid-cols-5 gap-3">
                  {lot.animal?.photos?.map((s:string, i:number) => (
@@ -453,7 +456,38 @@ function LotDetail() {
                           <p className="text-[10px] text-gold/40 uppercase font-black">Idade</p>
                           <p className="font-bold text-white">{getAge(lot.animal?.birth_date)}</p>
                         </div>
+                        {lot.animal?.weight && (
+                          <div className="p-4 bg-white/5 rounded-2xl text-center">
+                            <p className="text-[10px] text-gold/40 uppercase font-black">Peso</p>
+                            <p className="font-bold text-white">{lot.animal.weight}kg</p>
+                          </div>
+                        )}
+                        {lot.animal?.location && (
+                          <div className="p-4 bg-white/5 rounded-2xl text-center">
+                            <p className="text-[10px] text-gold/40 uppercase font-black">Localização</p>
+                            <p className="font-bold text-white">{lot.animal.location}</p>
+                          </div>
+                        )}
                       </div>
+ 
+                      {lot.animal?.vaccination_records && Array.isArray(lot.animal.vaccination_records) && lot.animal.vaccination_records.length > 0 && (
+                        <div className="mt-8">
+                          <h3 className="text-sm font-black uppercase text-gold/60 mb-4 flex items-center gap-2">
+                            <Stethoscope className="h-4 w-4" /> Registro de Vacinação
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {lot.animal.vaccination_records.map((v: any, idx: number) => (
+                              <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                                  <span className="text-xs font-bold text-white/80">{v.vaccine || v.name}</span>
+                                </div>
+                                <span className="text-[10px] text-white/40">{v.date}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                    </Card>
                  </TabsContent>
                  <TabsContent value="genealogia" className="mt-6">
@@ -469,8 +503,16 @@ function LotDetail() {
 
             <div className="space-y-6">
                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem]">
-                 <h2 className="text-4xl font-black text-white italic">{lot.animal?.name}</h2>
-                 <div className="mt-8 p-8 bg-black/40 rounded-[2rem] border border-white/5">
+                  <div className="flex justify-between items-start mb-6">
+                    <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
+                    {lot.animal?.youtube_url && (
+                      <Button variant="ghost" size="sm" className="text-gold hover:text-gold-bright hover:bg-gold/10 gap-2 font-bold h-auto p-2" onClick={() => document.querySelector('[value="videos"]')?.dispatchEvent(new MouseEvent('click', {bubbles:true}))}>
+                        <Video className="h-5 w-5" /> VER VÍDEO
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 p-8 bg-black/40 rounded-[2rem] border border-white/5">
                    <p className="text-gold font-black uppercase text-[10px]">Oferta Atual</p>
                    <p className="text-5xl font-black text-white italic">{formatBRL(currentPrice)}</p>
                    <div className="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
