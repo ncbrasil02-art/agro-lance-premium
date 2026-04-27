@@ -574,11 +574,20 @@ export const Route = createFileRoute("/ao-vivo")({
       }
     };
 
-    // Periodically refresh event data and act as a fallback for bids if realtime fails
+    // Periodically refresh event data with exponential backoff if realtime fails or offline
     useEffect(() => {
       if (!liveEvent?.id) return;
       
-      const intervalTime = (realtimeStatus !== "SUBSCRIBED" || isOffline) ? 5000 : 30000;
+      let intervalTime = 30000; // Default: 30s
+
+      if (realtimeStatus !== "SUBSCRIBED" || isOffline) {
+        // Faster polling when realtime is down (starting at 3s)
+        // but with exponential backoff to avoid hammering the server if the user is truly offline for a long time
+        // 3s, 6s, 12s, 24s... max 60s
+        intervalTime = Math.min(3000 * Math.pow(2, pollingRetryCount), 60000);
+      }
+      
+      console.log(`Setting refresh interval to ${intervalTime}ms (retry count: ${pollingRetryCount}, status: ${realtimeStatus})`);
       const interval = setInterval(refreshAllData, intervalTime);
 
       if (syncTrigger > 0) {
@@ -586,7 +595,7 @@ export const Route = createFileRoute("/ao-vivo")({
       }
 
       return () => clearInterval(interval);
-    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger]);
+    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger, pollingRetryCount]);
  
    const liveLot = liveEvent?.active_lot;
  
