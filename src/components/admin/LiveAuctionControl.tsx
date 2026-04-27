@@ -391,11 +391,12 @@ import { StatusBadge } from "@/components/auctions/status-badge";
 
        setIsActionLoading(true);
        try {
-         await supabase.from("lots").update({ 
-           status: 'sold', 
-           is_currently_live: false,
-           winner_id: finalWinnerId
-         }).eq("id", lotId);
+        await supabase.from("lots").update({ 
+          status: 'sold', 
+          is_currently_live: false,
+          winner_id: finalWinnerId,
+          updated_at: new Date().toISOString()
+        }).eq("id", lotId);
          
          await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!");
        } catch (error) {
