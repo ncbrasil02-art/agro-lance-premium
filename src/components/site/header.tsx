@@ -43,8 +43,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
                 <Gavel className="h-5 w-5 text-emerald-deep" />
               </span>
               <span className="text-lg tracking-tight">
-                <span className="text-foreground">{siteInfo?.name.split(' ')[0] || "Premium"}</span>
-                <span className="text-gradient-gold">{siteInfo?.name.split(' ').slice(1).join(' ') || "Agro"}</span>
+                <span className="text-foreground">{siteInfo?.name?.split(' ')[0] || "Premium"}</span>
+                <span className="text-gradient-gold">{siteInfo?.name?.split(' ').slice(1).join(' ') || "Agro"}</span>
               </span>
             </>
           )}
