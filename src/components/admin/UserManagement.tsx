@@ -4,19 +4,47 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon, HelpCircle } from "lucide-react";
+  import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon, HelpCircle, FileText, Send, MessageSquare } from "lucide-react";
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
- import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+  import { Textarea } from "@/components/ui/textarea";
+  import { Label } from "@/components/ui/label";
  
  export function UserManagement() {
    const [selectedUserLogs, setSelectedUserLogs] = useState<any[]>([]);
    const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
-   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+    const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [messageData, setMessageData] = useState({ title: "", content: "" });
+    const [isSendingMessage, setIsSendingMessage] = useState(false);
+    const handleSendMessage = async () => {
+      if (!selectedUser || !messageData.content) return;
+      setIsSendingMessage(true);
+      try {
+        const { error } = await supabase.from("messages").insert({
+          sender_id: adminProfile?.id,
+          recipient_id: selectedUser.id,
+          title: messageData.title || "Mensagem da Administração",
+          content: messageData.content
+        });
+        if (error) throw error;
+        toast.success("Mensagem enviada com sucesso!");
+        setIsMessageDialogOpen(false);
+        setMessageData({ title: "", content: "" });
+      } catch (error: any) {
+        toast.error("Erro ao enviar mensagem: " + error.message);
+      } finally {
+        setIsSendingMessage(false);
+      }
+    };
+
  
    const fetchUserLogs = async (userId: string) => {
      setIsLoadingLogs(true);
@@ -142,18 +170,25 @@
        if (error) throw error;
        
        // Record in audit log
-       await supabase.from("audit_logs").insert({
-         user_id: adminProfile?.id,
-         action: newStatus ? "APPROVE_USER" : "DISAPPROVE_USER",
-         entity_type: "profile",
-         entity_id: userId,
-         new_data: { is_approved: newStatus }
-       });
- 
-        toast.success(newStatus ? "Usuário Aprovado" : "Aprovação Revogada", {
-          description: newStatus ? "Cadastro validado. O licitante está habilitado para o leilão." : "O licitante não poderá mais realizar lances.",
+        await supabase.from("audit_logs").insert({
+          user_id: adminProfile?.id,
+          action: newStatus ? "APPROVE_USER" : "DISAPPROVE_USER",
+          entity_type: "profile",
+          entity_id: userId,
+          new_data: { is_approved: newStatus }
         });
-       fetchUsers();
+
+        // If approved, send notification email
+        if (newStatus) {
+          await supabase.functions.invoke('user-notifications', {
+            body: { userId, type: 'user_approved' }
+          });
+        }
+  
+         toast.success(newStatus ? "Usuário Aprovado" : "Aprovação Revogada", {
+           description: newStatus ? "Cadastro validado e e-mail de confirmação enviado." : "O licitante não poderá mais realizar lances.",
+         });
+        fetchUsers();
      } catch (error: any) {
        toast.error("Erro ao atualizar status: " + error.message);
      }
@@ -364,6 +399,46 @@
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsDocumentsDialogOpen(true);
+                                  }}
+                                  className="text-emerald-deep"
+                                >
+                                  <FileText className="h-5 w-5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Ver Documentos</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsMessageDialogOpen(true);
+                                  }}
+                                  className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                                >
+                                  <MessageSquare className="h-5 w-5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Enviar Mensagem</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleToggleBlock(user.id, user.is_blocked)}
                                   className={user.is_blocked ? "text-emerald-500 hover:bg-emerald-50" : "text-destructive hover:bg-destructive/10"}
                                 >
@@ -466,6 +541,87 @@
                 ))
               )}
             </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isDocumentsDialogOpen} onOpenChange={setIsDocumentsDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Documentos Enviados</DialogTitle>
+              <DialogDescription>
+                Documentação de {selectedUser?.full_name} para verificação.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
+              {selectedUser?.document_urls?.length > 0 ? (
+                selectedUser.document_urls.map((url: string, i: number) => (
+                  <div key={i} className="group relative aspect-square border rounded-xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all">
+                    {url.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/) ? (
+                      <img src={url} alt={`Doc ${i+1}`} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex flex-col items-center justify-center gap-2">
+                        <FileText className="h-10 w-10 text-muted-foreground/30" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Documento {i+1}</span>
+                      </div>
+                    )}
+                    <a 
+                      href={url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="absolute inset-0 bg-emerald-deep/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-2"
+                    >
+                      <Download className="h-4 w-4" /> ABRIR
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full py-12 text-center text-muted-foreground">
+                  <Info className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                  <p>Nenhum documento anexado a este perfil.</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Enviar Mensagem ao Usuário</DialogTitle>
+              <DialogDescription>
+                A mensagem será exibida no painel do licitante {selectedUser?.full_name}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Assunto</Label>
+                <Input 
+                  placeholder="Ex: Documentação Aprovada" 
+                  value={messageData.title}
+                  onChange={e => setMessageData({...messageData, title: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Conteúdo da Mensagem</Label>
+                <Textarea 
+                  placeholder="Escreva sua mensagem aqui..." 
+                  rows={5}
+                  value={messageData.content}
+                  onChange={e => setMessageData({...messageData, content: e.target.value})}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsMessageDialogOpen(false)}>Cancelar</Button>
+              <Button 
+                onClick={handleSendMessage} 
+                className="bg-emerald-deep text-white gap-2"
+                disabled={isSendingMessage || !messageData.content}
+              >
+                {isSendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Enviar Mensagem
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

@@ -24,6 +24,9 @@ function SignupPage() {
     password: "",
     cpf: "",
     phone: "",
+    address: "",
+    cep: "",
+    nationality: "Brasileira",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +42,9 @@ function SignupPage() {
             full_name: formData.name,
             cpf: formData.cpf,
             phone: formData.phone,
+            address: formData.address,
+            cep: formData.cep,
+            nationality: formData.nationality,
           },
         },
       });
@@ -88,7 +94,7 @@ function SignupPage() {
                <Input 
                  id="cpf" 
                  placeholder="000.000.000-00" 
-                 className="mt-1.5" 
+                 className="mt-1.5 text-sm" 
                  value={formData.cpf}
                  onChange={(e) => setFormData({ ...formData, cpf: maskCPF(e.target.value) })}
                  required
@@ -100,12 +106,36 @@ function SignupPage() {
                <Input 
                  id="phone" 
                  placeholder="(00) 00000-0000" 
-                 className="mt-1.5" 
+                 className="mt-1.5 text-sm" 
                  value={formData.phone}
                  onChange={(e) => setFormData({ ...formData, phone: maskPhone(e.target.value) })}
                  required
                  maxLength={15}
                />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <Label htmlFor="address">Endereço</Label>
+              <Input 
+                id="address" 
+                placeholder="Rua, nº, Bairro..." 
+                className="mt-1.5 text-sm" 
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="cep">CEP</Label>
+              <Input 
+                id="cep" 
+                placeholder="00000-000" 
+                className="mt-1.5 text-sm" 
+                value={formData.cep}
+                onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
+                required
+              />
             </div>
           </div>
           <div>

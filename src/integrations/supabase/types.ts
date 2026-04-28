@@ -763,6 +763,39 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          recipient_id: string
+          sender_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          recipient_id: string
+          sender_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          recipient_id?: string
+          sender_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -894,18 +927,22 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           approved_at: string | null
           approved_by: string | null
           auto_unlock_at: string | null
           avatar_url: string | null
           block_reason: string | null
+          cep: string | null
           cnpj: string | null
           cpf: string | null
           created_at: string
+          document_urls: string[] | null
           full_name: string | null
           id: string
           is_approved: boolean
           is_blocked: boolean | null
+          nationality: string | null
           phone: string | null
           risk_level: string | null
           risk_score: number | null
@@ -913,18 +950,22 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
           approved_at?: string | null
           approved_by?: string | null
           auto_unlock_at?: string | null
           avatar_url?: string | null
           block_reason?: string | null
+          cep?: string | null
           cnpj?: string | null
           cpf?: string | null
           created_at?: string
+          document_urls?: string[] | null
           full_name?: string | null
           id: string
           is_approved?: boolean
           is_blocked?: boolean | null
+          nationality?: string | null
           phone?: string | null
           risk_level?: string | null
           risk_score?: number | null
@@ -932,18 +973,22 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
           approved_at?: string | null
           approved_by?: string | null
           auto_unlock_at?: string | null
           avatar_url?: string | null
           block_reason?: string | null
+          cep?: string | null
           cnpj?: string | null
           cpf?: string | null
           created_at?: string
+          document_urls?: string[] | null
           full_name?: string | null
           id?: string
           is_approved?: boolean
           is_blocked?: boolean | null
+          nationality?: string | null
           phone?: string | null
           risk_level?: string | null
           risk_score?: number | null
