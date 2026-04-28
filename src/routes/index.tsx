@@ -1,3 +1,6 @@
+ import { ArticleCarousel } from "@/components/site/ArticleCarousel";
+ import { EventCarousel } from "@/components/site/EventCarousel";
+ import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
   import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2 } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
@@ -17,30 +20,39 @@ import { ErrorFallback } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   export const Route = createFileRoute("/")({
-    loader: async () => {
-      logger.info("Iniciando carregamento da Home");
-      try {
-        const [eventsRes, lotsRes, pastEventsRes, settingsRes] = await Promise.all([
+     loader: async () => {
+       logger.info("Iniciando carregamento da Home");
+       try {
+         const [eventsRes, lotsRes, pastEventsRes, settingsRes, articlesRes, sectionsSettingsRes] = await Promise.all([
+           supabase.from("events")
+             .select("*, lots!lots_event_id_fkey(id)")
+             .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
+             .order("start_date", { ascending: true })
+             .limit(15),
+            supabase.from("lots")
+              .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+              .eq("is_featured", true)
+              .order("created_at", { ascending: false })
+              .limit(12),
           supabase.from("events")
             .select("*, lots!lots_event_id_fkey(id)")
-            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
-            .order("start_date", { ascending: true })
-            .limit(10),
-           supabase.from("lots")
-             .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
-             .eq("is_featured", true)
-             .order("created_at", { ascending: false })
-             .limit(10),
-         supabase.from("events")
-           .select("*, lots!lots_event_id_fkey(id)")
-           .eq("status", "finished")
-          .order("start_date", { ascending: false })
-          .limit(3),
-        supabase.from("site_settings")
-          .select("*")
-          .eq("key", "announcement")
-          .maybeSingle()
-      ]);
+            .eq("status", "finished")
+           .order("start_date", { ascending: false })
+           .limit(3),
+         supabase.from("site_settings")
+           .select("*")
+           .eq("key", "announcement")
+           .maybeSingle(),
+         supabase.from("posts")
+           .select("*, category:categories(name)")
+           .eq("status", "published")
+           .order("published_at", { ascending: false })
+           .limit(10),
+         supabase.from("site_settings")
+           .select("*")
+           .eq("key", "homepage_sections")
+           .maybeSingle()
+       ]);
 
         logger.info("Carregamento da Home concluído com sucesso", {
           eventsCount: eventsRes.data?.length || 0,
@@ -60,12 +72,14 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           }
         }
 
-        return {
-          events: validatedEvents,
-          lots: validatedLots,
-          pastEvents: validatedPastEvents,
-          announcement: validatedAnnouncement
-        };
+         return {
+           events: validatedEvents,
+           lots: validatedLots,
+           pastEvents: validatedPastEvents,
+           announcement: validatedAnnouncement,
+           articles: articlesRes.data || [],
+           sectionsSettings: sectionsSettingsRes.data?.value || { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
+         };
       } catch (error) {
         logger.error("Erro ao carregar dados da Home", { error });
         throw error;
@@ -78,7 +92,13 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
  function Home() {
      const router = useRouter();
-    const { events, lots, pastEvents, announcement } = Route.useLoaderData();
+     const { events, lots, pastEvents, announcement, articles, sectionsSettings: rawSectionsSettings } = Route.useLoaderData();
+     
+     const sectionsSettings = (rawSectionsSettings as any) || { 
+       show_articles: true, 
+       show_upcoming_events: true, 
+       show_featured_lots: true 
+     };
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {
@@ -322,32 +342,24 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
         </section>
       )}
 
-      {/* EVENTOS FUTUROS */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Próximos eventos</h2>
-          <p className="mt-2 text-muted-foreground">Reserve sua agenda e participe das maiores oportunidades.</p>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-          {upcomingEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
-        </div>
-      </section>
+       {/* EVENTOS FUTUROS */}
+       {sectionsSettings.show_upcoming_events && (
+         <EventCarousel 
+           events={upcomingEvents} 
+           title="Próximos eventos" 
+           subtitle="Reserve sua agenda e participe das maiores oportunidades."
+         />
+       )}
+ 
+       {/* LOTES DESTAQUE */}
+       {sectionsSettings.show_featured_lots && (
+         <FeaturedLotsCarousel lots={mappedLots} />
+       )}
 
-      {/* LOTES DESTAQUE */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Lotes em <span className="text-gradient-gold">destaque</span></h2>
-            <p className="mt-2 text-muted-foreground">Os animais mais disputados desta semana.</p>
-          </div>
-          <Link to="/lotes" className="hidden items-center gap-1 text-sm text-gold hover:underline md:inline-flex">
-            Ver todos os lotes <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-          {featuredLots.map((l: any) => <LotCard key={l.id} lot={l} />)}
-        </div>
-      </section>
+       {/* ARTIGOS */}
+       {sectionsSettings.show_articles && (
+         <ArticleCarousel articles={articles} />
+       )}
 
       {/* EVENTOS PASSADOS */}
       {mappedPastEvents.length > 0 && (
