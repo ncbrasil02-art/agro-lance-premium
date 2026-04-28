@@ -323,6 +323,7 @@ function EventDetail() {
                   viewers: l.viewers || 0,
                   endsAt: l.end_date || event.end_date || "",
                   status: l.status as any,
+                  winnerName: l.winner?.full_name,
                   eventStatus: event.status,
                   eventStartDate: event.start_date,
                   eventEndDate: event.end_date,
