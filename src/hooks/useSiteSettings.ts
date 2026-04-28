@@ -1,3 +1,8 @@
+  export interface AboutPageSettings {
+    enabled: boolean;
+    title: string;
+  }
+ 
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  
@@ -31,7 +36,8 @@
     footer_text: string;
   }
  
-   export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null, customTexts?: CustomTexts | null }) {
+   export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null, customTexts?: CustomTexts | null, aboutPage?: AboutPageSettings | null }) {
+     const [aboutPage, setAboutPage] = useState<AboutPageSettings | null>(null);
      const [customTexts, setCustomTexts] = useState<CustomTexts | null>(null);
     const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
     const [theme, setTheme] = useState<ThemeSettings | null>(null);
@@ -45,6 +51,7 @@
         if (initialData.theme) setTheme(initialData.theme);
          if (initialData.homepage) setHomepage(initialData.homepage);
          if (initialData.customTexts) setCustomTexts(initialData.customTexts);
+         if (initialData.aboutPage) setAboutPage(initialData.aboutPage);
         setIsLoading(false);
       }
     }, [initialData?.siteInfo, initialData?.theme, initialData?.homepage]);
@@ -70,11 +77,13 @@
           const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
            const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
            const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
+           const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
            if (homeSettings) setHomepage(homeSettings);
            if (textsSettings) setCustomTexts(textsSettings);
+           if (aboutSettings) setAboutPage(aboutSettings);
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
           setIsLoading(false);
@@ -100,6 +109,7 @@
              if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...(updated.value as any) } as any));
+              if (updated.key === "about_page") setAboutPage(prev => ({ ...prev, ...(updated.value as any) } as any));
            }
          )
          .subscribe();
@@ -109,5 +119,5 @@
        };
    }, []);
  
-    return { siteInfo, theme, homepage, customTexts, isLoading };
+    return { siteInfo, theme, homepage, customTexts, aboutPage, isLoading };
  }
