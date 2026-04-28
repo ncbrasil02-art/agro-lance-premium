@@ -37,7 +37,7 @@ function NotFoundComponent() {
   );
 }
 
-  export const Route = createRootRoute<{
+   export const Route = createRootRouteWithContext<{
     siteInfo: any;
     theme: any;
     homepage: any;
