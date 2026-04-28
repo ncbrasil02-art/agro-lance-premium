@@ -528,6 +528,7 @@ export type Database = {
           end_date: string | null
           event_type: string | null
           id: string
+          is_featured: boolean | null
           is_live_interactive: boolean | null
           live_status_message: string | null
           location: string | null
@@ -559,6 +560,7 @@ export type Database = {
           end_date?: string | null
           event_type?: string | null
           id?: string
+          is_featured?: boolean | null
           is_live_interactive?: boolean | null
           live_status_message?: string | null
           location?: string | null
@@ -590,6 +592,7 @@ export type Database = {
           end_date?: string | null
           event_type?: string | null
           id?: string
+          is_featured?: boolean | null
           is_live_interactive?: boolean | null
           live_status_message?: string | null
           location?: string | null
@@ -922,6 +925,7 @@ export type Database = {
       posts: {
         Row: {
           author_id: string | null
+          category_id: string | null
           content: string
           created_at: string
           excerpt: string | null
@@ -935,6 +939,7 @@ export type Database = {
         }
         Insert: {
           author_id?: string | null
+          category_id?: string | null
           content: string
           created_at?: string
           excerpt?: string | null
@@ -948,6 +953,7 @@ export type Database = {
         }
         Update: {
           author_id?: string | null
+          category_id?: string | null
           content?: string
           created_at?: string
           excerpt?: string | null
@@ -965,6 +971,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
             referencedColumns: ["id"]
           },
         ]
