@@ -841,7 +841,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       )}
 
        {selectedEventId && liveEvent && (
-         <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
+          <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
            <div className="space-y-6">
              {/* Controle de Lotes */}
              <Card>
@@ -849,11 +849,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                  <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Fila de Lotes</CardTitle>
                </CardHeader>
                <CardContent>
-                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                   <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                    {lots.map((lot) => (
                      <div 
                        key={lot.id} 
-                        className={`relative rounded-xl border p-4 transition-all group ${
+                        className={`relative rounded-lg border p-3 transition-all group ${
                          lot.id === liveEvent.active_lot_id 
                           ? "border-gold bg-gold/10 ring-2 ring-gold shadow-gold-lg" 
                           : (lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished')
@@ -862,14 +862,14 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                        }`}
                      >
                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-black text-emerald-deep bg-emerald-deep/5 px-2 py-0.5 rounded">LOTE {lot.lot_number}</span>
+                           <span className="text-[10px] font-black text-emerald-deep bg-emerald-deep/5 px-1.5 py-0.5 rounded">LOTE {lot.lot_number}</span>
                          {lot.id === liveEvent.active_lot_id && (
                             <span className="flex items-center gap-1 text-[10px] font-black uppercase text-gold animate-pulse bg-gold/10 px-2 py-0.5 rounded-full">
                              <div className="h-1.5 w-1.5 rounded-full bg-gold" /> Ao Vivo
                            </span>
                          )}
                        </div>
-                        <h4 className="font-bold truncate text-emerald-deep">{lot.animal?.name || "Animal não vinculado"}</h4>
+                         <h4 className="font-bold truncate text-xs text-emerald-deep">{lot.animal?.name || "Não vinculado"}</h4>
                         <div className="mt-1 flex items-center gap-2 text-[10px] text-muted-foreground font-medium">
                           <span>{formatBRL(lot.current_price || lot.starting_price)}</span>
                           {lot.status === 'upcoming' && (
@@ -882,7 +882,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                         <div className="mt-4 flex flex-col gap-2">
                           {lot.id !== liveEvent.active_lot_id && lot.status !== 'sold' && lot.status !== 'passed' && lot.status !== 'finished' && (
                             <Button 
-                              size="sm" 
+                                 size="xs" 
                               className="w-full bg-emerald-deep text-white hover:bg-emerald-deep/90 font-bold shadow-sm"
                               onClick={() => activateLot(lot.id)}
                               disabled={isActionLoading}
@@ -893,7 +893,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                           {lot.id === liveEvent.active_lot_id && (
                             <div className="grid grid-cols-2 gap-2">
                               <Button 
-                                size="sm" 
+                                 size="xs" 
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                 onClick={() => sellLot(lot.id)}
                                 disabled={isActionLoading}
@@ -901,7 +901,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                                 <Check className="mr-1 h-3 w-3" /> Arrematar
                               </Button>
                               <Button 
-                                size="sm" 
+                                 size="xs" 
                                 variant="destructive"
                                 onClick={() => passLot(lot.id)}
                                 disabled={isActionLoading}
