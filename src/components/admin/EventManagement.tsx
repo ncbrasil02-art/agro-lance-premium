@@ -343,19 +343,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             </CardContent>
           </Card>
 
-         <div className="flex flex-col gap-6">
-           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-gold/5 p-4 rounded-2xl border border-gold/10">
-             <div className="space-y-1">
-               <h3 className="font-bold text-lg text-gold">Quer realizar um evento?</h3>
-               <p className="text-xs text-muted-foreground">Fale conosco e organize seu leilão na Elite.</p>
-             </div>
-             <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
-               <DialogTrigger asChild>
-                 <Button className="bg-emerald-deep text-white hover:bg-emerald-deep/90 shadow-lg">
-                   <Send className="mr-2 h-4 w-4" /> Criar um Evento
-                 </Button>
-               </DialogTrigger>
-               <DialogContent className="sm:max-w-[450px]">
+          <div className="flex flex-col gap-6">
+            {/* Solicitação de Eventos removida a pedido do usuário */}
+            <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
+                <DialogContent className="sm:max-w-[450px]">
                  <DialogHeader>
                    <DialogTitle>Solicitar Novo Evento</DialogTitle>
                    <DialogDescription>
