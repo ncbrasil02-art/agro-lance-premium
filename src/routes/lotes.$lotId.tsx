@@ -44,7 +44,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
       throw notFound();
     }
 
-    const [lotRes, bidsRes] = await Promise.all([
+    const [lotRes, bidsRes, neighboringLotsRes] = await Promise.all([
        supabase
          .from("lots")
          .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
@@ -55,16 +55,40 @@ export const Route = createFileRoute("/lotes/$lotId")({
         .select("*")
         .eq("lot_id", lotId)
         .order("created_at", { ascending: false })
-        .limit(5)
+        .limit(5),
+      supabase
+        .from("lots")
+        .select("id, lot_number")
+        .order("lot_number", { ascending: true })
     ]);
 
     if (lotRes.error || !lotRes.data) {
       throw notFound();
     }
 
+    // Get neighbors within the same event
+    const eventId = lotRes.data.event_id;
+    const eventLots = (neighboringLotsRes.data || []).filter((l: any) => l.event_id === undefined || true); // We'll filter properly in a sec
+    
+    // Actually let's fetch only lots from this event
+    const { data: eventLotsData } = await supabase
+      .from("lots")
+      .select("id, lot_number")
+      .eq("event_id", eventId)
+      .order("lot_number", { ascending: true });
+
+    const currentLotIndex = (eventLotsData || []).findIndex(l => l.id === lotId);
+    const prevLotId = currentLotIndex > 0 ? eventLotsData![currentLotIndex - 1].id : null;
+    const nextLotId = currentLotIndex < (eventLotsData?.length || 0) - 1 ? eventLotsData![currentLotIndex + 1].id : null;
+
     try {
       const validatedLot = lotSchema.parse(lotRes.data);
-      return { lot: validatedLot, initialBids: bidsRes.data || [] };
+      return { 
+        lot: validatedLot, 
+        initialBids: bidsRes.data || [],
+        prevLotId,
+        nextLotId
+      };
     } catch (e) {
       throw notFound();
     }
