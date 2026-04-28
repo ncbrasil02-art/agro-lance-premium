@@ -606,8 +606,8 @@ function LotDetail() {
         </header>
 
         <div className="container mx-auto px-4 py-8">
-          <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-            <div className="space-y-8">
+          <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] flex-col-reverse lg:flex-row">
+            <div className="space-y-8 order-2 lg:order-1">
                <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
                 <div className="relative">
                   <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
@@ -862,7 +862,7 @@ function LotDetail() {
                 </Tabs>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 order-1 lg:order-2">
                 <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full">
                   <div className="flex justify-between items-start mb-6">
                     <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
