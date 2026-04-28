@@ -723,12 +723,17 @@ function LotDetail() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {lot.animal.vaccination_records.map((v: any, idx: number) => (
                               <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                                  <span className="text-xs font-bold text-white/80">
-                                    {typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}
-                                  </span>
-                                </div>
+                                 <div className="flex items-center gap-3">
+                                   <div className="h-7 w-7 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
+                                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                                   </div>
+                                   <div className="flex flex-col">
+                                     <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">VACINADO (SIM)</span>
+                                     <span className="text-xs font-bold text-white/90 leading-tight">
+                                       {typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}
+                                     </span>
+                                   </div>
+                                 </div>
                                 {v.date && <span className="text-[10px] text-white/40">{v.date}</span>}
                               </div>
                             ))}
@@ -791,26 +796,26 @@ function LotDetail() {
                                return (
                                  <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
                                    <span className="text-xs text-white/80">{item.label}</span>
-                                   <div className="flex items-center gap-2">
+                                   <div className="flex items-center gap-3">
                                        {val === true ? (
-                                         <div className="flex items-center gap-1">
-                                           <span className="text-[10px] font-black uppercase text-emerald-400">SIM</span>
-                                           <div className="h-6 w-6 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
-                                             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-black uppercase text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">SIM</span>
+                                           <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
+                                             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                                            </div>
                                          </div>
                                        ) : val === false ? (
-                                         <div className="flex items-center gap-1">
-                                           <span className="text-[10px] font-black uppercase text-red-400">NÃO</span>
-                                           <div className="h-6 w-6 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
-                                             <AlertTriangle className="h-3.5 w-3.5 text-red-400" />
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-black uppercase text-red-400 bg-red-400/10 px-2 py-0.5 rounded border border-red-400/20">NÃO</span>
+                                           <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
+                                             <AlertTriangle className="h-4 w-4 text-red-400" />
                                            </div>
                                          </div>
                                        ) : (
-                                         <div className="flex items-center gap-1">
-                                           <span className="text-[10px] font-black uppercase text-white/20">-</span>
-                                           <div className="h-6 w-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                                             <AlertCircle className="h-3.5 w-3.5 text-white/10" />
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded border border-white/10">PENDENTE</span>
+                                           <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                                             <AlertCircle className="h-4 w-4 text-white/10" />
                                            </div>
                                          </div>
                                        )}
