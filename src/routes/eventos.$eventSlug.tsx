@@ -18,45 +18,36 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
    loader: async ({ params }) => {
      const eventSlug = params.eventSlug;
      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventSlug);
-     const selectQuery = "*, lots(*, animal:animals(*, seller:sellers(name)), winner:profiles(full_name))";
  
-     let eventData = null;
-     let fetchError = null;
+     try {
+       let eventData = null;
+       if (isUuid) {
+         const { data } = await supabase.from("events").select("*").eq("id", eventSlug).maybeSingle();
+         eventData = data;
+       }
+       if (!eventData) {
+         const { data } = await supabase.from("events").select("*").eq("slug", eventSlug).maybeSingle();
+         eventData = data;
+       }
  
-     if (isUuid) {
-       const { data, error } = await supabase
-         .from("events")
-         .select(selectQuery)
-         .eq("id", eventSlug)
-         .maybeSingle();
-       eventData = data;
-       fetchError = error;
-     }
+       if (!eventData) throw notFound();
  
-     if (!eventData && !fetchError) {
-       const { data, error } = await supabase
-         .from("events")
-         .select(selectQuery)
-         .eq("slug", eventSlug)
-         .maybeSingle();
-       eventData = data;
-       fetchError = error;
-     }
+       const { data: lots, error: lotsError } = await supabase
+         .from("lots")
+         .select("*, animal:animals(*, seller:sellers(name)), winner:profiles(full_name)")
+         .eq("event_id", eventData.id)
+         .order("lot_number", { ascending: true });
  
-     if (fetchError || !eventData) {
-       console.error("Erro ao buscar evento:", fetchError);
+       if (lotsError) console.error("Erro ao buscar lotes:", lotsError);
+ 
+       const event = { ...eventData, lots: lots || [] };
+       const result = eventSchema.safeParse(event);
+       return { event: result.success ? result.data : (event as any) };
+     } catch (err) {
+       console.error("Erro no loader de evento:", err);
        throw notFound();
      }
- 
-     const event = eventData;
-    try {
-      const validatedEvent = eventSchema.parse(event);
-      return { event: validatedEvent };
-    } catch (e) {
-      console.error("Erro de validação do evento:", e);
-      throw notFound();
-    }
-  },
+   },
   head: ({ loaderData }) => ({
     meta: loaderData?.event ? [
       { title: `${loaderData.event.name} — Premium Agro Leilões` },
