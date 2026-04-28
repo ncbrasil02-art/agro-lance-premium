@@ -103,45 +103,6 @@ export const Route = createFileRoute("/admin")({
       soldTotal: 0
     });
      const [isLoadingStats, setIsLoadingStats] = useState(false);
-     const [homepageSections, setHomepageSections] = useState({
-       show_articles: true,
-       show_upcoming_events: true,
-       show_featured_lots: true
-     });
-     const [isSavingSections, setIsSavingSections] = useState(false);
-
-     const fetchHomepageSections = async () => {
-       const { data } = await supabase
-         .from("site_settings")
-         .select("value")
-         .eq("key", "homepage_sections")
-         .maybeSingle();
-       if (data?.value) {
-         setHomepageSections(data.value as any);
-       }
-     };
-
-     const updateHomepageSection = async (key: string, value: boolean) => {
-       setIsSavingSections(true);
-       const newSettings = { ...homepageSections, [key]: value };
-       setHomepageSections(newSettings);
-       
-       const { error } = await supabase
-         .from("site_settings")
-         .upsert({
-           key: "homepage_sections",
-           value: newSettings,
-           description: "Controla a exibição de seções na página inicial"
-         });
-
-       if (error) {
-         toast.error("Erro ao salvar configurações: " + error.message);
-       } else {
-         toast.success("Configuração atualizada!");
-       }
-       setIsSavingSections(false);
-     };
- 
     const fetchStats = async () => {
       setIsLoadingStats(true);
       try {
@@ -167,9 +128,6 @@ export const Route = createFileRoute("/admin")({
      useEffect(() => {
        if (activeTab === "dashboard") {
          fetchStats();
-       }
-       if (activeTab === "settings") {
-         fetchHomepageSections();
        }
      }, [activeTab]);
 
