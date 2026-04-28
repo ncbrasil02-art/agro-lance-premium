@@ -100,7 +100,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
        };
      }, [router]);
 
-    const mapEvent = (e: ValidatedEvent) => ({
+    const mapEvent = (e: any) => ({
      id: e.id,
      slug: e.slug || "",
      name: e.name,
@@ -119,10 +119,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
       show_countdown: e.show_countdown !== false,
     });
 
-    const mappedEvents = events.map(mapEvent);
-    const mappedPastEvents = pastEvents.map(mapEvent);
+    const mappedEvents = (events || []).map(mapEvent);
+    const mappedPastEvents = (pastEvents || []).map(mapEvent);
  
-    const mappedLots = lots.map((l: ValidatedLot) => ({
+    const mappedLots = (lots || []).map((l: any) => ({
      id: l.id,
      number: l.lot_number,
      eventId: l.event_id,
