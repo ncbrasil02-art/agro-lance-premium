@@ -25,7 +25,8 @@ export const Route = createFileRoute("/admin")({
    import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
    import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
    import { UserManagement } from "@/components/admin/UserManagement";
-   import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+    import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+    import { PostManagement } from "@/components/admin/PostManagement";
   
   type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
