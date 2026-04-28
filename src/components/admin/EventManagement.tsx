@@ -851,6 +851,179 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
            )}
          </CardContent>
        </Card>
-     </div>
-   );
- }
+         </Dialog>
+ 
+         <Dialog open={!!viewingEventDetails} onOpenChange={(open) => !open && setViewingEventDetails(null)}>
+           <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
+             <DialogHeader>
+               <DialogTitle className="flex items-center gap-2">
+                 <Eye className="h-5 w-5 text-emerald-deep" />
+                 Detalhamento do Evento: {viewingEventDetails?.name}
+               </DialogTitle>
+               <DialogDescription>
+                 Acompanhe todos os lotes, arrematantes e valores finais deste leilão.
+               </DialogDescription>
+             </DialogHeader>
+ 
+             <div className="mt-4 space-y-4">
+               {isDetailsLoading ? (
+                 <div className="flex justify-center py-12">
+                   <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                 </div>
+               ) : eventLots.length === 0 ? (
+                 <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+                   Nenhum lote cadastrado para este evento.
+                 </div>
+               ) : (
+                 <div className="border rounded-xl overflow-hidden bg-card">
+                   <Table>
+                     <TableHeader className="bg-muted/50">
+                       <TableRow>
+                         <TableHead className="w-[80px]">Lote</TableHead>
+                         <TableHead>Animal</TableHead>
+                         <TableHead>Arrematante</TableHead>
+                         <TableHead>Valor Final</TableHead>
+                         <TableHead className="text-right">Ações</TableHead>
+                       </TableRow>
+                     </TableHeader>
+                     <TableBody>
+                       {eventLots.map((lot) => (
+                         <TableRow key={lot.id} className="hover:bg-muted/30">
+                           <TableCell className="font-bold text-lg text-emerald-deep">
+                             #{String(lot.lot_number).padStart(2, '0')}
+                           </TableCell>
+                           <TableCell>
+                             <div className="font-bold uppercase italic">{lot.animal?.name}</div>
+                             <div className="text-[10px] text-muted-foreground">CÓD: {lot.animal?.internal_code}</div>
+                           </TableCell>
+                           <TableCell>
+                             {lot.winner ? (
+                               <div className="space-y-1">
+                                 <div className="font-bold text-emerald-600 flex items-center gap-1">
+                                   <Users className="h-3 w-3" />
+                                   {lot.winner.full_name}
+                                 </div>
+                                 <div className="text-[10px] text-muted-foreground">CPF: {lot.winner.cpf || '---'}</div>
+                                 <a 
+                                   href={`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}`} 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 font-bold"
+                                 >
+                                   <MessageSquare className="h-3 w-3" />
+                                   WhatsApp: {lot.winner.phone}
+                                 </a>
+                               </div>
+                             ) : (
+                               <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
+                             )}
+                           </TableCell>
+                           <TableCell className="font-black text-emerald-deep">
+                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-1">
+                               {lot.winner && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button 
+                                         variant="outline" 
+                                         size="icon" 
+                                         className="h-8 w-8 border-emerald-deep/30 text-emerald-deep"
+                                         onClick={() => {
+                                           const msg = encodeURIComponent(`Olá ${lot.winner.full_name}, aqui é da Premium Agro Leilões. Parabéns pelo arremate do Lote ${lot.lot_number} (${lot.animal?.name}) no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}. Em breve enviaremos o termo de arrematação.`);
+                                           window.open(`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}?text=${msg}`, '_blank');
+                                         }}
+                                       >
+                                         <MessageSquare className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>Enviar aviso WhatsApp</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="icon" 
+                                       className="h-8 w-8 border-gold/30 text-gold"
+                                       onClick={() => {
+                                         const printWindow = window.open('', '_blank');
+                                         if (!printWindow) return;
+                                         const html = `
+                                           <html>
+                                             <head><title>Nota de Venda - Lote ${lot.lot_number}</title></head>
+                                             <body style="font-family: Arial; padding: 40px; border: 2px solid #000;">
+                                               <h1 style="text-align:center;">PREMIUM AGRO LEILÕES</h1>
+                                               <h2 style="text-align:center;">NOTA DE VENDA E ARREMATE</h2>
+                                               <hr/>
+                                               <p><strong>Evento:</strong> ${viewingEventDetails?.name}</p>
+                                               <p><strong>Lote:</strong> ${lot.lot_number} - ${lot.animal?.name}</p>
+                                               <p><strong>Arrematante:</strong> ${lot.winner?.full_name || '---'}</p>
+                                               <p><strong>CPF:</strong> ${lot.winner?.cpf || '---'}</p>
+                                               <p><strong>Telefone:</strong> ${lot.winner?.phone || '---'}</p>
+                                               <p><strong>Valor Final:</strong> ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}</p>
+                                               <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+                                               <div style="margin-top:100px; border-top: 1px solid #000; width: 300px; text-align:center;">Assinatura Premium Agro</div>
+                                               <script>window.print();</script>
+                                             </body>
+                                           </html>
+                                         `;
+                                         printWindow.document.write(html);
+                                         printWindow.document.close();
+                                       }}
+                                     >
+                                       <FileText className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Imprimir Nota de Venda</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="icon" 
+                                       className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                       onClick={async () => {
+                                         const { data: bids } = await supabase
+                                           .from("bids")
+                                           .select("id")
+                                           .eq("lot_id", lot.id)
+                                           .order("amount", { ascending: false })
+                                           .limit(1);
+                                         
+                                         if (bids && bids.length > 0) {
+                                           handleDeleteBid(bids[0].id, lot.id);
+                                         } else {
+                                           toast.error("Nenhum lance encontrado para excluir.");
+                                         }
+                                       }}
+                                     >
+                                       <Trash className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Excluir maior lance (Reverter arremate)</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                             </div>
+                           </TableCell>
+                         </TableRow>
+                       ))}
+                     </TableBody>
+                   </Table>
+                 </div>
+               )}
+             </div>
+             <DialogFooter>
+               <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
+       </div>
+     );
+   }
