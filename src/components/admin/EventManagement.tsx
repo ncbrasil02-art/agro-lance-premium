@@ -1098,7 +1098,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                          <TableHead className="w-[80px]">Lote</TableHead>
                          <TableHead>Animal</TableHead>
                          <TableHead>Arrematante</TableHead>
-                         <TableHead>Valor Final</TableHead>
+                         <TableHead>Valor / Lances</TableHead>
                          <TableHead className="text-right">Ações</TableHead>
                        </TableRow>
                      </TableHeader>
