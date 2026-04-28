@@ -957,7 +957,7 @@ function LotDetail() {
                       </Button>
                    </div>
                      <div className="flex flex-col gap-3 mt-2">
-                       {lot.animal?.accepts_offers && dynamicStatus === 'pre_lance' && (
+                        {lot.animal?.accepts_offers && (dynamicStatus === 'pre_lance' || dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento') && (
                          <Dialog open={isOfferDialogOpen} onOpenChange={setIsOfferDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
