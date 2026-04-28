@@ -1040,85 +1040,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
                              )}
                            </TableCell>
-                           <TableCell className="font-black text-emerald-deep">
-                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
-                           </TableCell>
-                                                   </div>
-                                                 </div>
-                                               </div>
-
-                                               <div class="section">
-                                                 <div class="section-title">Dados do Arrematante</div>
-                                                 <div class="grid">
-                                                   <div>
-                                                     <p><strong>Nome:</strong> ${lot.winner?.full_name || '---'}</p>
-                                                     <p><strong>CPF/CNPJ:</strong> ${lot.winner?.cpf || '---'}</p>
-                                                   </div>
-                                                   <div>
-                                                     <p><strong>Telefone:</strong> ${lot.winner?.phone || '---'}</p>
-                                                     <p><strong>Endereço:</strong> ${lot.winner?.address || '---'}</p>
-                                                   </div>
-                                                 </div>
-                                               </div>
-
-                                               <div class="section" style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
-                                                 <div class="section-title">Valores e Fechamento</div>
-                                                 <p style="font-size: 24px; font-weight: 900; color: #064e3b; margin: 10px 0;">
-                                                   Valor Final: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}
-                                                 </p>
-                                                 <p style="font-size: 10px; color: #666;">* Sujeito às condições de pagamento estabelecidas no regulamento do evento.</p>
-                                               </div>
-
-                                               <div class="footer">
-                                                 <div class="signature">Assinatura do Arrematante</div>
-                                                 <div class="signature">Assinatura Premium Agro</div>
-                                                 <p style="font-size: 10px; color: #999; margin-top: 40px;">Documento gerado eletronicamente em ${new Date().toLocaleString('pt-BR')}</p>
-                                               </div>
-                                               
-                                               <script>window.print();</script>
-                                             </body>
-                                           </html>
-                                         `;
-                                         printWindow.document.write(html);
-                                         printWindow.document.close();
-                                       }}
-                                     >
-                                       <FileText className="h-4 w-4" />
-                                     </Button>
-                                   </TooltipTrigger>
-                                   <TooltipContent>Imprimir Nota de Venda</TooltipContent>
-                                 </Tooltip>
-                               </TooltipProvider>
-                               <TooltipProvider>
-                                 <Tooltip>
-                                   <TooltipTrigger asChild>
-                                     <Button 
-                                       variant="outline" 
-                                       size="icon" 
-                                       className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                       onClick={async () => {
-                                         const { data: bids } = await supabase
-                                           .from("bids")
-                                           .select("id")
-                                           .eq("lot_id", lot.id)
-                                           .order("amount", { ascending: false })
-                                           .limit(1);
-                                         
-                                         if (bids && bids.length > 0) {
-                                           handleDeleteBid(bids[0].id, lot.id);
-                                         } else {
-                                           toast.error("Nenhum lance encontrado para excluir.");
-                                         }
-                                       }}
-                                     >
-                                       <Trash className="h-4 w-4" />
-                                     </Button>
-                                   </TooltipTrigger>
-                                   <TooltipContent>Excluir maior lance (Reverter arremate)</TooltipContent>
-                                 </Tooltip>
-                               </TooltipProvider>
-                             </div>
-                           </TableCell>
+                            <TableCell className="font-black text-emerald-deep">
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}>
+                                  <ListOrdered className="h-4 w-4" />
+                                </Button>
+                                {lot.status !== 'sold' && (
+                                  <Button variant="ghost" size="icon" className="text-emerald-600" onClick={() => handleFinalizeLot(lot)}>
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                {!lot.winner_id && (
+                                  <Button variant="ghost" size="icon" className="text-gold" onClick={() => setSelectedLotForWinner(lot)}>
+                                    <UserPlus className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
                          </TableRow>
                        ))}
                      </TableBody>
