@@ -63,26 +63,54 @@ import {
          viewers: 0
        });
 
-      const fetchData = async () => {
-        setIsLoading(true);
-        console.log("Fetching lots, events and animals...");
-        try {
-          const [lotsRes, eventsRes, animalsRes] = await Promise.all([
-            supabase
-              .from("lots")
-               .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
-              .order("is_featured", { ascending: false })
-              .order("lot_number", { ascending: true }),
-            supabase
-              .from("events")
-              .select("id, name")
-              .order("name"),
-            supabase
-              .from("animals")
-              .select("id, name, internal_code, sale_status")
-              .neq("sale_status", "sold")
-              .order("name")
-          ]);
+       const fetchData = async () => {
+         setIsLoading(true);
+         console.log("Fetching lots, events, animals and profiles...");
+         try {
+           const [lotsRes, eventsRes, animalsRes, profilesRes] = await Promise.all([
+             supabase
+               .from("lots")
+                .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
+               .order("is_featured", { ascending: false })
+               .order("lot_number", { ascending: true }),
+             supabase
+               .from("events")
+               .select("id, name")
+               .order("name"),
+             supabase
+               .from("animals")
+               .select("id, name, internal_code, sale_status")
+               .neq("sale_status", "sold")
+               .order("name"),
+             supabase
+               .from("profiles")
+               .select("id, full_name, phone, cpf")
+               .order("full_name")
+           ]);
+         const handleAssignWinner = async () => {
+           if (!winnerLotId || !selectedWinnerProfileId) return;
+           setIsLoading(true);
+           try {
+             const { error } = await supabase
+               .from("lots")
+               .update({ 
+                 winner_id: selectedWinnerProfileId,
+                 winner_link_reason: "Vínculo manual pós-leilão (Arrematado Pendente)"
+               })
+               .eq("id", winnerLotId);
+             
+             if (error) throw error;
+             toast.success("Ganhador vinculado com sucesso!");
+             setIsWinnerDialogOpen(false);
+             setWinnerLotId(null);
+             setSelectedWinnerProfileId("");
+             fetchData();
+           } catch (error: any) {
+             toast.error("Erro ao vincular ganhador: " + error.message);
+           } finally {
+             setIsLoading(false);
+           }
+         };
     
           if (lotsRes.error) {
             console.error("Error fetching lots:", lotsRes.error);
