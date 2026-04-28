@@ -643,23 +643,7 @@ export const Route = createFileRoute("/painel")({
                ))}
              </div>
            )}
-         </TabsContent>
- 
-         <TabsContent value="mensagens">
-          <Card>
-            <CardHeader>
-              <CardTitle>Canal de Comunicação</CardTitle>
-              <CardDescription>Mensagens trocadas com a leiloaria sobre seus arremates.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <MessageSquare className="h-12 w-12 text-muted-foreground/30 mb-4" />
-              <CardTitle className="text-xl">Nenhuma mensagem</CardTitle>
-              <CardDescription className="max-w-xs mx-auto mt-2">
-                Você ainda não possui mensagens trocadas com nossa equipe de pós-venda.
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          </TabsContent>
       </Tabs>
     </div>
   );
