@@ -536,11 +536,13 @@ export const Route = createFileRoute("/ao-vivo")({
                  const newBid = payload.new;
                  console.log("Processando novo lance (INSERT):", newBid);
                  
-                 setBids((prev: any[]) => {
-                   if (prev.some((b: any) => b.id === newBid.id)) return prev;
-                   const updatedBids = [newBid, ...prev].slice(0, 15);
-                   return updatedBids;
-                 });
+                  setBids((prev: any[]) => {
+                    if (prev.some((b: any) => b.id === newBid.id)) return prev;
+                    const updatedBids = [newBid, ...prev]
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .slice(0, 15);
+                    return updatedBids;
+                  });
  
                  setLiveEvent((prev: any) => {
                    if (!prev || !prev.active_lot || prev.active_lot.id !== newBid.lot_id) return prev;
@@ -1368,10 +1370,12 @@ export const Route = createFileRoute("/ao-vivo")({
                  <div>
                    <div className="font-semibold flex items-center gap-2">
                        <div className="flex flex-col">
-                          <span className="text-sm font-bold">
-                            {bid.phone_bidder_identifier || 
-                             (bidderProfiles[bid.user_id]?.full_name || bid.profile?.full_name || (bid.user_id ? `Comprador ...${bid.user_id.slice(-4)}` : "Licitante"))}
-                          </span>
+                           <span className="text-sm font-bold">
+                             {bid.phone_bidder_identifier || 
+                              bidderProfiles[bid.user_id]?.full_name || 
+                              bid.profile?.full_name || 
+                              (bid.user_id ? `Comprador #${bid.user_id.slice(0, 4)}` : "Licitante")}
+                           </span>
                          <div className="flex items-center gap-2 mt-0.5">
                            {bid.is_phone_bid ? (
                              <span className="flex items-center gap-1 text-[9px] bg-gold/20 text-gold px-1.5 py-0.5 rounded uppercase font-black">
