@@ -757,16 +757,28 @@ function LotDetail() {
                                  <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
                                    <span className="text-xs text-white/80">{item.label}</span>
                                    <div className="flex items-center gap-2">
-                                      <span className={`text-[10px] font-bold uppercase ${val === true ? 'text-emerald-500' : val === false ? 'text-red-500' : 'text-white/20'}`}>
-                                        {val === true ? 'Sim' : val === false ? 'Não' : '-'}
-                                      </span>
-                                      {val === true ? (
-                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                      ) : val === false ? (
-                                        <AlertTriangle className="h-4 w-4 text-red-500" />
-                                      ) : (
-                                        <AlertCircle className="h-4 w-4 text-white/10" />
-                                      )}
+                                       {val === true ? (
+                                         <div className="flex items-center gap-1">
+                                           <span className="text-[10px] font-black uppercase text-emerald-400">SIM</span>
+                                           <div className="h-6 w-6 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
+                                             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                                           </div>
+                                         </div>
+                                       ) : val === false ? (
+                                         <div className="flex items-center gap-1">
+                                           <span className="text-[10px] font-black uppercase text-red-400">NÃO</span>
+                                           <div className="h-6 w-6 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
+                                             <AlertTriangle className="h-3.5 w-3.5 text-red-400" />
+                                           </div>
+                                         </div>
+                                       ) : (
+                                         <div className="flex items-center gap-1">
+                                           <span className="text-[10px] font-black uppercase text-white/20">-</span>
+                                           <div className="h-6 w-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                                             <AlertCircle className="h-3.5 w-3.5 text-white/10" />
+                                           </div>
+                                         </div>
+                                       )}
                                    </div>
                                  </div>
                                );
@@ -904,9 +916,9 @@ function LotDetail() {
                         <Share2 className="mr-2 h-4 w-4 text-emerald-400" /> COMPARTILHAR
                       </Button>
                    </div>
-                    <div className="flex flex-col gap-2 mt-2">
-                      {lot.animal?.accepts_offers && (
-                        <Dialog open={isOfferDialogOpen} onOpenChange={setIsOfferDialogOpen}>
+                     <div className="flex flex-col gap-3 mt-2">
+                       {lot.animal?.accepts_offers && dynamicStatus === 'pre_lance' && (
+                         <Dialog open={isOfferDialogOpen} onOpenChange={setIsOfferDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
                               className="w-full h-14 rounded-2xl bg-emerald-bright text-white hover:bg-emerald-bright/90 gap-2 font-black italic shadow-[0_0_20px_rgba(16,185,129,0.3)]"
