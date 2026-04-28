@@ -91,9 +91,9 @@
        if (error) throw error;
  
         data.forEach(item => {
-          if (item.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(item.value as any) }));
-          if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) }));
-          if (item.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(item.value as any) }));
+          if (item.key === "site_info") setSiteInfo((prev: any) => ({ ...prev, ...(item.value as any) }));
+          if (item.key === "theme") setTheme((prev: any) => ({ ...prev, ...(item.value as any) }));
+          if (item.key === "homepage_sections") setHomepage((prev: any) => ({ ...prev, ...(item.value as any) }));
         });
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
