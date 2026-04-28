@@ -170,18 +170,25 @@
        if (error) throw error;
        
        // Record in audit log
-       await supabase.from("audit_logs").insert({
-         user_id: adminProfile?.id,
-         action: newStatus ? "APPROVE_USER" : "DISAPPROVE_USER",
-         entity_type: "profile",
-         entity_id: userId,
-         new_data: { is_approved: newStatus }
-       });
- 
-        toast.success(newStatus ? "Usuário Aprovado" : "Aprovação Revogada", {
-          description: newStatus ? "Cadastro validado. O licitante está habilitado para o leilão." : "O licitante não poderá mais realizar lances.",
+        await supabase.from("audit_logs").insert({
+          user_id: adminProfile?.id,
+          action: newStatus ? "APPROVE_USER" : "DISAPPROVE_USER",
+          entity_type: "profile",
+          entity_id: userId,
+          new_data: { is_approved: newStatus }
         });
-       fetchUsers();
+
+        // If approved, send notification email
+        if (newStatus) {
+          await supabase.functions.invoke('user-notifications', {
+            body: { userId, type: 'user_approved' }
+          });
+        }
+  
+         toast.success(newStatus ? "Usuário Aprovado" : "Aprovação Revogada", {
+           description: newStatus ? "Cadastro validado e e-mail de confirmação enviado." : "O licitante não poderá mais realizar lances.",
+         });
+        fetchUsers();
      } catch (error: any) {
        toast.error("Erro ao atualizar status: " + error.message);
      }
