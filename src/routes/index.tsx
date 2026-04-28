@@ -342,8 +342,8 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
       )}
 
       {/* DYNAMIC SECTIONS ORDERING */}
-      {(activeSections?.order || ["upcoming_events", "featured_lots", "sale_menu", "articles"]).map((sectionId: string) => {
-        if (sectionId === "upcoming_events" && activeSections?.show_upcoming_events) {
+      {((activeSections as any)?.order || ["upcoming_events", "featured_lots", "sale_menu", "articles"]).map((sectionId: string) => {
+        if (sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events) {
           return (
             <EventCarousel 
               key="upcoming"
@@ -353,13 +353,13 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
             />
           );
         }
-        if (sectionId === "featured_lots" && activeSections?.show_featured_lots) {
+        if (sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots) {
           return <FeaturedLotsCarousel key="featured" lots={mappedLots} />;
         }
-        if (sectionId === "articles" && activeSections?.show_articles) {
+        if (sectionId === "articles" && (activeSections as any)?.show_articles) {
           return <ArticleCarousel key="articles" articles={articles} />;
         }
-        if (sectionId === "sale_menu" && activeSections?.show_sale_menu) {
+        if (sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu) {
           return (
             <section key="sale" className="container mx-auto px-4 py-16">
               <div className="rounded-3xl bg-emerald-deep/40 border border-gold/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
