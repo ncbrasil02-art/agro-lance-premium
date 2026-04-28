@@ -1,3 +1,4 @@
+ import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
@@ -189,10 +190,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       }
     };
  
-   useEffect(() => {
-     fetchEvents();
-      fetchSellers();
-   }, []);
+    useEffect(() => {
+      fetchEvents();
+       fetchSellers();
+    }, []);
+
+    // Real-time updates for the events list and current details
+    useRealtimeLots(() => {
+      fetchEvents();
+      if (viewingEventDetails) {
+        fetchEventLots(viewingEventDetails.id);
+      }
+    });
+
+    useEffect(() => {
+      const channel = supabase
+        .channel('admin-events-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+          fetchEvents();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, []);
  
     const handleSave = async () => {
       if (!formData.name || !formData.start_date) {
