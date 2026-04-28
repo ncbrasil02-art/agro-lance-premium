@@ -84,12 +84,13 @@
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
  import {
-   User, Gavel, FileText, Receipt, CreditCard, Clock,
-   ChevronRight, BadgeCheck, Download, ExternalLink,
-   ShieldCheck, AlertCircle, Info, Printer, MessageSquare,
-   CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp
+    User, Gavel, FileText, Receipt, CreditCard, Clock, Camera,
+    ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
+    ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
+    CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
+    MapPin, Globe, Loader2, Send
  } from "lucide-react";
-import { useEffect, useState } from "react";
+ import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -99,8 +100,11 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { OptimizedImage } from "@/components/ui/optimized-image";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+ import { OptimizedImage } from "@/components/ui/optimized-image";
+ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+ import { Input } from "@/components/ui/input";
+ import { Label } from "@/components/ui/label";
+ import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/painel")({
   component: UserDashboard,
