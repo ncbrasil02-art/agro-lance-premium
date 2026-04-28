@@ -384,18 +384,25 @@ import {
        }
      };
 
-     const handleEventSelectChange = (val: string) => {
-       setSelectedEventId(val);
-       if (onEventChange) onEventChange(val);
-     };
- 
-    const filteredLots = lots.filter(lot => {
-      const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           lot.lot_number?.toString().includes(searchQuery);
-      const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
-      const matchesStatus = statusFilter === "all" || lot.status === statusFilter;
-      return matchesSearch && matchesEvent && matchesStatus;
-    });
+      const handleEventSelectChange = (val: string) => {
+        setSelectedEventId(val);
+        if (onEventChange) onEventChange(val);
+      };
+  
+     const filteredLots = lots.filter(lot => {
+       const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            lot.lot_number?.toString().includes(searchQuery);
+       const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
+       
+       let matchesStatus = true;
+       if (statusFilter === "pending_attribution") {
+         matchesStatus = lot.status === 'sold' && !lot.winner_id;
+       } else if (statusFilter !== "all") {
+         matchesStatus = lot.status === statusFilter;
+       }
+       
+       return matchesSearch && matchesEvent && matchesStatus;
+     });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja remover este lote? O animal voltará a ficar disponível para outros eventos.")) return;
