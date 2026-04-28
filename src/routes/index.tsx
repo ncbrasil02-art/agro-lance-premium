@@ -77,11 +77,22 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
   function Home() {
       const router = useRouter();
        const { events, lots, pastEvents, announcement, articles } = Route.useLoaderData();
-        const { siteInfo, theme, homepage } = Route.useRouteContext();
-       const { homepage: sectionsSettings, siteInfo: dynamicSiteInfo } = useSiteSettings({ siteInfo, theme, homepage });
-       
-       const activeSections = sectionsSettings || homepage || { show_articles: true, show_upcoming_events: true, show_featured_lots: true };
-       const currentSiteInfo = dynamicSiteInfo || siteInfo;
+        const context = Route.useRouteContext();
+        const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
+        const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings } = useSiteSettings({ 
+          siteInfo: ctxSiteInfo, 
+          theme: ctxTheme, 
+          homepage: ctxHomepage 
+        });
+        
+        const currentSiteInfo = dynamicSiteInfo || ctxSiteInfo;
+        const activeSections = sectionsSettings || ctxHomepage || { 
+          show_articles: true, 
+          show_upcoming_events: true, 
+          show_featured_lots: true,
+          show_animated_slides: true,
+          order: ["upcoming_events", "featured_lots", "sale_menu", "articles"]
+        };
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {
@@ -106,14 +117,14 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
      }, [router]);
 
     const mapEvent = (e: any) => ({
-     id: e.id,
-     slug: e.slug || "",
-     name: e.name,
-     description: e.description || "",
-     date: e.start_date,
-     city: e.location?.split("-")?.[0]?.trim() || "Brasil",
-     state: e.location?.split("-")?.[1]?.trim() || "",
-      cover: e.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
+      id: e?.id || Math.random().toString(),
+      slug: e?.slug || "",
+      name: e?.name || "Evento sem nome",
+      description: e?.description || "",
+      date: e?.start_date || new Date().toISOString(),
+      city: (e?.location as string)?.split("-")?.[0]?.trim() || "Brasil",
+      state: (e?.location as string)?.split("-")?.[1]?.trim() || "",
+       cover: e?.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
       status: e.status as any,
       end_date: (e as any).end_date,
        lotsCount: e.lots?.length || 0,
