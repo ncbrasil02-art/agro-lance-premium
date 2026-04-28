@@ -43,10 +43,13 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
        const event = { ...eventData, lots: lots || [] };
        const result = eventSchema.safeParse(event);
        return { event: result.success ? result.data : (event as any) };
-     } catch (err) {
-       console.error("Erro no loader de evento:", err);
-       throw notFound();
-     }
+      } catch (err: any) {
+        console.error("Erro no loader de evento:", err);
+        // If it's already a notFound error, rethrow it
+        if (err?.status === 404 || err?.name === 'NotFound') throw err;
+        // Otherwise rethrow the error to be caught by errorComponent
+        throw err;
+      }
    },
   head: ({ loaderData }) => ({
     meta: loaderData?.event ? [
