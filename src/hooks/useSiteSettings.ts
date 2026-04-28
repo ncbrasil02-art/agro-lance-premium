@@ -71,22 +71,27 @@
  
      fetchSettings();
  
-     // Real-time updates
-      const channel = supabase
-        .channel("site-settings-global")
-        .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload) => {
-          const updated: any = payload.new;
-          if (!updated || !updated.key) return;
-          
-           if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
-           if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
-           if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
-        })
-        .subscribe();
- 
-     return () => {
-       supabase.removeChannel(channel);
-     };
+       // Real-time updates - using unique channel name to avoid "already subscribed" errors
+       const channelId = `site-settings-${Math.random().toString(36).substring(2, 9)}`;
+       const channel = supabase
+         .channel(channelId)
+         .on(
+           "postgres_changes",
+           { event: "*", schema: "public", table: "site_settings" },
+           (payload) => {
+             const updated: any = payload.new;
+             if (!updated || !updated.key) return;
+             
+             if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
+             if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
+             if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
+           }
+         )
+         .subscribe();
+
+       return () => {
+         supabase.removeChannel(channel);
+       };
    }, []);
  
    return { siteInfo, theme, homepage, isLoading };
