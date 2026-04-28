@@ -15,23 +15,42 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useState } from "react";
 
 export const Route = createFileRoute("/eventos/$eventSlug")({
-  loader: async ({ params }) => {
-    const { data: event, error } = await supabase
-      .from("events")
-        .select("*, lots!lots_event_id_fkey(*, animal:animals!lots_animal_id_fkey(*, seller:sellers!animals_seller_id_fkey(name)), winner:profiles!lots_winner_id_fkey(full_name))")
-      .or(`slug.eq."${params.eventSlug}",id.eq."${params.eventSlug}"`)
-      .maybeSingle();
-
-    if (error || !event) throw notFound();
-
-    try {
-      const validatedEvent = eventSchema.parse(event);
-      return { event: validatedEvent };
-    } catch (e) {
-      console.error("Erro de validação do evento:", e);
-      throw notFound();
-    }
-  },
+   loader: async ({ params }) => {
+     const eventSlug = params.eventSlug;
+     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventSlug);
+ 
+     try {
+       let eventData = null;
+       if (isUuid) {
+         const { data } = await supabase.from("events").select("*").eq("id", eventSlug).maybeSingle();
+         eventData = data;
+       }
+       if (!eventData) {
+         const { data } = await supabase.from("events").select("*").eq("slug", eventSlug).maybeSingle();
+         eventData = data;
+       }
+ 
+       if (!eventData) throw notFound();
+ 
+       const { data: lots, error: lotsError } = await supabase
+         .from("lots")
+         .select("*, animal:animals(*, seller:sellers(name)), winner:profiles(full_name)")
+         .eq("event_id", eventData.id)
+         .order("lot_number", { ascending: true });
+ 
+       if (lotsError) console.error("Erro ao buscar lotes:", lotsError);
+ 
+       const event = { ...eventData, lots: lots || [] };
+       const result = eventSchema.safeParse(event);
+       return { event: result.success ? result.data : (event as any) };
+      } catch (err: any) {
+        console.error("Erro no loader de evento:", err);
+        // If it's already a notFound error, rethrow it
+        if (err?.status === 404 || err?.name === 'NotFound') throw err;
+        // Otherwise rethrow the error to be caught by errorComponent
+        throw err;
+      }
+   },
   head: ({ loaderData }) => ({
     meta: loaderData?.event ? [
       { title: `${loaderData.event.name} — Premium Agro Leilões` },
@@ -60,8 +79,8 @@ function EventDetail() {
      end_date: event.end_date
    });
    const router = useRouter();
-  const eventLots = event.lots || [];
-  const [isFlyerOpen, setIsFlyerOpen] = useState(false);
+   const eventLots = Array.isArray(event.lots) ? event.lots : [];
+   const [isFlyerOpen, setIsFlyerOpen] = useState(false);
  
    const { status } = useRealtimeEvent(event.id, () => {
      router.invalidate();
@@ -247,7 +266,7 @@ function EventDetail() {
       </section>
 
       {/* Gallery Section - Only if there are photos */}
-      {event.photos && event.photos.length > 0 && (
+       {Array.isArray(event.photos) && event.photos.length > 0 && (
         <section className="container mx-auto px-4 py-16 border-t border-white/5">
           <div className="flex items-center gap-4 mb-10">
             <div className="h-12 w-12 rounded-2xl bg-gold/10 flex items-center justify-center">
@@ -260,7 +279,7 @@ function EventDetail() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {event.photos.map((photo: string, index: number) => (
+             {event.photos.map((photo: any, index: number) => (
               <Dialog key={index}>
                 <DialogTrigger asChild>
                   <div className="relative aspect-square rounded-3xl overflow-hidden bg-emerald-deep/20 cursor-pointer group/photo">
