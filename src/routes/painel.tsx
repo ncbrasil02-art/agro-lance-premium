@@ -237,31 +237,19 @@ export const Route = createFileRoute("/painel")({
     setIsLoading(true);
     if (!user?.id) return;
     try {
-      // Fetch lots won by the user
+      // Fetch lots won by the user - Using a simpler and more robust query structure
       const { data: wonLots, error: wonError } = await supabase
         .from("lots")
         .select(`
-          *,
-          animal:animals!lots_animal_id_fkey(
-            *,
-            seller:sellers!animals_seller_id_fkey(name)
-          ),
-          event:events!lots_event_id_fkey(*)
+          id, lot_number, status, current_price, winner_id, updated_at,
+          animal:animals(id, name, breed, species, photos, internal_code),
+          event:events(id, name)
         `)
         .eq("winner_id", user.id)
         .order("updated_at", { ascending: false });
       
-      if (wonError) {
-        console.error("Erro ao buscar arremates:", wonError);
-        // Try fallback with corrected join
-        const { data: fallbackLots } = await supabase
-          .from("lots")
-          .select("*, animal:animals!lots_animal_id_fkey(*)")
-          .eq("winner_id", user.id);
-        if (fallbackLots) setMyLots(fallbackLots || []);
-      } else {
-        setMyLots(wonLots || []);
-      }
+      if (wonError) throw wonError;
+      setMyLots(wonLots || []);
 
       // Fetch recent bids by the user
       const { data: userBids } = await supabase
@@ -329,18 +317,18 @@ export const Route = createFileRoute("/painel")({
            <TabsTrigger value="lances" className="gap-2">
              <Clock className="h-4 w-4" /> Meus Lances
            </TabsTrigger>
-            <TabsTrigger value="favoritos" className="gap-2">
-              <Heart className="h-4 w-4" /> Meus Favoritos
-            </TabsTrigger>
-            <TabsTrigger value="mensagens" className="gap-2 relative">
-              <MessageSquare className="h-4 w-4" /> Mensagens
-              {messages.some(m => !m.is_read) && (
-                <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
-              )}
-            </TabsTrigger>
-           <TabsTrigger value="perfil" className="gap-2">
-             <User className="h-4 w-4" /> Perfil & Documentos
-           </TabsTrigger>
+          <TabsTrigger value="favoritos" className="gap-2">
+            <Heart className="h-4 w-4" /> Meus Favoritos
+          </TabsTrigger>
+          <TabsTrigger value="mensagens" className="gap-2 relative">
+            <MessageSquare className="h-4 w-4" /> Mensagens
+            {messages.some(m => !m.is_read) && (
+              <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="perfil" className="gap-2">
+            <User className="h-4 w-4" /> Perfil & Documentos
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="arremates" className="space-y-6">
