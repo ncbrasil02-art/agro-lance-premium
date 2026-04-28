@@ -41,13 +41,17 @@
       }
     }, [initialData?.siteInfo, initialData?.theme, initialData?.homepage]);
 
-   useEffect(() => {
-     async function fetchSettings() {
-        if (initialData) {
-          setIsLoading(false);
-          return;
-        }
-       try {
+     useEffect(() => {
+       async function fetchSettings() {
+         // Only skip fetch if we actually have data in initialData
+         const hasInitialData = initialData && (initialData.siteInfo || initialData.theme || initialData.homepage);
+         
+         if (hasInitialData) {
+           setIsLoading(false);
+           return;
+         }
+
+         try {
          const { data, error } = await supabase
            .from("site_settings")
            .select("key, value");
@@ -71,22 +75,27 @@
  
      fetchSettings();
  
-     // Real-time updates
-      const channel = supabase
-        .channel("site-settings-global")
-        .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload) => {
-          const updated: any = payload.new;
-          if (!updated || !updated.key) return;
-          
-           if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
-           if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
-           if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
-        })
-        .subscribe();
- 
-     return () => {
-       supabase.removeChannel(channel);
-     };
+       // Real-time updates - using unique channel name to avoid "already subscribed" errors
+       const channelId = `site-settings-${Math.random().toString(36).substring(2, 9)}`;
+       const channel = supabase
+         .channel(channelId)
+         .on(
+           "postgres_changes",
+           { event: "*", schema: "public", table: "site_settings" },
+           (payload) => {
+             const updated: any = payload.new;
+             if (!updated || !updated.key) return;
+             
+             if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
+             if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
+             if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
+           }
+         )
+         .subscribe();
+
+       return () => {
+         supabase.removeChannel(channel);
+       };
    }, []);
  
    return { siteInfo, theme, homepage, isLoading };
