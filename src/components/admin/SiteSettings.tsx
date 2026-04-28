@@ -97,9 +97,9 @@
         const homeData = data.find(i => i.key === "homepage_sections")?.value;
         const palettes = data.find(i => i.key === "saved_palettes")?.value;
 
-        if (info) setSiteInfo(prev => ({ ...prev, ...(info as any) }));
-        if (themeData) setTheme(prev => ({ ...prev, ...(themeData as any) }));
-        if (homeData) setHomepage(prev => ({ ...prev, ...(homeData as any) }));
+        if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
+        if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
+        if (homeData) setHomepage((prev: any) => ({ ...prev, ...(homeData as any) }));
         if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
 
      } catch (error: any) {
@@ -343,6 +343,56 @@
              <CardDescription>Personalize a identidade visual do site</CardDescription>
            </CardHeader>
            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6 mb-8 p-6 bg-gold/5 rounded-2xl border border-gold/20">
+                <div className="space-y-4">
+                  <h3 className="font-bold flex items-center gap-2 text-gold">
+                    <Wand2 className="h-5 w-5" /> Gerador de Temas
+                  </h3>
+                  <p className="text-sm text-muted-foreground">Escolha uma cor base e geraremos uma paleta completa para você.</p>
+                  <div className="flex gap-4 items-end">
+                    <div className="flex-1">
+                      <ColorPicker label="Cor Base" value={baseColor} onChange={setBaseColor} />
+                    </div>
+                    <Button onClick={generatePalette} className="bg-gold text-emerald-deep font-bold">Gerar</Button>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="font-bold flex items-center gap-2 text-gold">
+                    <History className="h-5 w-5" /> Paletas Salvas ({savedPalettes.length}/5)
+                  </h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {savedPalettes.map((p, i) => (
+                      <div key={i} className="group relative">
+                        <button 
+                          className="w-full aspect-square rounded-lg border shadow-sm transition-transform hover:scale-105 overflow-hidden"
+                          onClick={() => setTheme(p)}
+                          title="Clique para carregar esta paleta"
+                        >
+                          <div className="w-full h-1/2" style={{ backgroundColor: p.primary_color }} />
+                          <div className="w-full h-1/2" style={{ backgroundColor: p.secondary_color }} />
+                        </button>
+                        <button 
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          onClick={(e) => { e.stopPropagation(); deletePalette(i); }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {savedPalettes.length < 5 && (
+                      <button 
+                        onClick={savePalette}
+                        className="w-full aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:bg-muted/50 transition-colors"
+                        title="Salvar paleta atual"
+                      >
+                        <Save className="h-4 w-4" />
+                        <span className="text-[8px] mt-1 uppercase font-bold">Salvar</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
              <div className="space-y-8">
                <section className="space-y-4">
                  <h3 className="text-lg font-semibold border-b pb-2">Cores Principais</h3>
