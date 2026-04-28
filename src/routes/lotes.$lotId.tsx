@@ -684,13 +684,9 @@ function LotDetail() {
                                   {idx + 1}
                                 </div>
                                 <div>
-                                   <p className="font-bold text-white">
-                                      {bid.bid_type === 'security'
-                                        ? "Auditório/Mesa"
-                                        : (bid.is_phone_bid && bid.phone_bidder_identifier 
-                                          ? bid.phone_bidder_identifier 
-                                          : (bid.profile?.full_name || "Licitante"))}
-                                   </p>
+                                    <p className="font-bold text-white">
+                                       {bid.phone_bidder_identifier || (bid.profile?.full_name || "Licitante")}
+                                    </p>
                                   <p className="text-[10px] text-white/40 uppercase font-bold">
                                     {new Date(bid.created_at).toLocaleString('pt-BR')}
                                   </p>
