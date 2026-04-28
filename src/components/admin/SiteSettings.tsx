@@ -281,14 +281,18 @@
              <div className="space-y-8">
                <section className="space-y-4">
                  <h3 className="text-lg font-semibold border-b pb-2">Cores Principais</h3>
-                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                   <ColorPicker label="Cor Primária (Destaques)" value={theme.primary_color} onChange={v => setTheme({...theme, primary_color: v})} />
-                   <ColorPicker label="Cor Secundária (Nav/Footer)" value={theme.secondary_color} onChange={v => setTheme({...theme, secondary_color: v})} />
-                   <ColorPicker label="Fundo Geral" value={theme.background_color} onChange={v => setTheme({...theme, background_color: v})} />
-                   <ColorPicker label="Texto Principal" value={theme.foreground_color} onChange={v => setTheme({...theme, foreground_color: v})} />
-                   <ColorPicker label="Texto Secundário" value={theme.muted_foreground_color} onChange={v => setTheme({...theme, muted_foreground_color: v})} />
-                   <ColorPicker label="Bordas" value={theme.border_color} onChange={v => setTheme({...theme, border_color: v})} />
-                 </div>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <ColorPicker label="Cor Primária (Destaques)" value={theme.primary_color} onChange={v => setTheme({...theme, primary_color: v})} />
+                    <ColorPicker label="Texto sobre Primária" value={theme.primary_foreground_color} onChange={v => setTheme({...theme, primary_foreground_color: v})} />
+                    <ColorPicker label="Cor Secundária (Nav/Footer)" value={theme.secondary_color} onChange={v => setTheme({...theme, secondary_color: v})} />
+                    <ColorPicker label="Texto sobre Secundária" value={theme.secondary_foreground_color} onChange={v => setTheme({...theme, secondary_foreground_color: v})} />
+                    <ColorPicker label="Fundo Geral" value={theme.background_color} onChange={v => setTheme({...theme, background_color: v})} />
+                    <ColorPicker label="Texto Principal" value={theme.foreground_color} onChange={v => setTheme({...theme, foreground_color: v})} />
+                    <ColorPicker label="Texto Secundário" value={theme.muted_foreground_color} onChange={v => setTheme({...theme, muted_foreground_color: v})} />
+                    <ColorPicker label="Bordas" value={theme.border_color} onChange={v => setTheme({...theme, border_color: v})} />
+                    <ColorPicker label="Inputs" value={theme.input_color} onChange={v => setTheme({...theme, input_color: v})} />
+                    <ColorPicker label="Foco (Ring)" value={theme.ring_color} onChange={v => setTheme({...theme, ring_color: v})} />
+                  </div>
                </section>
 
                <section className="space-y-4">
@@ -296,6 +300,8 @@
                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                    <ColorPicker label="Fundo do Card" value={theme.card_color} onChange={v => setTheme({...theme, card_color: v})} />
                    <ColorPicker label="Texto do Card" value={theme.card_foreground_color} onChange={v => setTheme({...theme, card_foreground_color: v})} />
+                    <ColorPicker label="Fundo de Menus (Popover)" value={theme.popover_color} onChange={v => setTheme({...theme, popover_color: v})} />
+                    <ColorPicker label="Texto de Menus" value={theme.popover_foreground_color} onChange={v => setTheme({...theme, popover_foreground_color: v})} />
                    <ColorPicker label="Fundo Muted" value={theme.muted_color} onChange={v => setTheme({...theme, muted_color: v})} />
                  </div>
                </section>
@@ -304,7 +310,9 @@
                  <h3 className="text-lg font-semibold border-b pb-2">Estados e Status</h3>
                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                    <ColorPicker label="Sucesso / Sotaque" value={theme.accent_color} onChange={v => setTheme({...theme, accent_color: v})} />
+                    <ColorPicker label="Texto sobre Sucesso" value={theme.accent_foreground_color} onChange={v => setTheme({...theme, accent_foreground_color: v})} />
                    <ColorPicker label="Erro / Destrutivo" value={theme.destructive_color} onChange={v => setTheme({...theme, destructive_color: v})} />
+                    <ColorPicker label="Texto sobre Erro" value={theme.destructive_foreground_color} onChange={v => setTheme({...theme, destructive_foreground_color: v})} />
                    <ColorPicker label="Status: AO VIVO" value={theme.live_color} onChange={v => setTheme({...theme, live_color: v})} />
                    <ColorPicker label="Status: EM BREVE" value={theme.upcoming_color} onChange={v => setTheme({...theme, upcoming_color: v})} />
                    <ColorPicker label="Status: ENCERRADO" value={theme.closed_color} onChange={v => setTheme({...theme, closed_color: v})} />
