@@ -392,23 +392,33 @@
                                </TooltipContent>
                              </Tooltip>
                            </TooltipProvider>
-                         <TooltipProvider>
-                           <Tooltip>
-                             <TooltipTrigger asChild>
-                               <Button
-                                 variant="ghost"
-                                 size="icon"
-                                 onClick={() => handleToggleApproval(user.id, user.is_approved)}
-                                 className={user.is_approved ? "text-destructive hover:text-destructive hover:bg-destructive/10" : "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"}
-                               >
-                                 {user.is_approved ? <XCircle className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                               </Button>
-                             </TooltipTrigger>
-                             <TooltipContent>
-                               <p>{user.is_approved ? "Remover Aprovação" : "Aprovar Usuário"}</p>
-                             </TooltipContent>
-                           </Tooltip>
-                         </TooltipProvider>
+                          {!user.is_approved ? (
+                            <Button
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 shadow-sm"
+                              onClick={() => handleToggleApproval(user.id, user.is_approved)}
+                            >
+                              <CheckCircle className="h-3.5 w-3.5" /> Liberar Lances
+                            </Button>
+                          ) : (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleToggleApproval(user.id, user.is_approved)}
+                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  >
+                                    <XCircle className="h-5 w-5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Remover Aprovação</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                        </TableCell>
                      </TableRow>
                    ))
