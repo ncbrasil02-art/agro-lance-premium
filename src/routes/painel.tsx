@@ -110,18 +110,54 @@ export const Route = createFileRoute("/painel")({
   component: UserDashboard,
 });
 
- function UserDashboard() {
-   const { user, profile } = useAuth();
-   const [activeTab, setActiveTab] = useState("arremates");
-   const [myLots, setMyLots] = useState<any[]>([]);
-   const [myBids, setMyBids] = useState<any[]>([]);
-   const [myFavorites, setMyFavorites] = useState<any[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
+  function UserDashboard() {
+    const { user, profile, refreshProfile } = useAuth();
+    const [activeTab, setActiveTab] = useState("arremates");
+    const [myLots, setMyLots] = useState<any[]>([]);
+    const [myBids, setMyBids] = useState<any[]>([]);
+    const [myFavorites, setMyFavorites] = useState<any[]>([]);
+    const [messages, setMessages] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    
+    const [formData, setFormData] = useState({
+      full_name: "",
+      cpf: "",
+      phone: "",
+      address: "",
+      cep: "",
+      nationality: "Brasileira",
+    });
 
-  useEffect(() => {
-    if (!user) return;
-    fetchDashboardData();
-  }, [user]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const docInputRef = useRef<HTMLInputElement>(null);
+
+   useEffect(() => {
+     if (!user) return;
+     fetchDashboardData();
+     fetchMessages();
+     if (profile) {
+       setFormData({
+         full_name: profile.full_name || "",
+         cpf: profile.cpf || "",
+         phone: profile.phone || "",
+         address: profile.address || "",
+         cep: profile.cep || "",
+         nationality: profile.nationality || "Brasileira",
+       });
+     }
+   }, [user, profile]);
+
+   const fetchMessages = async () => {
+     if (!user?.id) return;
+     const { data } = await supabase
+       .from("messages")
+       .select("*")
+       .eq("recipient_id", user.id)
+       .order("created_at", { ascending: false });
+     setMessages(data || []);
+   };
 
   const fetchDashboardData = async () => {
     setIsLoading(true);
