@@ -66,15 +66,11 @@ export const Route = createFileRoute("/lotes/$lotId")({
       throw notFound();
     }
 
-    // Get neighbors within the same event
-    const eventId = lotRes.data.event_id;
-    const eventLots = (neighboringLotsRes.data || []).filter((l: any) => l.event_id === undefined || true); // We'll filter properly in a sec
-    
     // Actually let's fetch only lots from this event
     const { data: eventLotsData } = await supabase
       .from("lots")
       .select("id, lot_number")
-      .eq("event_id", eventId)
+      .eq("event_id", lotRes.data.event_id as string)
       .order("lot_number", { ascending: true });
 
     const currentLotIndex = (eventLotsData || []).findIndex(l => l.id === lotId);
