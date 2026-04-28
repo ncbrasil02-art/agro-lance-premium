@@ -297,6 +297,8 @@ function LotDetail() {
     const bidsChannel = supabase
       .channel(`bids-${lot.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p: any) => {
+        console.log("Bid change detected on lot details:", p.eventType, p.new);
+        
         if (p.eventType === "DELETE") {
           setRecentBids(prev => prev.filter(b => b.id !== p.old.id));
           return;
@@ -312,10 +314,25 @@ function LotDetail() {
             newBids = prev.map(b => b.id === updatedBid.id ? { ...b, ...updatedBid } : b);
           } else {
             newBids = [updatedBid, ...prev];
+            
+            // Notify of new bid if we are on the page
+            toast.info(`Novo lance: ${formatBRL(updatedBid.amount)}`, {
+              description: updatedBid.bidder_name || "Licitante",
+              icon: <Gavel className="h-4 w-4 text-gold" />,
+              duration: 3000
+            });
           }
           return newBids
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             .slice(0, 10);
+        });
+
+        // Also update the lot current price in local state if the bid is higher
+        setLot((prev: any) => {
+          if (updatedBid.amount > (prev.current_price || 0)) {
+            return { ...prev, current_price: updatedBid.amount };
+          }
+          return prev;
         });
       })
       .subscribe();
