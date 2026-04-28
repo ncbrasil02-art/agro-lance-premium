@@ -976,19 +976,75 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                          if (!printWindow) return;
                                          const html = `
                                            <html>
-                                             <head><title>Nota de Venda - Lote ${lot.lot_number}</title></head>
-                                             <body style="font-family: Arial; padding: 40px; border: 2px solid #000;">
-                                               <h1 style="text-align:center;">PREMIUM AGRO LEILÕES</h1>
-                                               <h2 style="text-align:center;">NOTA DE VENDA E ARREMATE</h2>
-                                               <hr/>
-                                               <p><strong>Evento:</strong> ${viewingEventDetails?.name}</p>
-                                               <p><strong>Lote:</strong> ${lot.lot_number} - ${lot.animal?.name}</p>
-                                               <p><strong>Arrematante:</strong> ${lot.winner?.full_name || '---'}</p>
-                                               <p><strong>CPF:</strong> ${lot.winner?.cpf || '---'}</p>
-                                               <p><strong>Telefone:</strong> ${lot.winner?.phone || '---'}</p>
-                                               <p><strong>Valor Final:</strong> ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}</p>
-                                               <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
-                                               <div style="margin-top:100px; border-top: 1px solid #000; width: 300px; text-align:center;">Assinatura Premium Agro</div>
+                                             <head>
+                                               <title>Termo de Arremate - Lote ${lot.lot_number}</title>
+                                               <style>
+                                                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+                                                 .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #064e3b; padding-bottom: 20px; }
+                                                 .logo { font-size: 32px; font-weight: 900; color: #064e3b; letter-spacing: 2px; }
+                                                 .title { font-size: 20px; font-weight: bold; margin-top: 10px; color: #c5a059; }
+                                                 .section { margin-bottom: 30px; }
+                                                 .section-title { font-weight: bold; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+                                                 .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
+                                                 .footer { margin-top: 100px; text-align: center; }
+                                                 .signature { display: inline-block; width: 300px; border-top: 1px solid #000; margin: 40px 20px; padding-top: 10px; font-size: 12px; }
+                                                 @media print { .no-print { display: none; } }
+                                               </style>
+                                             </head>
+                                             <body>
+                                               <div class="header">
+                                                 <div class="logo">PREMIUM AGRO LEILÕES</div>
+                                                 <div class="title">TERMO DE ARREMATAÇÃO E NOTA DE VENDA</div>
+                                               </div>
+                                               
+                                               <div class="section">
+                                                 <div class="section-title">Dados do Evento</div>
+                                                 <p><strong>Leilão:</strong> ${viewingEventDetails?.name}</p>
+                                                 <p><strong>Data:</strong> ${new Date(viewingEventDetails?.start_date).toLocaleDateString('pt-BR')}</p>
+                                               </div>
+
+                                               <div class="section">
+                                                 <div class="section-title">Dados do Lote</div>
+                                                 <div class="grid">
+                                                   <div>
+                                                     <p><strong>Número do Lote:</strong> ${lot.lot_number}</p>
+                                                     <p><strong>Animal:</strong> ${lot.animal?.name}</p>
+                                                   </div>
+                                                   <div>
+                                                     <p><strong>Raça:</strong> ${lot.animal?.breed || '---'}</p>
+                                                     <p><strong>Código Interno:</strong> ${lot.animal?.internal_code || '---'}</p>
+                                                   </div>
+                                                 </div>
+                                               </div>
+
+                                               <div class="section">
+                                                 <div class="section-title">Dados do Arrematante</div>
+                                                 <div class="grid">
+                                                   <div>
+                                                     <p><strong>Nome:</strong> ${lot.winner?.full_name || '---'}</p>
+                                                     <p><strong>CPF/CNPJ:</strong> ${lot.winner?.cpf || '---'}</p>
+                                                   </div>
+                                                   <div>
+                                                     <p><strong>Telefone:</strong> ${lot.winner?.phone || '---'}</p>
+                                                     <p><strong>Endereço:</strong> ${lot.winner?.address || '---'}</p>
+                                                   </div>
+                                                 </div>
+                                               </div>
+
+                                               <div class="section" style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+                                                 <div class="section-title">Valores e Fechamento</div>
+                                                 <p style="font-size: 24px; font-weight: 900; color: #064e3b; margin: 10px 0;">
+                                                   Valor Final: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}
+                                                 </p>
+                                                 <p style="font-size: 10px; color: #666;">* Sujeito às condições de pagamento estabelecidas no regulamento do evento.</p>
+                                               </div>
+
+                                               <div class="footer">
+                                                 <div class="signature">Assinatura do Arrematante</div>
+                                                 <div class="signature">Assinatura Premium Agro</div>
+                                                 <p style="font-size: 10px; color: #999; margin-top: 40px;">Documento gerado eletronicamente em ${new Date().toLocaleString('pt-BR')}</p>
+                                               </div>
+                                               
                                                <script>window.print();</script>
                                              </body>
                                            </html>
