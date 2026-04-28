@@ -26,12 +26,11 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
             .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
             .order("start_date", { ascending: true })
             .limit(10),
-          supabase.from("lots")
-            .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
-            .eq("is_featured", true)
-            .not("status", "in", "('sold','passed','finished','arrematado')")
-            .order("created_at", { ascending: false })
-            .limit(6),
+           supabase.from("lots")
+             .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+             .eq("is_featured", true)
+             .order("created_at", { ascending: false })
+             .limit(10),
          supabase.from("events")
            .select("*, lots!lots_event_id_fkey(id)")
            .eq("status", "finished")
