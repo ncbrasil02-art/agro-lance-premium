@@ -780,6 +780,19 @@ function LotDetail() {
                    </div>
                  </div>
                    <div className="mt-8 space-y-6">
+                     {user && profile && !profile.is_approved && (
+                       <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mb-4 flex gap-3 items-start animate-in fade-in slide-in-from-top-4 duration-500">
+                         <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                         <div>
+                           <p className="text-amber-500 font-black text-[10px] uppercase tracking-wider mb-1">Cadastro em Análise</p>
+                           <p className="text-white/80 text-xs leading-relaxed">
+                             Você ainda não está habilitado para dar lances. Seu cadastro está sendo revisado pela nossa equipe. 
+                             <a href="https://wa.me/5581989437877" target="_blank" className="text-gold hover:underline font-bold block mt-1">Clique aqui para agilizar no WhatsApp</a>
+                           </p>
+                         </div>
+                       </div>
+                     )}
+
                      {isBiddingOpen && (
                        <div className="space-y-3">
                          <p className="text-[10px] font-black text-gold/60 uppercase tracking-widest text-center">Sugestões de Lance</p>
