@@ -32,9 +32,9 @@ export function ErrorFallback({ error, reset }: ErrorFallbackProps) {
         Não foi possível carregar os dados desta página no momento. Por favor, tente novamente.
       </p>
       
-      {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === "development" && (
         <div className="mt-4 max-w-lg overflow-auto rounded-lg bg-muted p-4 text-left text-xs font-mono text-destructive">
-          {error.message}
+          {error?.message || 'Erro desconhecido'}
         </div>
       )}
 
