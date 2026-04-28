@@ -16,20 +16,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const nav = [
-  { to: "/", label: "Início" },
-  { to: "/eventos", label: "Eventos" },
-  { to: "/compra-direta", label: "Catálogo de Venda" },
-  { to: "/lotes", label: "Lotes" },
-  { to: "/ao-vivo", label: "Ao Vivo" },
-  { to: "/sobre", label: "Sobre" },
-] as const;
-
   export function Header() {
     const { theme, toggle } = useTheme();
-    const { siteInfo } = useSiteSettings();
+   const { siteInfo, homepage } = useSiteSettings();
   const { user, profile, signOut } = useAuth();
   const [open, setOpen] = useState(false);
+ 
+   const nav = [
+     { to: "/", label: "Início", show: true },
+     { to: "/eventos", label: "Eventos", show: true },
+     { to: "/compra-direta", label: "Venda Direta", show: homepage?.show_sale_menu !== false },
+     { to: "/lotes", label: "Lotes", show: true },
+     { to: "/ao-vivo", label: "Ao Vivo", show: true },
+     { to: "/sobre", label: "Sobre", show: true },
+   ].filter(i => i.show);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
