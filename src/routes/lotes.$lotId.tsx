@@ -348,11 +348,30 @@ function LotDetail() {
   const executeBid = async (amount: number) => {
     setIsBidding(true);
     try {
-      const { data, error } = await supabase.rpc("place_bid_safe", { p_lot_id: lot.id, p_amount: amount, p_bid_type: "online", p_session_id: "client-side" });
+      const { data, error } = await supabase.rpc("place_bid_safe", { 
+        p_lot_id: lot.id, 
+        p_amount: amount, 
+        p_bid_type: "online", 
+        p_session_id: "client-side" 
+      });
+      
       if (error) throw error;
-      toast.success("Lance efetuado!");
-    } catch (e: any) { toast.error(e.message); }
-    finally { setIsBidding(false); setShowConfirmBid(false); }
+      
+      const result = data as { success: boolean; message: string };
+      if (result.success) {
+        toast.success(result.message || "Lance efetuado!");
+      } else {
+        toast.error(result.message, {
+          duration: 6000,
+          icon: <AlertTriangle className="h-4 w-4 text-destructive" />,
+        });
+      }
+    } catch (e: any) { 
+      toast.error(e.message || "Erro ao efetuar lance."); 
+    } finally { 
+      setIsBidding(false); 
+      setShowConfirmBid(false); 
+    }
   };
 
   const handleSendOffer = async () => {
@@ -761,6 +780,19 @@ function LotDetail() {
                    </div>
                  </div>
                    <div className="mt-8 space-y-6">
+                     {user && profile && !profile.is_approved && (
+                       <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mb-4 flex gap-3 items-start animate-in fade-in slide-in-from-top-4 duration-500">
+                         <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                         <div>
+                           <p className="text-amber-500 font-black text-[10px] uppercase tracking-wider mb-1">Cadastro em Análise</p>
+                           <p className="text-white/80 text-xs leading-relaxed">
+                             Você ainda não está habilitado para dar lances. Seu cadastro está sendo revisado pela nossa equipe. 
+                             <a href="https://wa.me/5581989437877" target="_blank" className="text-gold hover:underline font-bold block mt-1">Clique aqui para agilizar no WhatsApp</a>
+                           </p>
+                         </div>
+                       </div>
+                     )}
+
                      {isBiddingOpen && (
                        <div className="space-y-3">
                          <p className="text-[10px] font-black text-gold/60 uppercase tracking-widest text-center">Sugestões de Lance</p>

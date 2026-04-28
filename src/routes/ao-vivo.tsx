@@ -1,4 +1,4 @@
- import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer } from "lucide-react";
+  import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -1071,6 +1071,19 @@ export const Route = createFileRoute("/ao-vivo")({
                 </div>
 
                 <div className="mt-auto pt-6 space-y-4">
+                  {user && profile && !profile.is_approved && (
+                    <div className="bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl flex gap-2 items-start animate-in fade-in slide-in-from-top-4 duration-500">
+                      <ShieldAlert className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-amber-500 font-black text-[9px] uppercase tracking-wider mb-0.5">Cadastro em Análise</p>
+                        <p className="text-emerald-deep/80 text-[10px] leading-tight">
+                          Habilitação pendente. 
+                          <a href="https://wa.me/5581989437877" target="_blank" className="text-emerald-deep hover:underline font-bold ml-1">Chamar no WhatsApp</a>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="rounded-2xl bg-emerald-deep/5 border border-emerald-deep/10 p-5 relative overflow-hidden group/price">
                     <div className="absolute top-0 right-0 p-3 opacity-20 group-hover/price:opacity-100 transition-opacity">
                        <Gavel className="h-10 w-10 text-gold" />
