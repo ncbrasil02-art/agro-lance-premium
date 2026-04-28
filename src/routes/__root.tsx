@@ -1,4 +1,4 @@
- import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouter } from "@tanstack/react-router";
+  import { Outlet, Link, HeadContent, Scripts, useRouter, createRootRouteWithContext } from "@tanstack/react-router";
  import { supabase } from "@/integrations/supabase/client";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 function GlobalErrorComponent({ error }: { error: Error }) {
