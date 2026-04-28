@@ -296,14 +296,20 @@ function LotDetail() {
 
     const bidsChannel = supabase
       .channel(`bids-${lot.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p) => {
-         const newBid = p.new;
-         setRecentBids(prev => {
-           if (prev.some(b => b.id === newBid.id)) return prev;
-           return [newBid, ...prev]
-             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-             .slice(0, 10);
-         });
+      .on("postgres_changes", { event: "*", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p) => {
+        const updatedBid = p.new;
+        setRecentBids(prev => {
+          const exists = prev.some(b => b.id === updatedBid.id);
+          let newBids;
+          if (exists) {
+            newBids = prev.map(b => b.id === updatedBid.id ? { ...b, ...updatedBid } : b);
+          } else {
+            newBids = [updatedBid, ...prev];
+          }
+          return newBids
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            .slice(0, 10);
+        });
       })
       .subscribe();
 
