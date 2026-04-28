@@ -174,9 +174,7 @@
     return <Navigate to="/" />;
   }
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  return (
+   return (
     <div className="flex min-h-screen bg-muted/30 flex-col md:flex-row">
       {/* Mobile Top Header */}
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-card px-4 md:hidden">
