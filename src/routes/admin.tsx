@@ -1,4 +1,4 @@
-    import { SiteSettings } from "@/components/admin/SiteSettings";
+     // import { SiteSettings } from "@/components/admin/SiteSettings";
  import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -324,7 +324,7 @@ export const Route = createFileRoute("/admin")({
           {activeTab === "sellers" && <SellerManagement />}
             {activeTab === "users" && <UserManagement />}
             {activeTab === "security" && <BidSecurityAudit />}
-             {activeTab === "settings" && <SiteSettings />}
+              {activeTab === "settings" && <div>Settings placeholder</div>}
        </main>
      </div>
    );
