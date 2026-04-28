@@ -44,7 +44,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
     try {
       const { data, error } = await supabase
         .from("bids")
-        .select("*, profile:profiles(full_name, phone, cpf)")
+        .select("*, profile:profiles!bids_user_id_fkey(full_name, phone, cpf)")
         .eq("lot_id", lotId)
         .order("amount", { ascending: false });
       if (error) throw error;
@@ -135,15 +135,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
      const fetchEventLots = async (eventId: string) => {
        setIsDetailsLoading(true);
        try {
-         const { data, error } = await supabase
-           .from("lots")
-           .select(`
-             *,
-             animal:animals(name, internal_code),
-             winner:profiles!winner_id(id, full_name, phone, cpf)
-           `)
-           .eq("event_id", eventId)
-           .order("lot_number", { ascending: true });
+          const { data, error } = await supabase
+            .from("lots")
+            .select(`
+              *,
+              animal:animals(name, internal_code),
+              winner:profiles!lots_winner_id_fkey(id, full_name, phone, cpf)
+            `)
+            .eq("event_id", eventId)
+            .order("lot_number", { ascending: true });
  
          if (error) throw error;
          setEventLots(data || []);
