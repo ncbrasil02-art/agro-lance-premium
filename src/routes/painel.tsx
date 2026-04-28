@@ -329,15 +329,18 @@ export const Route = createFileRoute("/painel")({
            <TabsTrigger value="lances" className="gap-2">
              <Clock className="h-4 w-4" /> Meus Lances
            </TabsTrigger>
-           <TabsTrigger value="favoritos" className="gap-2">
-             <BadgeCheck className="h-4 w-4" /> Meus Favoritos
+            <TabsTrigger value="favoritos" className="gap-2">
+              <Heart className="h-4 w-4" /> Meus Favoritos
+            </TabsTrigger>
+            <TabsTrigger value="mensagens" className="gap-2 relative">
+              <MessageSquare className="h-4 w-4" /> Mensagens
+              {messages.some(m => !m.is_read) && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
+              )}
+            </TabsTrigger>
+           <TabsTrigger value="perfil" className="gap-2">
+             <User className="h-4 w-4" /> Perfil & Documentos
            </TabsTrigger>
-           <TabsTrigger value="mensagens" className="gap-2">
-             <MessageSquare className="h-4 w-4" /> Mensagens
-           </TabsTrigger>
-          <TabsTrigger value="perfil" className="gap-2">
-            <User className="h-4 w-4" /> Dados Cadastrais
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="arremates" className="space-y-6">
