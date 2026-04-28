@@ -583,7 +583,6 @@ function LotDetail() {
                    <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
                     <TabsTrigger value="videos">Vídeo</TabsTrigger>
                      <TabsTrigger value="saude">Saúde do Animal</TabsTrigger>
-                    <TabsTrigger value="historico">Lances</TabsTrigger>
                  </TabsList>
                  <TabsContent value="detalhes" className="mt-6">
                    <Card className="bg-card/50 border-white/5 p-8">
@@ -743,47 +742,6 @@ function LotDetail() {
                        </div>
                      </Card>
                    </TabsContent>
-                  <TabsContent value="historico" className="mt-6">
-                    <Card className="bg-card/50 border-white/5 p-8">
-                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
-                        <Gavel className="h-4 w-4" /> Histórico de Lances
-                      </h3>
-                      
-                      <div className="space-y-3">
-                        {recentBids.length > 0 ? (
-                          recentBids.map((bid, idx) => (
-                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-white/5 border-white/5'}`}>
-                              <div className="flex items-center gap-4">
-                                <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
-                                  {idx + 1}
-                                </div>
-                                <div>
-                                    <p className="font-bold text-white">
-                                       {bid.bidder_name}
-                                    </p>
-                                  <p className="text-[10px] text-white/40 uppercase font-bold">
-                                    {new Date(bid.created_at).toLocaleString('pt-BR')}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className={`text-lg font-black italic ${idx === 0 ? 'text-gold' : 'text-white'}`}>
-                                  {formatBRL(bid.amount)}
-                                </p>
-                                {idx === 0 && <span className="text-[8px] font-black uppercase bg-gold text-emerald-deep px-2 py-0.5 rounded-full">LANCE ATUAL</span>}
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="py-12 text-center space-y-4">
-                            <Gavel className="h-12 w-12 text-white/10 mx-auto" />
-                            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Ainda não há lances para este lote</p>
-                            <p className="text-white/20 text-[10px]">Seja o primeiro a ofertar!</p>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  </TabsContent>
                 </Tabs>
               </div>
 
@@ -937,6 +895,46 @@ function LotDetail() {
                     </div>
                   </div>
                 </Card>
+
+                <Card className="bg-card/50 border-white/5 p-6 rounded-[2rem]">
+                  <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                    <Gavel className="h-4 w-4" /> Histórico de Lances
+                  </h3>
+                  
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {recentBids.length > 0 ? (
+                      recentBids.map((bid, idx) => (
+                        <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-white/5 border-white/5'}`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                              {idx + 1}
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-white leading-none mb-1">
+                                   {bid.bidder_name}
+                                </p>
+                              <p className="text-[8px] text-white/40 uppercase font-bold">
+                                {new Date(bid.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className={`text-sm font-black italic ${idx === 0 ? 'text-gold' : 'text-white'}`}>
+                              {formatBRL(bid.amount)}
+                            </p>
+                            {idx === 0 && <span className="text-[7px] font-black uppercase bg-gold text-emerald-deep px-1.5 py-0.5 rounded-full">LANCE ATUAL</span>}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-8 text-center space-y-3">
+                        <Gavel className="h-8 w-8 text-white/10 mx-auto" />
+                        <p className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Ainda não há lances</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+
                <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
                  <h3 className="text-white font-black uppercase text-sm mb-4">Pagamento & Envio</h3>
                  <ul className="text-white/60 text-xs space-y-2">
