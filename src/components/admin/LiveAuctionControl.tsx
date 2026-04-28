@@ -393,7 +393,12 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         // If the bid is already linked to a user (not a generic phone bid without profile)
         // we don't need to ask to link it, just a simple confirmation of the sale.
         const isGenericPhoneBid = lastBid.is_phone_bid && !lastBid.user_id;
-        const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
+        const isAdminBid = lastBid.user_id === currentUserId;
+        
+        // If it's a phone bid placed by the admin, we shouldn't attribute the winner to the admin
+        if (lastBid.is_phone_bid && isAdminBid && !phoneBid.profileId) {
+          finalWinnerId = null;
+        }
 
         // Automatic linking logic (Refined):
         // If the bid is from phone but we have a profile selected in the UI, auto-link it
@@ -576,7 +581,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
             updatePayload.user_id = phoneBid.profileId;
           }
 
-          await supabase.from("bids").update(updatePayload).eq("id", newBidId);
+          // Use a small delay to ensure the bid is processed by the DB before updating
+          // This helps with real-time sync in other components
+          setTimeout(async () => {
+            await supabase.from("bids").update(updatePayload).eq("id", newBidId);
+          }, 100);
         }
 
         toast.success("Lance via telefone registrado!");
