@@ -917,9 +917,9 @@ export const Route = createFileRoute("/ao-vivo")({
          </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_380px] flex-col lg:flex-row">
         {/* Player + Lote em destaque */}
-        <div className="space-y-6">
+        <div className="space-y-6 order-1">
            <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
              {liveEvent.transmission_link ? (
                <iframe
@@ -1338,7 +1338,7 @@ export const Route = createFileRoute("/ao-vivo")({
         </div>
 
         {/* Chat / Histórico de lances */}
-        <aside className="rounded-2xl border border-border bg-card">
+        <aside className="rounded-2xl border border-border bg-card order-2 lg:order-none">
           <div className="border-b border-border p-4 space-y-3">
             {statusMessage && (
               <div className="bg-gold/10 border border-gold/30 rounded-xl p-3 animate-in slide-in-from-top-2 duration-300">
