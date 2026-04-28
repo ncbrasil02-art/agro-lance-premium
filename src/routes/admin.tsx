@@ -25,10 +25,22 @@
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
  
  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
-
- export const Route = createFileRoute("/admin")({
-   component: AdminLayout,
- });
+ 
+  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
+    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+    { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
+    { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
+    { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
+    { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+    { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
+    { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
+    { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
+    { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
+    { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+    { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
+    { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
+    { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
+  ];
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -37,23 +49,7 @@
    onItemClick?: () => void;
  }
  
- function AdminSidebar({ activeTab, setActiveTab, signOut, onItemClick }: SidebarProps) {
-   const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
-     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
-     { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
-     { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
-      { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
-      { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
-      { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
-      { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
-       { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
-       { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
-        { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
-      { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
-      { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
-      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
-    ];
- 
+  function AdminSidebar({ activeTab, setActiveTab, signOut, onItemClick }: SidebarProps) {
    return (
      <div className="flex h-full flex-col py-4">
        <div className="mb-8 flex items-center gap-2 px-2 font-bold text-xl text-gold">
@@ -91,8 +87,8 @@
        </div>
      </div>
    );
- }
- 
+  }
+
   function AdminLayout() {
      const { profile, isLoading: authLoading, signOut } = useAuth();
      const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
