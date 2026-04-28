@@ -22,7 +22,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+   const [statusFilter, setStatusFilter] = useState("all");
+   const [pendingWinnerLots, setPendingWinnerLots] = useState<any[]>([]);
+   const [isPendingLoading, setIsPendingLoading] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
      const [editingEvent, setEditingEvent] = useState<any>(null);
@@ -291,18 +293,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       }
     };
  
-    useEffect(() => {
-      fetchEvents();
+     useEffect(() => {
+       fetchEvents();
        fetchSellers();
-    }, []);
+       fetchPendingWinnerLots();
+     }, []);
+
+     const fetchPendingWinnerLots = async () => {
+       setIsPendingLoading(true);
+       try {
+         const { data, error } = await supabase
+           .from("lots")
+           .select(`
+             *,
+             animal:animals(name, internal_code),
+             event:events(name)
+           `)
+           .eq("status", "sold")
+           .is("winner_id", null)
+           .order("updated_at", { ascending: false });
+         if (error) throw error;
+         setPendingWinnerLots(data || []);
+       } catch (error: any) {
+         console.error("Erro ao carregar pendências:", error);
+       } finally {
+         setIsPendingLoading(false);
+       }
+     };
 
     // Real-time updates for the events list and current details
-    useRealtimeLots(() => {
-      fetchEvents();
-      if (viewingEventDetails) {
-        fetchEventLots(viewingEventDetails.id);
-      }
-    });
+     useRealtimeLots(() => {
+       fetchEvents();
+       fetchPendingWinnerLots();
+       if (viewingEventDetails) {
+         fetchEventLots(viewingEventDetails.id);
+       }
+     });
 
     useEffect(() => {
       const channel = supabase
@@ -567,9 +593,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
              </DialogHeader>
               <Tabs defaultValue="basico" className="w-full mt-4">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="basico">Básico</TabsTrigger>
-                  <TabsTrigger value="agenda">Agenda</TabsTrigger>
-                  <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
+                 <TabsTrigger value="basico">Básico</TabsTrigger>
+                 <TabsTrigger value="agenda">Agenda</TabsTrigger>
+                 <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basico" className="space-y-4 animate-in fade-in slide-in-from-left-2">
