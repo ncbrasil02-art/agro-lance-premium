@@ -1013,6 +1013,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                  )}
                </TableBody>
              </Table>
+           )}
                </CardContent>
              </Card>
            </TabsContent>
