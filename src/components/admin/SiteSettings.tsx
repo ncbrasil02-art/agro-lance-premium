@@ -7,7 +7,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
- import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown } from "lucide-react";
+  import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check } from "lucide-react";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -34,6 +34,8 @@
    const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
    const [isUploading, setIsUploading] = useState(false);
+    const [baseColor, setBaseColor] = useState("#D4AF37");
+    const [savedPalettes, setSavedPalettes] = useState<any[]>([]);
  
    const [siteInfo, setSiteInfo] = useState({
      name: "",
@@ -90,12 +92,16 @@
        
        if (error) throw error;
  
-        data.forEach(item => {
-          if (!item.value) return;
-          if (item.key === "site_info") setSiteInfo((prev: any) => ({ ...prev, ...(item.value as any) }));
-          if (item.key === "theme") setTheme((prev: any) => ({ ...prev, ...(item.value as any) }));
-          if (item.key === "homepage_sections") setHomepage((prev: any) => ({ ...prev, ...(item.value as any) }));
-        });
+        const info = data.find(i => i.key === "site_info")?.value;
+        const themeData = data.find(i => i.key === "theme")?.value;
+        const homeData = data.find(i => i.key === "homepage_sections")?.value;
+        const palettes = data.find(i => i.key === "saved_palettes")?.value;
+
+        if (info) setSiteInfo(prev => ({ ...prev, ...(info as any) }));
+        if (themeData) setTheme(prev => ({ ...prev, ...(themeData as any) }));
+        if (homeData) setHomepage(prev => ({ ...prev, ...(homeData as any) }));
+        if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
+
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
      } finally {
@@ -108,7 +114,7 @@
      try {
        const { error } = await supabase
          .from("site_settings")
-         .upsert({ key, value });
+          .upsert({ key, value }, { onConflict: 'key' });
        
        if (error) throw error;
        toast.success("Configurações salvas com sucesso!");
@@ -175,6 +181,64 @@
      articles: "Artigos e Notícias"
    };
  
+    const generatePalette = () => {
+      const hexToRgb = (hex: string) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return { r, g, b };
+      };
+
+      const rgbToHex = (r: number, g: number, b: number) => {
+        return "#" + [r, g, b].map(x => {
+          const hex = Math.max(0, Math.min(255, Math.round(x))).toString(16);
+          return hex.length === 1 ? "0" + hex : hex;
+        }).join("");
+      };
+
+      const adjust = (hex: string, percent: number) => {
+        const { r, g, b } = hexToRgb(hex);
+        const amount = Math.floor(255 * (percent / 100));
+        return rgbToHex(
+          Math.max(0, Math.min(255, r + amount)),
+          Math.max(0, Math.min(255, g + amount)),
+          Math.max(0, Math.min(255, b + amount))
+        );
+      };
+
+      const newTheme = {
+        ...theme,
+        primary_color: baseColor,
+        primary_foreground_color: "#ffffff",
+        secondary_color: adjust(baseColor, -40),
+        secondary_foreground_color: "#ffffff",
+        accent_color: adjust(baseColor, 10),
+        background_color: adjust(baseColor, -85),
+        foreground_color: "#f8fafc",
+        card_color: adjust(baseColor, -75),
+        card_foreground_color: "#f8fafc",
+        popover_color: adjust(baseColor, -75),
+        popover_foreground_color: "#f8fafc",
+        border_color: adjust(baseColor, -50),
+        ring_color: baseColor,
+      };
+
+      setTheme(newTheme);
+      toast.success("Nova paleta gerada!");
+    };
+
+    const savePalette = async () => {
+      const newPalettes = [theme, ...savedPalettes].slice(0, 5);
+      setSavedPalettes(newPalettes);
+      await handleSave("saved_palettes", newPalettes);
+    };
+
+    const deletePalette = async (index: number) => {
+      const newPalettes = savedPalettes.filter((_, i) => i !== index);
+      setSavedPalettes(newPalettes);
+      await handleSave("saved_palettes", newPalettes);
+    };
+
    return (
      <Tabs defaultValue="geral" className="space-y-6">
        <TabsList className="bg-muted/50 p-1">
