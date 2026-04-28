@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand, ChevronDown, ChevronUp } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
       throw notFound();
     }
 
-    const [lotRes, bidsRes] = await Promise.all([
+    const [lotRes, bidsRes, neighboringLotsRes] = await Promise.all([
        supabase
          .from("lots")
          .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
@@ -55,16 +55,36 @@ export const Route = createFileRoute("/lotes/$lotId")({
         .select("*")
         .eq("lot_id", lotId)
         .order("created_at", { ascending: false })
-        .limit(5)
+        .limit(5),
+      supabase
+        .from("lots")
+        .select("id, lot_number")
+        .order("lot_number", { ascending: true })
     ]);
 
     if (lotRes.error || !lotRes.data) {
       throw notFound();
     }
 
+    // Actually let's fetch only lots from this event
+    const { data: eventLotsData } = await supabase
+      .from("lots")
+      .select("id, lot_number")
+      .eq("event_id", lotRes.data.event_id as string)
+      .order("lot_number", { ascending: true });
+
+    const currentLotIndex = (eventLotsData || []).findIndex(l => l.id === lotId);
+    const prevLotId = currentLotIndex > 0 ? eventLotsData![currentLotIndex - 1].id : null;
+    const nextLotId = currentLotIndex < (eventLotsData?.length || 0) - 1 ? eventLotsData![currentLotIndex + 1].id : null;
+
     try {
       const validatedLot = lotSchema.parse(lotRes.data);
-      return { lot: validatedLot, initialBids: bidsRes.data || [] };
+      return { 
+        lot: validatedLot, 
+        initialBids: bidsRes.data || [],
+        prevLotId,
+        nextLotId
+      };
     } catch (e) {
       throw notFound();
     }
@@ -272,7 +292,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
 }
 
 function LotDetail() {
-  const { lot: initialLot, initialBids } = Route.useLoaderData() as any;
+  const { lot: initialLot, initialBids, prevLotId, nextLotId } = Route.useLoaderData() as any;
   const { user, profile } = useAuth();
    const [lot, setLot] = useState(initialLot);
    const [viewIncremented, setViewIncremented] = useState(false);
@@ -550,14 +570,34 @@ function LotDetail() {
        </div>
 
       <div className="min-h-screen bg-background print:hidden">
-        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50">
-          <div className="container mx-auto px-4 flex items-center justify-between">
-            <Link to="/ao-vivo" className="text-white">← Voltar</Link>
-            <div className="text-center">
-              <h1 className="text-white font-bold uppercase">Lote #{lot.lot_number}</h1>
-              <p className="text-gold/80 text-[10px] uppercase font-bold">{lot.event?.name}</p>
+        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
+          <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+            <Link to="/ao-vivo" className="text-white flex items-center gap-1 hover:text-gold transition-colors">
+              <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">Voltar</span>
+            </Link>
+            
+            <div className="flex items-center gap-2 sm:gap-4">
+              {prevLotId && (
+                <Link to="/lotes/$lotId" params={{ lotId: prevLotId }} className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all">
+                  <ChevronLeft className="h-5 w-5" />
+                </Link>
+              )}
+              
+              <div className="text-center min-w-[120px]">
+                <h1 className="text-white font-black uppercase text-sm sm:text-base tracking-tighter">Lote #{lot.lot_number}</h1>
+                <p className="text-gold/80 text-[9px] uppercase font-bold truncate max-w-[150px]">{lot.event?.name}</p>
+              </div>
+
+              {nextLotId && (
+                <Link to="/lotes/$lotId" params={{ lotId: nextLotId }} className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all">
+                  <ChevronRight className="h-5 w-5" />
+                </Link>
+              )}
             </div>
-            <StatusBadge status={dynamicStatus} urgent={isUrgent} />
+
+            <div className="flex items-center gap-3">
+              <StatusBadge status={dynamicStatus} urgent={isUrgent} />
+            </div>
           </div>
         </header>
 
@@ -583,7 +623,6 @@ function LotDetail() {
                    <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
                     <TabsTrigger value="videos">Vídeo</TabsTrigger>
                      <TabsTrigger value="saude">Saúde do Animal</TabsTrigger>
-                    <TabsTrigger value="historico">Lances</TabsTrigger>
                  </TabsList>
                  <TabsContent value="detalhes" className="mt-6">
                    <Card className="bg-card/50 border-white/5 p-8">
@@ -743,47 +782,6 @@ function LotDetail() {
                        </div>
                      </Card>
                    </TabsContent>
-                  <TabsContent value="historico" className="mt-6">
-                    <Card className="bg-card/50 border-white/5 p-8">
-                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
-                        <Gavel className="h-4 w-4" /> Histórico de Lances
-                      </h3>
-                      
-                      <div className="space-y-3">
-                        {recentBids.length > 0 ? (
-                          recentBids.map((bid, idx) => (
-                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-white/5 border-white/5'}`}>
-                              <div className="flex items-center gap-4">
-                                <div className={`h-10 w-10 rounded-full flex items-center justify-center font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
-                                  {idx + 1}
-                                </div>
-                                <div>
-                                    <p className="font-bold text-white">
-                                       {bid.bidder_name}
-                                    </p>
-                                  <p className="text-[10px] text-white/40 uppercase font-bold">
-                                    {new Date(bid.created_at).toLocaleString('pt-BR')}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className={`text-lg font-black italic ${idx === 0 ? 'text-gold' : 'text-white'}`}>
-                                  {formatBRL(bid.amount)}
-                                </p>
-                                {idx === 0 && <span className="text-[8px] font-black uppercase bg-gold text-emerald-deep px-2 py-0.5 rounded-full">LANCE ATUAL</span>}
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="py-12 text-center space-y-4">
-                            <Gavel className="h-12 w-12 text-white/10 mx-auto" />
-                            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Ainda não há lances para este lote</p>
-                            <p className="text-white/20 text-[10px]">Seja o primeiro a ofertar!</p>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  </TabsContent>
                 </Tabs>
               </div>
 
@@ -937,6 +935,46 @@ function LotDetail() {
                     </div>
                   </div>
                 </Card>
+
+                <Card className="bg-card/50 border-white/5 p-6 rounded-[2rem]">
+                  <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                    <Gavel className="h-4 w-4" /> Histórico de Lances
+                  </h3>
+                  
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {recentBids.length > 0 ? (
+                      recentBids.map((bid, idx) => (
+                        <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-white/5 border-white/5'}`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                              {idx + 1}
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-white leading-none mb-1">
+                                   {bid.bidder_name}
+                                </p>
+                              <p className="text-[8px] text-white/40 uppercase font-bold">
+                                {new Date(bid.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className={`text-sm font-black italic ${idx === 0 ? 'text-gold' : 'text-white'}`}>
+                              {formatBRL(bid.amount)}
+                            </p>
+                            {idx === 0 && <span className="text-[7px] font-black uppercase bg-gold text-emerald-deep px-1.5 py-0.5 rounded-full">LANCE ATUAL</span>}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-8 text-center space-y-3">
+                        <Gavel className="h-8 w-8 text-white/10 mx-auto" />
+                        <p className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Ainda não há lances</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+
                <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
                  <h3 className="text-white font-black uppercase text-sm mb-4">Pagamento & Envio</h3>
                  <ul className="text-white/60 text-xs space-y-2">
