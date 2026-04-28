@@ -536,6 +536,87 @@
             </div>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isDocumentsDialogOpen} onOpenChange={setIsDocumentsDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Documentos Enviados</DialogTitle>
+              <DialogDescription>
+                Documentação de {selectedUser?.full_name} para verificação.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
+              {selectedUser?.document_urls?.length > 0 ? (
+                selectedUser.document_urls.map((url: string, i: number) => (
+                  <div key={i} className="group relative aspect-square border rounded-xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all">
+                    {url.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/) ? (
+                      <img src={url} alt={`Doc ${i+1}`} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex flex-col items-center justify-center gap-2">
+                        <FileText className="h-10 w-10 text-muted-foreground/30" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Documento {i+1}</span>
+                      </div>
+                    )}
+                    <a 
+                      href={url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="absolute inset-0 bg-emerald-deep/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-2"
+                    >
+                      <Download className="h-4 w-4" /> ABRIR
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full py-12 text-center text-muted-foreground">
+                  <Info className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                  <p>Nenhum documento anexado a este perfil.</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Enviar Mensagem ao Usuário</DialogTitle>
+              <DialogDescription>
+                A mensagem será exibida no painel do licitante {selectedUser?.full_name}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Assunto</Label>
+                <Input 
+                  placeholder="Ex: Documentação Aprovada" 
+                  value={messageData.title}
+                  onChange={e => setMessageData({...messageData, title: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Conteúdo da Mensagem</Label>
+                <Textarea 
+                  placeholder="Escreva sua mensagem aqui..." 
+                  rows={5}
+                  value={messageData.content}
+                  onChange={e => setMessageData({...messageData, content: e.target.value})}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsMessageDialogOpen(false)}>Cancelar</Button>
+              <Button 
+                onClick={handleSendMessage} 
+                className="bg-emerald-deep text-white gap-2"
+                disabled={isSendingMessage || !messageData.content}
+              >
+                {isSendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Enviar Mensagem
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
