@@ -17,8 +17,8 @@ import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
               <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-8 object-contain" />
             ) : (
               <span>
-                <span className="text-foreground">{siteInfo?.name.split(' ')[0] || "Premium"}</span>
-                <span className="text-gradient-gold">{siteInfo?.name.split(' ').slice(1).join(' ') || "Agro"}</span>
+                <span className="text-foreground">{siteInfo?.name?.split(' ')?.[0] || "Premium"}</span>
+                <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ') || "Agro"}</span>
               </span>
             )}
           </Link>
