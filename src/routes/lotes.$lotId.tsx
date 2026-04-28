@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand } from "lucide-react";
+ import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand, ChevronDown, ChevronUp } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -529,7 +529,7 @@ function LotDetail() {
                    <TabsTrigger value="detalhes">Descrição</TabsTrigger>
                    <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
                     <TabsTrigger value="videos">Vídeo</TabsTrigger>
-                    <TabsTrigger value="saude">Saúde</TabsTrigger>
+                     <TabsTrigger value="saude">Saúde do Animal</TabsTrigger>
                     <TabsTrigger value="historico">Lances</TabsTrigger>
                  </TabsList>
                  <TabsContent value="detalhes" className="mt-6">
@@ -608,67 +608,88 @@ function LotDetail() {
                       )}
                     </div>
                   </TabsContent>
-                  <TabsContent value="saude" className="mt-6">
-                    <Card className="bg-card/50 border-white/5 p-8">
-                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
-                        <Stethoscope className="h-4 w-4" /> Histórico Veterinário e Saúde
-                      </h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Checklist de Saúde</p>
-                          <div className="grid grid-cols-1 gap-2">
-                            {[
-                              { id: "prognata", label: "Prognata" },
-                              { id: "aerofagico", label: "Aerofágico" },
-                              { id: "criptorquidico", label: "Criptorquídico" },
-                              { id: "cirurgia_neurectomia", label: "Cirurgia de neurectomia" },
-                              { id: "laminite", label: "Laminite" },
-                              { id: "cirurgia_colica", label: "Cirurgia de Cólica" },
-                              { id: "dpco", label: "DPCO" },
-                              { id: "cirurgia_grave", label: "Cirurgia Grave" },
-                              { id: "cicatrizes", label: "Cicatrizes" },
-                              { id: "hypp", label: "HYPP" },
-                            ].map(item => {
-                              const val = lot.animal?.veterinary_history?.[item.id];
-                              return (
-                                <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                                  <span className="text-xs text-white/80">{item.label}</span>
-                                  {val ? (
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                  ) : (
-                                    <AlertCircle className="h-4 w-4 text-white/10" />
-                                  )}
+                   <TabsContent value="saude" className="mt-6">
+                     <Card className="bg-card/50 border-white/5 p-8">
+                       <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                         <Stethoscope className="h-4 w-4" /> Saúde do Animal
+                       </h3>
+                       
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         <div className="space-y-4">
+                           <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Checklist de Saúde</p>
+                           <div className="grid grid-cols-1 gap-2">
+                             {[
+                               { id: "prognata", label: "Prognata" },
+                               { id: "aerofagico", label: "Aerofágico" },
+                               { id: "criptorquidico", label: "Criptorquídico" },
+                               { id: "cirurgia_neurectomia", label: "Cirurgia de neurectomia" },
+                               { id: "laminite", label: "Laminite" },
+                               { id: "cirurgia_colica", label: "Cirurgia de Cólica" },
+                               { id: "dpco", label: "DPCO" },
+                               { id: "cirurgia_grave", label: "Cirurgia Grave" },
+                               { id: "cicatrizes", label: "Cicatrizes" },
+                               { id: "hypp", label: "HYPP" },
+                             ].map(item => {
+                               const val = lot.animal?.veterinary_history?.[item.id];
+                               return (
+                                 <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                                   <span className="text-xs text-white/80">{item.label}</span>
+                                   <div className="flex items-center gap-2">
+                                      <span className={`text-[10px] font-bold uppercase ${val === true ? 'text-emerald-500' : val === false ? 'text-red-500' : 'text-white/20'}`}>
+                                        {val === true ? 'Sim' : val === false ? 'Não' : '-'}
+                                      </span>
+                                      {val === true ? (
+                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                      ) : val === false ? (
+                                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                                      ) : (
+                                        <AlertCircle className="h-4 w-4 text-white/10" />
+                                      )}
+                                   </div>
+                                 </div>
+                               );
+                             })}
+                           </div>
+                         </div>
+                         
+                         <div className="space-y-6">
+                           {lot.animal?.veterinary_history?.health_photo_url && (
+                             <div>
+                               <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Imagens de Exames (Raio-X)</p>
+                               <div className="rounded-2xl border border-gold/20 overflow-hidden bg-black/40 group cursor-pointer" onClick={() => window.open(lot.animal.veterinary_history.health_photo_url, '_blank')}>
+                                 <OptimizedImage 
+                                   src={lot.animal.veterinary_history.health_photo_url} 
+                                   alt="Exame de Saúde"
+                                   aspectRatio="video"
+                                   className="w-full h-auto group-hover:scale-110 transition-transform duration-500"
+                                 />
+                                 <div className="p-2 text-center bg-gold/10 text-[8px] font-black text-gold uppercase tracking-widest">Clique para ampliar</div>
+                               </div>
+                           </div>
+                           )}
+
+                           <div>
+                             <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Observações Veterinárias</p>
+                             <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-white/60 italic leading-relaxed">
+                               {lot.animal?.veterinary_history?.other_info || "Nenhuma observação adicional registrada."}
+                             </div>
+                           </div>
+
+                           {/* Detalhamento Expansivo */}
+                           <div className="pt-4">
+                              <div className="flex flex-col gap-2">
+                                <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Detalhamento do Animal</p>
+                                <div className="p-4 bg-emerald-deep/40 rounded-2xl border border-gold/10 text-white/90">
+                                  <p className="text-sm leading-relaxed whitespace-pre-line">
+                                    {lot.animal?.description || "Informações detalhadas não informadas."}
+                                  </p>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-6">
-                          <div>
-                            <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Observações Adicionais</p>
-                            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-white/60 italic">
-                              {lot.animal?.veterinary_history?.other_info || "Nenhuma observação adicional registrada."}
-                            </div>
-                          </div>
-                          {lot.animal?.health_info && Object.keys(lot.animal.health_info).length > 0 && (
-                            <div>
-                              <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Informações de Saúde</p>
-                              <div className="space-y-2">
-                                {Object.entries(lot.animal.health_info).map(([key, val]: [string, any]) => (
-                                  <div key={key} className="p-3 bg-white/5 rounded-xl border border-white/5">
-                                    <p className="text-[10px] text-gold/40 uppercase font-black mb-1">{key}</p>
-                                    <p className="text-xs text-white/80">{String(val)}</p>
-                                  </div>
-                                ))}
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
+                           </div>
+                         </div>
+                       </div>
+                     </Card>
+                   </TabsContent>
                   <TabsContent value="historico" className="mt-6">
                     <Card className="bg-card/50 border-white/5 p-8">
                       <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
