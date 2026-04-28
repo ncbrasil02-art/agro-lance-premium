@@ -98,17 +98,18 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
      useEffect(() => {
        const interval = setInterval(() => setNow(Date.now()), 1000);
        
-       const channel = supabase
-         .channel('home-updates')
-         .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
-           logger.info("Evento alterado, atualizando home...");
-           router.invalidate();
-         })
-         .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
-           logger.info("Lote alterado, atualizando home...");
-           router.invalidate();
-         })
-         .subscribe();
+        const homeChannelId = `home-updates-${Math.random().toString(36).substring(2, 9)}`;
+        const channel = supabase
+          .channel(homeChannelId)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+            logger.info("Evento alterado, atualizando home...");
+            router.invalidate();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
+            logger.info("Lote alterado, atualizando home...");
+            router.invalidate();
+          })
+          .subscribe();
  
        return () => {
          clearInterval(interval);
