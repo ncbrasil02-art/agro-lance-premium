@@ -1,3 +1,4 @@
+ import { useSiteSettings } from "@/hooks/useSiteSettings";
  import { ArticleCarousel } from "@/components/site/ArticleCarousel";
  import { EventCarousel } from "@/components/site/EventCarousel";
  import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
@@ -92,13 +93,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
  function Home() {
      const router = useRouter();
-     const { events, lots, pastEvents, announcement, articles, sectionsSettings: rawSectionsSettings } = Route.useLoaderData();
-     
-     const sectionsSettings = (rawSectionsSettings as any) || { 
-       show_articles: true, 
-       show_upcoming_events: true, 
-       show_featured_lots: true 
-     };
+      const { events, lots, pastEvents, announcement, articles, sectionsSettings: initialSections } = Route.useLoaderData();
+      const { homepage: sectionsSettings, siteInfo } = useSiteSettings();
+      
+      const activeSections = sectionsSettings || initialSections;
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {
@@ -225,18 +223,19 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
         </div>
       )}
 
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <OptimizedImage 
-            src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
-            alt="Cavalo de elite ao entardecer" 
-            width={1920} 
-            className="h-full w-full opacity-40" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-        </div>
+       {/* HERO / BANNERS */}
+       {(!activeSections || (activeSections as any).show_animated_slides) && (
+         <section className="relative overflow-hidden">
+           <div className="absolute inset-0">
+             <OptimizedImage 
+               src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
+               alt="Cavalo de elite ao entardecer" 
+               width={1920} 
+               className="h-full w-full opacity-40" 
+             />
+             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
+             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+           </div>
 
         <div className="container relative mx-auto px-4 py-20 md:py-32">
           <div className="max-w-2xl">
@@ -281,12 +280,12 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
                 </div>
               </div>
             )}
-            <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
-              Leilões <span className="text-gradient-gold">premium</span><br />
+            <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase">
+              {siteInfo?.name.split(' ')[0] || "Leilões"} <span className="text-gradient-gold">{siteInfo?.name.split(' ').slice(1).join(' ') || "Premium"}</span><br />
               em tempo real
             </h1>
-             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Cavalos, bovinos e embriões de elite com transmissão ao vivo, curadoria genética
+             <p className="mt-5 max-w-xl text-lg text-muted-foreground italic">
+              {siteInfo?.name || "Premium Agro"} - A elite do agronegócio com transmissão ao vivo, curadoria genética
               e tecnologia de ponta para compradores e leiloeiros profissionais.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -321,6 +320,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           </div>
         </div>
       </section>
+      )}
 
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
@@ -342,24 +342,43 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
         </section>
       )}
 
-       {/* EVENTOS FUTUROS */}
-       {sectionsSettings.show_upcoming_events && (
-         <EventCarousel 
-           events={upcomingEvents} 
-           title="Próximos eventos" 
-           subtitle="Reserve sua agenda e participe das maiores oportunidades."
-         />
-       )}
- 
-       {/* LOTES DESTAQUE */}
-       {sectionsSettings.show_featured_lots && (
-         <FeaturedLotsCarousel lots={mappedLots} />
-       )}
-
-       {/* ARTIGOS */}
-       {sectionsSettings.show_articles && (
-         <ArticleCarousel articles={articles} />
-       )}
+      {/* DYNAMIC SECTIONS ORDERING */}
+      {((activeSections as any)?.order || ["upcoming_events", "featured_lots", "sale_menu", "articles"]).map((sectionId: string) => {
+        if (sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events) {
+          return (
+            <EventCarousel 
+              key="upcoming"
+              events={upcomingEvents} 
+              title="Próximos eventos" 
+              subtitle="Reserve sua agenda e participe das maiores oportunidades."
+            />
+          );
+        }
+        if (sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots) {
+          return <FeaturedLotsCarousel key="featured" lots={mappedLots} />;
+        }
+        if (sectionId === "articles" && (activeSections as any)?.show_articles) {
+          return <ArticleCarousel key="articles" articles={articles} />;
+        }
+        if (sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu) {
+          return (
+            <section key="sale" className="container mx-auto px-4 py-16">
+              <div className="rounded-3xl bg-emerald-deep/40 border border-gold/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div>
+                  <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">Compra Direta de Elite</h2>
+                  <p className="text-white/60 max-w-md">Acesse nosso catálogo exclusivo de venda direta e garanta seu animal sem a necessidade de disputa em leilão.</p>
+                </div>
+                <Link to="/compra-direta">
+                  <Button size="lg" className="bg-gold text-emerald-deep font-black uppercase italic tracking-widest h-16 px-8 rounded-2xl shadow-gold hover:scale-105 transition-transform">
+                    Acessar Catálogo
+                  </Button>
+                </Link>
+              </div>
+            </section>
+          );
+        }
+        return null;
+      })}
 
       {/* EVENTOS PASSADOS */}
       {mappedPastEvents.length > 0 && (
