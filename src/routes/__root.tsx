@@ -1,4 +1,5 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouter } from "@tanstack/react-router";
+  import { Outlet, Link, HeadContent, Scripts, useRouter, createRootRouteWithContext } from "@tanstack/react-router";
+ import { supabase } from "@/integrations/supabase/client";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 function GlobalErrorComponent({ error }: { error: Error }) {
   return (
@@ -36,7 +37,29 @@ function NotFoundComponent() {
   );
 }
 
-export const Route = createRootRoute({
+   export const Route = createRootRouteWithContext<{
+    siteInfo: any;
+    theme: any;
+    homepage: any;
+  }>()({
+   loader: async () => {
+     try {
+       const { data, error } = await supabase
+         .from("site_settings")
+         .select("key, value");
+       
+       if (error) throw error;
+       
+       const info = data.find((i: any) => i.key === "site_info")?.value as any;
+       const theme = data.find((i: any) => i.key === "theme")?.value as any;
+       const homepage = data.find((i: any) => i.key === "homepage_sections")?.value as any;
+       
+       return { siteInfo: info, theme, homepage };
+     } catch (error) {
+       console.error("Error loading root settings:", error);
+       return { siteInfo: null, theme: null, homepage: null };
+     }
+   },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

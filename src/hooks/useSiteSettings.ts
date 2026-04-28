@@ -25,14 +25,18 @@
    order: string[];
  }
  
- export function useSiteSettings() {
-   const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
-    const [theme, setTheme] = useState<ThemeSettings | null>(null);
-   const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
-   const [isLoading, setIsLoading] = useState(true);
+ export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null }) {
+   const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(initialData?.siteInfo || null);
+   const [theme, setTheme] = useState<ThemeSettings | null>(initialData?.theme || null);
+   const [homepage, setHomepage] = useState<HomepageSettings | null>(initialData?.homepage || null);
+   const [isLoading, setIsLoading] = useState(!initialData);
  
    useEffect(() => {
      async function fetchSettings() {
+        if (initialData) {
+          setIsLoading(false);
+          return;
+        }
        try {
          const { data, error } = await supabase
            .from("site_settings")
@@ -40,12 +44,13 @@
          
          if (error) throw error;
  
-          data.forEach(item => {
-            if (!item.value) return;
-             if (item.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(item.value as any) } as any));
-             if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) } as any));
-             if (item.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(item.value as any) } as any));
-          });
+          const info = data.find(i => i.key === "site_info")?.value as any as SiteInfo;
+          const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
+          const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
+
+          if (info) setSiteInfo(info);
+          if (themeSettings) setTheme(themeSettings);
+          if (homeSettings) setHomepage(homeSettings);
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
           setIsLoading(false);

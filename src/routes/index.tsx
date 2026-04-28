@@ -20,71 +20,68 @@ import { HomeSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
-  export const Route = createFileRoute("/")({
-    loader: async () => {
-      try {
-        console.log("Loader Home started");
-        const [eventsRes, lotsRes, pastEventsRes, settingsRes, articlesRes, sectionsSettingsRes] = await Promise.all([
-          supabase.from("events")
-            .select("*, lots!lots_event_id_fkey(id)")
-            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
-            .order("start_date", { ascending: true })
-            .limit(15),
-          supabase.from("lots")
-            .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
-            .eq("is_featured", true)
-            .order("created_at", { ascending: false })
-            .limit(12),
-          supabase.from("events")
-            .select("*, lots!lots_event_id_fkey(id)")
-            .eq("status", "finished")
-            .order("start_date", { ascending: false })
-            .limit(3),
-          supabase.from("site_settings")
-            .select("*")
-            .eq("key", "announcement")
-            .maybeSingle(),
-          supabase.from("posts")
-            .select("*, category:categories(name)")
-            .eq("status", "published")
-            .order("published_at", { ascending: false })
-            .limit(10),
-          supabase.from("site_settings")
-            .select("*")
-            .eq("key", "homepage_sections")
-            .maybeSingle()
-        ]);
-
-        return {
-          events: eventsRes.data || [],
-          lots: lotsRes.data || [],
-          pastEvents: pastEventsRes.data || [],
-          announcement: settingsRes.data?.value || null,
-          articles: articlesRes.data || [],
-          sectionsSettings: sectionsSettingsRes.data?.value || { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
-        };
-      } catch (err) {
-        console.error("Loader Home fatal error:", err);
-        return {
-          events: [],
-          lots: [],
-          pastEvents: [],
-          announcement: null,
-          articles: [],
-          sectionsSettings: { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
-        };
-      }
-    },
+   export const Route = createFileRoute("/")({
+     loader: async () => {
+       try {
+         console.log("Loader Home started");
+         const [eventsRes, lotsRes, pastEventsRes, announcementRes, articlesRes] = await Promise.all([
+           supabase.from("events")
+             .select("*, lots!lots_event_id_fkey(id)")
+             .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
+             .order("start_date", { ascending: true })
+             .limit(15),
+           supabase.from("lots")
+             .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+             .eq("is_featured", true)
+             .order("created_at", { ascending: false })
+             .limit(12),
+           supabase.from("events")
+             .select("*, lots!lots_event_id_fkey(id)")
+             .eq("status", "finished")
+             .order("start_date", { ascending: false })
+             .limit(3),
+           supabase.from("site_settings")
+             .select("*")
+             .eq("key", "announcement")
+             .maybeSingle(),
+           supabase.from("posts")
+             .select("*, category:categories(name)")
+             .eq("status", "published")
+             .order("published_at", { ascending: false })
+             .limit(10),
+         ]);
+ 
+         return {
+           events: eventsRes.data || [],
+           lots: lotsRes.data || [],
+           pastEvents: pastEventsRes.data || [],
+           announcement: announcementRes.data?.value || null,
+           articles: articlesRes.data || [],
+         };
+       } catch (err) {
+         console.error("Loader Home fatal error:", err);
+         return {
+           events: [],
+           lots: [],
+           pastEvents: [],
+           announcement: null,
+           articles: [],
+         };
+       }
+     },
     component: Home,
     pendingComponent: HomeSkeleton,
     errorComponent: ErrorFallback,
   });
 
- function Home() {
-     const router = useRouter();
-      const { events, lots, pastEvents, announcement, articles, sectionsSettings: initialSections } = Route.useLoaderData();
-      const { homepage: sectionsSettings, siteInfo } = useSiteSettings();
-      const activeSections = sectionsSettings || initialSections;
+  function Home() {
+      const router = useRouter();
+       const { events, lots, pastEvents, announcement, articles } = Route.useLoaderData();
+        const { siteInfo, theme, homepage } = Route.useRouteContext();
+       const { homepage: sectionsSettings, siteInfo: dynamicSiteInfo } = useSiteSettings({ siteInfo, theme, homepage });
+       
+       const activeSections = sectionsSettings || homepage || { show_articles: true, show_upcoming_events: true, show_featured_lots: true };
+       const currentSiteInfo = dynamicSiteInfo || siteInfo;
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {

@@ -6,22 +6,46 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+ serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { userId, type, data } = await req.json()
-    
     // Initialize Supabase client
     const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    )
+
+    // Get the user from the JWT
+    const { data: { user: authUser }, error: authError } = await supabaseClient.auth.getUser()
+    if (authError || !authUser) {
+      throw new Error('Unauthorized')
+    }
+
+    // Check if the user is an admin
+    const { data: profileRole } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', authUser.id)
+      .single()
+
+    if (profileRole?.role !== 'admin') {
+      throw new Error('Forbidden: Only admins can send notifications')
+    }
+
+    const { userId, type, data } = await req.json()
+    
+    // Use service role for admin tasks
+    const adminClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Fetch user profile
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await adminClient
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -31,8 +55,7 @@ serve(async (req) => {
       throw new Error('User not found')
     }
 
-    // Get user email from auth.users
-    const { data: { user }, error: userError } = await supabaseClient.auth.admin.getUserById(userId)
+    const { data: { user }, error: userError } = await adminClient.auth.admin.getUserById(userId)
     if (userError || !user) {
       throw new Error('User email not found')
     }
