@@ -1371,10 +1371,7 @@ export const Route = createFileRoute("/ao-vivo")({
                    <div className="font-semibold flex items-center gap-2">
                        <div className="flex flex-col">
                            <span className="text-sm font-bold">
-                             {bid.phone_bidder_identifier || 
-                              bidderProfiles[bid.user_id]?.full_name || 
-                              bid.profile?.full_name || 
-                              (bid.user_id ? `Comprador #${bid.user_id.slice(0, 4)}` : "Licitante")}
+                             {bid.bidder_name || bid.phone_bidder_identifier || "Licitante"}
                            </span>
                          <div className="flex items-center gap-2 mt-0.5">
                            {bid.is_phone_bid ? (
