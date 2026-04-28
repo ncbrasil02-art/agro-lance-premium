@@ -33,8 +33,17 @@ export const Route = createFileRoute("/eventos/")({
           throw error;
         }
 
-        const validatedEvents = z.array(eventSchema).parse(events || []);
-        logger.info("Eventos carregados e validados com sucesso", { count: validatedEvents.length });
+        const validatedEvents = (events || []).map(event => {
+          const result = eventSchema.safeParse(event);
+          if (!result.success) {
+            logger.warn("Evento com dados incompletos detectado", { id: event.id, error: result.error });
+            // Tenta retornar o máximo possível do evento mesmo com falha na validação
+            return { ...event, status: event.status || 'scheduled' } as ValidatedEvent;
+          }
+          return result.data;
+        });
+
+        logger.info("Eventos processados com sucesso", { count: validatedEvents.length });
         return { events: validatedEvents };
       } catch (error) {
         logger.error("Erro ao carregar página de Eventos", { error });
