@@ -1031,23 +1031,17 @@ import {
                                            {selectedLotBids.length === 0 ? (
                                              <TableRow><TableCell colSpan={3} className="text-center text-xs py-4">Sem lances</TableCell></TableRow>
                                            ) : (
-                                             selectedLotBids.map(bid => {
-                                               const bidderName = bid.is_phone_bid 
-                                                 ? (bid.phone_bidder_identifier || "Auditório/Mesa") 
-                                                 : (bid.profile?.full_name || 'Licitante');
-                                               
-                                               return (
-                                                 <TableRow key={bid.id}>
-                                                   <TableCell className="py-3 text-sm font-bold text-slate-900">{bidderName}</TableCell>
-                                                   <TableCell className="py-3 text-sm font-black text-emerald-700">
-                                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
-                                                   </TableCell>
-                                                   <TableCell className="py-3 text-sm font-medium text-slate-500">
-                                                     {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
-                                                   </TableCell>
-                                                 </TableRow>
-                                               );
-                                             })
+                                              selectedLotBids.map(bid => (
+                                                  <TableRow key={bid.id}>
+                                                    <TableCell className="py-3 text-sm font-bold text-slate-900">{bid.bidder_name}</TableCell>
+                                                    <TableCell className="py-3 text-sm font-black text-emerald-700">
+                                                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
+                                                    </TableCell>
+                                                    <TableCell className="py-3 text-sm font-medium text-slate-500">
+                                                      {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
+                                                    </TableCell>
+                                                  </TableRow>
+                                              ))
                                            )}
                                         </TableBody>
                                       </Table>
@@ -1164,14 +1158,9 @@ import {
                          </TableCell>
                        </TableRow>
                      ) : (
-                        selectedLotBids.map((bid) => {
-                          const bidderName = bid.is_phone_bid 
-                            ? (bid.phone_bidder_identifier || "Auditório/Mesa") 
-                            : (bid.profile?.full_name || "Usuário");
-                          
-                          return (
+                        selectedLotBids.map((bid) => (
                             <TableRow key={bid.id}>
-                               <TableCell className="font-bold text-sm text-slate-900">{bidderName}</TableCell>
+                               <TableCell className="font-bold text-sm text-slate-900">{bid.bidder_name}</TableCell>
                                <TableCell className="font-black text-sm text-emerald-700">
                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
                                </TableCell>
@@ -1189,8 +1178,7 @@ import {
                                 </Button>
                               </TableCell>
                             </TableRow>
-                          );
-                        })
+                        ))
                      )}
                    </TableBody>
                  </Table>

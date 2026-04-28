@@ -710,7 +710,7 @@ function LotDetail() {
                                 </div>
                                 <div>
                                     <p className="font-bold text-white">
-                                       {bid.bidder_name || bid.phone_bidder_identifier || "Licitante"}
+                                       {bid.bidder_name}
                                     </p>
                                   <p className="text-[10px] text-white/40 uppercase font-bold">
                                     {new Date(bid.created_at).toLocaleString('pt-BR')}

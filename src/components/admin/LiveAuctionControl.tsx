@@ -977,7 +977,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                             <div className="flex flex-col gap-1">
                               <div className="flex items-center gap-1.5">
                                  <span className="font-bold text-white">
-                                   {bid.phone_bidder_identifier || (bid.profile?.full_name || "Licitante")}
+                                   {bid.bidder_name}
                                  </span>
                                 {bid.profile?.risk_level === 'high' && <div className="h-1.5 w-1.5 rounded-full bg-red-500" />}
                               </div>
