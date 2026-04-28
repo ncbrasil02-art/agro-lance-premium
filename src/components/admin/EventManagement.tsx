@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { toast } from "sonner";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
- import { validateLiveLink } from "@/utils/format";
+ import { validateLiveLink, formatBRL } from "@/utils/format";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
