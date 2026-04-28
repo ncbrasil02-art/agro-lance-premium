@@ -74,7 +74,8 @@ import {
               .order("name"),
             supabase
               .from("animals")
-              .select("id, name, internal_code")
+              .select("id, name, internal_code, sale_status")
+              .neq("sale_status", "sold")
               .order("name")
           ]);
     
@@ -117,13 +118,27 @@ import {
          fetchData();
        }, [initialEventId]);
  
-        useRealtimeLots(() => {
-          fetchData();
-          if (expandedLotId) {
-            fetchLotBids(expandedLotId, true);
-            fetchLotOffers(expandedLotId);
-          }
-        });
+        useRealtimeLots(fetchData);
+
+        useEffect(() => {
+          if (!expandedLotId) return;
+          
+          const channel = supabase
+            .channel(`lot-bids-${expandedLotId}`)
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'bids', filter: `lot_id=eq.${expandedLotId}` },
+              () => {
+                console.log("Bid change detected for expanded lot", expandedLotId);
+                fetchLotBids(expandedLotId, true);
+              }
+            )
+            .subscribe();
+            
+          return () => {
+            supabase.removeChannel(channel);
+          };
+        }, [expandedLotId]);
 
        const resetForm = () => {
          setEditingLot(null);
@@ -681,7 +696,11 @@ import {
                         return (
                           <>
                           <TableRow 
-                            className={`${lot.status === 'active' ? 'bg-emerald-50/30' : lot.status === 'paused' ? 'bg-amber-50/30' : ''} ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50`}
+                             className={`${
+                               lot.status === 'active' ? 'bg-emerald-50/30 border-l-4 border-l-emerald-500' : 
+                               lot.status === 'paused' ? 'bg-amber-50/30 border-l-4 border-l-amber-500' : 
+                               lot.status === 'sold' ? 'bg-amber-50/50 border-l-4 border-l-gold' : ''
+                             } ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50 transition-all duration-200`}
                             onClick={() => toggleExpand(lot.id)}
                           >
                             <TableCell onClick={(e) => e.stopPropagation()}>
@@ -942,13 +961,13 @@ import {
                                         Atualizar
                                       </Button>
                                     </div>
-                                    <div className="max-h-[200px] overflow-y-auto border rounded-md bg-white">
+                                     <div className="max-h-[200px] overflow-y-auto border rounded-md bg-slate-50 shadow-inner">
                                       <Table>
                                         <TableHeader className="bg-muted/50 sticky top-0">
                                           <TableRow>
-                                             <TableHead className="h-8 text-xs">Licitante</TableHead>
-                                             <TableHead className="h-8 text-xs">Valor</TableHead>
-                                             <TableHead className="h-8 text-xs">Hora</TableHead>
+                                              <TableHead className="h-10 text-sm font-bold text-slate-700">Licitante</TableHead>
+                                              <TableHead className="h-10 text-sm font-bold text-slate-700">Valor</TableHead>
+                                              <TableHead className="h-10 text-sm font-bold text-slate-700">Hora</TableHead>
                                           </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -962,11 +981,11 @@ import {
                                                
                                                return (
                                                  <TableRow key={bid.id}>
-                                                   <TableCell className="py-2 text-xs font-medium">{bidderName}</TableCell>
-                                                   <TableCell className="py-2 text-xs font-bold text-emerald-600">
+                                                   <TableCell className="py-3 text-sm font-bold text-slate-900">{bidderName}</TableCell>
+                                                   <TableCell className="py-3 text-sm font-black text-emerald-700">
                                                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
                                                    </TableCell>
-                                                   <TableCell className="py-2 text-xs text-muted-foreground">
+                                                   <TableCell className="py-3 text-sm font-medium text-slate-500">
                                                      {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
                                                    </TableCell>
                                                  </TableRow>
@@ -985,7 +1004,7 @@ import {
                                         Ofertas Informais
                                       </h4>
                                     </div>
-                                    <div className="max-h-[200px] overflow-y-auto border rounded-md bg-white">
+                                     <div className="max-h-[200px] overflow-y-auto border rounded-md bg-slate-50 shadow-inner">
                                       <Table>
                                         <TableHeader className="bg-muted/50 sticky top-0">
                                           <TableRow>
@@ -1095,11 +1114,11 @@ import {
                           
                           return (
                             <TableRow key={bid.id}>
-                              <TableCell className="font-bold text-sm">{bidderName}</TableCell>
-                              <TableCell className="font-black text-sm text-emerald-600">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
-                              </TableCell>
-                              <TableCell className="text-xs text-muted-foreground">
+                               <TableCell className="font-bold text-sm text-slate-900">{bidderName}</TableCell>
+                               <TableCell className="font-black text-sm text-emerald-700">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
+                               </TableCell>
+                               <TableCell className="text-xs text-slate-600">
                                 {new Date(bid.created_at).toLocaleString('pt-BR')}
                               </TableCell>
                               <TableCell className="text-right">

@@ -393,7 +393,12 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         // If the bid is already linked to a user (not a generic phone bid without profile)
         // we don't need to ask to link it, just a simple confirmation of the sale.
         const isGenericPhoneBid = lastBid.is_phone_bid && !lastBid.user_id;
-        const isAdminBid = lastBid.user_id === currentUserId && !lastBid.is_phone_bid;
+        const isAdminBid = lastBid.user_id === currentUserId;
+        
+        // If it's a phone bid placed by the admin, we shouldn't attribute the winner to the admin
+        if (lastBid.is_phone_bid && isAdminBid && !phoneBid.profileId) {
+          finalWinnerId = null;
+        }
 
         // Automatic linking logic (Refined):
         // If the bid is from phone but we have a profile selected in the UI, auto-link it
@@ -414,14 +419,24 @@ import { StatusBadge } from "@/components/auctions/status-badge";
 
        setIsActionLoading(true);
        try {
-        await supabase.from("lots").update({ 
+        // Update lot status
+        const { data: updatedLot, error: lotUpdateError } = await supabase.from("lots").update({ 
           status: 'sold', 
           is_currently_live: false,
-           winner_id: finalWinnerId,
-           winner_link_reason: lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)',
-           last_bid_ip: lastBid.ip_address,
+          winner_id: finalWinnerId,
+          winner_link_reason: lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)',
+          last_bid_ip: lastBid.ip_address,
           updated_at: new Date().toISOString()
-        }).eq("id", lotId);
+        }).eq("id", lotId).select('animal_id').single();
+
+        if (lotUpdateError) throw lotUpdateError;
+
+        // Also update the animal's sale status to 'sold' to prevent re-allocation
+        if (updatedLot?.animal_id) {
+          await supabase.from("animals")
+            .update({ sale_status: 'sold', updated_at: new Date().toISOString() })
+            .eq("id", updatedLot.animal_id);
+        }
          
           await handleAfterLotFinalized(lotId, "Lote ARREMATADO com sucesso!", activeLot?.lot_number);
        } catch (error) {
@@ -566,7 +581,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
             updatePayload.user_id = phoneBid.profileId;
           }
 
-          await supabase.from("bids").update(updatePayload).eq("id", newBidId);
+          // Use a small delay to ensure the bid is processed by the DB before updating
+          // This helps with real-time sync in other components
+          setTimeout(async () => {
+            await supabase.from("bids").update(updatePayload).eq("id", newBidId);
+          }, 100);
         }
 
         toast.success("Lance via telefone registrado!");

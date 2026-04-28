@@ -973,7 +973,14 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                    </TableRow>
                  ) : (
                     filteredAnimals.map((animal) => (
-                       <TableRow key={animal.id} className={animal.sale_status === 'sold' ? "opacity-60 bg-muted/20" : ""}>
+                        <TableRow 
+                          key={animal.id} 
+                          className={
+                            animal.sale_status === 'sold' 
+                              ? "bg-amber-50/50 border-l-4 border-l-gold hover:bg-amber-100/50" 
+                              : "hover:bg-muted/50"
+                          }
+                        >
                          <TableCell>
                            {animal.photos && animal.photos.length > 0 ? (
                              <OptimizedImage 
