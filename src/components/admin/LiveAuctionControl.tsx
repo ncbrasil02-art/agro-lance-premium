@@ -881,14 +881,14 @@ import { StatusBadge } from "@/components/auctions/status-badge";
 
                         <div className="mt-4 flex flex-col gap-2">
                           {lot.id !== liveEvent.active_lot_id && lot.status !== 'sold' && lot.status !== 'passed' && lot.status !== 'finished' && (
-                            <Button 
-                                 size="xs" 
-                              className="w-full bg-emerald-deep text-white hover:bg-emerald-deep/90 font-bold shadow-sm"
-                              onClick={() => activateLot(lot.id)}
-                              disabled={isActionLoading}
-                            >
-                              <Play className="mr-1 h-3 w-3 fill-current" /> Colocar na Tela
-                            </Button>
+                            <Button
+                                size="sm"
+                                className="w-full bg-emerald-deep text-white hover:bg-emerald-deep/90 font-bold shadow-sm h-7 text-[10px]"
+                                onClick={() => activateLot(lot.id)}
+                                disabled={isActionLoading}
+                              >
+                                <Play className="mr-1 h-3 w-3 fill-current" /> Colocar na Tela
+                              </Button>
                           )}
                           {lot.id === liveEvent.active_lot_id && (
                             <div className="grid grid-cols-2 gap-2">
