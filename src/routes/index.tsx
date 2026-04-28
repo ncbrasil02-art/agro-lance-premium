@@ -1,3 +1,4 @@
+ import { useSiteSettings } from "@/hooks/useSiteSettings";
  import { ArticleCarousel } from "@/components/site/ArticleCarousel";
  import { EventCarousel } from "@/components/site/EventCarousel";
  import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
@@ -222,19 +223,19 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
         </div>
       )}
 
-      {/* HERO / BANNERS */}
-      {(!activeSections || activeSections.show_animated_slides) && (
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0">
-            <OptimizedImage 
-              src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
-              alt="Cavalo de elite ao entardecer" 
-              width={1920} 
-              className="h-full w-full opacity-40" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-          </div>
+       {/* HERO / BANNERS */}
+       {(!activeSections || (activeSections as any).show_animated_slides) && (
+         <section className="relative overflow-hidden">
+           <div className="absolute inset-0">
+             <OptimizedImage 
+               src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
+               alt="Cavalo de elite ao entardecer" 
+               width={1920} 
+               className="h-full w-full opacity-40" 
+             />
+             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
+             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+           </div>
 
         <div className="container relative mx-auto px-4 py-20 md:py-32">
           <div className="max-w-2xl">
