@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand, ChevronDown, ChevronUp } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -296,7 +296,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
 }
 
 function LotDetail() {
-  const { lot: initialLot, initialBids } = Route.useLoaderData() as any;
+  const { lot: initialLot, initialBids, prevLotId, nextLotId } = Route.useLoaderData() as any;
   const { user, profile } = useAuth();
    const [lot, setLot] = useState(initialLot);
    const [viewIncremented, setViewIncremented] = useState(false);
@@ -574,14 +574,34 @@ function LotDetail() {
        </div>
 
       <div className="min-h-screen bg-background print:hidden">
-        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50">
-          <div className="container mx-auto px-4 flex items-center justify-between">
-            <Link to="/ao-vivo" className="text-white">← Voltar</Link>
-            <div className="text-center">
-              <h1 className="text-white font-bold uppercase">Lote #{lot.lot_number}</h1>
-              <p className="text-gold/80 text-[10px] uppercase font-bold">{lot.event?.name}</p>
+        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
+          <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+            <Link to="/ao-vivo" className="text-white flex items-center gap-1 hover:text-gold transition-colors">
+              <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">Voltar</span>
+            </Link>
+            
+            <div className="flex items-center gap-2 sm:gap-4">
+              {prevLotId && (
+                <Link to="/lotes/$lotId" params={{ lotId: prevLotId }} className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all">
+                  <ChevronLeft className="h-5 w-5" />
+                </Link>
+              )}
+              
+              <div className="text-center min-w-[120px]">
+                <h1 className="text-white font-black uppercase text-sm sm:text-base tracking-tighter">Lote #{lot.lot_number}</h1>
+                <p className="text-gold/80 text-[9px] uppercase font-bold truncate max-w-[150px]">{lot.event?.name}</p>
+              </div>
+
+              {nextLotId && (
+                <Link to="/lotes/$lotId" params={{ lotId: nextLotId }} className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all">
+                  <ChevronRight className="h-5 w-5" />
+                </Link>
+              )}
             </div>
-            <StatusBadge status={dynamicStatus} urgent={isUrgent} />
+
+            <div className="flex items-center gap-3">
+              <StatusBadge status={dynamicStatus} urgent={isUrgent} />
+            </div>
           </div>
         </header>
 
