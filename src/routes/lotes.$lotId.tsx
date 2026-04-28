@@ -296,8 +296,15 @@ function LotDetail() {
 
     const bidsChannel = supabase
       .channel(`bids-${lot.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p) => {
+      .on("postgres_changes", { event: "*", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p: any) => {
+        if (p.eventType === "DELETE") {
+          setRecentBids(prev => prev.filter(b => b.id !== p.old.id));
+          return;
+        }
+        
         const updatedBid = p.new;
+        if (!updatedBid || !updatedBid.id) return;
+        
         setRecentBids(prev => {
           const exists = prev.some(b => b.id === updatedBid.id);
           let newBids;
