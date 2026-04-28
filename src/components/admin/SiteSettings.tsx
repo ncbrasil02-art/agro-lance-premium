@@ -44,20 +44,28 @@
    });
  
    const [theme, setTheme] = useState<any>({
-     primary_color: "#D4AF37",
-     secondary_color: "#064E3B",
-     accent_color: "#10B981",
-     background_color: "#022C22",
-     foreground_color: "#F8FAFC",
-     card_color: "#064E3B",
-     card_foreground_color: "#F8FAFC",
-     muted_color: "#0F172A",
-     muted_foreground_color: "#94A3B8",
-     border_color: "#1E293B",
-     destructive_color: "#EF4444",
-     live_color: "#EF4444",
-     upcoming_color: "#D4AF37",
-     closed_color: "#64748B"
+      primary_color: "#D4AF37",
+      primary_foreground_color: "#022C22",
+      secondary_color: "#064E3B",
+      secondary_foreground_color: "#F8FAFC",
+      accent_color: "#10B981",
+      accent_foreground_color: "#F8FAFC",
+      background_color: "#022C22",
+      foreground_color: "#F8FAFC",
+      card_color: "#064E3B",
+      card_foreground_color: "#F8FAFC",
+      popover_color: "#064E3B",
+      popover_foreground_color: "#F8FAFC",
+      muted_color: "#0F172A",
+      muted_foreground_color: "#94A3B8",
+      border_color: "#1E293B",
+      input_color: "#1E293B",
+      ring_color: "#D4AF37",
+      destructive_color: "#EF4444",
+      destructive_foreground_color: "#F8FAFC",
+      live_color: "#EF4444",
+      upcoming_color: "#D4AF37",
+      closed_color: "#64748B"
    });
  
    const [homepage, setHomepage] = useState({
