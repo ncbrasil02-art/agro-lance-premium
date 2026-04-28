@@ -965,9 +965,9 @@ import {
                                       <Table>
                                         <TableHeader className="bg-muted/50 sticky top-0">
                                           <TableRow>
-                                             <TableHead className="h-8 text-xs">Licitante</TableHead>
-                                             <TableHead className="h-8 text-xs">Valor</TableHead>
-                                             <TableHead className="h-8 text-xs">Hora</TableHead>
+                                              <TableHead className="h-10 text-sm font-bold text-slate-700">Licitante</TableHead>
+                                              <TableHead className="h-10 text-sm font-bold text-slate-700">Valor</TableHead>
+                                              <TableHead className="h-10 text-sm font-bold text-slate-700">Hora</TableHead>
                                           </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -981,11 +981,11 @@ import {
                                                
                                                return (
                                                  <TableRow key={bid.id}>
-                                                   <TableCell className="py-2 text-xs font-semibold text-slate-800">{bidderName}</TableCell>
-                                                   <TableCell className="py-2 text-xs font-black text-emerald-700">
+                                                   <TableCell className="py-3 text-sm font-bold text-slate-900">{bidderName}</TableCell>
+                                                   <TableCell className="py-3 text-sm font-black text-emerald-700">
                                                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
                                                    </TableCell>
-                                                   <TableCell className="py-2 text-xs text-slate-500">
+                                                   <TableCell className="py-3 text-sm font-medium text-slate-500">
                                                      {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
                                                    </TableCell>
                                                  </TableRow>
