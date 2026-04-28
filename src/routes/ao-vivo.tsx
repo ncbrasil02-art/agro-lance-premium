@@ -529,49 +529,38 @@ export const Route = createFileRoute("/ao-vivo")({
               table: "bids", 
               filter: `lot_id=eq.${liveEvent.active_lot_id}` 
             },
-            async (payload) => {
+            async (payload: any) => {
               console.log("Bid change detected:", payload.eventType, payload.new);
               
-               if (payload.eventType === "INSERT") {
-                 const newBid = payload.new;
-                 console.log("Processando novo lance (INSERT):", newBid);
-                 
-                  setBids((prev: any[]) => {
-                    if (prev.some((b: any) => b.id === newBid.id)) return prev;
-                    const updatedBids = [newBid, ...prev]
-                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                      .slice(0, 15);
-                    return updatedBids;
-                  });
- 
-                 setLiveEvent((prev: any) => {
-                   if (!prev || !prev.active_lot || prev.active_lot.id !== newBid.lot_id) return prev;
-                   const isNewer = newBid.amount > (prev.active_lot.current_price || 0);
-                   return {
-                     ...prev,
-                     active_lot: {
-                       ...prev.active_lot,
-                       current_price: isNewer ? newBid.amount : prev.active_lot.current_price,
-                       bids_count: (prev.active_lot.bids_count || 0) + 1
-                     }
-                   };
-                 });
+              if (payload.eventType === "INSERT") {
+                const newBid = payload.new;
+                setBids((prev: any[]) => {
+                  if (prev.some((b: any) => b.id === newBid.id)) return prev;
+                  return [newBid, ...prev]
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .slice(0, 15);
+                });
+
+                setLiveEvent((prev: any) => {
+                  if (!prev || !prev.active_lot || prev.active_lot.id !== newBid.lot_id) return prev;
+                  const isNewer = newBid.amount > (prev.active_lot.current_price || 0);
+                  return {
+                    ...prev,
+                    active_lot: {
+                      ...prev.active_lot,
+                      current_price: isNewer ? newBid.amount : prev.active_lot.current_price,
+                      bids_count: (prev.active_lot.bids_count || 0) + 1
+                    }
+                  };
+                });
+              } else if (payload.eventType === "UPDATE") {
                 const updatedBid = payload.new;
                 setBids((prev: any[]) => 
                   prev.map((b: any) => b.id === updatedBid.id ? { ...b, ...updatedBid } : b)
+                  .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                 );
-                
-                // If user_id was added in update, fetch profile
-                if (updatedBid.user_id && !bidderProfiles[updatedBid.user_id]) {
-                  const { data } = await supabase
-                    .from("profiles")
-                    .select("id, full_name")
-                    .eq("id", updatedBid.user_id)
-                    .single();
-                  if (data) {
-                    setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
-                  }
-                }
+              } else if (payload.eventType === "DELETE") {
+                setBids(prev => prev.filter(b => b.id !== payload.old.id));
               }
             }
           )
