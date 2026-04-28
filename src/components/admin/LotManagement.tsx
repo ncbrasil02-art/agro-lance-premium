@@ -961,7 +961,7 @@ import {
                                         Atualizar
                                       </Button>
                                     </div>
-                                    <div className="max-h-[200px] overflow-y-auto border rounded-md bg-white">
+                                     <div className="max-h-[200px] overflow-y-auto border rounded-md bg-slate-50 shadow-inner">
                                       <Table>
                                         <TableHeader className="bg-muted/50 sticky top-0">
                                           <TableRow>
@@ -981,11 +981,11 @@ import {
                                                
                                                return (
                                                  <TableRow key={bid.id}>
-                                                   <TableCell className="py-2 text-xs font-medium">{bidderName}</TableCell>
-                                                   <TableCell className="py-2 text-xs font-bold text-emerald-600">
+                                                   <TableCell className="py-2 text-xs font-semibold text-slate-800">{bidderName}</TableCell>
+                                                   <TableCell className="py-2 text-xs font-black text-emerald-700">
                                                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
                                                    </TableCell>
-                                                   <TableCell className="py-2 text-xs text-muted-foreground">
+                                                   <TableCell className="py-2 text-xs text-slate-500">
                                                      {new Date(bid.created_at).toLocaleTimeString('pt-BR')}
                                                    </TableCell>
                                                  </TableRow>
@@ -1004,7 +1004,7 @@ import {
                                         Ofertas Informais
                                       </h4>
                                     </div>
-                                    <div className="max-h-[200px] overflow-y-auto border rounded-md bg-white">
+                                     <div className="max-h-[200px] overflow-y-auto border rounded-md bg-slate-50 shadow-inner">
                                       <Table>
                                         <TableHeader className="bg-muted/50 sticky top-0">
                                           <TableRow>
@@ -1114,11 +1114,11 @@ import {
                           
                           return (
                             <TableRow key={bid.id}>
-                              <TableCell className="font-bold text-sm">{bidderName}</TableCell>
-                              <TableCell className="font-black text-sm text-emerald-600">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
-                              </TableCell>
-                              <TableCell className="text-xs text-muted-foreground">
+                               <TableCell className="font-bold text-sm text-slate-900">{bidderName}</TableCell>
+                               <TableCell className="font-black text-sm text-emerald-700">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bid.amount)}
+                               </TableCell>
+                               <TableCell className="text-xs text-slate-600">
                                 {new Date(bid.created_at).toLocaleString('pt-BR')}
                               </TableCell>
                               <TableCell className="text-right">
