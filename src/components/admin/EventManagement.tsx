@@ -1134,26 +1134,95 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
                              )}
                            </TableCell>
-                            <TableCell className="font-black text-emerald-deep">
-                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-1">
-                                <Button variant="ghost" size="icon" onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}>
-                                  <ListOrdered className="h-4 w-4" />
-                                </Button>
-                                {lot.status !== 'sold' && (
-                                  <Button variant="ghost" size="icon" className="text-emerald-600" onClick={() => handleFinalizeLot(lot)}>
-                                    <Check className="h-4 w-4" />
-                                  </Button>
-                                )}
-                                {!lot.winner_id && (
-                                  <Button variant="ghost" size="icon" className="text-gold" onClick={() => setSelectedLotForWinner(lot)}>
-                                    <UserPlus className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
+                           <TableCell>
+                             <div className="flex flex-col">
+                               <span className="font-black text-emerald-deep">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                               </span>
+                               <Button 
+                                 variant="ghost" 
+                                 size="sm" 
+                                 className="h-6 px-0 text-[10px] text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
+                                 onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}
+                               >
+                                 <ListOrdered className="h-3 w-3" /> Ver {lot.bids_count || 0} lances
+                               </Button>
+                             </div>
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-1">
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}>
+                                       <ListOrdered className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Histórico de Lances</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+
+                               {lot.status !== 'sold' && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600" onClick={() => handleFinalizeLot(lot)}>
+                                         <Check className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>Finalizar Arremate</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+
+                               {!lot.winner_id && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button variant="ghost" size="icon" className="h-8 w-8 text-gold" onClick={() => setSelectedLotForWinner(lot)}>
+                                         <UserPlus className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>Vincular Ganhador</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+
+                               {lot.winner && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button 
+                                         variant="ghost" 
+                                         size="icon" 
+                                         className="h-8 w-8 text-blue-500"
+                                         onClick={() => window.open(`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}`, '_blank')}
+                                       >
+                                         <MessageSquare className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>WhatsApp do Ganhador</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="ghost" 
+                                       size="icon" 
+                                       className="h-8 w-8 text-muted-foreground"
+                                       onClick={() => toast.info("Funcionalidade de emitir documentos para o administrador em breve.")}
+                                     >
+                                       <FileText className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Gerar Documentos (Nota/Boleta)</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                             </div>
+                           </TableCell>
                          </TableRow>
                        ))}
                      </TableBody>
