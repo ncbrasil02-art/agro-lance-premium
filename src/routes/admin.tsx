@@ -1,3 +1,7 @@
+ 
+ export const Route = createFileRoute("/admin")({
+   component: AdminLayout,
+ });
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { 
