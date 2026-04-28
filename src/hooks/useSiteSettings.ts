@@ -78,15 +78,17 @@
      fetchSettings();
  
      // Real-time updates
-     const channel = supabase
-       .channel("site-settings-global")
-       .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload) => {
-         const updated: any = payload.new;
-         if (updated.key === "site_info") setSiteInfo(updated.value);
-         if (updated.key === "theme") setTheme(updated.value);
-         if (updated.key === "homepage_sections") setHomepage(updated.value);
-       })
-       .subscribe();
+      const channel = supabase
+        .channel("site-settings-global")
+        .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload) => {
+          const updated: any = payload.new;
+          if (!updated || !updated.key) return;
+          
+          if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) }));
+          if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) }));
+          if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) }));
+        })
+        .subscribe();
  
      return () => {
        supabase.removeChannel(channel);
