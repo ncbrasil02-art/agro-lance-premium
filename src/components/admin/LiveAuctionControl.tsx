@@ -221,7 +221,17 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           .order("created_at", { ascending: false })
           .limit(10);
         
-        if (latestBids) setBids(latestBids);
+         if (latestBids) {
+           setBids(prev => {
+             const merged = [...latestBids];
+             prev.forEach(pb => {
+               if (pb.lot_id === activeLot.id && !merged.some(mb => mb.id === pb.id)) {
+                 merged.push(pb);
+               }
+             });
+             return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 15);
+           });
+         }
         setPollingRetryCount(0);
       } catch (err) {
         console.error("Erro na sincronização do narrador:", err);
@@ -333,7 +343,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         
         if (error) throw error;
         toast.success("Link de transmissão atualizado!");
-        fetchEventDetails(selectedEventId);
+        refreshAdminData();
       } catch (error: any) {
         toast.error("Erro ao atualizar link: " + error.message);
       } finally {
@@ -533,37 +543,30 @@ import { StatusBadge } from "@/components/auctions/status-badge";
      }
  
      setIsActionLoading(true);
-     try {
-       const { data, error } = await supabase.rpc("place_bid_safe", {
-         p_lot_id: activeLot.id,
-         p_amount: phoneBid.amount,
-         p_bid_type: "online", // Using online but marking as phone bid via extra fields if needed or specific type
-         p_session_id: "admin-live-phone-bid"
-       });
- 
-       if (error) throw error;
-       
-       // Also mark as phone bid (requires the bid ID which isn't returned by place_bid_safe easily, 
-       // but we can query the latest bid for this lot)
-       const { data: latestBid } = await supabase
-         .from("bids")
-         .select("id")
-         .eq("lot_id", activeLot.id)
-         .order("created_at", { ascending: false })
-         .limit(1)
-         .single();
-       
-       if (latestBid) {
-         await supabase.from("bids").update({
-           is_phone_bid: true,
-           phone_bidder_identifier: phoneBid.identifier
-         }).eq("id", latestBid.id);
-       }
- 
-        if (latestBid && phoneBid.profileId) {
-          await supabase.from("bids").update({
-            user_id: phoneBid.profileId
-          }).eq("id", latestBid.id);
+      try {
+        const { data: rpcData, error } = await supabase.rpc("place_bid_safe", {
+          p_lot_id: activeLot.id,
+          p_amount: phoneBid.amount,
+          p_bid_type: "online",
+          p_session_id: "admin-live-phone-bid"
+        });
+
+        if (error) throw error;
+        
+        const result = rpcData as any;
+        const newBidId = result?.id;
+
+        if (newBidId) {
+          const updatePayload: any = {
+            is_phone_bid: true,
+            phone_bidder_identifier: phoneBid.identifier
+          };
+          
+          if (phoneBid.profileId) {
+            updatePayload.user_id = phoneBid.profileId;
+          }
+
+          await supabase.from("bids").update(updatePayload).eq("id", newBidId);
         }
 
         toast.success("Lance via telefone registrado!");
@@ -599,7 +602,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         if (result.success) {
           toast.success("Lance de segurança (auditório) efetuado!");
           setSecurityBidAmount(0);
-          fetchEventDetails(selectedEventId);
+          refreshAdminData();
         } else {
           toast.error(result.message);
         }
