@@ -489,7 +489,7 @@ function LotDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden w-full relative">
        <div className="hidden print:block p-8 text-black bg-white min-h-screen">
          <div className="border-b-4 border-emerald-900 pb-4 mb-8 flex justify-between items-end">
            <div>
@@ -569,7 +569,7 @@ function LotDetail() {
          </div>
        </div>
 
-      <div className="min-h-screen bg-background print:hidden">
+      <div className="min-h-screen bg-background print:hidden overflow-x-hidden w-full relative">
         <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
           <div className="container mx-auto px-4 flex items-center justify-between gap-4">
             <Link to="/ao-vivo" className="text-white flex items-center gap-1 hover:text-gold transition-colors">
@@ -606,8 +606,8 @@ function LotDetail() {
         </header>
 
         <div className="container mx-auto px-4 py-8">
-          <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-            <div className="space-y-8">
+          <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] flex-col-reverse lg:flex-row">
+            <div className="space-y-8 order-2 lg:order-1">
                <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
                 <div className="relative">
                   <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
@@ -648,12 +648,47 @@ function LotDetail() {
                  ))}
                </div>
                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                 <TabsList className="bg-emerald-deep/20">
-                   <TabsTrigger value="detalhes">Descrição</TabsTrigger>
-                   <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
-                    <TabsTrigger value="videos">Vídeo</TabsTrigger>
-                     <TabsTrigger value="saude">Saúde do Animal</TabsTrigger>
-                 </TabsList>
+                  <TabsList className="bg-emerald-deep/20 flex-wrap h-auto py-1">
+                    <TabsTrigger value="detalhes" className="text-[10px] sm:text-sm">Descrição</TabsTrigger>
+                    <TabsTrigger value="genealogia" className="text-[10px] sm:text-sm">Genealogia</TabsTrigger>
+                    <TabsTrigger value="videos" className="text-[10px] sm:text-sm">Vídeo</TabsTrigger>
+                    <TabsTrigger value="saude" className="text-[10px] sm:text-sm">Saúde</TabsTrigger>
+                    <TabsTrigger value="lances" className="text-[10px] sm:text-sm">Lances</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="lances" className="mt-6">
+                    <Card className="bg-card/50 border-white/5 p-6 rounded-[2rem]">
+                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                        <Gavel className="h-4 w-4" /> Histórico de Lances
+                      </h3>
+                      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        {recentBids.length > 0 ? (
+                          recentBids.map((bid, idx) => (
+                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'bg-white/5 border-white/5'}`}>
+                              <div className="flex items-center gap-3">
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <p className="text-xs font-bold text-white leading-none mb-1">
+                                    {bid.bidder_name || (bid.user_id === user?.id ? profile?.full_name : 'Licitante')}
+                                  </p>
+                                  <p className="text-[10px] text-white/40">{new Date(bid.created_at).toLocaleTimeString('pt-BR')}</p>
+                                </div>
+                              </div>
+                              <div className={`font-black italic ${idx === 0 ? 'text-gold text-lg' : 'text-white text-sm'}`}>
+                                {formatBRL(bid.amount)}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-3xl">
+                            <Gavel className="h-12 w-12 text-white/10 mx-auto mb-4" />
+                            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum lance recebido</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  </TabsContent>
                  <TabsContent value="detalhes" className="mt-6">
                    <Card className="bg-card/50 border-white/5 p-8">
                      <p className="text-white/80 leading-relaxed italic">{lot.animal?.description}</p>
@@ -688,12 +723,17 @@ function LotDetail() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {lot.animal.vaccination_records.map((v: any, idx: number) => (
                               <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                                  <span className="text-xs font-bold text-white/80">
-                                    {typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}
-                                  </span>
-                                </div>
+                                 <div className="flex items-center gap-3">
+                                   <div className="h-7 w-7 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
+                                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                                   </div>
+                                   <div className="flex flex-col">
+                                     <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">VACINADO (SIM)</span>
+                                     <span className="text-xs font-bold text-white/90 leading-tight">
+                                       {typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}
+                                     </span>
+                                   </div>
+                                 </div>
                                 {v.date && <span className="text-[10px] text-white/40">{v.date}</span>}
                               </div>
                             ))}
@@ -756,26 +796,26 @@ function LotDetail() {
                                return (
                                  <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
                                    <span className="text-xs text-white/80">{item.label}</span>
-                                   <div className="flex items-center gap-2">
+                                   <div className="flex items-center gap-3">
                                        {val === true ? (
-                                         <div className="flex items-center gap-1">
-                                           <span className="text-[10px] font-black uppercase text-emerald-400">SIM</span>
-                                           <div className="h-6 w-6 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
-                                             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-black uppercase text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">SIM</span>
+                                           <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
+                                             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                                            </div>
                                          </div>
                                        ) : val === false ? (
-                                         <div className="flex items-center gap-1">
-                                           <span className="text-[10px] font-black uppercase text-red-400">NÃO</span>
-                                           <div className="h-6 w-6 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
-                                             <AlertTriangle className="h-3.5 w-3.5 text-red-400" />
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-black uppercase text-red-400 bg-red-400/10 px-2 py-0.5 rounded border border-red-400/20">NÃO</span>
+                                           <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
+                                             <AlertTriangle className="h-4 w-4 text-red-400" />
                                            </div>
                                          </div>
                                        ) : (
-                                         <div className="flex items-center gap-1">
-                                           <span className="text-[10px] font-black uppercase text-white/20">-</span>
-                                           <div className="h-6 w-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                                             <AlertCircle className="h-3.5 w-3.5 text-white/10" />
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded border border-white/10">PENDENTE</span>
+                                           <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                                             <AlertCircle className="h-4 w-4 text-white/10" />
                                            </div>
                                          </div>
                                        )}
@@ -827,7 +867,7 @@ function LotDetail() {
                 </Tabs>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 order-1 lg:order-2">
                 <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full">
                   <div className="flex justify-between items-start mb-6">
                     <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
@@ -917,7 +957,7 @@ function LotDetail() {
                       </Button>
                    </div>
                      <div className="flex flex-col gap-3 mt-2">
-                       {lot.animal?.accepts_offers && dynamicStatus === 'pre_lance' && (
+                        {lot.animal?.accepts_offers && (dynamicStatus === 'pre_lance' || dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento') && (
                          <Dialog open={isOfferDialogOpen} onOpenChange={setIsOfferDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 

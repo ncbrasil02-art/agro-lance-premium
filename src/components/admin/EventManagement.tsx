@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -497,14 +497,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
     };
 
     const statusDescriptions = [
-      { id: 'em_loteamento', label: 'Em Loteamento', color: 'text-amber-500 bg-amber-500/10', desc: 'Fase inicial de cadastro de animais. O evento não fica aberto para lances no site.' },
+      { id: 'em_loteamento', label: 'Em Loteamento', color: 'text-orange-600 bg-orange-600/10 font-black', desc: 'Fase inicial de cadastro de animais. O evento não fica aberto para lances no site.' },
       { id: 'scheduled', label: 'Aceita pré-lance', color: 'text-blue-500 bg-blue-500/10', desc: 'O evento está pronto e aguardando a data de início oficial.' },
       { id: 'recebendo_lances', label: 'Recebendo Lances', color: 'text-purple-500 bg-purple-500/10', desc: 'Evento aberto e aceitando lances em todos os lotes simultaneamente.' },
       { id: 'live', label: 'Ao Vivo', color: 'text-emerald-500 bg-emerald-500/10', desc: 'Evento acontecendo em tempo real com transmissão ao vivo e lances simultâneos.' },
       { id: 'em_condicional', label: 'Em Condicional', color: 'text-orange-500 bg-orange-500/10', desc: 'O maior lance não atingiu o preço de reserva e está em negociação.' },
       { id: 'incondicional', label: 'Evento Confirmado', color: 'text-emerald-600 bg-emerald-600/10', desc: 'A venda foi confirmada e o martelo batido sem restrições.' },
       { id: 'evento_adiado', label: 'Evento Adiado', color: 'text-red-500 bg-red-500/10', desc: 'O evento foi postergado para uma nova data/horário.' },
-      { id: 'finished', label: 'Finalizado', color: 'text-muted-foreground bg-muted', desc: 'O leilão encerrou completamente e todos os lotes foram processados.' },
+      { id: 'finished', label: 'Finalizado', color: 'text-emerald-700 bg-emerald-700/10 border-emerald-700/20 font-black', desc: 'O leilão encerrou completamente e todos os lotes foram processados.' },
     ];
 
     return (
@@ -1206,21 +1206,63 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                  </TooltipProvider>
                                )}
 
-                               <TooltipProvider>
-                                 <Tooltip>
-                                   <TooltipTrigger asChild>
-                                     <Button 
-                                       variant="ghost" 
-                                       size="icon" 
-                                       className="h-8 w-8 text-muted-foreground"
-                                       onClick={() => toast.info("Funcionalidade de emitir documentos para o administrador em breve.")}
-                                     >
-                                       <FileText className="h-4 w-4" />
+                               <Dialog>
+                                 <DialogTrigger asChild>
+                                   <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600">
+                                     <FileText className="h-4 w-4" />
+                                   </Button>
+                                 </DialogTrigger>
+                                 <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-white p-0 text-black">
+                                   <div className="p-8 space-y-8">
+                                     <div className="text-center border-b-2 border-emerald-900 pb-6 mb-8">
+                                       <h1 className="text-3xl font-black uppercase text-emerald-900 leading-none">Premium Agro Leilões</h1>
+                                       <p className="text-sm text-gray-500 uppercase font-bold mt-2">Documento Oficial de Arremate — Admin</p>
+                                     </div>
+                                     
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                       <div className="space-y-4">
+                                         <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">Dados do Arrematante</h3>
+                                         <div className="space-y-1 text-sm">
+                                            <p><span className="text-gray-500">Nome:</span> <span className="font-bold">{lot.winner?.full_name || "Auditório"}</span></p>
+                                            <p><span className="text-gray-500">CPF/CNPJ:</span> <span className="font-bold">{lot.winner?.cpf || "---"}</span></p>
+                                           <p><span className="text-gray-500">Telefone:</span> <span className="font-bold">{lot.winner?.phone || "---"}</span></p>
+                                         </div>
+                                       </div>
+                                       <div className="space-y-4">
+                                         <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">Dados do Lote</h3>
+                                         <div className="space-y-1 text-sm">
+                                           <p><span className="text-gray-500">Evento:</span> <span className="font-bold">{viewingEventDetails?.name}</span></p>
+                                           <p><span className="text-gray-500">Lote:</span> <span className="font-bold">#{lot.lot_number}</span></p>
+                                           <p><span className="text-gray-500">Animal:</span> <span className="font-bold">{lot.animal?.name}</span></p>
+                                         </div>
+                                       </div>
+                                     </div>
+
+                                     <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+                                       <div className="flex justify-between items-center">
+                                          <div className="uppercase font-black text-emerald-900">Valor do Arremate</div>
+                                          <div className="text-3xl font-black text-emerald-600">{formatBRL(lot.current_price)}</div>
+                                       </div>
+                                     </div>
+
+                                     <div className="pt-10">
+                                       <p className="text-xs leading-relaxed text-gray-500 italic">
+                                         Este documento serve como registro administrativo do arremate. 
+                                         O arremate foi realizado em {new Date(lot.updated_at).toLocaleString('pt-BR')}.
+                                       </p>
+                                     </div>
+
+                                     <div className="flex justify-between items-end pt-20">
+                                        <div className="w-48 border-t border-black text-center pt-2 text-[10px] uppercase font-bold">Premium Agro</div>
+                                        <div className="w-48 border-t border-black text-center pt-2 text-[10px] uppercase font-bold">Arrematante</div>
+                                     </div>
+                                     
+                                     <Button className="w-full bg-emerald-900 text-white print:hidden mt-10" onClick={() => window.print()}>
+                                       <Printer className="mr-2 h-4 w-4" /> Imprimir Termo de Venda
                                      </Button>
-                                   </TooltipTrigger>
-                                   <TooltipContent>Gerar Documentos (Nota/Boleta)</TooltipContent>
-                                 </Tooltip>
-                               </TooltipProvider>
+                                   </div>
+                                 </DialogContent>
+                               </Dialog>
                              </div>
                            </TableCell>
                          </TableRow>
