@@ -11,9 +11,27 @@
  
  export interface ThemeSettings {
    primary_color: string;
+   primary_foreground_color?: string;
    secondary_color: string;
+   secondary_foreground_color?: string;
    accent_color: string;
+   accent_foreground_color?: string;
    background_color: string;
+   foreground_color?: string;
+   card_color?: string;
+   card_foreground_color?: string;
+   popover_color?: string;
+   popover_foreground_color?: string;
+   muted_color?: string;
+   muted_foreground_color?: string;
+   border_color?: string;
+   input_color?: string;
+   ring_color?: string;
+   destructive_color?: string;
+   destructive_foreground_color?: string;
+   live_color?: string;
+   upcoming_color?: string;
+   closed_color?: string;
  }
  
  export interface HomepageSettings {
