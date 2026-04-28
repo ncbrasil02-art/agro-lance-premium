@@ -76,8 +76,8 @@ function EventDetail() {
      end_date: event.end_date
    });
    const router = useRouter();
-  const eventLots = event.lots || [];
-  const [isFlyerOpen, setIsFlyerOpen] = useState(false);
+   const eventLots = Array.isArray(event.lots) ? event.lots : [];
+   const [isFlyerOpen, setIsFlyerOpen] = useState(false);
  
    const { status } = useRealtimeEvent(event.id, () => {
      router.invalidate();
@@ -263,7 +263,7 @@ function EventDetail() {
       </section>
 
       {/* Gallery Section - Only if there are photos */}
-      {event.photos && event.photos.length > 0 && (
+       {Array.isArray(event.photos) && event.photos.length > 0 && (
         <section className="container mx-auto px-4 py-16 border-t border-white/5">
           <div className="flex items-center gap-4 mb-10">
             <div className="h-12 w-12 rounded-2xl bg-gold/10 flex items-center justify-center">
@@ -276,7 +276,7 @@ function EventDetail() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {event.photos.map((photo: string, index: number) => (
+             {event.photos.map((photo: any, index: number) => (
               <Dialog key={index}>
                 <DialogTrigger asChild>
                   <div className="relative aspect-square rounded-3xl overflow-hidden bg-emerald-deep/20 cursor-pointer group/photo">
