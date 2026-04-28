@@ -44,9 +44,9 @@
          
          if (error) throw error;
  
-          const info = data.find(i => i.key === "site_info")?.value as SiteInfo;
-          const themeSettings = data.find(i => i.key === "theme")?.value as ThemeSettings;
-          const homeSettings = data.find(i => i.key === "homepage_sections")?.value as HomepageSettings;
+          const info = data.find(i => i.key === "site_info")?.value as any as SiteInfo;
+          const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
+          const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
