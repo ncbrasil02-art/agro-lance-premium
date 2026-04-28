@@ -159,6 +159,80 @@ export const Route = createFileRoute("/painel")({
      setMessages(data || []);
    };
 
+   const handleUpdateProfile = async (e: React.FormEvent) => {
+     e.preventDefault();
+     if (!user?.id) return;
+     
+     setIsSaving(true);
+     try {
+       const { error } = await supabase
+         .from("profiles")
+         .update({
+           full_name: formData.full_name,
+           cpf: formData.cpf,
+           phone: formData.phone,
+           address: formData.address,
+           cep: formData.cep,
+           nationality: formData.nationality,
+         })
+         .eq("id", user.id);
+
+       if (error) throw error;
+       
+       toast.success("Perfil atualizado com sucesso!");
+       refreshProfile();
+     } catch (error: any) {
+       toast.error("Erro ao atualizar perfil: " + error.message);
+     } finally {
+       setIsSaving(false);
+     }
+   };
+
+   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'document') => {
+     const file = e.target.files?.[0];
+     if (!file || !user?.id) return;
+
+     setIsUploading(true);
+     try {
+       const fileExt = file.name.split('.').pop();
+       const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+       const bucket = type === 'avatar' ? 'avatars' : 'documents';
+
+       const { error: uploadError } = await supabase.storage
+         .from(bucket)
+         .upload(filePath, file);
+
+       if (uploadError) throw uploadError;
+
+       const { data: { publicUrl } } = supabase.storage
+         .from(bucket)
+         .getPublicUrl(filePath);
+
+       if (type === 'avatar') {
+         const { error: updateError } = await supabase
+           .from("profiles")
+           .update({ avatar_url: publicUrl })
+           .eq("id", user.id);
+         if (updateError) throw updateError;
+         toast.success("Foto de perfil atualizada!");
+       } else {
+         const newDocs = [...(profile?.document_urls || []), publicUrl];
+         const { error: updateError } = await supabase
+           .from("profiles")
+           .update({ document_urls: newDocs })
+           .eq("id", user.id);
+         if (updateError) throw updateError;
+         toast.success("Documento enviado com sucesso!");
+       }
+       
+       refreshProfile();
+     } catch (error: any) {
+       toast.error("Erro no upload: " + error.message);
+     } finally {
+       setIsUploading(false);
+     }
+   };
+
   const fetchDashboardData = async () => {
     setIsLoading(true);
     if (!user?.id) return;
