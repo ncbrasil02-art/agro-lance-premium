@@ -60,9 +60,23 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           lotsCount: lotsRes.data?.length || 0
         });
 
-        const validatedEvents = z.array(eventSchema).parse(eventsRes.data || []);
-        const validatedLots = z.array(lotSchema).parse(lotsRes.data || []);
-        const validatedPastEvents = z.array(eventSchema).parse(pastEventsRes.data || []);
+        const eventsResult = z.array(eventSchema).safeParse(eventsRes.data || []);
+        const lotsResult = z.array(lotSchema).safeParse(lotsRes.data || []);
+        const pastEventsResult = z.array(eventSchema).safeParse(pastEventsRes.data || []);
+
+        if (!eventsResult.success) {
+          logger.error("Erro na validação de eventos", { error: eventsResult.error });
+        }
+        if (!lotsResult.success) {
+          logger.error("Erro na validação de lotes", { error: lotsResult.error });
+        }
+        if (!pastEventsResult.success) {
+          logger.error("Erro na validação de eventos passados", { error: pastEventsResult.error });
+        }
+
+        const validatedEvents = eventsResult.success ? eventsResult.data : (eventsRes.data as any[] || []);
+        const validatedLots = lotsResult.success ? lotsResult.data : (lotsRes.data as any[] || []);
+        const validatedPastEvents = pastEventsResult.success ? pastEventsResult.data : (pastEventsRes.data as any[] || []);
 
         let validatedAnnouncement = null;
         if (settingsRes.data?.value) {
@@ -281,7 +295,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
               </div>
             )}
             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase">
-              {siteInfo?.name.split(' ')[0] || "Leilões"} <span className="text-gradient-gold">{siteInfo?.name.split(' ').slice(1).join(' ') || "Premium"}</span><br />
+              {(typeof siteInfo?.name === 'string' ? siteInfo.name : "Elite Agro").split(' ')[0]} <span className="text-gradient-gold">{(typeof siteInfo?.name === 'string' ? siteInfo.name : "Leilões").split(' ').slice(1).join(' ')}</span><br />
               em tempo real
             </h1>
              <p className="mt-5 max-w-xl text-lg text-muted-foreground italic">
