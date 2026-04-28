@@ -1,3 +1,4 @@
+ import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
@@ -5,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -24,7 +25,51 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
     const [statusFilter, setStatusFilter] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
-    const [editingEvent, setEditingEvent] = useState<any>(null);
+     const [editingEvent, setEditingEvent] = useState<any>(null);
+     const [viewingEventDetails, setViewingEventDetails] = useState<any>(null);
+     const [eventLots, setEventLots] = useState<any[]>([]);
+     const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+     const fetchEventLots = async (eventId: string) => {
+       setIsDetailsLoading(true);
+       try {
+         const { data, error } = await supabase
+           .from("lots")
+           .select(`
+             *,
+             animal:animals(name, internal_code),
+             winner:profiles!winner_id(id, full_name, phone, cpf)
+           `)
+           .eq("event_id", eventId)
+           .order("lot_number", { ascending: true });
+ 
+         if (error) throw error;
+         setEventLots(data || []);
+       } catch (error: any) {
+         toast.error("Erro ao carregar lotes do evento: " + error.message);
+       } finally {
+         setIsDetailsLoading(false);
+       }
+     };
+ 
+     const handleDeleteBid = async (bidId: string, lotId: string) => {
+       if (!confirm("Tem certeza que deseja EXCLUIR este lance?")) return;
+       try {
+         const { data, error } = await supabase.rpc("delete_bid_safe", {
+           p_bid_id: bidId
+         });
+         if (error) throw error;
+         const result = data as { success: boolean; message: string };
+         if (result.success) {
+           toast.success(result.message);
+           if (viewingEventDetails) fetchEventLots(viewingEventDetails.id);
+         } else {
+           toast.error(result.message);
+         }
+       } catch (error: any) {
+         toast.error("Erro ao excluir lance: " + error.message);
+       }
+     };
+ 
     
     const [requestFormData, setRequestFormData] = useState({
       name: "",
@@ -145,10 +190,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       }
     };
  
-   useEffect(() => {
-     fetchEvents();
-      fetchSellers();
-   }, []);
+    useEffect(() => {
+      fetchEvents();
+       fetchSellers();
+    }, []);
+
+    // Real-time updates for the events list and current details
+    useRealtimeLots(() => {
+      fetchEvents();
+      if (viewingEventDetails) {
+        fetchEventLots(viewingEventDetails.id);
+      }
+    });
+
+    useEffect(() => {
+      const channel = supabase
+        .channel('admin-events-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+          fetchEvents();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, []);
  
     const handleSave = async () => {
       if (!formData.name || !formData.start_date) {
@@ -269,7 +335,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
         case 'recebendo_lances': return 'text-purple-500 bg-purple-500/10';
         case 'em_condicional': return 'text-orange-500 bg-orange-500/10';
         case 'evento_adiado': return 'text-red-500 bg-red-500/10';
-        case 'finished': return 'text-muted-foreground bg-muted';
+         case 'finished': return 'text-emerald-700 bg-emerald-100 border border-emerald-200 shadow-sm';
         default: return 'text-muted-foreground bg-muted';
       }
    };
@@ -746,16 +812,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                  </Tooltip>
                                </TooltipProvider>
                              )}
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
-                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
-                                   <Pencil className="h-4 w-4" />
-                                 </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>Editar configurações do evento</TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <Button 
+                                     variant="ghost" 
+                                     size="icon" 
+                                     className="text-emerald-deep"
+                                     onClick={() => {
+                                       setViewingEventDetails(event);
+                                       fetchEventLots(event.id);
+                                     }}
+                                   >
+                                     <Eye className="h-4 w-4" />
+                                   </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent>Ver detalhes e arrematantes</TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
+                                     <Pencil className="h-4 w-4" />
+                                   </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent>Editar configurações do evento</TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
                             {['draft', 'cancelled', 'scheduled', 'em_loteamento'].includes(event.status) ? (
                               <TooltipProvider>
                                 <Tooltip>
@@ -787,8 +871,236 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                </TableBody>
              </Table>
            )}
-         </CardContent>
-       </Card>
-     </div>
-   );
- }
+          </CardContent>
+        </Card>
+ 
+        <Dialog open={!!viewingEventDetails} onOpenChange={(open) => !open && setViewingEventDetails(null)}>
+           <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
+             <DialogHeader>
+               <DialogTitle className="flex items-center gap-2">
+                 <Eye className="h-5 w-5 text-emerald-deep" />
+                 Detalhamento do Evento: {viewingEventDetails?.name}
+               </DialogTitle>
+               <DialogDescription>
+                 Acompanhe todos os lotes, arrematantes e valores finais deste leilão.
+               </DialogDescription>
+             </DialogHeader>
+ 
+             <div className="mt-4 space-y-4">
+               {isDetailsLoading ? (
+                 <div className="flex justify-center py-12">
+                   <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                 </div>
+               ) : eventLots.length === 0 ? (
+                 <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+                   Nenhum lote cadastrado para este evento.
+                 </div>
+               ) : (
+                 <div className="border rounded-xl overflow-hidden bg-card">
+                   <Table>
+                     <TableHeader className="bg-muted/50">
+                       <TableRow>
+                         <TableHead className="w-[80px]">Lote</TableHead>
+                         <TableHead>Animal</TableHead>
+                         <TableHead>Arrematante</TableHead>
+                         <TableHead>Valor Final</TableHead>
+                         <TableHead className="text-right">Ações</TableHead>
+                       </TableRow>
+                     </TableHeader>
+                     <TableBody>
+                       {eventLots.map((lot) => (
+                         <TableRow key={lot.id} className="hover:bg-muted/30">
+                           <TableCell className="font-bold text-lg text-emerald-deep">
+                             #{String(lot.lot_number).padStart(2, '0')}
+                           </TableCell>
+                           <TableCell>
+                             <div className="font-bold uppercase italic">{lot.animal?.name}</div>
+                             <div className="text-[10px] text-muted-foreground">CÓD: {lot.animal?.internal_code}</div>
+                           </TableCell>
+                           <TableCell>
+                             {lot.winner ? (
+                               <div className="space-y-1">
+                                 <div className="font-bold text-emerald-600 flex items-center gap-1">
+                                   <Users className="h-3 w-3" />
+                                   {lot.winner.full_name}
+                                 </div>
+                                 <div className="text-[10px] text-muted-foreground">CPF: {lot.winner.cpf || '---'}</div>
+                                 <a 
+                                   href={`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}`} 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 font-bold"
+                                 >
+                                   <MessageSquare className="h-3 w-3" />
+                                   WhatsApp: {lot.winner.phone}
+                                 </a>
+                               </div>
+                             ) : (
+                               <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
+                             )}
+                           </TableCell>
+                           <TableCell className="font-black text-emerald-deep">
+                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-1">
+                               {lot.winner && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button 
+                                         variant="outline" 
+                                         size="icon" 
+                                         className="h-8 w-8 border-emerald-deep/30 text-emerald-deep"
+                                         onClick={() => {
+                                           const msg = encodeURIComponent(`Olá ${lot.winner.full_name}, aqui é da Premium Agro Leilões. Parabéns pelo arremate do Lote ${lot.lot_number} (${lot.animal?.name}) no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}. Em breve enviaremos o termo de arrematação.`);
+                                           window.open(`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}?text=${msg}`, '_blank');
+                                         }}
+                                       >
+                                         <MessageSquare className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>Enviar aviso WhatsApp</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="icon" 
+                                       className="h-8 w-8 border-gold/30 text-gold"
+                                       onClick={() => {
+                                         const printWindow = window.open('', '_blank');
+                                         if (!printWindow) return;
+                                         const html = `
+                                           <html>
+                                             <head>
+                                               <title>Termo de Arremate - Lote ${lot.lot_number}</title>
+                                               <style>
+                                                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+                                                 .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #064e3b; padding-bottom: 20px; }
+                                                 .logo { font-size: 32px; font-weight: 900; color: #064e3b; letter-spacing: 2px; }
+                                                 .title { font-size: 20px; font-weight: bold; margin-top: 10px; color: #c5a059; }
+                                                 .section { margin-bottom: 30px; }
+                                                 .section-title { font-weight: bold; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+                                                 .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
+                                                 .footer { margin-top: 100px; text-align: center; }
+                                                 .signature { display: inline-block; width: 300px; border-top: 1px solid #000; margin: 40px 20px; padding-top: 10px; font-size: 12px; }
+                                                 @media print { .no-print { display: none; } }
+                                               </style>
+                                             </head>
+                                             <body>
+                                               <div class="header">
+                                                 <div class="logo">PREMIUM AGRO LEILÕES</div>
+                                                 <div class="title">TERMO DE ARREMATAÇÃO E NOTA DE VENDA</div>
+                                               </div>
+                                               
+                                               <div class="section">
+                                                 <div class="section-title">Dados do Evento</div>
+                                                 <p><strong>Leilão:</strong> ${viewingEventDetails?.name}</p>
+                                                 <p><strong>Data:</strong> ${new Date(viewingEventDetails?.start_date).toLocaleDateString('pt-BR')}</p>
+                                               </div>
+
+                                               <div class="section">
+                                                 <div class="section-title">Dados do Lote</div>
+                                                 <div class="grid">
+                                                   <div>
+                                                     <p><strong>Número do Lote:</strong> ${lot.lot_number}</p>
+                                                     <p><strong>Animal:</strong> ${lot.animal?.name}</p>
+                                                   </div>
+                                                   <div>
+                                                     <p><strong>Raça:</strong> ${lot.animal?.breed || '---'}</p>
+                                                     <p><strong>Código Interno:</strong> ${lot.animal?.internal_code || '---'}</p>
+                                                   </div>
+                                                 </div>
+                                               </div>
+
+                                               <div class="section">
+                                                 <div class="section-title">Dados do Arrematante</div>
+                                                 <div class="grid">
+                                                   <div>
+                                                     <p><strong>Nome:</strong> ${lot.winner?.full_name || '---'}</p>
+                                                     <p><strong>CPF/CNPJ:</strong> ${lot.winner?.cpf || '---'}</p>
+                                                   </div>
+                                                   <div>
+                                                     <p><strong>Telefone:</strong> ${lot.winner?.phone || '---'}</p>
+                                                     <p><strong>Endereço:</strong> ${lot.winner?.address || '---'}</p>
+                                                   </div>
+                                                 </div>
+                                               </div>
+
+                                               <div class="section" style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+                                                 <div class="section-title">Valores e Fechamento</div>
+                                                 <p style="font-size: 24px; font-weight: 900; color: #064e3b; margin: 10px 0;">
+                                                   Valor Final: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}
+                                                 </p>
+                                                 <p style="font-size: 10px; color: #666;">* Sujeito às condições de pagamento estabelecidas no regulamento do evento.</p>
+                                               </div>
+
+                                               <div class="footer">
+                                                 <div class="signature">Assinatura do Arrematante</div>
+                                                 <div class="signature">Assinatura Premium Agro</div>
+                                                 <p style="font-size: 10px; color: #999; margin-top: 40px;">Documento gerado eletronicamente em ${new Date().toLocaleString('pt-BR')}</p>
+                                               </div>
+                                               
+                                               <script>window.print();</script>
+                                             </body>
+                                           </html>
+                                         `;
+                                         printWindow.document.write(html);
+                                         printWindow.document.close();
+                                       }}
+                                     >
+                                       <FileText className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Imprimir Nota de Venda</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="outline" 
+                                       size="icon" 
+                                       className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                       onClick={async () => {
+                                         const { data: bids } = await supabase
+                                           .from("bids")
+                                           .select("id")
+                                           .eq("lot_id", lot.id)
+                                           .order("amount", { ascending: false })
+                                           .limit(1);
+                                         
+                                         if (bids && bids.length > 0) {
+                                           handleDeleteBid(bids[0].id, lot.id);
+                                         } else {
+                                           toast.error("Nenhum lance encontrado para excluir.");
+                                         }
+                                       }}
+                                     >
+                                       <Trash className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Excluir maior lance (Reverter arremate)</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                             </div>
+                           </TableCell>
+                         </TableRow>
+                       ))}
+                     </TableBody>
+                   </Table>
+                 </div>
+               )}
+             </div>
+             <DialogFooter>
+               <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
+       </div>
+     );
+   }
