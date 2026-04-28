@@ -87,30 +87,6 @@ import {
                .select("id, full_name, phone, cpf")
                .order("full_name")
            ]);
-         const handleAssignWinner = async () => {
-           if (!winnerLotId || !selectedWinnerProfileId) return;
-           setIsLoading(true);
-           try {
-             const { error } = await supabase
-               .from("lots")
-               .update({ 
-                 winner_id: selectedWinnerProfileId,
-                 winner_link_reason: "Vínculo manual pós-leilão (Arrematado Pendente)"
-               })
-               .eq("id", winnerLotId);
-             
-             if (error) throw error;
-             toast.success("Ganhador vinculado com sucesso!");
-             setIsWinnerDialogOpen(false);
-             setWinnerLotId(null);
-             setSelectedWinnerProfileId("");
-             fetchData();
-           } catch (error: any) {
-             toast.error("Erro ao vincular ganhador: " + error.message);
-           } finally {
-             setIsLoading(false);
-           }
-         };
     
           if (lotsRes.error) {
             console.error("Error fetching lots:", lotsRes.error);
@@ -152,6 +128,31 @@ import {
        }, [initialEventId]);
  
         useRealtimeLots(fetchData);
+
+        const handleAssignWinner = async () => {
+          if (!winnerLotId || !selectedWinnerProfileId) return;
+          setIsLoading(true);
+          try {
+            const { error } = await supabase
+              .from("lots")
+              .update({ 
+                winner_id: selectedWinnerProfileId,
+                winner_link_reason: "Vínculo manual pós-leilão (Arrematado Pendente)"
+              })
+              .eq("id", winnerLotId);
+            
+            if (error) throw error;
+            toast.success("Ganhador vinculado com sucesso!");
+            setIsWinnerDialogOpen(false);
+            setWinnerLotId(null);
+            setSelectedWinnerProfileId("");
+            fetchData();
+          } catch (error: any) {
+            toast.error("Erro ao vincular ganhador: " + error.message);
+          } finally {
+            setIsLoading(false);
+          }
+        };
 
         useEffect(() => {
           if (!expandedLotId) return;
