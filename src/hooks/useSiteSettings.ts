@@ -42,9 +42,9 @@
  
           data.forEach(item => {
             if (!item.value) return;
-             if (item.key === "site_info") setSiteInfo(prev => ({ ...(prev || {}), ...(item.value as any) }));
-             if (item.key === "theme") setTheme(prev => ({ ...(prev || {}), ...(item.value as any) }));
-             if (item.key === "homepage_sections") setHomepage(prev => ({ ...(prev || {}), ...(item.value as any) }));
+             if (item.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(item.value as any) } as any));
+             if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) } as any));
+             if (item.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(item.value as any) } as any));
           });
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
@@ -63,9 +63,9 @@
           const updated: any = payload.new;
           if (!updated || !updated.key) return;
           
-          if (updated.key === "site_info") setSiteInfo(prev => ({ ...(prev || {}), ...(updated.value as any) }));
-          if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) }));
-          if (updated.key === "homepage_sections") setHomepage(prev => ({ ...(prev || {}), ...(updated.value as any) }));
+           if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
+           if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
+           if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
         })
         .subscribe();
  

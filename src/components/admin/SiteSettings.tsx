@@ -92,9 +92,9 @@
  
         data.forEach(item => {
           if (!item.value) return;
-          if (item.key === "site_info") setSiteInfo((prev: any) => ({ ...(prev || {}), ...(item.value as any) }));
-          if (item.key === "theme") setTheme((prev: any) => ({ ...(prev || {}), ...(item.value as any) }));
-          if (item.key === "homepage_sections") setHomepage((prev: any) => ({ ...(prev || {}), ...(item.value as any) }));
+          if (item.key === "site_info") setSiteInfo((prev: any) => ({ ...prev, ...(item.value as any) }));
+          if (item.key === "theme") setTheme((prev: any) => ({ ...prev, ...(item.value as any) }));
+          if (item.key === "homepage_sections") setHomepage((prev: any) => ({ ...prev, ...(item.value as any) }));
         });
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
