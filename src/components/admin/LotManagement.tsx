@@ -38,7 +38,12 @@ import {
        const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
        const [statusFilter, setStatusFilter] = useState<string>("all");
       const [searchQuery, setSearchQuery] = useState("");
-      const [editingLot, setEditingLot] = useState<any>(null);
+       const [editingLot, setEditingLot] = useState<any>(null);
+       const [isWinnerDialogOpen, setIsWinnerDialogOpen] = useState(false);
+       const [winnerLotId, setWinnerLotId] = useState<string | null>(null);
+       const [selectedWinnerProfileId, setSelectedWinnerProfileId] = useState<string>("");
+       const [profiles, setProfiles] = useState<any[]>([]);
+       const [searchProfile, setSearchProfile] = useState("");
       const [expandedLotId, setExpandedLotId] = useState<string | null>(null);
       const [selectedLotBids, setSelectedLotBids] = useState<any[]>([]);
       const [selectedLotOffers, setSelectedLotOffers] = useState<any[]>([]);
