@@ -239,7 +239,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
               <Sparkles className="h-3.5 w-3.5" />
               A nova era dos leilões agropecuários
             </div>
-            {nextEvent && (
+            {nextEvent && nextEvent.slug && (
               <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-gold/30 bg-black/40 p-6 backdrop-blur-xl md:w-fit mb-12 shadow-[0_0_40px_rgba(212,175,55,0.1)] border-l-4 border-l-gold">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/20 text-gold">
