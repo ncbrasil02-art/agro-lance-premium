@@ -18,7 +18,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
    loader: async ({ params }) => {
      const eventSlug = params.eventSlug;
      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventSlug);
-     const selectQuery = "*, lots!lots_event_id_fkey(*, animal:animals!lots_animal_id_fkey(*, seller:sellers!animals_seller_id_fkey(name)), winner:profiles!lots_winner_id_fkey(full_name))";
+     const selectQuery = "*, lots(*, animal:animals(*, seller:sellers(name)), winner:profiles(full_name))";
  
      let eventData = null;
      let fetchError = null;
