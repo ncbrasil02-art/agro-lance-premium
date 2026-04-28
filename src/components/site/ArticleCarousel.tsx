@@ -86,7 +86,7 @@
                      <div className="mb-3 flex items-center gap-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                        <div className="flex items-center gap-1">
                          <Calendar className="h-3 w-3 text-gold" />
-                         {article.published_at && format(new Date(article.published_at), "dd 'de' MMMM", { locale: ptBR })}
+                         {article.published_at && article.published_at && format(new Date(article.published_at), "dd 'de' MMMM", { locale: ptBR })}
                        </div>
                        <div className="flex items-center gap-1">
                          <MessageSquare className="h-3 w-3 text-gold" />
