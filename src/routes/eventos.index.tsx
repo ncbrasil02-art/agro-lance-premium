@@ -82,7 +82,7 @@ function EventsPage() {
       return effectiveStatus === filter;
     });
 
-    return result.sort((a, b) => {
+    return result.sort((a: any, b: any) => {
       const statusA = getEffectiveEventStatus({ status: a.status, start_date: a.date, end_date: a.end_date });
       const statusB = getEffectiveEventStatus({ status: b.status, start_date: b.date, end_date: b.end_date });
 
