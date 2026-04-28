@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
