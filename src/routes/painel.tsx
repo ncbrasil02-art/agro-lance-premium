@@ -238,30 +238,30 @@ export const Route = createFileRoute("/painel")({
     if (!user?.id) return;
     try {
       // Fetch lots won by the user
-        const { data: wonLots, error: wonError } = await supabase
-          .from("lots")
-          .select(`
+      const { data: wonLots, error: wonError } = await supabase
+        .from("lots")
+        .select(`
+          *,
+          animal:animals!lots_animal_id_fkey(
             *,
-            animal:animals(
-              *,
-              seller:sellers(name)
-            ),
-            event:events(*)
-          `)
-          .eq("winner_id", user.id)
-          .order("updated_at", { ascending: false });
-        
-        if (wonError) {
-          console.error("Erro ao buscar arremates:", wonError);
-          // Try fallback without complex joins
-          const { data: fallbackLots } = await supabase
-            .from("lots")
-            .select("*, animal:animals(*)")
-            .eq("winner_id", user.id);
-          if (fallbackLots) setMyLots(fallbackLots);
-        } else {
-          setMyLots(wonLots || []);
-        }
+            seller:sellers!animals_seller_id_fkey(name)
+          ),
+          event:events!lots_event_id_fkey(*)
+        `)
+        .eq("winner_id", user.id)
+        .order("updated_at", { ascending: false });
+      
+      if (wonError) {
+        console.error("Erro ao buscar arremates:", wonError);
+        // Try fallback with corrected join
+        const { data: fallbackLots } = await supabase
+          .from("lots")
+          .select("*, animal:animals!lots_animal_id_fkey(*)")
+          .eq("winner_id", user.id);
+        if (fallbackLots) setMyLots(fallbackLots || []);
+      } else {
+        setMyLots(wonLots || []);
+      }
 
       // Fetch recent bids by the user
       const { data: userBids } = await supabase
