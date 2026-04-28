@@ -1,4 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+ import { createFileRoute, Navigate } from "@tanstack/react-router";
+ import { useState, useEffect } from "react";
+ import { supabase } from "@/integrations/supabase/client";
+ import { Loader2 } from "lucide-react";
 import { ShieldCheck, Trophy, Users, Radio } from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
@@ -13,7 +16,36 @@ export const Route = createFileRoute("/sobre")({
   component: AboutPage,
 });
 
-function AboutPage() {
+ function AboutPage() {
+   const [settings, setSettings] = useState<any>(null);
+   const [isLoading, setIsLoading] = useState(true);
+ 
+   useEffect(() => {
+     async function fetchSettings() {
+       const { data } = await supabase
+         .from("site_settings")
+         .select("value")
+         .eq("key", "about_page")
+         .single();
+       
+       setSettings(data?.value || { enabled: true, title: "Sobre" });
+       setIsLoading(false);
+     }
+     fetchSettings();
+   }, []);
+ 
+   if (isLoading) {
+     return (
+       <div className="flex min-h-[60vh] items-center justify-center">
+         <Loader2 className="h-8 w-8 animate-spin text-gold" />
+       </div>
+     );
+   }
+ 
+   if (settings && !settings.enabled) {
+     return <Navigate to="/" />;
+   }
+ 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-16">
       <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Sobre a <span className="text-gradient-gold">Premium Agro</span></h1>
