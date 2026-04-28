@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
 
  export function Footer() {
-   const { siteInfo } = useSiteSettings();
+    const { siteInfo, customTexts } = useSiteSettings();
    const year = new Date().getFullYear();
   return (
     <footer className="border-t border-border/60 bg-card/40">
@@ -22,9 +22,9 @@ import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
               </span>
             )}
           </Link>
-          <p className="mt-3 text-sm text-muted-foreground">
-            A plataforma premium de leilões agropecuários do Brasil.
-          </p>
+           <p className="mt-3 text-sm text-muted-foreground whitespace-pre-line">
+             {customTexts?.footer_text || "A plataforma premium de leilões agropecuários do Brasil."}
+           </p>
           <div className="mt-4 flex gap-2">
             {[Instagram, Youtube, Facebook].map((Icon, i) => (
               <a key={i} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-muted-foreground transition-smooth hover:bg-gold-gradient hover:text-emerald-deep" aria-label="Rede social">
