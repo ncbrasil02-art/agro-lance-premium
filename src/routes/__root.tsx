@@ -46,9 +46,9 @@ function NotFoundComponent() {
        
        if (error) throw error;
        
-       const info = data.find(i => i.key === "site_info")?.value as any;
-       const theme = data.find(i => i.key === "theme")?.value as any;
-       const homepage = data.find(i => i.key === "homepage_sections")?.value as any;
+       const info = data.find((i: any) => i.key === "site_info")?.value as any;
+       const theme = data.find((i: any) => i.key === "theme")?.value as any;
+       const homepage = data.find((i: any) => i.key === "homepage_sections")?.value as any;
        
        return { siteInfo: info, theme, homepage };
      } catch (error) {
