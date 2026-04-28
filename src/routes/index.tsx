@@ -295,7 +295,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
               </div>
             )}
             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase">
-              {(siteInfo?.name || "Leilões").split(' ')[0]} <span className="text-gradient-gold">{(siteInfo?.name || "Premium").split(' ').slice(1).join(' ')}</span><br />
+              {(typeof siteInfo?.name === 'string' ? siteInfo.name : "Elite Agro").split(' ')[0]} <span className="text-gradient-gold">{(typeof siteInfo?.name === 'string' ? siteInfo.name : "Leilões").split(' ').slice(1).join(' ')}</span><br />
               em tempo real
             </h1>
              <p className="mt-5 max-w-xl text-lg text-muted-foreground italic">
