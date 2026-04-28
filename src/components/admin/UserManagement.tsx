@@ -4,19 +4,47 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon, HelpCircle } from "lucide-react";
+  import { Search, CheckCircle, XCircle, Loader2, Info, UserCheck, Shield, Clock, History, Download, ShieldAlert, ShieldCheck as ShieldCheckIcon, HelpCircle, FileText, Send, MessageSquare } from "lucide-react";
  import { toast } from "sonner";
  import { Badge } from "@/components/ui/badge";
  import { useAuth } from "@/components/auth/auth-provider";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
- import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+  import { Textarea } from "@/components/ui/textarea";
+  import { Label } from "@/components/ui/label";
  
  export function UserManagement() {
    const [selectedUserLogs, setSelectedUserLogs] = useState<any[]>([]);
    const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
-   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+    const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [messageData, setMessageData] = useState({ title: "", content: "" });
+    const [isSendingMessage, setIsSendingMessage] = useState(false);
+    const handleSendMessage = async () => {
+      if (!selectedUser || !messageData.content) return;
+      setIsSendingMessage(true);
+      try {
+        const { error } = await supabase.from("messages").insert({
+          sender_id: adminProfile?.id,
+          recipient_id: selectedUser.id,
+          title: messageData.title || "Mensagem da Administração",
+          content: messageData.content
+        });
+        if (error) throw error;
+        toast.success("Mensagem enviada com sucesso!");
+        setIsMessageDialogOpen(false);
+        setMessageData({ title: "", content: "" });
+      } catch (error: any) {
+        toast.error("Erro ao enviar mensagem: " + error.message);
+      } finally {
+        setIsSendingMessage(false);
+      }
+    };
+
  
    const fetchUserLogs = async (userId: string) => {
      setIsLoadingLogs(true);
