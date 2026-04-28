@@ -37,7 +37,11 @@ function NotFoundComponent() {
   );
 }
 
- export const Route = createRootRoute({
+  export const Route = createRootRoute<{
+    siteInfo: any;
+    theme: any;
+    homepage: any;
+  }>()({
    loader: async () => {
      try {
        const { data, error } = await supabase
