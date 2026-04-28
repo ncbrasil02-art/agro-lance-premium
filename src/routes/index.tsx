@@ -60,9 +60,23 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           lotsCount: lotsRes.data?.length || 0
         });
 
-        const validatedEvents = z.array(eventSchema).parse(eventsRes.data || []);
-        const validatedLots = z.array(lotSchema).parse(lotsRes.data || []);
-        const validatedPastEvents = z.array(eventSchema).parse(pastEventsRes.data || []);
+        const eventsResult = z.array(eventSchema).safeParse(eventsRes.data || []);
+        const lotsResult = z.array(lotSchema).safeParse(lotsRes.data || []);
+        const pastEventsResult = z.array(eventSchema).safeParse(pastEventsRes.data || []);
+
+        if (!eventsResult.success) {
+          logger.error("Erro na validação de eventos", { error: eventsResult.error });
+        }
+        if (!lotsResult.success) {
+          logger.error("Erro na validação de lotes", { error: lotsResult.error });
+        }
+        if (!pastEventsResult.success) {
+          logger.error("Erro na validação de eventos passados", { error: pastEventsResult.error });
+        }
+
+        const validatedEvents = eventsResult.success ? eventsResult.data : (eventsRes.data as any[] || []);
+        const validatedLots = lotsResult.success ? lotsResult.data : (lotsRes.data as any[] || []);
+        const validatedPastEvents = pastEventsResult.success ? pastEventsResult.data : (pastEventsRes.data as any[] || []);
 
         let validatedAnnouncement = null;
         if (settingsRes.data?.value) {
