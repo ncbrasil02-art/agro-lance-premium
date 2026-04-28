@@ -4,9 +4,9 @@ import { Textarea } from "@/components/ui/textarea";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
- import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -15,20 +15,123 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { toast } from "sonner";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
- import { validateLiveLink } from "@/utils/format";
+ import { validateLiveLink, formatBRL } from "@/utils/format";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+   const [statusFilter, setStatusFilter] = useState("all");
+   const [pendingWinnerLots, setPendingWinnerLots] = useState<any[]>([]);
+   const [isPendingLoading, setIsPendingLoading] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
      const [editingEvent, setEditingEvent] = useState<any>(null);
      const [viewingEventDetails, setViewingEventDetails] = useState<any>(null);
      const [eventLots, setEventLots] = useState<any[]>([]);
      const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [selectedLotForBids, setSelectedLotForBids] = useState<any>(null);
+  const [lotBids, setLotBids] = useState<any[]>([]);
+  const [isBidsLoading, setIsBidsLoading] = useState(false);
+  const [selectedLotForWinner, setSelectedLotForWinner] = useState<any>(null);
+  const [searchWinnerQuery, setSearchWinnerQuery] = useState("");
+  const [isAssigningWinner, setIsAssigningWinner] = useState(false);
+  const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+
+  const fetchLotBids = async (lotId: string) => {
+    setIsBidsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("bids")
+        .select("*, profile:profiles(full_name, phone, cpf)")
+        .eq("lot_id", lotId)
+        .order("amount", { ascending: false });
+      if (error) throw error;
+      setLotBids(data || []);
+    } catch (error: any) {
+      toast.error("Erro ao carregar lances: " + error.message);
+    } finally {
+      setIsBidsLoading(false);
+    }
+  };
+
+  const handleAssignWinner = async (profileId: string) => {
+    if (!selectedLotForWinner) return;
+    setIsAssigningWinner(true);
+    try {
+      const { error } = await supabase
+        .from("lots")
+        .update({ 
+          winner_id: profileId,
+          status: 'sold',
+          winner_link_reason: 'Atribuição manual via painel de eventos'
+        })
+        .eq("id", selectedLotForWinner.id);
+      
+      if (error) throw error;
+      
+      toast.success("Ganhador atribuído com sucesso!");
+      setSelectedLotForWinner(null);
+      if (viewingEventDetails) fetchEventLots(viewingEventDetails.id);
+    } catch (error: any) {
+      toast.error("Erro ao atribuir ganhador: " + error.message);
+    } finally {
+      setIsAssigningWinner(false);
+    }
+  };
+
+  const handleFinalizeLot = async (lot: any) => {
+    if (!confirm(`Deseja finalizar a venda do Lote ${lot.lot_number}? O maior lance atual será o vencedor.`)) return;
+    
+    try {
+      // Find the highest bid
+      const { data: bids } = await supabase
+        .from("bids")
+        .select("*")
+        .eq("lot_id", lot.id)
+        .order("amount", { ascending: false })
+        .limit(1);
+      
+      const highestBid = bids?.[0];
+      if (!highestBid) {
+        toast.error("Este lote não possui lances para ser finalizado.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("lots")
+        .update({ 
+          status: 'sold', 
+          winner_id: highestBid.user_id,
+          current_price: highestBid.amount
+        })
+        .eq("id", lot.id);
+      
+      if (error) throw error;
+      toast.success("Lote finalizado com sucesso!");
+      if (viewingEventDetails) fetchEventLots(viewingEventDetails.id);
+    } catch (error: any) {
+      toast.error("Erro ao finalizar lote: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (searchWinnerQuery.length > 2) {
+      const search = async () => {
+           const { data } = await supabase
+           .from("profiles")
+           .select("id, full_name, phone, cpf")
+           .or(`full_name.ilike.%${searchWinnerQuery}%,cpf.ilike.%${searchWinnerQuery}%`)
+           .limit(10);
+        setFilteredProfiles(data || []);
+      };
+      search();
+    } else if (searchWinnerQuery.length === 0) {
+      setFilteredProfiles([]);
+    }
+  }, [searchWinnerQuery]);
+
      const fetchEventLots = async (eventId: string) => {
        setIsDetailsLoading(true);
        try {
@@ -190,18 +293,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
       }
     };
  
-    useEffect(() => {
-      fetchEvents();
+     useEffect(() => {
+       fetchEvents();
        fetchSellers();
-    }, []);
+       fetchPendingWinnerLots();
+     }, []);
+
+     const fetchPendingWinnerLots = async () => {
+       setIsPendingLoading(true);
+       try {
+         const { data, error } = await supabase
+           .from("lots")
+           .select(`
+             *,
+             animal:animals(name, internal_code),
+             event:events(name)
+           `)
+           .eq("status", "sold")
+           .is("winner_id", null)
+           .order("updated_at", { ascending: false });
+         if (error) throw error;
+         setPendingWinnerLots(data || []);
+       } catch (error: any) {
+         console.error("Erro ao carregar pendências:", error);
+       } finally {
+         setIsPendingLoading(false);
+       }
+     };
 
     // Real-time updates for the events list and current details
-    useRealtimeLots(() => {
-      fetchEvents();
-      if (viewingEventDetails) {
-        fetchEventLots(viewingEventDetails.id);
-      }
-    });
+     useRealtimeLots(() => {
+       fetchEvents();
+       fetchPendingWinnerLots();
+       if (viewingEventDetails) {
+         fetchEventLots(viewingEventDetails.id);
+       }
+     });
 
     useEffect(() => {
       const channel = supabase
@@ -466,9 +593,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
              </DialogHeader>
               <Tabs defaultValue="basico" className="w-full mt-4">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="basico">Básico</TabsTrigger>
-                  <TabsTrigger value="agenda">Agenda</TabsTrigger>
-                  <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
+                 <TabsTrigger value="basico">Básico</TabsTrigger>
+                 <TabsTrigger value="agenda">Agenda</TabsTrigger>
+                 <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basico" className="space-y-4 animate-in fade-in slide-in-from-left-2">
@@ -691,11 +818,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             </DialogContent>
           </Dialog>
 
-        <Card>
-         <CardHeader>
-           <CardTitle>Eventos de Leilão</CardTitle>
-         </CardHeader>
-         <CardContent>
+         <Tabs defaultValue="eventos" className="w-full">
+           <TabsList className="mb-4">
+             <TabsTrigger value="eventos" className="gap-2">
+               <CalendarIcon className="h-4 w-4" /> Eventos
+             </TabsTrigger>
+             <TabsTrigger value="pendencias" className="gap-2 relative">
+               <AlertCircle className="h-4 w-4" /> Pendências
+               {pendingWinnerLots.length > 0 && (
+                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                   {pendingWinnerLots.length}
+                 </span>
+               )}
+             </TabsTrigger>
+           </TabsList>
+
+           <TabsContent value="eventos">
+             <Card>
+               <CardHeader>
+                 <CardTitle>Eventos de Leilão</CardTitle>
+               </CardHeader>
+               <CardContent>
            {isLoading ? (
              <div className="flex justify-center py-8">
                <Loader2 className="h-8 w-8 animate-spin text-gold" />
@@ -871,8 +1014,60 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                </TableBody>
              </Table>
            )}
-          </CardContent>
-        </Card>
+               </CardContent>
+             </Card>
+           </TabsContent>
+
+           <TabsContent value="pendencias">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center gap-2">
+                   <Gavel className="h-5 w-5 text-gold" />
+                   Arremates Pendentes de Vínculo
+                 </CardTitle>
+                 <CardDescription>
+                   Lotes vendidos via auditório ou telefone que ainda não foram vinculados a um cadastro do site.
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 {isPendingLoading ? (
+                   <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-gold" /></div>
+                 ) : pendingWinnerLots.length === 0 ? (
+                   <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+                     Nenhum arremate pendente.
+                   </div>
+                 ) : (
+                   <Table>
+                     <TableHeader>
+                       <TableRow>
+                         <TableHead>Lote</TableHead>
+                         <TableHead>Evento</TableHead>
+                         <TableHead>Animal</TableHead>
+                         <TableHead>Valor</TableHead>
+                         <TableHead className="text-right">Ação</TableHead>
+                       </TableRow>
+                     </TableHeader>
+                     <TableBody>
+                       {pendingWinnerLots.map((lot) => (
+                         <TableRow key={lot.id}>
+                           <TableCell className="font-bold">#{lot.lot_number}</TableCell>
+                           <TableCell className="text-xs">{lot.event?.name}</TableCell>
+                           <TableCell className="font-medium uppercase">{lot.animal?.name}</TableCell>
+                           <TableCell className="font-bold text-emerald-deep">{formatBRL(lot.current_price)}</TableCell>
+                           <TableCell className="text-right">
+                             <Button size="sm" onClick={() => setSelectedLotForWinner(lot)}>
+                               <UserPlus className="mr-2 h-4 w-4" /> Atribuir Ganhador
+                             </Button>
+                           </TableCell>
+                         </TableRow>
+                       ))}
+                     </TableBody>
+                   </Table>
+                 )}
+               </CardContent>
+             </Card>
+           </TabsContent>
+         </Tabs>
  
         <Dialog open={!!viewingEventDetails} onOpenChange={(open) => !open && setViewingEventDetails(null)}>
            <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
@@ -939,156 +1134,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
                              )}
                            </TableCell>
-                           <TableCell className="font-black text-emerald-deep">
-                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
-                           </TableCell>
-                           <TableCell className="text-right">
-                             <div className="flex justify-end gap-1">
-                               {lot.winner && (
-                                 <TooltipProvider>
-                                   <Tooltip>
-                                     <TooltipTrigger asChild>
-                                       <Button 
-                                         variant="outline" 
-                                         size="icon" 
-                                         className="h-8 w-8 border-emerald-deep/30 text-emerald-deep"
-                                         onClick={() => {
-                                           const msg = encodeURIComponent(`Olá ${lot.winner.full_name}, aqui é da Premium Agro Leilões. Parabéns pelo arremate do Lote ${lot.lot_number} (${lot.animal?.name}) no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}. Em breve enviaremos o termo de arrematação.`);
-                                           window.open(`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}?text=${msg}`, '_blank');
-                                         }}
-                                       >
-                                         <MessageSquare className="h-4 w-4" />
-                                       </Button>
-                                     </TooltipTrigger>
-                                     <TooltipContent>Enviar aviso WhatsApp</TooltipContent>
-                                   </Tooltip>
-                                 </TooltipProvider>
-                               )}
-                               <TooltipProvider>
-                                 <Tooltip>
-                                   <TooltipTrigger asChild>
-                                     <Button 
-                                       variant="outline" 
-                                       size="icon" 
-                                       className="h-8 w-8 border-gold/30 text-gold"
-                                       onClick={() => {
-                                         const printWindow = window.open('', '_blank');
-                                         if (!printWindow) return;
-                                         const html = `
-                                           <html>
-                                             <head>
-                                               <title>Termo de Arremate - Lote ${lot.lot_number}</title>
-                                               <style>
-                                                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-                                                 .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #064e3b; padding-bottom: 20px; }
-                                                 .logo { font-size: 32px; font-weight: 900; color: #064e3b; letter-spacing: 2px; }
-                                                 .title { font-size: 20px; font-weight: bold; margin-top: 10px; color: #c5a059; }
-                                                 .section { margin-bottom: 30px; }
-                                                 .section-title { font-weight: bold; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #eee; margin-bottom: 10px; }
-                                                 .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-                                                 .footer { margin-top: 100px; text-align: center; }
-                                                 .signature { display: inline-block; width: 300px; border-top: 1px solid #000; margin: 40px 20px; padding-top: 10px; font-size: 12px; }
-                                                 @media print { .no-print { display: none; } }
-                                               </style>
-                                             </head>
-                                             <body>
-                                               <div class="header">
-                                                 <div class="logo">PREMIUM AGRO LEILÕES</div>
-                                                 <div class="title">TERMO DE ARREMATAÇÃO E NOTA DE VENDA</div>
-                                               </div>
-                                               
-                                               <div class="section">
-                                                 <div class="section-title">Dados do Evento</div>
-                                                 <p><strong>Leilão:</strong> ${viewingEventDetails?.name}</p>
-                                                 <p><strong>Data:</strong> ${new Date(viewingEventDetails?.start_date).toLocaleDateString('pt-BR')}</p>
-                                               </div>
-
-                                               <div class="section">
-                                                 <div class="section-title">Dados do Lote</div>
-                                                 <div class="grid">
-                                                   <div>
-                                                     <p><strong>Número do Lote:</strong> ${lot.lot_number}</p>
-                                                     <p><strong>Animal:</strong> ${lot.animal?.name}</p>
-                                                   </div>
-                                                   <div>
-                                                     <p><strong>Raça:</strong> ${lot.animal?.breed || '---'}</p>
-                                                     <p><strong>Código Interno:</strong> ${lot.animal?.internal_code || '---'}</p>
-                                                   </div>
-                                                 </div>
-                                               </div>
-
-                                               <div class="section">
-                                                 <div class="section-title">Dados do Arrematante</div>
-                                                 <div class="grid">
-                                                   <div>
-                                                     <p><strong>Nome:</strong> ${lot.winner?.full_name || '---'}</p>
-                                                     <p><strong>CPF/CNPJ:</strong> ${lot.winner?.cpf || '---'}</p>
-                                                   </div>
-                                                   <div>
-                                                     <p><strong>Telefone:</strong> ${lot.winner?.phone || '---'}</p>
-                                                     <p><strong>Endereço:</strong> ${lot.winner?.address || '---'}</p>
-                                                   </div>
-                                                 </div>
-                                               </div>
-
-                                               <div class="section" style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
-                                                 <div class="section-title">Valores e Fechamento</div>
-                                                 <p style="font-size: 24px; font-weight: 900; color: #064e3b; margin: 10px 0;">
-                                                   Valor Final: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}
-                                                 </p>
-                                                 <p style="font-size: 10px; color: #666;">* Sujeito às condições de pagamento estabelecidas no regulamento do evento.</p>
-                                               </div>
-
-                                               <div class="footer">
-                                                 <div class="signature">Assinatura do Arrematante</div>
-                                                 <div class="signature">Assinatura Premium Agro</div>
-                                                 <p style="font-size: 10px; color: #999; margin-top: 40px;">Documento gerado eletronicamente em ${new Date().toLocaleString('pt-BR')}</p>
-                                               </div>
-                                               
-                                               <script>window.print();</script>
-                                             </body>
-                                           </html>
-                                         `;
-                                         printWindow.document.write(html);
-                                         printWindow.document.close();
-                                       }}
-                                     >
-                                       <FileText className="h-4 w-4" />
-                                     </Button>
-                                   </TooltipTrigger>
-                                   <TooltipContent>Imprimir Nota de Venda</TooltipContent>
-                                 </Tooltip>
-                               </TooltipProvider>
-                               <TooltipProvider>
-                                 <Tooltip>
-                                   <TooltipTrigger asChild>
-                                     <Button 
-                                       variant="outline" 
-                                       size="icon" 
-                                       className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                       onClick={async () => {
-                                         const { data: bids } = await supabase
-                                           .from("bids")
-                                           .select("id")
-                                           .eq("lot_id", lot.id)
-                                           .order("amount", { ascending: false })
-                                           .limit(1);
-                                         
-                                         if (bids && bids.length > 0) {
-                                           handleDeleteBid(bids[0].id, lot.id);
-                                         } else {
-                                           toast.error("Nenhum lance encontrado para excluir.");
-                                         }
-                                       }}
-                                     >
-                                       <Trash className="h-4 w-4" />
-                                     </Button>
-                                   </TooltipTrigger>
-                                   <TooltipContent>Excluir maior lance (Reverter arremate)</TooltipContent>
-                                 </Tooltip>
-                               </TooltipProvider>
-                             </div>
-                           </TableCell>
+                            <TableCell className="font-black text-emerald-deep">
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}>
+                                  <ListOrdered className="h-4 w-4" />
+                                </Button>
+                                {lot.status !== 'sold' && (
+                                  <Button variant="ghost" size="icon" className="text-emerald-600" onClick={() => handleFinalizeLot(lot)}>
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                {!lot.winner_id && (
+                                  <Button variant="ghost" size="icon" className="text-gold" onClick={() => setSelectedLotForWinner(lot)}>
+                                    <UserPlus className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
                          </TableRow>
                        ))}
                      </TableBody>
@@ -1099,6 +1164,79 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
              <DialogFooter>
                <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
              </DialogFooter>
+           </DialogContent>
+         </Dialog>
+
+         <Dialog open={!!selectedLotForBids} onOpenChange={(open) => !open && setSelectedLotForBids(null)}>
+           <DialogContent className="max-w-xl">
+             <DialogHeader>
+               <DialogTitle>Histórico de Lances: Lote #{selectedLotForBids?.lot_number}</DialogTitle>
+             </DialogHeader>
+             <div className="mt-4">
+               {isBidsLoading ? (
+                 <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+               ) : lotBids.length === 0 ? (
+                 <p className="text-center py-8 text-muted-foreground">Nenhum lance recebido.</p>
+               ) : (
+                 <Table>
+                   <TableHeader>
+                     <TableRow>
+                       <TableHead>Usuário</TableHead>
+                       <TableHead>Valor</TableHead>
+                       <TableHead>Data</TableHead>
+                     </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                     {lotBids.map((bid) => (
+                       <TableRow key={bid.id}>
+                         <TableCell>
+                           <div className="font-bold">{bid.profile?.full_name || bid.bidder_name || 'Usuário'}</div>
+                           <div className="text-[10px] text-muted-foreground">{bid.bid_type}</div>
+                         </TableCell>
+                         <TableCell className="font-bold text-emerald-600">{formatBRL(bid.amount)}</TableCell>
+                         <TableCell className="text-xs">{format(new Date(bid.created_at), "dd/MM HH:mm")}</TableCell>
+                       </TableRow>
+                     ))}
+                   </TableBody>
+                 </Table>
+               )}
+             </div>
+           </DialogContent>
+         </Dialog>
+
+         <Dialog open={!!selectedLotForWinner} onOpenChange={(open) => !open && setSelectedLotForWinner(null)}>
+           <DialogContent>
+             <DialogHeader>
+               <DialogTitle>Atribuir Ganhador: Lote #{selectedLotForWinner?.lot_number}</DialogTitle>
+               <DialogDescription>Pesquise o cadastro para vincular a este arremate.</DialogDescription>
+             </DialogHeader>
+             <div className="space-y-4 py-4">
+               <div className="relative">
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                 <Input 
+                   placeholder="Nome, CPF ou E-mail..." 
+                   className="pl-9"
+                   value={searchWinnerQuery}
+                   onChange={(e) => setSearchWinnerQuery(e.target.value)}
+                 />
+               </div>
+               <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                 {filteredProfiles.map((p) => (
+                   <div key={p.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                     <div>
+                       <p className="font-bold text-sm">{p.full_name}</p>
+                       <p className="text-[10px] text-muted-foreground">CPF: {p.cpf || '---'} | Tel: {p.phone || '---'}</p>
+                     </div>
+                     <Button size="sm" onClick={() => handleAssignWinner(p.id)} disabled={isAssigningWinner}>
+                       {isAssigningWinner ? <Loader2 className="h-4 w-4 animate-spin" /> : "Selecionar"}
+                     </Button>
+                   </div>
+                 ))}
+                 {searchWinnerQuery.length > 2 && filteredProfiles.length === 0 && (
+                   <p className="text-center text-xs text-muted-foreground py-4">Nenhum cadastro encontrado.</p>
+                 )}
+               </div>
+             </div>
            </DialogContent>
          </Dialog>
        </div>
