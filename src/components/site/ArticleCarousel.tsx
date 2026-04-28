@@ -12,10 +12,10 @@
    id: string
    title: string
    slug: string
-   excerpt: string
-   featured_image: string
-   published_at: string
-   category?: { name: string }
+   excerpt: string | null
+   featured_image: string | null
+   published_at: string | null
+   category?: { name: string | null } | null
  }
 
  export function ArticleCarousel({ articles }: { articles: Article[] }) {
