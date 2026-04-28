@@ -697,10 +697,10 @@ import {
                           <>
                           <TableRow 
                              className={`${
-                               lot.status === 'active' ? 'bg-emerald-50/30' : 
-                               lot.status === 'paused' ? 'bg-amber-50/30' : 
-                               lot.status === 'sold' ? 'bg-gold/5' : ''
-                             } ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50`}
+                               lot.status === 'active' ? 'bg-emerald-50/30 border-l-4 border-l-emerald-500' : 
+                               lot.status === 'paused' ? 'bg-amber-50/30 border-l-4 border-l-amber-500' : 
+                               lot.status === 'sold' ? 'bg-amber-50/50 border-l-4 border-l-gold' : ''
+                             } ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50 transition-all duration-200`}
                             onClick={() => toggleExpand(lot.id)}
                           >
                             <TableCell onClick={(e) => e.stopPropagation()}>
