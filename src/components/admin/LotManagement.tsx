@@ -74,7 +74,8 @@ import {
               .order("name"),
             supabase
               .from("animals")
-              .select("id, name, internal_code")
+              .select("id, name, internal_code, sale_status")
+              .neq("sale_status", "sold")
               .order("name")
           ]);
     
@@ -117,13 +118,27 @@ import {
          fetchData();
        }, [initialEventId]);
  
-        useRealtimeLots(() => {
-          fetchData();
-          if (expandedLotId) {
-            fetchLotBids(expandedLotId, true);
-            fetchLotOffers(expandedLotId);
-          }
-        });
+        useRealtimeLots(fetchData);
+
+        useEffect(() => {
+          if (!expandedLotId) return;
+          
+          const channel = supabase
+            .channel(`lot-bids-${expandedLotId}`)
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'bids', filter: `lot_id=eq.${expandedLotId}` },
+              () => {
+                console.log("Bid change detected for expanded lot", expandedLotId);
+                fetchLotBids(expandedLotId, true);
+              }
+            )
+            .subscribe();
+            
+          return () => {
+            supabase.removeChannel(channel);
+          };
+        }, [expandedLotId]);
 
        const resetForm = () => {
          setEditingLot(null);
@@ -681,7 +696,11 @@ import {
                         return (
                           <>
                           <TableRow 
-                            className={`${lot.status === 'active' ? 'bg-emerald-50/30' : lot.status === 'paused' ? 'bg-amber-50/30' : ''} ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50`}
+                             className={`${
+                               lot.status === 'active' ? 'bg-emerald-50/30' : 
+                               lot.status === 'paused' ? 'bg-amber-50/30' : 
+                               lot.status === 'sold' ? 'bg-gold/5' : ''
+                             } ${isUrgent ? 'animate-neon border-live/30' : ''} cursor-pointer hover:bg-muted/50`}
                             onClick={() => toggleExpand(lot.id)}
                           >
                             <TableCell onClick={(e) => e.stopPropagation()}>
