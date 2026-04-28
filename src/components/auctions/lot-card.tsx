@@ -44,9 +44,10 @@ import { Countdown } from "./countdown";
       mother?: string;
       sex?: string;
       color?: string;
-      birthDate?: string;
-      seller?: string;
-      location?: string;
+       birthDate?: string;
+       seller?: string;
+       location?: string;
+       winnerName?: string;
     } 
   }) {
    const [isUrgent, setIsUrgent] = useState(false);
@@ -170,7 +171,14 @@ import { Countdown } from "./countdown";
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-3">
           <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Lance atual</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex justify-between items-center">
+              <span>Lance atual</span>
+              {lot.winnerName && (
+                <span className="text-[9px] text-emerald-500 font-bold truncate max-w-[80px]">
+                  {lot.winnerName.split(' ')[0]}
+                </span>
+              )}
+            </div>
           <div className="text-xl font-bold text-gradient-gold">
             {formatBRL(lot?.currentBid || 0)}
           </div>
