@@ -343,7 +343,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         
         if (error) throw error;
         toast.success("Link de transmissão atualizado!");
-        fetchEventDetails(selectedEventId);
+        refreshAdminData();
       } catch (error: any) {
         toast.error("Erro ao atualizar link: " + error.message);
       } finally {
@@ -602,7 +602,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
         if (result.success) {
           toast.success("Lance de segurança (auditório) efetuado!");
           setSecurityBidAmount(0);
-          fetchEventDetails(selectedEventId);
+          refreshAdminData();
         } else {
           toast.error(result.message);
         }
