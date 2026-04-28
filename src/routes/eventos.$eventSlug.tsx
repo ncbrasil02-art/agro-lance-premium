@@ -15,15 +15,40 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useState } from "react";
 
 export const Route = createFileRoute("/eventos/$eventSlug")({
-  loader: async ({ params }) => {
-    const { data: event, error } = await supabase
-      .from("events")
-        .select("*, lots!lots_event_id_fkey(*, animal:animals!lots_animal_id_fkey(*, seller:sellers!animals_seller_id_fkey(name)), winner:profiles!lots_winner_id_fkey(full_name))")
-      .or(`slug.eq."${params.eventSlug}",id.eq."${params.eventSlug}"`)
-      .maybeSingle();
-
-    if (error || !event) throw notFound();
-
+   loader: async ({ params }) => {
+     const eventSlug = params.eventSlug;
+     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventSlug);
+     const selectQuery = "*, lots!lots_event_id_fkey(*, animal:animals!lots_animal_id_fkey(*, seller:sellers!animals_seller_id_fkey(name)), winner:profiles!lots_winner_id_fkey(full_name))";
+ 
+     let eventData = null;
+     let fetchError = null;
+ 
+     if (isUuid) {
+       const { data, error } = await supabase
+         .from("events")
+         .select(selectQuery)
+         .eq("id", eventSlug)
+         .maybeSingle();
+       eventData = data;
+       fetchError = error;
+     }
+ 
+     if (!eventData && !fetchError) {
+       const { data, error } = await supabase
+         .from("events")
+         .select(selectQuery)
+         .eq("slug", eventSlug)
+         .maybeSingle();
+       eventData = data;
+       fetchError = error;
+     }
+ 
+     if (fetchError || !eventData) {
+       console.error("Erro ao buscar evento:", fetchError);
+       throw notFound();
+     }
+ 
+     const event = eventData;
     try {
       const validatedEvent = eventSchema.parse(event);
       return { event: validatedEvent };
