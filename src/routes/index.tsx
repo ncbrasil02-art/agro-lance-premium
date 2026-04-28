@@ -320,6 +320,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           </div>
         </div>
       </section>
+      )}
 
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
