@@ -919,7 +919,7 @@ export const Route = createFileRoute("/ao-vivo")({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px] flex-col lg:flex-row">
         {/* Player + Lote em destaque */}
-        <div className="space-y-6 order-1">
+        <div className="space-y-6 order-1 flex flex-col">
            <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
              {liveEvent.transmission_link ? (
                <iframe
@@ -987,8 +987,32 @@ export const Route = createFileRoute("/ao-vivo")({
              </div>
            </div>
 
+          {/* Bid History for Mobile (Visible between Player and Lot Highlight) */}
+          <div className="lg:hidden order-2 mb-2">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+              <div className="p-3 border-b border-border flex justify-between items-center bg-muted/30">
+                <h3 className="font-bold text-xs uppercase tracking-wider">Histórico de Lances</h3>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-[9px] font-bold text-emerald-600">
+                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> AO VIVO
+                </div>
+              </div>
+              <ul className="max-h-[160px] overflow-auto p-2 text-[11px] space-y-1 custom-scrollbar">
+                {bids?.slice(0, 5).map((bid: any, i: number) => (
+                  <li key={bid.id} className={`flex items-center justify-between p-2 rounded ${i === 0 ? 'bg-gold/10 ring-1 ring-gold/20 animate-bid-flash' : 'border-b border-border/40'}`}>
+                    <div className="flex flex-col">
+                      <span className="font-bold">{bid.bidder_name}</span>
+                      <span className="text-[9px] text-muted-foreground">{new Date(bid.created_at).toLocaleTimeString("pt-BR")}</span>
+                    </div>
+                    <span className={`font-mono font-black ${i === 0 ? 'text-gold text-sm' : ''}`}>{formatBRL(bid.amount)}</span>
+                  </li>
+                ))}
+                {(!bids || bids.length === 0) && <li className="text-center text-muted-foreground py-4 italic">Aguardando lances...</li>}
+              </ul>
+            </div>
+          </div>
+
           {/* Lote em destaque - Otimizado */}
-          <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500">
+          <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500 order-3">
             <div className="grid md:grid-cols-[1fr_1.2fr]">
                {/* Lado Esquerdo: Foto Grande */}
                <div className="relative aspect-square md:aspect-auto h-full group">
