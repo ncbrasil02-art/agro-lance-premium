@@ -210,7 +210,7 @@ export function BidSecurityAudit() {
                           <div className="flex flex-col">
                             <div className="flex items-center gap-1">
                               <User className="h-3 w-3 text-gold" />
-                              <span className="font-medium text-sm">{bid.profile?.full_name}</span>
+                               <span className="font-medium text-sm">{bid.bidder_name}</span>
                             </div>
                             <span className="text-[10px] text-muted-foreground font-mono">{bid.profile?.cpf}</span>
                           </div>
