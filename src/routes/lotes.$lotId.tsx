@@ -609,10 +609,36 @@ function LotDetail() {
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
             <div className="space-y-8">
                <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
-                <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
-                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                <div className="relative">
+                  <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <Expand className="h-12 w-12 text-white/50" />
-                 </div>
+                  </div>
+                  
+                  {/* Next/Prev overlays on image */}
+                  <div className="absolute inset-y-0 left-0 flex items-center px-4">
+                    {prevLotId && (
+                      <Link 
+                        to="/lotes/$lotId" 
+                        params={{ lotId: prevLotId }}
+                        className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all shadow-xl"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </Link>
+                    )}
+                  </div>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-4">
+                    {nextLotId && (
+                      <Link 
+                        to="/lotes/$lotId" 
+                        params={{ lotId: nextLotId }}
+                        className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all shadow-xl"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
                </div>
                <div className="grid grid-cols-5 gap-3">
                  {lot.animal?.photos?.map((s:string, i:number) => (

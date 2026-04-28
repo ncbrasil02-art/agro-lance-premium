@@ -1098,7 +1098,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                          <TableHead className="w-[80px]">Lote</TableHead>
                          <TableHead>Animal</TableHead>
                          <TableHead>Arrematante</TableHead>
-                         <TableHead>Valor Final</TableHead>
+                         <TableHead>Valor / Lances</TableHead>
                          <TableHead className="text-right">Ações</TableHead>
                        </TableRow>
                      </TableHeader>
@@ -1134,26 +1134,95 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
                              )}
                            </TableCell>
-                            <TableCell className="font-black text-emerald-deep">
-                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-1">
-                                <Button variant="ghost" size="icon" onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}>
-                                  <ListOrdered className="h-4 w-4" />
-                                </Button>
-                                {lot.status !== 'sold' && (
-                                  <Button variant="ghost" size="icon" className="text-emerald-600" onClick={() => handleFinalizeLot(lot)}>
-                                    <Check className="h-4 w-4" />
-                                  </Button>
-                                )}
-                                {!lot.winner_id && (
-                                  <Button variant="ghost" size="icon" className="text-gold" onClick={() => setSelectedLotForWinner(lot)}>
-                                    <UserPlus className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
+                           <TableCell>
+                             <div className="flex flex-col">
+                               <span className="font-black text-emerald-deep">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                               </span>
+                               <Button 
+                                 variant="ghost" 
+                                 size="sm" 
+                                 className="h-6 px-0 text-[10px] text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
+                                 onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}
+                               >
+                                 <ListOrdered className="h-3 w-3" /> Ver {lot.bids_count || 0} lances
+                               </Button>
+                             </div>
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-1">
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}>
+                                       <ListOrdered className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Histórico de Lances</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+
+                               {lot.status !== 'sold' && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600" onClick={() => handleFinalizeLot(lot)}>
+                                         <Check className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>Finalizar Arremate</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+
+                               {!lot.winner_id && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button variant="ghost" size="icon" className="h-8 w-8 text-gold" onClick={() => setSelectedLotForWinner(lot)}>
+                                         <UserPlus className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>Vincular Ganhador</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+
+                               {lot.winner && (
+                                 <TooltipProvider>
+                                   <Tooltip>
+                                     <TooltipTrigger asChild>
+                                       <Button 
+                                         variant="ghost" 
+                                         size="icon" 
+                                         className="h-8 w-8 text-blue-500"
+                                         onClick={() => window.open(`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}`, '_blank')}
+                                       >
+                                         <MessageSquare className="h-4 w-4" />
+                                       </Button>
+                                     </TooltipTrigger>
+                                     <TooltipContent>WhatsApp do Ganhador</TooltipContent>
+                                   </Tooltip>
+                                 </TooltipProvider>
+                               )}
+
+                               <TooltipProvider>
+                                 <Tooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button 
+                                       variant="ghost" 
+                                       size="icon" 
+                                       className="h-8 w-8 text-muted-foreground"
+                                       onClick={() => toast.info("Funcionalidade de emitir documentos para o administrador em breve.")}
+                                     >
+                                       <FileText className="h-4 w-4" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Gerar Documentos (Nota/Boleta)</TooltipContent>
+                                 </Tooltip>
+                               </TooltipProvider>
+                             </div>
+                           </TableCell>
                          </TableRow>
                        ))}
                      </TableBody>
@@ -1181,21 +1250,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                  <Table>
                    <TableHeader>
                      <TableRow>
-                       <TableHead>Usuário</TableHead>
-                       <TableHead>Valor</TableHead>
-                       <TableHead>Data</TableHead>
+                        <TableHead>Usuário</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead className="text-right">Ação</TableHead>
                      </TableRow>
                    </TableHeader>
                    <TableBody>
                      {lotBids.map((bid) => (
-                       <TableRow key={bid.id}>
-                         <TableCell>
-                           <div className="font-bold">{bid.profile?.full_name || bid.bidder_name || 'Usuário'}</div>
-                           <div className="text-[10px] text-muted-foreground">{bid.bid_type}</div>
-                         </TableCell>
-                         <TableCell className="font-bold text-emerald-600">{formatBRL(bid.amount)}</TableCell>
-                         <TableCell className="text-xs">{format(new Date(bid.created_at), "dd/MM HH:mm")}</TableCell>
-                       </TableRow>
+                        <TableRow key={bid.id} className={bid.is_winning ? "bg-emerald-50" : ""}>
+                          <TableCell>
+                            <div className="font-bold">{bid.profile?.full_name || bid.bidder_name || 'Usuário'}</div>
+                            <div className="text-[10px] text-muted-foreground">{bid.bid_type}</div>
+                          </TableCell>
+                          <TableCell className="font-bold text-emerald-600">{formatBRL(bid.amount)}</TableCell>
+                          <TableCell className="text-xs">{format(new Date(bid.created_at), "dd/MM HH:mm")}</TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-destructive"
+                              onClick={() => handleDeleteBid(bid.id, selectedLotForBids.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
                      ))}
                    </TableBody>
                  </Table>

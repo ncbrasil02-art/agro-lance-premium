@@ -133,21 +133,52 @@ export const Route = createFileRoute("/painel")({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const docInputRef = useRef<HTMLInputElement>(null);
 
-   useEffect(() => {
-     if (!user) return;
-     fetchDashboardData();
-     fetchMessages();
-     if (profile) {
-       setFormData({
-         full_name: profile.full_name || "",
-         cpf: profile.cpf || "",
-         phone: profile.phone || "",
-         address: profile.address || "",
-         cep: profile.cep || "",
-         nationality: profile.nationality || "Brasileira",
-       });
-     }
-   }, [user, profile]);
+    useEffect(() => {
+      if (!user) return;
+      fetchDashboardData();
+      fetchMessages();
+      
+      if (profile) {
+        setFormData({
+          full_name: profile.full_name || "",
+          cpf: profile.cpf || "",
+          phone: profile.phone || "",
+          address: profile.address || "",
+          cep: profile.cep || "",
+          nationality: profile.nationality || "Brasileira",
+        });
+      }
+
+      // Add real-time listeners for the dashboard
+      const lotsChannel = supabase
+        .channel('dashboard-lots-realtime')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'lots',
+          filter: `winner_id=eq.${user.id}` 
+        }, () => {
+          fetchDashboardData();
+        })
+        .subscribe();
+
+      const bidsChannel = supabase
+        .channel('dashboard-bids-realtime')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'bids',
+          filter: `user_id=eq.${user.id}` 
+        }, () => {
+          fetchDashboardData();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(lotsChannel);
+        supabase.removeChannel(bidsChannel);
+      };
+    }, [user, profile]);
 
    const fetchMessages = async () => {
      if (!user?.id) return;
@@ -383,13 +414,15 @@ export const Route = createFileRoute("/painel")({
                         <td className="px-4 py-4 font-bold text-emerald-deep">
                           {formatBRL(bid.amount)}
                         </td>
-                        <td className="px-4 py-4">
-                          {bid.amount >= (bid.lot?.current_price || 0) ? (
-                            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Maior lance</Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-muted-foreground">Lance superado</Badge>
-                          )}
-                        </td>
+                         <td className="px-4 py-4">
+                           {bid.lot?.winner_id === user.id && bid.lot?.status === 'sold' ? (
+                             <Badge className="bg-emerald-600 text-white border-none">ARREMATADO</Badge>
+                           ) : bid.amount >= (bid.lot?.current_price || 0) ? (
+                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Maior lance</Badge>
+                           ) : (
+                             <Badge variant="outline" className="text-muted-foreground">Lance superado</Badge>
+                           )}
+                         </td>
                       </tr>
                     ))}
                   </tbody>
