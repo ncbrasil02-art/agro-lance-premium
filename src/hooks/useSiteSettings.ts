@@ -69,9 +69,10 @@
             if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) }));
             if (item.key === "homepage_sections") setHomepage(prev => ({ ...(prev || {}), ...(item.value as any) }));
           });
-       } catch (error) {
-         console.error("Error fetching site settings:", error);
-       } finally {
+        } catch (error: any) {
+          console.error("Error fetching site settings:", error);
+          setIsLoading(false);
+        } finally {
          setIsLoading(false);
        }
      }
