@@ -576,24 +576,28 @@ function LotDetail() {
               <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">Voltar</span>
             </Link>
             
-            <div className="flex items-center gap-2 sm:gap-4">
-              {prevLotId && (
-                <Link to="/lotes/$lotId" params={{ lotId: prevLotId }} className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all">
-                  <ChevronLeft className="h-5 w-5" />
-                </Link>
-              )}
-              
-              <div className="text-center min-w-[120px]">
-                <h1 className="text-white font-black uppercase text-sm sm:text-base tracking-tighter">Lote #{lot.lot_number}</h1>
-                <p className="text-gold/80 text-[9px] uppercase font-bold truncate max-w-[150px]">{lot.event?.name}</p>
-              </div>
-
-              {nextLotId && (
-                <Link to="/lotes/$lotId" params={{ lotId: nextLotId }} className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all">
-                  <ChevronRight className="h-5 w-5" />
-                </Link>
-              )}
-            </div>
+             <div className="flex items-center gap-2 sm:gap-6">
+               {prevLotId ? (
+                 <Link to="/lotes/$lotId" params={{ lotId: prevLotId }} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-emerald-deep transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                   <ChevronLeft className="h-6 w-6" />
+                 </Link>
+               ) : (
+                 <div className="h-10 w-10 sm:h-12 sm:w-12" />
+               )}
+               
+               <div className="text-center min-w-[140px]">
+                 <div className="text-gold/60 text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Navegar Lotes</div>
+                 <h1 className="text-white font-black uppercase text-base sm:text-xl tracking-tighter italic">Lote #{lot.lot_number}</h1>
+               </div>
+ 
+               {nextLotId ? (
+                 <Link to="/lotes/$lotId" params={{ lotId: nextLotId }} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-emerald-deep transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                   <ChevronRight className="h-6 w-6" />
+                 </Link>
+               ) : (
+                 <div className="h-10 w-10 sm:h-12 sm:w-12" />
+               )}
+             </div>
 
             <div className="flex items-center gap-3">
               <StatusBadge status={dynamicStatus} urgent={isUrgent} />
