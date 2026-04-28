@@ -1,3 +1,4 @@
+  import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Link } from "@tanstack/react-router";
  import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
 import { useState } from "react";
@@ -24,22 +25,29 @@ const nav = [
   { to: "/sobre", label: "Sobre" },
 ] as const;
 
-export function Header() {
-  const { theme, toggle } = useTheme();
+  export function Header() {
+    const { theme, toggle } = useTheme();
+    const { siteInfo } = useSiteSettings();
   const { user, profile, signOut } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-bold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
-            <Gavel className="h-5 w-5 text-emerald-deep" />
-          </span>
-          <span className="text-lg tracking-tight">
-            <span className="text-foreground">Premium</span>
-            <span className="text-gradient-gold">Agro</span>
-          </span>
+        <Link to="/" className="flex items-center gap-2 font-bold group">
+          {siteInfo?.logo_url ? (
+            <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
+          ) : (
+            <>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
+                <Gavel className="h-5 w-5 text-emerald-deep" />
+              </span>
+              <span className="text-lg tracking-tight">
+                <span className="text-foreground">{siteInfo?.name.split(' ')[0] || "Premium"}</span>
+                <span className="text-gradient-gold">{siteInfo?.name.split(' ').slice(1).join(' ') || "Agro"}</span>
+              </span>
+            </>
+          )}
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
