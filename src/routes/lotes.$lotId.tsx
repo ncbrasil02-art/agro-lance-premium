@@ -300,7 +300,8 @@ function LotDetail() {
          const { data: profileData } = await supabase.from("profiles").select("id, full_name").eq("id", p.new.user_id).single();
          const newBid = { ...p.new, profile: profileData };
          setRecentBids(prev => {
-           if (prev.some(b => b.id === newBid.id)) return prev;
+           const bidId = (newBid as any).id;
+           if (prev.some(b => b.id === bidId)) return prev;
            return [newBid, ...prev]
              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
              .slice(0, 10);
