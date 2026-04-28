@@ -51,8 +51,8 @@ export const Route = createFileRoute("/admin")({
         { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
       { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
       { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
-    import { PostManagement } from "@/components/admin/PostManagement";
-     { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
+      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
+  import { PostManagement } from "@/components/admin/PostManagement";
    ];
  
    return (
