@@ -41,13 +41,17 @@
       }
     }, [initialData?.siteInfo, initialData?.theme, initialData?.homepage]);
 
-   useEffect(() => {
-     async function fetchSettings() {
-        if (initialData) {
-          setIsLoading(false);
-          return;
-        }
-       try {
+     useEffect(() => {
+       async function fetchSettings() {
+         // Only skip fetch if we actually have data in initialData
+         const hasInitialData = initialData && (initialData.siteInfo || initialData.theme || initialData.homepage);
+         
+         if (hasInitialData) {
+           setIsLoading(false);
+           return;
+         }
+
+         try {
          const { data, error } = await supabase
            .from("site_settings")
            .select("key, value");
