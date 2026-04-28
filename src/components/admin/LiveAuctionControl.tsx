@@ -29,7 +29,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
    
     // Phone bid form
     const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "", profileId: "" });
-    const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
     const [profiles, setProfiles] = useState<any[]>([]);
      const [searchProfile, setSearchProfile] = useState("");
      const [isAutoAdvancing, setIsAutoAdvancing] = useState(true);
@@ -598,39 +597,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
      }
    };
  
-    const handleSecurityBid = async () => {
-      if (!activeLot) {
-        toast.error("Nenhum lote ativo");
-        return;
-      }
-
-      const amount = securityBidAmount || (activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment;
-      
-      setIsActionLoading(true);
-      try {
-        const { data, error } = await supabase.rpc("place_bid_safe", {
-          p_lot_id: activeLot.id,
-          p_amount: amount,
-          p_bid_type: "security",
-          p_session_id: "admin-security-bid"
-        });
-
-        if (error) throw error;
-        
-        const result = data as any;
-        if (result.success) {
-          toast.success("Lance de segurança (auditório) efetuado!");
-          setSecurityBidAmount(0);
-          refreshAdminData();
-        } else {
-          toast.error(result.message);
-        }
-      } catch (error: any) {
-        toast.error(error.message);
-      } finally {
-        setIsActionLoading(false);
-      }
-    };
 
     const statusLegend = [
       { label: 'Loteamento', desc: 'Fase de cadastro. O evento não aceita lances.' },
