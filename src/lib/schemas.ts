@@ -16,7 +16,7 @@
     slug: z.string().nullable().optional().default(""),
     name: z.string(),
     description: z.string().nullable().optional(),
-    start_date: z.string(),
+    start_date: z.string().nullable().optional().default(new Date().toISOString()),
     location: z.string().nullable().optional(),
     banner_url: z.string().nullable().optional(),
     status: z.string().default("scheduled"),
@@ -65,10 +65,10 @@
  });
  
   export const lotSchema = z.object({
-    id: z.string().uuid(),
-    event_id: z.string().uuid(),
-    lot_number: z.number().int().nullable().optional(),
-    animal_id: z.string().uuid(),
+    id: z.string().uuid().optional(),
+    event_id: z.string().uuid().optional(),
+    lot_number: z.number().int().nullable().optional().default(0),
+    animal_id: z.string().uuid().optional(),
     starting_price: z.number().nonnegative().nullable().optional(),
     current_price: z.number().nonnegative().nullable().optional(),
     bid_increment: z.number().nonnegative().nullable().optional().default(0),
