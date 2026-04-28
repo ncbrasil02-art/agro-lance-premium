@@ -1368,13 +1368,10 @@ export const Route = createFileRoute("/ao-vivo")({
                  <div>
                    <div className="font-semibold flex items-center gap-2">
                        <div className="flex flex-col">
-                         <span className="text-sm font-bold">
-                           {bid.is_phone_bid && bid.phone_bidder_identifier
-                             ? bid.phone_bidder_identifier
-                             : (bid.bid_type === 'security' || bid.is_manual)
-                               ? (bid.phone_bidder_identifier || "Auditório")
-                               : (bidderProfiles[bid.user_id]?.full_name || bid.profile?.full_name || (bid.user_id ? `Comprador ...${bid.user_id.slice(-4)}` : "Licitante"))}
-                         </span>
+                          <span className="text-sm font-bold">
+                            {bid.phone_bidder_identifier || 
+                             (bidderProfiles[bid.user_id]?.full_name || bid.profile?.full_name || (bid.user_id ? `Comprador ...${bid.user_id.slice(-4)}` : "Licitante"))}
+                          </span>
                          <div className="flex items-center gap-2 mt-0.5">
                            {bid.is_phone_bid ? (
                              <span className="flex items-center gap-1 text-[9px] bg-gold/20 text-gold px-1.5 py-0.5 rounded uppercase font-black">
