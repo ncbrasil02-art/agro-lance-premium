@@ -58,11 +58,11 @@
          
          if (error) throw error;
  
-         data.forEach(item => {
-           if (item.key === "site_info") setSiteInfo(item.value as any);
-           if (item.key === "theme") setTheme(item.value as any);
-           if (item.key === "homepage_sections") setHomepage(item.value as any);
-         });
+          data.forEach(item => {
+            if (item.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(item.value as any) }));
+            if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) }));
+            if (item.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(item.value as any) }));
+          });
        } catch (error) {
          console.error("Error fetching site settings:", error);
        } finally {
