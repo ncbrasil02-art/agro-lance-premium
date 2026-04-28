@@ -18,8 +18,8 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
   loader: async ({ params }) => {
     const { data: event, error } = await supabase
       .from("events")
-        .select("*, lots!lots_event_id_fkey(*, animal:animals(*, seller:sellers(name)))")
-      .eq("slug", params.eventSlug)
+        .select("*, lots!lots_event_id_fkey(*, animal:animals!lots_animal_id_fkey(*, seller:sellers!animals_seller_id_fkey(name)), winner:profiles!lots_winner_id_fkey(full_name))")
+      .or(`slug.eq."${params.eventSlug}",id.eq."${params.eventSlug}"`)
       .maybeSingle();
 
     if (error || !event) throw notFound();
@@ -323,6 +323,7 @@ function EventDetail() {
                   viewers: l.viewers || 0,
                   endsAt: l.end_date || event.end_date || "",
                   status: l.status as any,
+                  winnerName: l.winner?.full_name,
                   eventStatus: event.status,
                   eventStartDate: event.start_date,
                   eventEndDate: event.end_date,

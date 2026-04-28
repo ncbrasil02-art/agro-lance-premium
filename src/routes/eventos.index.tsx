@@ -50,10 +50,14 @@ function EventsPage() {
    const { events } = Route.useLoaderData();
   const [filter, setFilter] = useState("all");
  
-    const mappedEvents = events.map((e: ValidatedEvent) => ({
-     id: e.id,
-     slug: e.slug || "",
-     name: e.name,
+    const mappedEvents = events.map((e: ValidatedEvent) => {
+      // Fallback for missing slugs to prevent navigation issues
+      const eventSlug = e.slug || e.id;
+      
+      return {
+      id: e.id,
+      slug: eventSlug,
+      name: e.name,
      description: e.description || "",
      date: e.start_date,
      city: e.location?.split("-")?.[0]?.trim() || "Brasil",
@@ -66,7 +70,7 @@ function EventsPage() {
      bidsCount: 0,
      auctioneer: e.auctioneer_name || "",
      promoter: e.promoter_company || "",
-   }));
+    }});
  
   const filteredEvents = useMemo(() => {
     const result = filter === "all" ? mappedEvents : mappedEvents.filter((e: any) => {
