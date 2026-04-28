@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -29,6 +29,107 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
      const [viewingEventDetails, setViewingEventDetails] = useState<any>(null);
      const [eventLots, setEventLots] = useState<any[]>([]);
      const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [selectedLotForBids, setSelectedLotForBids] = useState<any>(null);
+  const [lotBids, setLotBids] = useState<any[]>([]);
+  const [isBidsLoading, setIsBidsLoading] = useState(false);
+  const [selectedLotForWinner, setSelectedLotForWinner] = useState<any>(null);
+  const [searchWinnerQuery, setSearchWinnerQuery] = useState("");
+  const [isAssigningWinner, setIsAssigningWinner] = useState(false);
+  const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+
+  const fetchLotBids = async (lotId: string) => {
+    setIsBidsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("bids")
+        .select("*, profile:profiles(full_name, phone, cpf)")
+        .eq("lot_id", lotId)
+        .order("amount", { ascending: false });
+      if (error) throw error;
+      setLotBids(data || []);
+    } catch (error: any) {
+      toast.error("Erro ao carregar lances: " + error.message);
+    } finally {
+      setIsBidsLoading(false);
+    }
+  };
+
+  const handleAssignWinner = async (profileId: string) => {
+    if (!selectedLotForWinner) return;
+    setIsAssigningWinner(true);
+    try {
+      const { error } = await supabase
+        .from("lots")
+        .update({ 
+          winner_id: profileId,
+          status: 'sold',
+          winner_link_reason: 'Atribuição manual via painel de eventos'
+        })
+        .eq("id", selectedLotForWinner.id);
+      
+      if (error) throw error;
+      
+      toast.success("Ganhador atribuído com sucesso!");
+      setSelectedLotForWinner(null);
+      if (viewingEventDetails) fetchEventLots(viewingEventDetails.id);
+    } catch (error: any) {
+      toast.error("Erro ao atribuir ganhador: " + error.message);
+    } finally {
+      setIsAssigningWinner(false);
+    }
+  };
+
+  const handleFinalizeLot = async (lot: any) => {
+    if (!confirm(`Deseja finalizar a venda do Lote ${lot.lot_number}? O maior lance atual será o vencedor.`)) return;
+    
+    try {
+      // Find the highest bid
+      const { data: bids } = await supabase
+        .from("bids")
+        .select("*")
+        .eq("lot_id", lot.id)
+        .order("amount", { ascending: false })
+        .limit(1);
+      
+      const highestBid = bids?.[0];
+      if (!highestBid) {
+        toast.error("Este lote não possui lances para ser finalizado.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("lots")
+        .update({ 
+          status: 'sold', 
+          winner_id: highestBid.user_id,
+          current_price: highestBid.amount
+        })
+        .eq("id", lot.id);
+      
+      if (error) throw error;
+      toast.success("Lote finalizado com sucesso!");
+      if (viewingEventDetails) fetchEventLots(viewingEventDetails.id);
+    } catch (error: any) {
+      toast.error("Erro ao finalizar lote: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (searchWinnerQuery.length > 2) {
+      const search = async () => {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id, full_name, email, phone, cpf")
+          .or(`full_name.ilike.%${searchWinnerQuery}%,email.ilike.%${searchWinnerQuery}%,cpf.ilike.%${searchWinnerQuery}%`)
+          .limit(10);
+        setFilteredProfiles(data || []);
+      };
+      search();
+    } else if (searchWinnerQuery.length === 0) {
+      setFilteredProfiles([]);
+    }
+  }, [searchWinnerQuery]);
+
      const fetchEventLots = async (eventId: string) => {
        setIsDetailsLoading(true);
        try {
