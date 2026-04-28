@@ -411,39 +411,199 @@ export const Route = createFileRoute("/painel")({
           </Card>
         </TabsContent>
 
-        <TabsContent value="perfil">
+        <TabsContent value="perfil" className="space-y-6">
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Foto de Perfil</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center gap-4">
+                  <div className="relative group">
+                    <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-muted bg-muted flex items-center justify-center">
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+                      ) : (
+                        <User className="h-16 w-16 text-muted-foreground/30" />
+                      )}
+                    </div>
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute bottom-0 right-0 p-2 bg-gold text-emerald-deep rounded-full shadow-lg hover:scale-110 transition-transform"
+                      disabled={isUploading}
+                    >
+                      {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                    </button>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'avatar')}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold text-emerald-deep">{profile?.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Verificação de Conta</CardTitle>
+                  <CardDescription>Envie seus documentos para aprovação de lances.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-muted-foreground">Documentos Enviados</Label>
+                    {profile?.document_urls?.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {profile.document_urls.map((url: string, i: number) => (
+                          <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="p-2 border rounded-lg bg-muted/30 hover:bg-muted transition-colors flex items-center justify-center">
+                            <FileText className="h-4 w-4 text-emerald-deep" />
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 border-2 border-dashed rounded-lg text-center text-xs text-muted-foreground">
+                        Nenhum documento enviado
+                      </div>
+                    )}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-emerald-deep text-emerald-deep"
+                    onClick={() => docInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    <Upload className="h-4 w-4 mr-2" /> {isUploading ? "Enviando..." : "Enviar Documentos"}
+                  </Button>
+                  <input 
+                    type="file" 
+                    ref={docInputRef} 
+                    className="hidden" 
+                    multiple
+                    onChange={(e) => handleFileUpload(e, 'document')}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dados Cadastrais</CardTitle>
+                  <CardDescription>Mantenha suas informações atualizadas para emissão de contratos.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleUpdateProfile} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="full_name">Nome Completo</Label>
+                        <Input 
+                          id="full_name" 
+                          value={formData.full_name} 
+                          onChange={e => setFormData({...formData, full_name: e.target.value})}
+                          placeholder="Seu nome completo"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cpf">CPF</Label>
+                        <Input 
+                          id="cpf" 
+                          value={formData.cpf} 
+                          onChange={e => setFormData({...formData, cpf: e.target.value})}
+                          placeholder="000.000.000-00"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">WhatsApp / Celular</Label>
+                        <Input 
+                          id="phone" 
+                          value={formData.phone} 
+                          onChange={e => setFormData({...formData, phone: e.target.value})}
+                          placeholder="(00) 00000-0000"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="nationality">Nacionalidade</Label>
+                        <Input 
+                          id="nationality" 
+                          value={formData.nationality} 
+                          onChange={e => setFormData({...formData, nationality: e.target.value})}
+                          placeholder="Brasileira"
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="address">Endereço Completo</Label>
+                        <Input 
+                          id="address" 
+                          value={formData.address} 
+                          onChange={e => setFormData({...formData, address: e.target.value})}
+                          placeholder="Rua, Número, Complemento, Bairro, Cidade, Estado"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cep">CEP</Label>
+                        <Input 
+                          id="cep" 
+                          value={formData.cep} 
+                          onChange={e => setFormData({...formData, cep: e.target.value})}
+                          placeholder="00000-000"
+                        />
+                      </div>
+                    </div>
+                    <Button type="submit" className="w-full bg-gold text-emerald-deep font-bold" disabled={isSaving}>
+                      {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      Salvar Alterações
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="mensagens">
           <Card>
             <CardHeader>
-              <CardTitle>Dados do Perfil</CardTitle>
-              <CardDescription>Informações utilizadas para emissão de contratos e notas.</CardDescription>
+              <CardTitle>Centro de Mensagens</CardTitle>
+              <CardDescription>Comunicações oficiais da Premium Agro.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">Nome Completo</label>
-                  <p className="font-medium">{profile?.full_name}</p>
+            <CardContent>
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground/20 mb-4" />
+                  <p className="text-muted-foreground">Você não possui mensagens no momento.</p>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">E-mail</label>
-                  <p className="font-medium">{user.email}</p>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((msg) => (
+                    <div 
+                      key={msg.id} 
+                      className={`p-4 rounded-xl border transition-all ${msg.is_read ? 'bg-white border-gray-100' : 'bg-emerald-50/30 border-emerald-100'}`}
+                      onClick={async () => {
+                        if (!msg.is_read) {
+                          await supabase.from('messages').update({ is_read: true }).eq('id', msg.id);
+                          fetchMessages();
+                        }
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-bold text-emerald-deep flex items-center gap-2">
+                          {!msg.is_read && <span className="h-2 w-2 bg-emerald-500 rounded-full" />}
+                          {msg.title || "Mensagem do Sistema"}
+                        </h4>
+                        <span className="text-[10px] text-gray-400">
+                          {new Date(msg.created_at).toLocaleString('pt-BR')}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">CPF</label>
-                  <p className="font-medium">{profile?.cpf || "Não informado"}</p>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">Telefone</label>
-                  <p className="font-medium">{profile?.phone || "Não informado"}</p>
-                </div>
-              </div>
-              <Separator />
-              <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex gap-3">
-                <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-bold text-amber-900">Mantenha seus dados atualizados</p>
-                  <p className="text-xs text-amber-800">Estes dados são essenciais para a validade jurídica dos contratos de arremate. Caso precise alterar, entre em contato com o suporte.</p>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
