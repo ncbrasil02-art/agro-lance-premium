@@ -622,11 +622,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                   {editingEvent ? "Salvar Alterações" : "Criar Evento"}
                </Button>
              </DialogFooter>
-           </DialogContent>
-         </Dialog>
-       </div>
- 
-       <Card>
+            </DialogContent>
+          </Dialog>
+
+        <Card>
          <CardHeader>
            <CardTitle>Eventos de Leilão</CardTitle>
          </CardHeader>
