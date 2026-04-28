@@ -9,6 +9,7 @@
 import { OptimizedImage } from "@/components/ui/optimized-image";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Checkbox } from "@/components/ui/checkbox";
+ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -57,8 +58,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
        weight: "",
        height: "",
          vaccination_records: "",
-         veterinary_history: {},
-          other_veterinary_info: "",
+        veterinary_history: {},
+         other_veterinary_info: "",
+         health_photo_url: "",
            genealogy_father: "",
            genealogy_mother: "",
            genealogy_grandfather_paternal: "",
@@ -105,8 +107,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
         weight: "",
         height: "",
          vaccination_records: "",
-         veterinary_history: {},
-          other_veterinary_info: "",
+        veterinary_history: {},
+         other_veterinary_info: "",
+         health_photo_url: "",
            genealogy_father: "",
            genealogy_mother: "",
            genealogy_grandfather_paternal: "",
@@ -154,8 +157,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
         weight: animal.weight || "",
         height: animal.height || "",
          vaccination_records: Array.isArray(animal.vaccination_records) ? animal.vaccination_records.join(", ") : (animal.vaccination_records || ""),
-         veterinary_history: animal.veterinary_history || {},
-         other_veterinary_info: animal.veterinary_history?.other_info || "",
+          veterinary_history: animal.veterinary_history || {},
+          other_veterinary_info: animal.veterinary_history?.other_info || "",
+          health_photo_url: animal.veterinary_history?.health_photo_url || "",
          genealogy_father: animal.genealogy?.father || "",
           genealogy_mother: animal.genealogy?.mother || "",
           genealogy_grandfather_paternal: animal.genealogy?.grandfather_paternal || "",
@@ -211,8 +215,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                weight: formData.weight ? parseFloat(formData.weight as string) : null,
                height: formData.height ? parseFloat(formData.height as string) : null,
                default_bid_increment: formData.default_bid_increment ? parseFloat(formData.default_bid_increment as string) : 1000,
-                 vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
-                 veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
+                  vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
+                  veterinary_history: { 
+                    ...formData.veterinary_history, 
+                    other_info: formData.other_veterinary_info,
+                    health_photo_url: formData.health_photo_url 
+                  },
                genealogy: { 
                  father: formData.genealogy_father, 
                  mother: formData.genealogy_mother,
@@ -263,8 +271,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
              weight: formData.weight ? parseFloat(formData.weight as string) : null,
              height: formData.height ? parseFloat(formData.height as string) : null,
              default_bid_increment: formData.default_bid_increment ? parseFloat(formData.default_bid_increment as string) : 1000,
-               vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
-               veterinary_history: { ...formData.veterinary_history, other_info: formData.other_veterinary_info },
+                vaccination_records: formData.vaccination_records ? formData.vaccination_records.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
+                veterinary_history: { 
+                  ...formData.veterinary_history, 
+                  other_info: formData.other_veterinary_info,
+                  health_photo_url: formData.health_photo_url 
+                },
               genealogy: { 
                 father: formData.genealogy_father, 
                 mother: formData.genealogy_mother,
@@ -427,9 +439,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                   <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 mb-4">
                     <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
                     <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
-                    <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
-                    <TabsTrigger value="saude" className="text-xs">Saúde</TabsTrigger>
-                    <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
+                     <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
+                     <TabsTrigger value="saude" className="text-xs">Saúde do Animal</TabsTrigger>
+                     <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
                     <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
                   </TabsList>
 
@@ -733,30 +745,54 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                   </div>
                 </TabsContent>
                
-               <TabsContent value="saude" className="space-y-4 pt-4">
+               <TabsContent value="saude" className="space-y-4 pt-4 max-h-[60vh] overflow-y-auto pr-2">
                  <div className="grid gap-4">
-                   <Label className="text-base font-bold">Histórico Veterinário</Label>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3 border rounded-md p-4 bg-muted/30">
-                     {[...VETERINARY_CHECKLIST, ...Object.keys(formData.veterinary_history || {}).filter(k => k !== 'other_info' && !VETERINARY_CHECKLIST.find(i => i.id === k)).map(k => ({ id: k, label: k }))].map((item) => (
-                       <div key={item.id} className="flex items-center space-x-2">
-                         <Checkbox 
-                           id={item.id} 
-                           checked={formData.veterinary_history?.[item.id] || false}
-                           onCheckedChange={(checked) => {
+                   <Label className="text-base font-bold">Saúde do Animal</Label>
+                   <div className="grid grid-cols-1 gap-2 border rounded-md p-4 bg-muted/30">
+                     {[...VETERINARY_CHECKLIST, ...Object.keys(formData.veterinary_history || {}).filter(k => k !== 'other_info' && k !== 'health_photo_url' && !VETERINARY_CHECKLIST.find(i => i.id === k)).map(k => ({ id: k, label: k }))].map((item) => (
+                       <div key={item.id} className="flex items-center justify-between py-2 border-b last:border-0 border-white/5">
+                         <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
+                           {item.label}
+                         </Label>
+                         <ToggleGroup 
+                           type="single" 
+                           value={formData.veterinary_history?.[item.id] === true ? "sim" : formData.veterinary_history?.[item.id] === false ? "nao" : ""}
+                           onValueChange={(val) => {
                              setFormData({
                                ...formData,
                                veterinary_history: {
                                  ...formData.veterinary_history,
-                                 [item.id]: !!checked
+                                 [item.id]: val === "sim"
                                }
                              });
                            }}
-                         />
-                         <Label htmlFor={item.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                           {item.label}
-                         </Label>
+                         >
+                           <ToggleGroupItem value="sim" className="h-8 text-xs data-[state=on]:bg-emerald-500 data-[state=on]:text-white">Sim</ToggleGroupItem>
+                           <ToggleGroupItem value="nao" className="h-8 text-xs data-[state=on]:bg-red-500 data-[state=on]:text-white">Não</ToggleGroupItem>
+                         </ToggleGroup>
                        </div>
                      ))}
+                   </div>
+
+                   <div className="grid gap-2 border rounded-md p-4 bg-muted/30">
+                     <Label className="text-sm font-bold">Exames e Imagens (ex: Raio-X)</Label>
+                     <div className="flex flex-col gap-2">
+                       <Input 
+                         placeholder="URL da Foto do Exame" 
+                         value={formData.health_photo_url} 
+                         onChange={(e) => setFormData({ ...formData, health_photo_url: e.target.value })} 
+                       />
+                       {formData.health_photo_url && (
+                         <div className="mt-2 border rounded-md overflow-hidden bg-black/20">
+                           <OptimizedImage 
+                             src={formData.health_photo_url} 
+                             alt="Exame de Saúde" 
+                             aspectRatio="video"
+                             className="w-full h-auto max-h-[200px] object-contain"
+                           />
+                         </div>
+                       )}
+                     </div>
                    </div>
                    
                    <div className="flex gap-2">
