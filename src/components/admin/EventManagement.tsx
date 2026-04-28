@@ -117,11 +117,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
   useEffect(() => {
     if (searchWinnerQuery.length > 2) {
       const search = async () => {
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, full_name, email, phone, cpf")
-          .or(`full_name.ilike.%${searchWinnerQuery}%,email.ilike.%${searchWinnerQuery}%,cpf.ilike.%${searchWinnerQuery}%`)
-          .limit(10);
+           const { data } = await supabase
+           .from("profiles")
+           .select("id, full_name, phone, cpf")
+           .or(`full_name.ilike.%${searchWinnerQuery}%,cpf.ilike.%${searchWinnerQuery}%`)
+           .limit(10);
         setFilteredProfiles(data || []);
       };
       search();
@@ -1043,77 +1043,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                            <TableCell className="font-black text-emerald-deep">
                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
                            </TableCell>
-                           <TableCell className="text-right">
-                             <div className="flex justify-end gap-1">
-                               {lot.winner && (
-                                 <TooltipProvider>
-                                   <Tooltip>
-                                     <TooltipTrigger asChild>
-                                       <Button 
-                                         variant="outline" 
-                                         size="icon" 
-                                         className="h-8 w-8 border-emerald-deep/30 text-emerald-deep"
-                                         onClick={() => {
-                                           const msg = encodeURIComponent(`Olá ${lot.winner.full_name}, aqui é da Premium Agro Leilões. Parabéns pelo arremate do Lote ${lot.lot_number} (${lot.animal?.name}) no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price)}. Em breve enviaremos o termo de arrematação.`);
-                                           window.open(`https://wa.me/55${lot.winner.phone?.replace(/\D/g, '')}?text=${msg}`, '_blank');
-                                         }}
-                                       >
-                                         <MessageSquare className="h-4 w-4" />
-                                       </Button>
-                                     </TooltipTrigger>
-                                     <TooltipContent>Enviar aviso WhatsApp</TooltipContent>
-                                   </Tooltip>
-                                 </TooltipProvider>
-                               )}
-                               <TooltipProvider>
-                                 <Tooltip>
-                                   <TooltipTrigger asChild>
-                                     <Button 
-                                       variant="outline" 
-                                       size="icon" 
-                                       className="h-8 w-8 border-gold/30 text-gold"
-                                       onClick={() => {
-                                         const printWindow = window.open('', '_blank');
-                                         if (!printWindow) return;
-                                         const html = `
-                                           <html>
-                                             <head>
-                                               <title>Termo de Arremate - Lote ${lot.lot_number}</title>
-                                               <style>
-                                                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-                                                 .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #064e3b; padding-bottom: 20px; }
-                                                 .logo { font-size: 32px; font-weight: 900; color: #064e3b; letter-spacing: 2px; }
-                                                 .title { font-size: 20px; font-weight: bold; margin-top: 10px; color: #c5a059; }
-                                                 .section { margin-bottom: 30px; }
-                                                 .section-title { font-weight: bold; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #eee; margin-bottom: 10px; }
-                                                 .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-                                                 .footer { margin-top: 100px; text-align: center; }
-                                                 .signature { display: inline-block; width: 300px; border-top: 1px solid #000; margin: 40px 20px; padding-top: 10px; font-size: 12px; }
-                                                 @media print { .no-print { display: none; } }
-                                               </style>
-                                             </head>
-                                             <body>
-                                               <div class="header">
-                                                 <div class="logo">PREMIUM AGRO LEILÕES</div>
-                                                 <div class="title">TERMO DE ARREMATAÇÃO E NOTA DE VENDA</div>
-                                               </div>
-                                               
-                                               <div class="section">
-                                                 <div class="section-title">Dados do Evento</div>
-                                                 <p><strong>Leilão:</strong> ${viewingEventDetails?.name}</p>
-                                                 <p><strong>Data:</strong> ${new Date(viewingEventDetails?.start_date).toLocaleDateString('pt-BR')}</p>
-                                               </div>
-
-                                               <div class="section">
-                                                 <div class="section-title">Dados do Lote</div>
-                                                 <div class="grid">
-                                                   <div>
-                                                     <p><strong>Número do Lote:</strong> ${lot.lot_number}</p>
-                                                     <p><strong>Animal:</strong> ${lot.animal?.name}</p>
-                                                   </div>
-                                                   <div>
-                                                     <p><strong>Raça:</strong> ${lot.animal?.breed || '---'}</p>
-                                                     <p><strong>Código Interno:</strong> ${lot.animal?.internal_code || '---'}</p>
                                                    </div>
                                                  </div>
                                                </div>
