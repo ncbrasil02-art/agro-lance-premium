@@ -392,6 +392,46 @@
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsDocumentsDialogOpen(true);
+                                  }}
+                                  className="text-emerald-deep"
+                                >
+                                  <FileText className="h-5 w-5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Ver Documentos</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsMessageDialogOpen(true);
+                                  }}
+                                  className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                                >
+                                  <MessageSquare className="h-5 w-5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Enviar Mensagem</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleToggleBlock(user.id, user.is_blocked)}
                                   className={user.is_blocked ? "text-emerald-500 hover:bg-emerald-50" : "text-destructive hover:bg-destructive/10"}
                                 >
