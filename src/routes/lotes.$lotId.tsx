@@ -52,7 +52,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
          .maybeSingle(),
       supabase
         .from("bids")
-        .select("*, profile:profiles(full_name)")
+        .select("*")
         .eq("lot_id", lotId)
         .order("created_at", { ascending: false })
         .limit(5)

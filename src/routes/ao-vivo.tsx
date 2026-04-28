@@ -147,7 +147,7 @@ export const Route = createFileRoute("/ao-vivo")({
         if (liveEvent.active_lot_id) {
           const { data: bids, error: bidsError } = await supabase
             .from("bids")
-            .select("*, profile:profiles!bids_user_id_fkey(id, full_name)")
+            .select("*")
             .eq("lot_id", liveEvent.active_lot_id)
             .order("created_at", { ascending: false })
             .limit(10);
@@ -657,7 +657,7 @@ export const Route = createFileRoute("/ao-vivo")({
           if (activeLotId) {
             const { data: latestBids } = await supabase
               .from("bids")
-              .select("*, profile:profiles(id, full_name)")
+              .select("*")
               .eq("lot_id", activeLotId)
               .order("created_at", { ascending: false })
               .limit(10);
