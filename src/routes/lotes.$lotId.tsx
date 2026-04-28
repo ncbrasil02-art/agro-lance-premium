@@ -648,12 +648,47 @@ function LotDetail() {
                  ))}
                </div>
                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                 <TabsList className="bg-emerald-deep/20">
-                   <TabsTrigger value="detalhes">Descrição</TabsTrigger>
-                   <TabsTrigger value="genealogia">Genealogia</TabsTrigger>
-                    <TabsTrigger value="videos">Vídeo</TabsTrigger>
-                     <TabsTrigger value="saude">Saúde do Animal</TabsTrigger>
-                 </TabsList>
+                  <TabsList className="bg-emerald-deep/20 flex-wrap h-auto py-1">
+                    <TabsTrigger value="detalhes" className="text-[10px] sm:text-sm">Descrição</TabsTrigger>
+                    <TabsTrigger value="genealogia" className="text-[10px] sm:text-sm">Genealogia</TabsTrigger>
+                    <TabsTrigger value="videos" className="text-[10px] sm:text-sm">Vídeo</TabsTrigger>
+                    <TabsTrigger value="saude" className="text-[10px] sm:text-sm">Saúde</TabsTrigger>
+                    <TabsTrigger value="lances" className="text-[10px] sm:text-sm">Lances</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="lances" className="mt-6">
+                    <Card className="bg-card/50 border-white/5 p-6 rounded-[2rem]">
+                      <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
+                        <Gavel className="h-4 w-4" /> Histórico de Lances
+                      </h3>
+                      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        {recentBids.length > 0 ? (
+                          recentBids.map((bid, idx) => (
+                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'bg-white/5 border-white/5'}`}>
+                              <div className="flex items-center gap-3">
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <p className="text-xs font-bold text-white leading-none mb-1">
+                                    {bid.bidder_name || (bid.user_id === user?.id ? profile?.full_name : 'Licitante')}
+                                  </p>
+                                  <p className="text-[10px] text-white/40">{new Date(bid.created_at).toLocaleTimeString('pt-BR')}</p>
+                                </div>
+                              </div>
+                              <div className={`font-black italic ${idx === 0 ? 'text-gold text-lg' : 'text-white text-sm'}`}>
+                                {formatBRL(bid.amount)}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-3xl">
+                            <Gavel className="h-12 w-12 text-white/10 mx-auto mb-4" />
+                            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum lance recebido</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  </TabsContent>
                  <TabsContent value="detalhes" className="mt-6">
                    <Card className="bg-card/50 border-white/5 p-8">
                      <p className="text-white/80 leading-relaxed italic">{lot.animal?.description}</p>
