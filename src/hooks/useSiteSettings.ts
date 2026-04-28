@@ -14,6 +14,16 @@
    secondary_color: string;
    accent_color: string;
    background_color: string;
+   foreground_color?: string;
+   card_color?: string;
+   card_foreground_color?: string;
+   muted_color?: string;
+   muted_foreground_color?: string;
+   border_color?: string;
+   destructive_color?: string;
+   live_color?: string;
+   upcoming_color?: string;
+   closed_color?: string;
  }
  
  export interface HomepageSettings {
