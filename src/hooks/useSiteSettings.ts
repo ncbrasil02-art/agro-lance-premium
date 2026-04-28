@@ -45,12 +45,7 @@
  
  export function useSiteSettings() {
    const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
-    const [theme, setTheme] = useState<ThemeSettings>({
-      primary_color: "#D4AF37",
-      secondary_color: "#064E3B",
-      accent_color: "#10B981",
-      background_color: "#022C22"
-    });
+    const [theme, setTheme] = useState<ThemeSettings | null>(null);
    const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
    const [isLoading, setIsLoading] = useState(true);
  
