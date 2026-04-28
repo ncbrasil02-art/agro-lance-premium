@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
 
  export function Footer() {
-   const { siteInfo } = useSiteSettings();
+    const { siteInfo, customTexts, aboutPage } = useSiteSettings();
    const year = new Date().getFullYear();
   return (
     <footer className="border-t border-border/60 bg-card/40">
@@ -22,9 +22,9 @@ import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
               </span>
             )}
           </Link>
-          <p className="mt-3 text-sm text-muted-foreground">
-            A plataforma premium de leilões agropecuários do Brasil.
-          </p>
+           <p className="mt-3 text-sm text-muted-foreground whitespace-pre-line">
+             {customTexts?.footer_text || "A plataforma premium de leilões agropecuários do Brasil."}
+           </p>
           <div className="mt-4 flex gap-2">
             {[Instagram, Youtube, Facebook].map((Icon, i) => (
               <a key={i} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-muted-foreground transition-smooth hover:bg-gold-gradient hover:text-emerald-deep" aria-label="Rede social">
@@ -39,7 +39,9 @@ import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
             <li><Link to="/eventos" className="hover:text-foreground">Eventos</Link></li>
             <li><Link to="/lotes" className="hover:text-foreground">Lotes</Link></li>
             <li><Link to="/ao-vivo" className="hover:text-foreground">Ao Vivo</Link></li>
-            <li><Link to="/sobre" className="hover:text-foreground">Sobre</Link></li>
+             {aboutPage?.enabled !== false && (
+               <li><Link to="/sobre" className="hover:text-foreground">{aboutPage?.title || "Sobre"}</Link></li>
+             )}
           </ul>
         </div>
         <div>

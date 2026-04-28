@@ -1,14 +1,17 @@
+  import { useSiteSettings } from "@/hooks/useSiteSettings";
  import { Link } from "@tanstack/react-router";
  import { Home, Calendar, Gavel, PlayCircle, Info } from "lucide-react";
  
- export function BottomNav() {
-   const navItems = [
-     { to: "/", label: "Início", icon: Home },
-     { to: "/eventos", label: "Eventos", icon: Calendar },
-     { to: "/ao-vivo", label: "Ao Vivo", icon: PlayCircle },
-     { to: "/lotes", label: "Lotes", icon: Gavel },
-     { to: "/sobre", label: "Sobre", icon: Info },
-   ];
+  export function BottomNav() {
+    const { aboutPage } = useSiteSettings();
+ 
+    const navItems = [
+      { to: "/", label: "Início", icon: Home, show: true },
+      { to: "/eventos", label: "Eventos", icon: Calendar, show: true },
+      { to: "/ao-vivo", label: "Ao Vivo", icon: PlayCircle, show: true },
+      { to: "/lotes", label: "Lotes", icon: Gavel, show: true },
+      { to: "/sobre", label: aboutPage?.title || "Sobre", icon: Info, show: aboutPage?.enabled !== false },
+    ].filter(i => i.show);
  
    return (
      <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-border/60 bg-background/80 backdrop-blur-xl md:hidden">

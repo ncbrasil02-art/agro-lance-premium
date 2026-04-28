@@ -79,7 +79,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
        const { events, lots, pastEvents, announcement, articles } = Route.useLoaderData();
         const context = Route.useRouteContext();
         const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
-        const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings } = useSiteSettings({ 
+         const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts } = useSiteSettings({ 
           siteInfo: ctxSiteInfo, 
           theme: ctxTheme, 
           homepage: ctxHomepage 
@@ -277,14 +277,19 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
                 </div>
               </div>
             )}
-            <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase" key="main-title">
-              {(currentSiteInfo?.name || "Premium Agro")?.split(' ')?.[0]} <span className="text-gradient-gold">{(currentSiteInfo?.name || "Premium Agro")?.split(' ')?.slice(1)?.join(' ')}</span><br />
-              em tempo real
-            </h1>
-             <p className="mt-5 max-w-xl text-lg text-muted-foreground italic">
-              {currentSiteInfo?.name || "Premium Agro"} - A elite do agronegócio com transmissão ao vivo, curadoria genética
-              e tecnologia de ponta para compradores e leiloeiros profissionais.
-            </p>
+             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase whitespace-pre-line" key="main-title">
+               {customTexts?.hero_title || (
+                 <>
+                   {(currentSiteInfo?.name || "Premium Agro")?.split(' ')?.[0]} <span className="text-gradient-gold">{(currentSiteInfo?.name || "Premium Agro")?.split(' ')?.slice(1)?.join(' ')}</span><br />
+                   em tempo real
+                 </>
+               )}
+             </h1>
+              <p className="mt-5 max-w-xl text-lg text-muted-foreground italic whitespace-pre-line">
+               {customTexts?.hero_subtitle || (
+                 `${currentSiteInfo?.name || "Premium Agro"} - A elite do agronegócio com transmissão ao vivo, curadoria genética e tecnologia de ponta para compradores e leiloeiros profissionais.`
+               )}
+             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/ao-vivo">
                 <Button size="lg" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">

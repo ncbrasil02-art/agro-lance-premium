@@ -6,7 +6,7 @@ import { getCacheStats } from "@/utils/image-optimization";
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { useAuth } from "@/components/auth/auth-provider";
-    import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart, ShieldCheck } from "lucide-react";
+     import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart, ShieldCheck, Newspaper } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
  import { Button } from "@/components/ui/button";
@@ -25,9 +25,10 @@ export const Route = createFileRoute("/admin")({
    import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
    import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
    import { UserManagement } from "@/components/admin/UserManagement";
-   import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+    import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+    import { PostManagement } from "@/components/admin/PostManagement";
   
- type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings";
+  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
  
  interface SidebarProps {
@@ -49,9 +50,10 @@ export const Route = createFileRoute("/admin")({
        { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
        { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
         { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
-        { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
-     { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> },
-   ];
+      { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
+      { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
+      { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
+    ];
  
    return (
      <div className="flex h-full flex-col py-4">
@@ -322,8 +324,9 @@ export const Route = createFileRoute("/admin")({
           {activeTab === "event_requests" && <EventRequestManagement />}
           {activeTab === "direct_sales" && <DirectSaleManagement />}
           {activeTab === "sellers" && <SellerManagement />}
-            {activeTab === "users" && <UserManagement />}
-            {activeTab === "security" && <BidSecurityAudit />}
+             {activeTab === "users" && <UserManagement />}
+             {activeTab === "posts" && <PostManagement />}
+             {activeTab === "security" && <BidSecurityAudit />}
               {activeTab === "settings" && <SiteSettings />}
        </main>
      </div>
