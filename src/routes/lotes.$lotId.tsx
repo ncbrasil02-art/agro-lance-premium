@@ -489,7 +489,7 @@ function LotDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden w-full relative">
        <div className="hidden print:block p-8 text-black bg-white min-h-screen">
          <div className="border-b-4 border-emerald-900 pb-4 mb-8 flex justify-between items-end">
            <div>
@@ -569,7 +569,7 @@ function LotDetail() {
          </div>
        </div>
 
-      <div className="min-h-screen bg-background print:hidden">
+      <div className="min-h-screen bg-background print:hidden overflow-x-hidden w-full relative">
         <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
           <div className="container mx-auto px-4 flex items-center justify-between gap-4">
             <Link to="/ao-vivo" className="text-white flex items-center gap-1 hover:text-gold transition-colors">
