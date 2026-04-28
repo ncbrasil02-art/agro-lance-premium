@@ -83,9 +83,9 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
  function Home() {
      const router = useRouter();
       const { events, lots, pastEvents, announcement, articles, sectionsSettings: initialSections } = Route.useLoaderData();
-      const { homepage: sectionsSettings, siteInfo } = useSiteSettings();
-      
-      const activeSections = sectionsSettings || initialSections;
+      // Temporary removal of hook to debug crash
+      const activeSections = initialSections;
+      const siteInfo = { name: "Elite Agro Premium" };
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {
