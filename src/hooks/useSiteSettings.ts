@@ -85,9 +85,9 @@
           const updated: any = payload.new;
           if (!updated || !updated.key) return;
           
-          if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) }));
+          if (updated.key === "site_info") setSiteInfo(prev => ({ ...(prev || {}), ...(updated.value as any) }));
           if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) }));
-          if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) }));
+          if (updated.key === "homepage_sections") setHomepage(prev => ({ ...(prev || {}), ...(updated.value as any) }));
         })
         .subscribe();
  
