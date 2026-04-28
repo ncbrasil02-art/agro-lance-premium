@@ -22,49 +22,58 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   export const Route = createFileRoute("/")({
     loader: async () => {
-      console.log("Loader Home started");
-      const eventsRes = await supabase.from("events")
-        .select("*, lots!lots_event_id_fkey(id)")
-        .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
-        .order("start_date", { ascending: true })
-        .limit(15);
+      try {
+        console.log("Loader Home started");
+        const [eventsRes, lotsRes, pastEventsRes, settingsRes, articlesRes, sectionsSettingsRes] = await Promise.all([
+          supabase.from("events")
+            .select("*, lots!lots_event_id_fkey(id)")
+            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
+            .order("start_date", { ascending: true })
+            .limit(15),
+          supabase.from("lots")
+            .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+            .eq("is_featured", true)
+            .order("created_at", { ascending: false })
+            .limit(12),
+          supabase.from("events")
+            .select("*, lots!lots_event_id_fkey(id)")
+            .eq("status", "finished")
+            .order("start_date", { ascending: false })
+            .limit(3),
+          supabase.from("site_settings")
+            .select("*")
+            .eq("key", "announcement")
+            .maybeSingle(),
+          supabase.from("posts")
+            .select("*, category:categories(name)")
+            .eq("status", "published")
+            .order("published_at", { ascending: false })
+            .limit(10),
+          supabase.from("site_settings")
+            .select("*")
+            .eq("key", "homepage_sections")
+            .maybeSingle()
+        ]);
 
-      const lotsRes = await supabase.from("lots")
-        .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
-        .eq("is_featured", true)
-        .order("created_at", { ascending: false })
-        .limit(12);
-
-      const pastEventsRes = await supabase.from("events")
-        .select("*, lots!lots_event_id_fkey(id)")
-        .eq("status", "finished")
-        .order("start_date", { ascending: false })
-        .limit(3);
-
-      const settingsRes = await supabase.from("site_settings")
-        .select("*")
-        .eq("key", "announcement")
-        .maybeSingle();
-
-      const articlesRes = await supabase.from("posts")
-        .select("*, category:categories(name)")
-        .eq("status", "published")
-        .order("published_at", { ascending: false })
-        .limit(10);
-
-      const sectionsSettingsRes = await supabase.from("site_settings")
-        .select("*")
-        .eq("key", "homepage_sections")
-        .maybeSingle();
-
-      return {
-        events: eventsRes.data || [],
-        lots: lotsRes.data || [],
-        pastEvents: pastEventsRes.data || [],
-        announcement: settingsRes.data?.value || null,
-        articles: articlesRes.data || [],
-        sectionsSettings: sectionsSettingsRes.data?.value || { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
-      };
+        return {
+          events: eventsRes.data || [],
+          lots: lotsRes.data || [],
+          pastEvents: pastEventsRes.data || [],
+          announcement: settingsRes.data?.value || null,
+          articles: articlesRes.data || [],
+          sectionsSettings: sectionsSettingsRes.data?.value || { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
+        };
+      } catch (err) {
+        console.error("Loader Home fatal error:", err);
+        return {
+          events: [],
+          lots: [],
+          pastEvents: [],
+          announcement: null,
+          articles: [],
+          sectionsSettings: { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
+        };
+      }
     },
     component: Home,
     pendingComponent: HomeSkeleton,
