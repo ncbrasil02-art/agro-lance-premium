@@ -92,7 +92,13 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
  function Home() {
      const router = useRouter();
-     const { events, lots, pastEvents, announcement, articles, sectionsSettings } = Route.useLoaderData();
+     const { events, lots, pastEvents, announcement, articles, sectionsSettings: rawSectionsSettings } = Route.useLoaderData();
+     
+     const sectionsSettings = (rawSectionsSettings as any) || { 
+       show_articles: true, 
+       show_upcoming_events: true, 
+       show_featured_lots: true 
+     };
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {
