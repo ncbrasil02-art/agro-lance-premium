@@ -94,14 +94,22 @@ export function useRealtimeLots(onUpdate: () => void) {
   useEffect(() => {
     const channel = supabase
       .channel('all-lots-updates')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'lots' },
-        () => {
-          logger.info('Mudança detectada em algum lote (global)');
-          onUpdate();
-        }
-      )
+       .on(
+         'postgres_changes',
+         { event: '*', schema: 'public', table: 'lots' },
+         () => {
+           logger.info('Mudança detectada em algum lote (global)');
+           onUpdate();
+         }
+       )
+       .on(
+         'postgres_changes',
+         { event: 'INSERT', schema: 'public', table: 'bids' },
+         () => {
+           logger.info('Novo lance detectado (global)');
+           onUpdate();
+         }
+       )
       .subscribe((status) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           setTimeout(() => setRetryCount(c => c + 1), 5000);

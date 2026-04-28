@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History, ChevronDown, ChevronRight, Printer, MessageSquare, Play, PauseCircle, Eye } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Link as LinkIcon, PlusCircle, Zap, ShieldCheck, AlertTriangle, Filter, HelpCircle, Info, History, ChevronDown, ChevronRight, Printer, MessageSquare, Play, PauseCircle, Eye, Users } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -38,7 +38,12 @@ import {
        const [selectedEventId, setSelectedEventId] = useState<string>(initialEventId);
        const [statusFilter, setStatusFilter] = useState<string>("all");
       const [searchQuery, setSearchQuery] = useState("");
-      const [editingLot, setEditingLot] = useState<any>(null);
+       const [editingLot, setEditingLot] = useState<any>(null);
+       const [isWinnerDialogOpen, setIsWinnerDialogOpen] = useState(false);
+       const [winnerLotId, setWinnerLotId] = useState<string | null>(null);
+       const [selectedWinnerProfileId, setSelectedWinnerProfileId] = useState<string>("");
+       const [profiles, setProfiles] = useState<any[]>([]);
+       const [searchProfile, setSearchProfile] = useState("");
       const [expandedLotId, setExpandedLotId] = useState<string | null>(null);
       const [selectedLotBids, setSelectedLotBids] = useState<any[]>([]);
       const [selectedLotOffers, setSelectedLotOffers] = useState<any[]>([]);
@@ -58,26 +63,30 @@ import {
          viewers: 0
        });
 
-      const fetchData = async () => {
-        setIsLoading(true);
-        console.log("Fetching lots, events and animals...");
-        try {
-          const [lotsRes, eventsRes, animalsRes] = await Promise.all([
-            supabase
-              .from("lots")
-               .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
-              .order("is_featured", { ascending: false })
-              .order("lot_number", { ascending: true }),
-            supabase
-              .from("events")
-              .select("id, name")
-              .order("name"),
-            supabase
-              .from("animals")
-              .select("id, name, internal_code, sale_status")
-              .neq("sale_status", "sold")
-              .order("name")
-          ]);
+       const fetchData = async () => {
+         setIsLoading(true);
+         console.log("Fetching lots, events, animals and profiles...");
+         try {
+           const [lotsRes, eventsRes, animalsRes, profilesRes] = await Promise.all([
+             supabase
+               .from("lots")
+                .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
+               .order("is_featured", { ascending: false })
+               .order("lot_number", { ascending: true }),
+             supabase
+               .from("events")
+               .select("id, name")
+               .order("name"),
+             supabase
+               .from("animals")
+               .select("id, name, internal_code, sale_status")
+               .neq("sale_status", "sold")
+               .order("name"),
+             supabase
+               .from("profiles")
+               .select("id, full_name, phone, cpf")
+               .order("full_name")
+           ]);
     
           if (lotsRes.error) {
             console.error("Error fetching lots:", lotsRes.error);
@@ -119,6 +128,31 @@ import {
        }, [initialEventId]);
  
         useRealtimeLots(fetchData);
+
+        const handleAssignWinner = async () => {
+          if (!winnerLotId || !selectedWinnerProfileId) return;
+          setIsLoading(true);
+          try {
+            const { error } = await supabase
+              .from("lots")
+              .update({ 
+                winner_id: selectedWinnerProfileId,
+                winner_link_reason: "Vínculo manual pós-leilão (Arrematado Pendente)"
+              })
+              .eq("id", winnerLotId);
+            
+            if (error) throw error;
+            toast.success("Ganhador vinculado com sucesso!");
+            setIsWinnerDialogOpen(false);
+            setWinnerLotId(null);
+            setSelectedWinnerProfileId("");
+            fetchData();
+          } catch (error: any) {
+            toast.error("Erro ao vincular ganhador: " + error.message);
+          } finally {
+            setIsLoading(false);
+          }
+        };
 
         useEffect(() => {
           if (!expandedLotId) return;
@@ -351,18 +385,25 @@ import {
        }
      };
 
-     const handleEventSelectChange = (val: string) => {
-       setSelectedEventId(val);
-       if (onEventChange) onEventChange(val);
-     };
- 
-    const filteredLots = lots.filter(lot => {
-      const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           lot.lot_number?.toString().includes(searchQuery);
-      const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
-      const matchesStatus = statusFilter === "all" || lot.status === statusFilter;
-      return matchesSearch && matchesEvent && matchesStatus;
-    });
+      const handleEventSelectChange = (val: string) => {
+        setSelectedEventId(val);
+        if (onEventChange) onEventChange(val);
+      };
+  
+     const filteredLots = lots.filter(lot => {
+       const matchesSearch = lot.animal?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            lot.lot_number?.toString().includes(searchQuery);
+       const matchesEvent = selectedEventId === "all" || lot.event_id === selectedEventId;
+       
+       let matchesStatus = true;
+       if (statusFilter === "pending_attribution") {
+         matchesStatus = lot.status === 'sold' && !lot.winner_id;
+       } else if (statusFilter !== "all") {
+         matchesStatus = lot.status === statusFilter;
+       }
+       
+       return matchesSearch && matchesEvent && matchesStatus;
+     });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja remover este lote? O animal voltará a ficar disponível para outros eventos.")) return;
@@ -762,31 +803,47 @@ import {
                                    lot.status === 'passed' ? 'Passou' : 
                                    lot.status === 'upcoming' ? 'Aceita pré-lance' : 'Finalizado'}
                                 </span>
-                                 {lot.status === 'sold' && (
-                                   <Button 
-                                     variant="outline" 
-                                     size="sm" 
-                                     className="h-8 gap-1 border-emerald-500/50 hover:bg-emerald-50 text-emerald-600 text-[10px] font-bold"
-                                     onClick={async () => {
-                                       if (!confirm("Atenção: Para que este animal volte ao catálogo de vendas, é necessário reverter o lote arrematado. Deseja reverter este lote agora?")) return;
-                                       setIsLoading(true);
-                                       try {
-                                         const { error } = await supabase.rpc("revert_sold_lot", {
-                                           p_lot_id: lot.id
-                                         });
-                                         if (error) throw error;
-                                         toast.success("Lote revertido com sucesso! O animal voltou ao catálogo.");
-                                         fetchData();
-                                       } catch (error: any) {
-                                         toast.error("Erro ao reverter lote: " + error.message);
-                                       } finally {
-                                         setIsLoading(false);
-                                       }
-                                     }}
-                                   >
-                                     <History className="h-3 w-3" /> Reverter Lote
-                                   </Button>
-                                 )}
+                                   {lot.status === 'sold' && (
+                                     <div className="flex flex-col gap-1">
+                                       {!lot.winner_id && (
+                                         <Button 
+                                           size="sm" 
+                                           className="h-8 gap-1 bg-gold hover:bg-gold/90 text-emerald-deep text-[10px] font-black uppercase shadow-sm"
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             setWinnerLotId(lot.id);
+                                             setIsWinnerDialogOpen(true);
+                                           }}
+                                         >
+                                           <Users className="h-3 w-3" /> Vincular Cadastro
+                                         </Button>
+                                       )}
+                                       <Button 
+                                         variant="outline" 
+                                         size="sm" 
+                                         className="h-8 gap-1 border-emerald-500/50 hover:bg-emerald-50 text-emerald-600 text-[10px] font-bold"
+                                         onClick={async (e) => {
+                                           e.stopPropagation();
+                                           if (!confirm("Atenção: Para que este animal volte ao catálogo de vendas, é necessário reverter o lote arrematado. Deseja reverter este lote agora?")) return;
+                                           setIsLoading(true);
+                                           try {
+                                             const { error } = await supabase.rpc("revert_sold_lot", {
+                                               p_lot_id: lot.id
+                                             });
+                                             if (error) throw error;
+                                             toast.success("Lote revertido com sucesso! O animal voltou ao catálogo.");
+                                             fetchData();
+                                           } catch (error: any) {
+                                             toast.error("Erro ao reverter lote: " + error.message);
+                                           } finally {
+                                             setIsLoading(false);
+                                           }
+                                         }}
+                                       >
+                                         <History className="h-3 w-3" /> Reverter Lote
+                                       </Button>
+                                     </div>
+                                   )}
                                  {lot.status === 'passed' && (
                                    <Button 
                                      variant="outline" 
@@ -1145,6 +1202,66 @@ import {
            </DialogFooter>
          </DialogContent>
        </Dialog>
-     </div>
-   );
- }
+         <Dialog open={isWinnerDialogOpen} onOpenChange={setIsWinnerDialogOpen}>
+           <DialogContent className="sm:max-w-[425px]">
+             <DialogHeader>
+               <DialogTitle className="flex items-center gap-2 text-emerald-deep">
+                 <Users className="h-5 w-5 text-gold" /> Vincular Cadastro ao Lote
+               </DialogTitle>
+               <DialogDescription>
+                 Selecione o cliente que arrematou este lote via mesa/telefone.
+               </DialogDescription>
+             </DialogHeader>
+             <div className="py-4 space-y-4">
+               <div className="space-y-2">
+                 <Label>Pesquisar Cliente</Label>
+                 <Input 
+                   placeholder="Nome, CPF ou Telefone..." 
+                   value={searchProfile}
+                   onChange={(e) => setSearchProfile(e.target.value)}
+                   className="border-gold/30"
+                 />
+               </div>
+               <div className="max-h-[300px] overflow-y-auto border rounded-md p-2 space-y-1 bg-muted/20">
+                 {profiles
+                   .filter(p => p.full_name?.toLowerCase().includes(searchProfile.toLowerCase()) || 
+                               p.cpf?.includes(searchProfile) || 
+                               p.phone?.includes(searchProfile))
+                   .slice(0, 50)
+                   .map(p => (
+                     <div 
+                       key={p.id}
+                       className={`flex flex-col p-2 rounded-md cursor-pointer transition-colors ${
+                         selectedWinnerProfileId === p.id 
+                           ? "bg-gold/20 border border-gold" 
+                           : "hover:bg-gold/5 border border-transparent"
+                       }`}
+                       onClick={() => setSelectedWinnerProfileId(p.id)}
+                     >
+                       <span className="font-bold text-sm text-emerald-deep">{p.full_name}</span>
+                       <span className="text-[10px] text-muted-foreground">{p.cpf || 'S/ CPF'} • {p.phone || 'S/ Telefone'}</span>
+                     </div>
+                   ))}
+                 {profiles.length === 0 && (
+                   <div className="text-center py-4 text-xs text-muted-foreground italic">
+                     Nenhum cliente cadastrado.
+                   </div>
+                 )}
+               </div>
+             </div>
+             <DialogFooter>
+               <Button variant="outline" onClick={() => setIsWinnerDialogOpen(false)}>Cancelar</Button>
+               <Button 
+                 className="bg-gold text-emerald-deep font-bold hover:bg-gold/90"
+                 disabled={!selectedWinnerProfileId || isLoading}
+                 onClick={handleAssignWinner}
+               >
+                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                 Confirmar Arremate
+               </Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
+       </div>
+     );
+   }

@@ -29,7 +29,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
    
     // Phone bid form
     const [phoneBid, setPhoneBid] = useState({ amount: 0, identifier: "", profileId: "" });
-    const [securityBidAmount, setSecurityBidAmount] = useState<number>(0);
     const [profiles, setProfiles] = useState<any[]>([]);
      const [searchProfile, setSearchProfile] = useState("");
      const [isAutoAdvancing, setIsAutoAdvancing] = useState(true);
@@ -598,39 +597,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
      }
    };
  
-    const handleSecurityBid = async () => {
-      if (!activeLot) {
-        toast.error("Nenhum lote ativo");
-        return;
-      }
-
-      const amount = securityBidAmount || (activeLot.current_price || activeLot.starting_price) + activeLot.bid_increment;
-      
-      setIsActionLoading(true);
-      try {
-        const { data, error } = await supabase.rpc("place_bid_safe", {
-          p_lot_id: activeLot.id,
-          p_amount: amount,
-          p_bid_type: "security",
-          p_session_id: "admin-security-bid"
-        });
-
-        if (error) throw error;
-        
-        const result = data as any;
-        if (result.success) {
-          toast.success("Lance de segurança (auditório) efetuado!");
-          setSecurityBidAmount(0);
-          refreshAdminData();
-        } else {
-          toast.error(result.message);
-        }
-      } catch (error: any) {
-        toast.error(error.message);
-      } finally {
-        setIsActionLoading(false);
-      }
-    };
 
     const statusLegend = [
       { label: 'Loteamento', desc: 'Fase de cadastro. O evento não aceita lances.' },
@@ -875,7 +841,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       )}
 
        {selectedEventId && liveEvent && (
-         <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
+          <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
            <div className="space-y-6">
              {/* Controle de Lotes */}
              <Card>
@@ -883,11 +849,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                  <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Fila de Lotes</CardTitle>
                </CardHeader>
                <CardContent>
-                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                   <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                    {lots.map((lot) => (
                      <div 
                        key={lot.id} 
-                        className={`relative rounded-xl border p-4 transition-all group ${
+                        className={`relative rounded-lg border p-3 transition-all group ${
                          lot.id === liveEvent.active_lot_id 
                           ? "border-gold bg-gold/10 ring-2 ring-gold shadow-gold-lg" 
                           : (lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished')
@@ -896,14 +862,14 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                        }`}
                      >
                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-black text-emerald-deep bg-emerald-deep/5 px-2 py-0.5 rounded">LOTE {lot.lot_number}</span>
+                           <span className="text-[10px] font-black text-emerald-deep bg-emerald-deep/5 px-1.5 py-0.5 rounded">LOTE {lot.lot_number}</span>
                          {lot.id === liveEvent.active_lot_id && (
                             <span className="flex items-center gap-1 text-[10px] font-black uppercase text-gold animate-pulse bg-gold/10 px-2 py-0.5 rounded-full">
                              <div className="h-1.5 w-1.5 rounded-full bg-gold" /> Ao Vivo
                            </span>
                          )}
                        </div>
-                        <h4 className="font-bold truncate text-emerald-deep">{lot.animal?.name || "Animal não vinculado"}</h4>
+                         <h4 className="font-bold truncate text-xs text-emerald-deep">{lot.animal?.name || "Não vinculado"}</h4>
                         <div className="mt-1 flex items-center gap-2 text-[10px] text-muted-foreground font-medium">
                           <span>{formatBRL(lot.current_price || lot.starting_price)}</span>
                           {lot.status === 'upcoming' && (
@@ -915,28 +881,29 @@ import { StatusBadge } from "@/components/auctions/status-badge";
 
                         <div className="mt-4 flex flex-col gap-2">
                           {lot.id !== liveEvent.active_lot_id && lot.status !== 'sold' && lot.status !== 'passed' && lot.status !== 'finished' && (
-                            <Button 
-                              size="sm" 
-                              className="w-full bg-emerald-deep text-white hover:bg-emerald-deep/90 font-bold shadow-sm"
-                              onClick={() => activateLot(lot.id)}
-                              disabled={isActionLoading}
-                            >
-                              <Play className="mr-1 h-3 w-3 fill-current" /> Colocar na Tela
-                            </Button>
+                            <Button
+                                size="sm"
+                                className="w-full bg-emerald-deep text-white hover:bg-emerald-deep/90 font-bold shadow-sm h-7 text-[10px]"
+                                onClick={() => activateLot(lot.id)}
+                                disabled={isActionLoading}
+                              >
+                                <Play className="mr-1 h-3 w-3 fill-current" /> Colocar na Tela
+                              </Button>
                           )}
                           {lot.id === liveEvent.active_lot_id && (
                             <div className="grid grid-cols-2 gap-2">
-                              <Button 
-                                size="sm" 
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                              <Button
+                                size="sm"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-[10px] px-2"
                                 onClick={() => sellLot(lot.id)}
                                 disabled={isActionLoading}
                               >
                                 <Check className="mr-1 h-3 w-3" /> Arrematar
                               </Button>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="destructive"
+                                className="h-7 text-[10px] px-2"
                                 onClick={() => passLot(lot.id)}
                                 disabled={isActionLoading}
                               >
@@ -1159,88 +1126,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                </CardContent>
              </Card>
  
-              <Card className="border-gold/50 bg-emerald-deep text-white shadow-gold-sm">
-                <CardHeader className="pb-2 pt-4">
-                  <CardTitle className="text-lg text-gold font-bold flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" /> Auditório / Segurança
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-[10px] text-white/60 uppercase leading-tight">
-                    Lances manuais recebidos no local físico ou lances de segurança.
-                  </p>
-                  
-                  <div className="grid grid-cols-3 gap-2">
-                    {[500, 1000, 2000, 5000].map(inc => (
-                      <Button 
-                        key={inc}
-                        variant="outline" 
-                        size="sm"
-                        className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-8 font-bold text-[10px]"
-                        onClick={() => {
-                          if (!activeLot) return;
-                          const base = activeLot.current_price || activeLot.starting_price;
-                          setSecurityBidAmount(base + inc);
-                        }}
-                        disabled={!activeLot}
-                      >
-                        +{formatBRL(inc)}
-                      </Button>
-                    ))}
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-8 font-bold text-[10px]"
-                      onClick={() => {
-                        if (!activeLot) return;
-                        const base = activeLot.current_price || activeLot.starting_price;
-                        setSecurityBidAmount(base + activeLot.bid_increment);
-                      }}
-                      disabled={!activeLot}
-                    >
-                      +Inc ({activeLot ? formatBRL(activeLot.bid_increment) : "..."})
-                    </Button>
-                  </div>
-
-                  <div className="mb-2">
-                    {activeLot && (
-                      <div className={`text-[10px] px-2 py-1 rounded flex items-center gap-1.5 font-bold ${
-                        activeLot.status === 'active' || activeLot.status === 'live'
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : activeLot.allows_pre_bidding 
-                          ? "bg-blue-500/20 text-blue-400"
-                          : "bg-red-500/20 text-red-400"
-                      }`}>
-                        <Info className="h-3 w-3" />
-                        {activeLot.status === 'active' || activeLot.status === 'live'
-                          ? "LOTE ATIVO: Recebendo lances ao vivo"
-                          : activeLot.allows_pre_bidding 
-                            ? "PRÉ-LANCE: Aceitando lances antecipados"
-                            : "LOTE BLOQUEADO: Abra o lote para aceitar lances"}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs text-white/80">Valor do Lance</Label>
-                    <Input 
-                      type="number" 
-                      className="h-10 bg-white/10 border-white/20 text-white text-lg font-bold" 
-                      placeholder="0,00"
-                      value={securityBidAmount || ""}
-                      onChange={(e) => setSecurityBidAmount(parseFloat(e.target.value))}
-                    />
-                  </div>
-                  <Button 
-                    className="w-full h-12 bg-gold text-emerald-deep font-black text-base hover:bg-gold/90 transition-all active:scale-95"
-                    onClick={handleSecurityBid}
-                    disabled={isActionLoading || !activeLot}
-                  >
-                    {isActionLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Gavel className="mr-2 h-5 w-5" />}
-                    {securityBidAmount ? `CONFIRMAR ${formatBRL(securityBidAmount)}` : "CONFIRMAR LANCE"}
-                  </Button>
-                </CardContent>
-              </Card>
 
              <Card>
                <CardHeader className="pb-2">
