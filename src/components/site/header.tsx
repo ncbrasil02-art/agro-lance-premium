@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
   export function Header() {
     const { theme, toggle } = useTheme();
-   const { siteInfo, homepage } = useSiteSettings();
+    const { siteInfo, homepage, aboutPage } = useSiteSettings();
   const { user, profile, signOut } = useAuth();
   const [open, setOpen] = useState(false);
  
@@ -28,7 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
      { to: "/compra-direta", label: "Venda Direta", show: homepage?.show_sale_menu !== false },
      { to: "/lotes", label: "Lotes", show: true },
      { to: "/ao-vivo", label: "Ao Vivo", show: true },
-     { to: "/sobre", label: "Sobre", show: true },
+      { to: "/sobre", label: aboutPage?.title || "Sobre", show: aboutPage?.enabled !== false },
    ].filter(i => i.show);
 
   return (
