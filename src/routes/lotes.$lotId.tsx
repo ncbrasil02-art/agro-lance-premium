@@ -953,11 +953,11 @@ function LotDetail() {
                             <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
                               {idx + 1}
                             </div>
-                            <div>
-                                <p className="text-xs font-bold text-white leading-none mb-1">
-                                   {bid.bidder_name}
-                                </p>
-                              <p className="text-[8px] text-white/40 uppercase font-bold">
+                             <div>
+                                 <p className="text-xs font-bold text-white leading-none mb-1">
+                                    {bid.bidder_name || (bid.user_id === user?.id ? profile?.full_name : 'Licitante')}
+                                 </p>
+                               <p className="text-[8px] text-white/40 uppercase font-bold">
                                 {new Date(bid.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
