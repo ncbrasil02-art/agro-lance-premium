@@ -1,3 +1,4 @@
+    import { SiteSettings } from "@/components/admin/SiteSettings";
  import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -365,100 +366,7 @@ export const Route = createFileRoute("/admin")({
           {activeTab === "sellers" && <SellerManagement />}
             {activeTab === "users" && <UserManagement />}
             {activeTab === "security" && <BidSecurityAudit />}
-             {activeTab === "settings" && (
-               <div className="space-y-6">
-                 <Card>
-                   <CardHeader>
-                     <CardTitle>Visibilidade da Página Inicial</CardTitle>
-                     <CardDescription>Escolha quais seções aparecerão para os visitantes</CardDescription>
-                   </CardHeader>
-                   <CardContent className="space-y-4">
-                     <div className="flex items-center justify-between space-x-2">
-                       <Label htmlFor="show-upcoming" className="flex flex-col">
-                         <span>Próximos Eventos</span>
-                         <span className="font-normal text-muted-foreground text-xs">Exibir carrossel de eventos futuros</span>
-                       </Label>
-                       <Switch 
-                         id="show-upcoming" 
-                         checked={homepageSections.show_upcoming_events} 
-                         onCheckedChange={(checked) => updateHomepageSection('show_upcoming_events', checked)}
-                         disabled={isSavingSections}
-                       />
-                     </div>
-                     <div className="flex items-center justify-between space-x-2">
-                       <Label htmlFor="show-featured" className="flex flex-col">
-                         <span>Lotes em Destaque</span>
-                         <span className="font-normal text-muted-foreground text-xs">Exibir carrossel de lotes marcados como destaque</span>
-                       </Label>
-                       <Switch 
-                         id="show-featured" 
-                         checked={homepageSections.show_featured_lots} 
-                         onCheckedChange={(checked) => updateHomepageSection('show_featured_lots', checked)}
-                         disabled={isSavingSections}
-                       />
-                     </div>
-                     <div className="flex items-center justify-between space-x-2">
-                       <Label htmlFor="show-articles" className="flex flex-col">
-                         <span>Artigos & Notícias</span>
-                         <span className="font-normal text-muted-foreground text-xs">Exibir carrossel com os últimos artigos do blog</span>
-                       </Label>
-                       <Switch 
-                         id="show-articles" 
-                         checked={homepageSections.show_articles} 
-                         onCheckedChange={(checked) => updateHomepageSection('show_articles', checked)}
-                         disabled={isSavingSections}
-                       />
-                     </div>
-                   </CardContent>
-                 </Card>
-
-                 <Card>
-                   <CardHeader>
-                     <CardTitle>Configurações Globais</CardTitle>
-                     <CardDescription>Ajuste o comportamento do sistema de otimização</CardDescription>
-                   </CardHeader>
-                   <CardContent className="space-y-6">
-                     <div className="space-y-4">
-                       <div className="flex items-center justify-between">
-                         <Label className="text-sm font-bold">Qualidade Padrão das Imagens</Label>
-                         <span className="text-xs font-mono bg-gold/10 text-gold px-2 py-0.5 rounded">80%</span>
-                       </div>
-                       <Slider defaultValue={[80]} max={100} step={5} className="w-full" />
-                       <p className="text-[10px] text-muted-foreground">Qualidade sugerida para o WebP. Valores menores economizam dados, valores maiores aumentam a nitidez.</p>
-                     </div>
-                   </CardContent>
-                 </Card>
- 
-                 <Card>
-                   <CardHeader>
-                     <CardTitle className="text-sm font-bold uppercase tracking-wider">Performance de Ativos</CardTitle>
-                     <CardDescription>Estatísticas do cache de imagens otimizadas</CardDescription>
-                   </CardHeader>
-                   <CardContent>
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                       {[
-                         { label: "Hits", value: getCacheStats().hits },
-                         { label: "Misses", value: getCacheStats().misses },
-                         { label: "Tamanho Cache", value: getCacheStats().size },
-                         { label: "Taxa de Sucesso", value: `${getCacheStats().hitRate.toFixed(1)}%` },
-                       ].map(stat => (
-                         <div key={stat.label} className="p-4 rounded-xl bg-muted/50 border">
-                           <div className="text-[10px] uppercase font-black text-muted-foreground mb-1">{stat.label}</div>
-                           <div className="text-xl font-bold">{stat.value}</div>
-                         </div>
-                       ))}
-                     </div>
-                   </CardContent>
-                 </Card>
- 
-                 <div className="mt-8 pt-8 border-t text-[10px] text-muted-foreground">
-                   <p>Debug Info:</p>
-                   <p>User ID: {profile?.id}</p>
-                   <p>Role: {profile?.role}</p>
-                   <p>Environment: {import.meta.env.MODE}</p>
-                 </div>
-               </div>
-             )}
+             {activeTab === "settings" && <SiteSettings />}
        </main>
      </div>
    );
