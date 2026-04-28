@@ -296,12 +296,10 @@ function LotDetail() {
 
     const bidsChannel = supabase
       .channel(`bids-${lot.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, async (p) => {
-         const { data: profileData } = await supabase.from("profiles").select("id, full_name").eq("id", p.new.user_id).single();
-         const newBid = { ...p.new, profile: profileData };
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p) => {
+         const newBid = p.new;
          setRecentBids(prev => {
-           const bidId = (newBid as any).id;
-           if (prev.some(b => b.id === bidId)) return prev;
+           if (prev.some(b => b.id === newBid.id)) return prev;
            return [newBid, ...prev]
              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
              .slice(0, 10);
@@ -712,7 +710,7 @@ function LotDetail() {
                                 </div>
                                 <div>
                                     <p className="font-bold text-white">
-                                       {bid.phone_bidder_identifier || bid.profile?.full_name || (bid.user_id ? `Comprador #${bid.user_id.slice(0, 4)}` : "Licitante")}
+                                       {bid.bidder_name || bid.phone_bidder_identifier || "Licitante"}
                                     </p>
                                   <p className="text-[10px] text-white/40 uppercase font-bold">
                                     {new Date(bid.created_at).toLocaleString('pt-BR')}
