@@ -1250,21 +1250,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                  <Table>
                    <TableHeader>
                      <TableRow>
-                       <TableHead>Usuário</TableHead>
-                       <TableHead>Valor</TableHead>
-                       <TableHead>Data</TableHead>
+                        <TableHead>Usuário</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead className="text-right">Ação</TableHead>
                      </TableRow>
                    </TableHeader>
                    <TableBody>
                      {lotBids.map((bid) => (
-                       <TableRow key={bid.id}>
-                         <TableCell>
-                           <div className="font-bold">{bid.profile?.full_name || bid.bidder_name || 'Usuário'}</div>
-                           <div className="text-[10px] text-muted-foreground">{bid.bid_type}</div>
-                         </TableCell>
-                         <TableCell className="font-bold text-emerald-600">{formatBRL(bid.amount)}</TableCell>
-                         <TableCell className="text-xs">{format(new Date(bid.created_at), "dd/MM HH:mm")}</TableCell>
-                       </TableRow>
+                        <TableRow key={bid.id} className={bid.is_winning ? "bg-emerald-50" : ""}>
+                          <TableCell>
+                            <div className="font-bold">{bid.profile?.full_name || bid.bidder_name || 'Usuário'}</div>
+                            <div className="text-[10px] text-muted-foreground">{bid.bid_type}</div>
+                          </TableCell>
+                          <TableCell className="font-bold text-emerald-600">{formatBRL(bid.amount)}</TableCell>
+                          <TableCell className="text-xs">{format(new Date(bid.created_at), "dd/MM HH:mm")}</TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-destructive"
+                              onClick={() => handleDeleteBid(bid.id, selectedLotForBids.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
                      ))}
                    </TableBody>
                  </Table>
