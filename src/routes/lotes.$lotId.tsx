@@ -348,11 +348,30 @@ function LotDetail() {
   const executeBid = async (amount: number) => {
     setIsBidding(true);
     try {
-      const { data, error } = await supabase.rpc("place_bid_safe", { p_lot_id: lot.id, p_amount: amount, p_bid_type: "online", p_session_id: "client-side" });
+      const { data, error } = await supabase.rpc("place_bid_safe", { 
+        p_lot_id: lot.id, 
+        p_amount: amount, 
+        p_bid_type: "online", 
+        p_session_id: "client-side" 
+      });
+      
       if (error) throw error;
-      toast.success("Lance efetuado!");
-    } catch (e: any) { toast.error(e.message); }
-    finally { setIsBidding(false); setShowConfirmBid(false); }
+      
+      const result = data as { success: boolean; message: string };
+      if (result.success) {
+        toast.success(result.message || "Lance efetuado!");
+      } else {
+        toast.error(result.message, {
+          duration: 6000,
+          icon: <AlertTriangle className="h-4 w-4 text-destructive" />,
+        });
+      }
+    } catch (e: any) { 
+      toast.error(e.message || "Erro ao efetuar lance."); 
+    } finally { 
+      setIsBidding(false); 
+      setShowConfirmBid(false); 
+    }
   };
 
   const handleSendOffer = async () => {
