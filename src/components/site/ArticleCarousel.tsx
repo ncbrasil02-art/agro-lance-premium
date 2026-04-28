@@ -86,7 +86,16 @@
                      <div className="mb-3 flex items-center gap-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                        <div className="flex items-center gap-1">
                          <Calendar className="h-3 w-3 text-gold" />
-                         {article.published_at && format(new Date(article.published_at), "dd 'de' MMMM", { locale: ptBR })}
+                          {(() => {
+                            if (!article.published_at) return "--";
+                            try {
+                              const d = new Date(article.published_at);
+                              if (isNaN(d.getTime())) return "--";
+                              return format(d, "dd 'de' MMMM", { locale: ptBR });
+                            } catch (e) {
+                              return "--";
+                            }
+                          })()}
                        </div>
                        <div className="flex items-center gap-1">
                          <MessageSquare className="h-3 w-3 text-gold" />

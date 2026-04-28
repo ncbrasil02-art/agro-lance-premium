@@ -25,12 +25,22 @@
    order: string[];
  }
  
- export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null }) {
-   const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(initialData?.siteInfo || null);
-   const [theme, setTheme] = useState<ThemeSettings | null>(initialData?.theme || null);
-   const [homepage, setHomepage] = useState<HomepageSettings | null>(initialData?.homepage || null);
-   const [isLoading, setIsLoading] = useState(!initialData);
- 
+  export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null }) {
+    const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
+    const [theme, setTheme] = useState<ThemeSettings | null>(null);
+    const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Sync with initialData changes
+    useEffect(() => {
+      if (initialData) {
+        if (initialData.siteInfo) setSiteInfo(initialData.siteInfo);
+        if (initialData.theme) setTheme(initialData.theme);
+        if (initialData.homepage) setHomepage(initialData.homepage);
+        setIsLoading(false);
+      }
+    }, [initialData?.siteInfo, initialData?.theme, initialData?.homepage]);
+
    useEffect(() => {
      async function fetchSettings() {
         if (initialData) {
