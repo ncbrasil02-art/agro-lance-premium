@@ -124,7 +124,10 @@ import { Countdown } from "./countdown";
               Recebendo Lance
             </span>
           )}
-          <span className="flex items-center gap-1"><Gavel className="h-3 w-3" aria-hidden="true" /> {lot?.bidsCount || 0} lances</span>
+          <span className="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-sm">
+            <Gavel className="h-3 w-3 text-gold" aria-hidden="true" /> 
+            <span className="font-bold">{lot?.bidsCount || 0}</span> lances
+          </span>
         </div>
       </div>
 
