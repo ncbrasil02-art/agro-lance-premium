@@ -21,83 +21,58 @@ import { ErrorFallback } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   export const Route = createFileRoute("/")({
-     loader: async () => {
-       logger.info("Iniciando carregamento da Home");
-       try {
-         const [eventsRes, lotsRes, pastEventsRes, settingsRes, articlesRes, sectionsSettingsRes] = await Promise.all([
-           supabase.from("events")
-             .select("*, lots!lots_event_id_fkey(id)")
-             .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
-             .order("start_date", { ascending: true })
-             .limit(15),
-            supabase.from("lots")
-              .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
-              .eq("is_featured", true)
-              .order("created_at", { ascending: false })
-              .limit(12),
+    loader: async () => {
+      try {
+        console.log("Loader Home started");
+        const [eventsRes, lotsRes, pastEventsRes, settingsRes, articlesRes, sectionsSettingsRes] = await Promise.all([
+          supabase.from("events")
+            .select("*, lots!lots_event_id_fkey(id)")
+            .or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento")
+            .order("start_date", { ascending: true })
+            .limit(15),
+          supabase.from("lots")
+            .select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)")
+            .eq("is_featured", true)
+            .order("created_at", { ascending: false })
+            .limit(12),
           supabase.from("events")
             .select("*, lots!lots_event_id_fkey(id)")
             .eq("status", "finished")
-           .order("start_date", { ascending: false })
-           .limit(3),
-         supabase.from("site_settings")
-           .select("*")
-           .eq("key", "announcement")
-           .maybeSingle(),
-         supabase.from("posts")
-           .select("*, category:categories(name)")
-           .eq("status", "published")
-           .order("published_at", { ascending: false })
-           .limit(10),
-         supabase.from("site_settings")
-           .select("*")
-           .eq("key", "homepage_sections")
-           .maybeSingle()
-       ]);
+            .order("start_date", { ascending: false })
+            .limit(3),
+          supabase.from("site_settings")
+            .select("*")
+            .eq("key", "announcement")
+            .maybeSingle(),
+          supabase.from("posts")
+            .select("*, category:categories(name)")
+            .eq("status", "published")
+            .order("published_at", { ascending: false })
+            .limit(10),
+          supabase.from("site_settings")
+            .select("*")
+            .eq("key", "homepage_sections")
+            .maybeSingle()
+        ]);
 
-        logger.info("Carregamento da Home concluído com sucesso", {
-          eventsCount: eventsRes.data?.length || 0,
-          lotsCount: lotsRes.data?.length || 0
-        });
-
-        const eventsResult = z.array(eventSchema).safeParse(eventsRes.data || []);
-        const lotsResult = z.array(lotSchema).safeParse(lotsRes.data || []);
-        const pastEventsResult = z.array(eventSchema).safeParse(pastEventsRes.data || []);
-
-        if (!eventsResult.success) {
-          logger.error("Erro na validação de eventos", { error: eventsResult.error });
-        }
-        if (!lotsResult.success) {
-          logger.error("Erro na validação de lotes", { error: lotsResult.error });
-        }
-        if (!pastEventsResult.success) {
-          logger.error("Erro na validação de eventos passados", { error: pastEventsResult.error });
-        }
-
-        const validatedEvents = eventsResult.success ? eventsResult.data : (eventsRes.data as any[] || []);
-        const validatedLots = lotsResult.success ? lotsResult.data : (lotsRes.data as any[] || []);
-        const validatedPastEvents = pastEventsResult.success ? pastEventsResult.data : (pastEventsRes.data as any[] || []);
-
-        let validatedAnnouncement = null;
-        if (settingsRes.data?.value) {
-          try {
-            validatedAnnouncement = announcementSchema.parse(settingsRes.data.value);
-          } catch (e) {
-            logger.warn("Anúncio com formato inválido no banco de dados", { error: e });
-          }
-        }
-
-         return {
-           events: validatedEvents,
-           lots: validatedLots,
-           pastEvents: validatedPastEvents,
-           announcement: validatedAnnouncement,
-           articles: articlesRes.data || [],
-           sectionsSettings: sectionsSettingsRes.data?.value || { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
-         };
-      } catch (error) {
-        logger.error("Erro ao carregar dados da Home", { error });
-        throw error;
+        return {
+          events: eventsRes.data || [],
+          lots: lotsRes.data || [],
+          pastEvents: pastEventsRes.data || [],
+          announcement: settingsRes.data?.value || null,
+          articles: articlesRes.data || [],
+          sectionsSettings: sectionsSettingsRes.data?.value || { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
+        };
+      } catch (err) {
+        console.error("Loader Home fatal error:", err);
+        return {
+          events: [],
+          lots: [],
+          pastEvents: [],
+          announcement: null,
+          articles: [],
+          sectionsSettings: { show_articles: true, show_upcoming_events: true, show_featured_lots: true }
+        };
       }
     },
     component: Home,
@@ -109,7 +84,6 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
      const router = useRouter();
       const { events, lots, pastEvents, announcement, articles, sectionsSettings: initialSections } = Route.useLoaderData();
       const { homepage: sectionsSettings, siteInfo } = useSiteSettings();
-      
       const activeSections = sectionsSettings || initialSections;
     const [now, setNow] = useState(Date.now());
 
@@ -134,7 +108,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
        };
      }, [router]);
 
-    const mapEvent = (e: ValidatedEvent) => ({
+    const mapEvent = (e: any) => ({
      id: e.id,
      slug: e.slug || "",
      name: e.name,
@@ -153,10 +127,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
       show_countdown: e.show_countdown !== false,
     });
 
-    const mappedEvents = events.map(mapEvent);
-    const mappedPastEvents = pastEvents.map(mapEvent);
+    const mappedEvents = (events || []).map(mapEvent);
+    const mappedPastEvents = (pastEvents || []).map(mapEvent);
  
-    const mappedLots = lots.map((l: ValidatedLot) => ({
+    const mappedLots = (lots || []).map((l: any) => ({
      id: l.id,
      number: l.lot_number,
      eventId: l.event_id,
@@ -295,7 +269,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
               </div>
             )}
             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase">
-              {(typeof siteInfo?.name === 'string' ? siteInfo.name : "Elite Agro").split(' ')[0]} <span className="text-gradient-gold">{(typeof siteInfo?.name === 'string' ? siteInfo.name : "Leilões").split(' ').slice(1).join(' ')}</span><br />
+              {(siteInfo?.name || "Premium Agro").split(' ')[0]} <span className="text-gradient-gold">{(siteInfo?.name || "Premium Agro").split(' ').slice(1).join(' ')}</span><br />
               em tempo real
             </h1>
              <p className="mt-5 max-w-xl text-lg text-muted-foreground italic">

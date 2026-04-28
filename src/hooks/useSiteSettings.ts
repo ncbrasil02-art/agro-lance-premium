@@ -9,30 +9,12 @@
    logo_url: string;
  }
  
- export interface ThemeSettings {
-   primary_color: string;
-   primary_foreground_color?: string;
-   secondary_color: string;
-   secondary_foreground_color?: string;
-   accent_color: string;
-   accent_foreground_color?: string;
-   background_color: string;
-   foreground_color?: string;
-   card_color?: string;
-   card_foreground_color?: string;
-   popover_color?: string;
-   popover_foreground_color?: string;
-   muted_color?: string;
-   muted_foreground_color?: string;
-   border_color?: string;
-   input_color?: string;
-   ring_color?: string;
-   destructive_color?: string;
-   destructive_foreground_color?: string;
-   live_color?: string;
-   upcoming_color?: string;
-   closed_color?: string;
- }
+  export interface ThemeSettings {
+    primary_color: string;
+    secondary_color: string;
+    accent_color: string;
+    background_color: string;
+  }
  
  export interface HomepageSettings {
    show_articles: boolean;
@@ -45,12 +27,7 @@
  
  export function useSiteSettings() {
    const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
-    const [theme, setTheme] = useState<ThemeSettings>({
-      primary_color: "#D4AF37",
-      secondary_color: "#064E3B",
-      accent_color: "#10B981",
-      background_color: "#022C22"
-    });
+    const [theme, setTheme] = useState<ThemeSettings | null>(null);
    const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
    const [isLoading, setIsLoading] = useState(true);
  
