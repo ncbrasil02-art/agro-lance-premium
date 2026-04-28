@@ -25,7 +25,14 @@
    order: string[];
  }
  
-  export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null }) {
+  export interface CustomTexts {
+    hero_title: string;
+    hero_subtitle: string;
+    footer_text: string;
+  }
+ 
+   export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null, customTexts?: CustomTexts | null }) {
+     const [customTexts, setCustomTexts] = useState<CustomTexts | null>(null);
     const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
     const [theme, setTheme] = useState<ThemeSettings | null>(null);
     const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
@@ -36,7 +43,8 @@
       if (initialData) {
         if (initialData.siteInfo) setSiteInfo(initialData.siteInfo);
         if (initialData.theme) setTheme(initialData.theme);
-        if (initialData.homepage) setHomepage(initialData.homepage);
+         if (initialData.homepage) setHomepage(initialData.homepage);
+         if (initialData.customTexts) setCustomTexts(initialData.customTexts);
         setIsLoading(false);
       }
     }, [initialData?.siteInfo, initialData?.theme, initialData?.homepage]);
@@ -60,11 +68,13 @@
  
           const info = data.find(i => i.key === "site_info")?.value as any as SiteInfo;
           const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
-          const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
+           const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
+           const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
-          if (homeSettings) setHomepage(homeSettings);
+           if (homeSettings) setHomepage(homeSettings);
+           if (textsSettings) setCustomTexts(textsSettings);
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
           setIsLoading(false);
@@ -88,7 +98,8 @@
              
              if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
              if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
-             if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
+              if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
+              if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...(updated.value as any) } as any));
            }
          )
          .subscribe();
@@ -98,5 +109,5 @@
        };
    }, []);
  
-   return { siteInfo, theme, homepage, isLoading };
+    return { siteInfo, theme, homepage, customTexts, isLoading };
  }
