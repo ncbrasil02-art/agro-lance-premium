@@ -990,11 +990,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                           <div key={bid.id} className={`p-3 flex items-center justify-between text-xs transition-colors ${i === 0 ? "bg-gold/5" : ""}`}>
                             <div className="flex flex-col gap-1">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-white">
-                                  {bid.bid_type === 'security' 
-                                    ? "Auditório/Mesa" 
-                                    : (bid.is_phone_bid ? (bid.phone_bidder_identifier || "Telefone") : (bid.profile?.full_name || "Licitante"))}
-                                </span>
+                                 <span className="font-bold text-white">
+                                   {bid.phone_bidder_identifier || (bid.profile?.full_name || "Licitante")}
+                                 </span>
                                 {bid.profile?.risk_level === 'high' && <div className="h-1.5 w-1.5 rounded-full bg-red-500" />}
                               </div>
                               <div className="flex items-center gap-2 text-[10px] text-white/50">
