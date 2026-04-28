@@ -268,13 +268,13 @@ export const Route = createFileRoute("/painel")({
     setIsLoading(true);
     if (!user?.id) return;
     try {
-      // Fetch lots won by the user - Using a simpler and more robust query structure
+      // Fetch lots won by the user - Using explicit relationship names to avoid ambiguity
       const { data: wonLots, error: wonError } = await supabase
         .from("lots")
         .select(`
           id, lot_number, status, current_price, winner_id, updated_at,
-          animal:animals(id, name, breed, species, photos, internal_code),
-          event:events(id, name)
+          animal:animals!lots_animal_id_fkey(id, name, breed, species, photos, internal_code),
+          event:events!lots_event_id_fkey(id, name)
         `)
         .eq("winner_id", user.id)
         .order("updated_at", { ascending: false });
@@ -285,18 +285,18 @@ export const Route = createFileRoute("/painel")({
       // Fetch recent bids by the user
       const { data: userBids } = await supabase
         .from("bids")
-        .select("*, lot:lots(*, animal:animals(name))")
+        .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(10);
       
        setMyBids(userBids || []);
  
-       // Fetch followed lots
-       const { data: followedData } = await supabase
-         .from("followed_lots")
-         .select("*, lot:lots(*, animal:animals(*), event:events(*))")
-         .eq("user_id", user.id);
+        // Fetch followed lots
+        const { data: followedData } = await supabase
+          .from("followed_lots")
+          .select("*, lot:lots!followed_lots_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(*), event:events!lots_event_id_fkey(*))")
+          .eq("user_id", user.id);
        
        setMyFavorites(followedData || []);
     } catch (error) {
