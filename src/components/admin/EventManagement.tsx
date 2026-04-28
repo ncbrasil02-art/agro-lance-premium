@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -24,7 +24,51 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
     const [statusFilter, setStatusFilter] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
-    const [editingEvent, setEditingEvent] = useState<any>(null);
+     const [editingEvent, setEditingEvent] = useState<any>(null);
+     const [viewingEventDetails, setViewingEventDetails] = useState<any>(null);
+     const [eventLots, setEventLots] = useState<any[]>([]);
+     const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+     const fetchEventLots = async (eventId: string) => {
+       setIsDetailsLoading(true);
+       try {
+         const { data, error } = await supabase
+           .from("lots")
+           .select(`
+             *,
+             animal:animals(name, internal_code),
+             winner:profiles!winner_id(id, full_name, phone, cpf)
+           `)
+           .eq("event_id", eventId)
+           .order("lot_number", { ascending: true });
+ 
+         if (error) throw error;
+         setEventLots(data || []);
+       } catch (error: any) {
+         toast.error("Erro ao carregar lotes do evento: " + error.message);
+       } finally {
+         setIsDetailsLoading(false);
+       }
+     };
+ 
+     const handleDeleteBid = async (bidId: string, lotId: string) => {
+       if (!confirm("Tem certeza que deseja EXCLUIR este lance?")) return;
+       try {
+         const { data, error } = await supabase.rpc("delete_bid_safe", {
+           p_bid_id: bidId
+         });
+         if (error) throw error;
+         const result = data as { success: boolean; message: string };
+         if (result.success) {
+           toast.success(result.message);
+           if (viewingEventDetails) fetchEventLots(viewingEventDetails.id);
+         } else {
+           toast.error(result.message);
+         }
+       } catch (error: any) {
+         toast.error("Erro ao excluir lance: " + error.message);
+       }
+     };
+ 
     
     const [requestFormData, setRequestFormData] = useState({
       name: "",
