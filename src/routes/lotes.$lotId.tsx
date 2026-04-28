@@ -52,7 +52,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
          .maybeSingle(),
       supabase
         .from("bids")
-        .select("*, profile:profiles(full_name)")
+        .select("*")
         .eq("lot_id", lotId)
         .order("created_at", { ascending: false })
         .limit(5)
@@ -299,7 +299,13 @@ function LotDetail() {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, async (p) => {
          const { data: profileData } = await supabase.from("profiles").select("id, full_name").eq("id", p.new.user_id).single();
          const newBid = { ...p.new, profile: profileData };
-        setRecentBids(prev => [newBid, ...prev].slice(0, 10));
+         setRecentBids(prev => {
+           const bidId = (newBid as any).id;
+           if (prev.some(b => b.id === bidId)) return prev;
+           return [newBid, ...prev]
+             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+             .slice(0, 10);
+         });
       })
       .subscribe();
 
@@ -706,7 +712,7 @@ function LotDetail() {
                                 </div>
                                 <div>
                                     <p className="font-bold text-white">
-                                       {bid.phone_bidder_identifier || (bid.profile?.full_name || "Licitante")}
+                                       {bid.phone_bidder_identifier || bid.profile?.full_name || (bid.user_id ? `Comprador #${bid.user_id.slice(0, 4)}` : "Licitante")}
                                     </p>
                                   <p className="text-[10px] text-white/40 uppercase font-bold">
                                     {new Date(bid.created_at).toLocaleString('pt-BR')}

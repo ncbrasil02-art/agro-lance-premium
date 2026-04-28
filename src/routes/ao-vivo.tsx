@@ -147,7 +147,7 @@ export const Route = createFileRoute("/ao-vivo")({
         if (liveEvent.active_lot_id) {
           const { data: bids, error: bidsError } = await supabase
             .from("bids")
-            .select("*, profile:profiles!bids_user_id_fkey(id, full_name)")
+            .select("*")
             .eq("lot_id", liveEvent.active_lot_id)
             .order("created_at", { ascending: false })
             .limit(10);
@@ -536,11 +536,13 @@ export const Route = createFileRoute("/ao-vivo")({
                  const newBid = payload.new;
                  console.log("Processando novo lance (INSERT):", newBid);
                  
-                 setBids((prev: any[]) => {
-                   if (prev.some((b: any) => b.id === newBid.id)) return prev;
-                   const updatedBids = [newBid, ...prev].slice(0, 15);
-                   return updatedBids;
-                 });
+                  setBids((prev: any[]) => {
+                    if (prev.some((b: any) => b.id === newBid.id)) return prev;
+                    const updatedBids = [newBid, ...prev]
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .slice(0, 15);
+                    return updatedBids;
+                  });
  
                  setLiveEvent((prev: any) => {
                    if (!prev || !prev.active_lot || prev.active_lot.id !== newBid.lot_id) return prev;
@@ -554,27 +556,6 @@ export const Route = createFileRoute("/ao-vivo")({
                      }
                    };
                  });
-                
-                // Only fetch profile if not in cache
-                if (newBid.user_id) {
-                  setBidderProfiles(currentCache => {
-                    if (!currentCache[newBid.user_id]) {
-                      // Profile not in cache, fetch it
-                      supabase
-                        .from("profiles")
-                        .select("id, full_name")
-                        .eq("id", newBid.user_id)
-                        .single()
-                        .then(({ data }) => {
-                          if (data) {
-                            setBidderProfiles(prev => ({ ...prev, [data.id]: data }));
-                          }
-                        });
-                    }
-                    return currentCache;
-                  });
-                }
-              } else if (payload.eventType === "UPDATE") {
                 const updatedBid = payload.new;
                 setBids((prev: any[]) => 
                   prev.map((b: any) => b.id === updatedBid.id ? { ...b, ...updatedBid } : b)
@@ -655,7 +636,7 @@ export const Route = createFileRoute("/ao-vivo")({
           if (activeLotId) {
             const { data: latestBids } = await supabase
               .from("bids")
-              .select("*, profile:profiles(id, full_name)")
+              .select("*")
               .eq("lot_id", activeLotId)
               .order("created_at", { ascending: false })
               .limit(10);
@@ -1368,10 +1349,9 @@ export const Route = createFileRoute("/ao-vivo")({
                  <div>
                    <div className="font-semibold flex items-center gap-2">
                        <div className="flex flex-col">
-                          <span className="text-sm font-bold">
-                            {bid.phone_bidder_identifier || 
-                             (bidderProfiles[bid.user_id]?.full_name || bid.profile?.full_name || (bid.user_id ? `Comprador ...${bid.user_id.slice(-4)}` : "Licitante"))}
-                          </span>
+                           <span className="text-sm font-bold">
+                             {bid.bidder_name || bid.phone_bidder_identifier || "Licitante"}
+                           </span>
                          <div className="flex items-center gap-2 mt-0.5">
                            {bid.is_phone_bid ? (
                              <span className="flex items-center gap-1 text-[9px] bg-gold/20 text-gold px-1.5 py-0.5 rounded uppercase font-black">

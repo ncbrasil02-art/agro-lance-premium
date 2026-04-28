@@ -225,6 +225,7 @@ export type Database = {
         Row: {
           amount: number
           bid_type: string | null
+          bidder_name: string | null
           created_at: string
           id: string
           ip_address: string | null
@@ -238,6 +239,7 @@ export type Database = {
         Insert: {
           amount: number
           bid_type?: string | null
+          bidder_name?: string | null
           created_at?: string
           id?: string
           ip_address?: string | null
@@ -251,6 +253,7 @@ export type Database = {
         Update: {
           amount?: number
           bid_type?: string | null
+          bidder_name?: string | null
           created_at?: string
           id?: string
           ip_address?: string | null

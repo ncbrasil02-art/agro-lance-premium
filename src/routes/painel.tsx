@@ -148,8 +148,6 @@ export const Route = createFileRoute("/painel")({
         } else {
           setMyLots(wonLots || []);
         }
-      
-      setMyLots(wonLots || []);
 
       // Fetch recent bids by the user
       const { data: userBids } = await supabase
