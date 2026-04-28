@@ -313,7 +313,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
         case 'recebendo_lances': return 'text-purple-500 bg-purple-500/10';
         case 'em_condicional': return 'text-orange-500 bg-orange-500/10';
         case 'evento_adiado': return 'text-red-500 bg-red-500/10';
-        case 'finished': return 'text-muted-foreground bg-muted';
+         case 'finished': return 'text-emerald-700 bg-emerald-100 border border-emerald-200 shadow-sm';
         default: return 'text-muted-foreground bg-muted';
       }
    };
@@ -790,16 +790,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                                  </Tooltip>
                                </TooltipProvider>
                              )}
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
-                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
-                                   <Pencil className="h-4 w-4" />
-                                 </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>Editar configurações do evento</TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <Button 
+                                     variant="ghost" 
+                                     size="icon" 
+                                     className="text-emerald-deep"
+                                     onClick={() => {
+                                       setViewingEventDetails(event);
+                                       fetchEventLots(event.id);
+                                     }}
+                                   >
+                                     <Eye className="h-4 w-4" />
+                                   </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent>Ver detalhes e arrematantes</TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
+                                     <Pencil className="h-4 w-4" />
+                                   </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent>Editar configurações do evento</TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
                             {['draft', 'cancelled', 'scheduled', 'em_loteamento'].includes(event.status) ? (
                               <TooltipProvider>
                                 <Tooltip>
