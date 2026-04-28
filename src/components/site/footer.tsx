@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
 
  export function Footer() {
-    const { siteInfo, customTexts } = useSiteSettings();
+    const { siteInfo, customTexts, aboutPage } = useSiteSettings();
    const year = new Date().getFullYear();
   return (
     <footer className="border-t border-border/60 bg-card/40">
@@ -39,7 +39,9 @@ import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
             <li><Link to="/eventos" className="hover:text-foreground">Eventos</Link></li>
             <li><Link to="/lotes" className="hover:text-foreground">Lotes</Link></li>
             <li><Link to="/ao-vivo" className="hover:text-foreground">Ao Vivo</Link></li>
-            <li><Link to="/sobre" className="hover:text-foreground">Sobre</Link></li>
+             {aboutPage?.enabled !== false && (
+               <li><Link to="/sobre" className="hover:text-foreground">{aboutPage?.title || "Sobre"}</Link></li>
+             )}
           </ul>
         </div>
         <div>
