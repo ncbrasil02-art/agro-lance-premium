@@ -42,9 +42,9 @@
  
           data.forEach(item => {
             if (!item.value) return;
-            if (item.key === "site_info") setSiteInfo(prev => ({ ...(prev || {}), ...(item.value as any) }));
-            if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) }));
-            if (item.key === "homepage_sections") setHomepage(prev => ({ ...(prev || {}), ...(item.value as any) }));
+             if (item.key === "site_info") setSiteInfo(prev => ({ ...(prev || {}), ...(item.value as any) }));
+             if (item.key === "theme") setTheme(prev => ({ ...(prev || {}), ...(item.value as any) }));
+             if (item.key === "homepage_sections") setHomepage(prev => ({ ...(prev || {}), ...(item.value as any) }));
           });
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
