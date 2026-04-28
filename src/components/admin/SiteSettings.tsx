@@ -9,6 +9,27 @@
  import { toast } from "sonner";
  import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown } from "lucide-react";
  
+ function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
+   return (
+     <div className="space-y-2">
+       <Label className="text-xs font-medium text-muted-foreground uppercase">{label}</Label>
+       <div className="flex gap-2">
+         <Input 
+           type="color" 
+           className="w-12 h-10 p-1 cursor-pointer" 
+           value={value} 
+           onChange={e => onChange(e.target.value)}
+         />
+         <Input 
+           value={value} 
+           onChange={e => onChange(e.target.value)}
+           className="font-mono text-sm"
+         />
+       </div>
+     </div>
+   );
+ }
+ 
  export function SiteSettings() {
    const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
