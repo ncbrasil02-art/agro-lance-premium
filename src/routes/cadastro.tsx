@@ -26,6 +26,7 @@ function SignupPage() {
     phone: "",
     address: "",
     cep: "",
+    nationality: "Brasileira",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,6 +44,7 @@ function SignupPage() {
             phone: formData.phone,
             address: formData.address,
             cep: formData.cep,
+            nationality: formData.nationality,
           },
         },
       });
