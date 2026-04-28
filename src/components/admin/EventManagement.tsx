@@ -818,11 +818,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             </DialogContent>
           </Dialog>
 
-        <Card>
-         <CardHeader>
-           <CardTitle>Eventos de Leilão</CardTitle>
-         </CardHeader>
-         <CardContent>
+         <Tabs defaultValue="eventos" className="w-full">
+           <TabsList className="mb-4">
+             <TabsTrigger value="eventos" className="gap-2">
+               <CalendarIcon className="h-4 w-4" /> Eventos
+             </TabsTrigger>
+             <TabsTrigger value="pendencias" className="gap-2 relative">
+               <AlertCircle className="h-4 w-4" /> Pendências
+               {pendingWinnerLots.length > 0 && (
+                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                   {pendingWinnerLots.length}
+                 </span>
+               )}
+             </TabsTrigger>
+           </TabsList>
+
+           <TabsContent value="eventos">
+             <Card>
+               <CardHeader>
+                 <CardTitle>Eventos de Leilão</CardTitle>
+               </CardHeader>
+               <CardContent>
            {isLoading ? (
              <div className="flex justify-center py-8">
                <Loader2 className="h-8 w-8 animate-spin text-gold" />
@@ -997,9 +1013,60 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                  )}
                </TableBody>
              </Table>
-           )}
-          </CardContent>
-        </Card>
+               </CardContent>
+             </Card>
+           </TabsContent>
+
+           <TabsContent value="pendencias">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center gap-2">
+                   <Gavel className="h-5 w-5 text-gold" />
+                   Arremates Pendentes de Vínculo
+                 </CardTitle>
+                 <CardDescription>
+                   Lotes vendidos via auditório ou telefone que ainda não foram vinculados a um cadastro do site.
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 {isPendingLoading ? (
+                   <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-gold" /></div>
+                 ) : pendingWinnerLots.length === 0 ? (
+                   <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+                     Nenhum arremate pendente.
+                   </div>
+                 ) : (
+                   <Table>
+                     <TableHeader>
+                       <TableRow>
+                         <TableHead>Lote</TableHead>
+                         <TableHead>Evento</TableHead>
+                         <TableHead>Animal</TableHead>
+                         <TableHead>Valor</TableHead>
+                         <TableHead className="text-right">Ação</TableHead>
+                       </TableRow>
+                     </TableHeader>
+                     <TableBody>
+                       {pendingWinnerLots.map((lot) => (
+                         <TableRow key={lot.id}>
+                           <TableCell className="font-bold">#{lot.lot_number}</TableCell>
+                           <TableCell className="text-xs">{lot.event?.name}</TableCell>
+                           <TableCell className="font-medium uppercase">{lot.animal?.name}</TableCell>
+                           <TableCell className="font-bold text-emerald-deep">{formatBRL(lot.current_price)}</TableCell>
+                           <TableCell className="text-right">
+                             <Button size="sm" onClick={() => setSelectedLotForWinner(lot)}>
+                               <UserPlus className="mr-2 h-4 w-4" /> Atribuir Ganhador
+                             </Button>
+                           </TableCell>
+                         </TableRow>
+                       ))}
+                     </TableBody>
+                   </Table>
+                 )}
+               </CardContent>
+             </Card>
+           </TabsContent>
+         </Tabs>
  
         <Dialog open={!!viewingEventDetails} onOpenChange={(open) => !open && setViewingEventDetails(null)}>
            <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
