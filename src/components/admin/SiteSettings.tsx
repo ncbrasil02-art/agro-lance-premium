@@ -249,67 +249,38 @@
              <CardDescription>Personalize a identidade visual do site</CardDescription>
            </CardHeader>
            <CardContent className="space-y-6">
-             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-               <div className="space-y-2">
-                 <Label>Cor Primária (Destaques)</Label>
-                 <div className="flex gap-2">
-                   <Input 
-                     type="color" 
-                     className="w-12 h-10 p-1" 
-                     value={theme.primary_color} 
-                     onChange={e => setTheme({...theme, primary_color: e.target.value})}
-                   />
-                   <Input 
-                     value={theme.primary_color} 
-                     onChange={e => setTheme({...theme, primary_color: e.target.value})}
-                   />
+             <div className="space-y-8">
+               <section className="space-y-4">
+                 <h3 className="text-lg font-semibold border-b pb-2">Cores Principais</h3>
+                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                   <ColorPicker label="Cor Primária (Destaques)" value={theme.primary_color} onChange={v => setTheme({...theme, primary_color: v})} />
+                   <ColorPicker label="Cor Secundária (Nav/Footer)" value={theme.secondary_color} onChange={v => setTheme({...theme, secondary_color: v})} />
+                   <ColorPicker label="Fundo Geral" value={theme.background_color} onChange={v => setTheme({...theme, background_color: v})} />
+                   <ColorPicker label="Texto Principal" value={theme.foreground_color} onChange={v => setTheme({...theme, foreground_color: v})} />
+                   <ColorPicker label="Texto Secundário" value={theme.muted_foreground_color} onChange={v => setTheme({...theme, muted_foreground_color: v})} />
+                   <ColorPicker label="Bordas" value={theme.border_color} onChange={v => setTheme({...theme, border_color: v})} />
                  </div>
-               </div>
-               <div className="space-y-2">
-                 <Label>Cor Secundária (Fundo Escuro)</Label>
-                 <div className="flex gap-2">
-                   <Input 
-                     type="color" 
-                     className="w-12 h-10 p-1" 
-                     value={theme.secondary_color} 
-                     onChange={e => setTheme({...theme, secondary_color: e.target.value})}
-                   />
-                   <Input 
-                     value={theme.secondary_color} 
-                     onChange={e => setTheme({...theme, secondary_color: e.target.value})}
-                   />
+               </section>
+
+               <section className="space-y-4">
+                 <h3 className="text-lg font-semibold border-b pb-2">Cards e Superfícies</h3>
+                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                   <ColorPicker label="Fundo do Card" value={theme.card_color} onChange={v => setTheme({...theme, card_color: v})} />
+                   <ColorPicker label="Texto do Card" value={theme.card_foreground_color} onChange={v => setTheme({...theme, card_foreground_color: v})} />
+                   <ColorPicker label="Fundo Muted" value={theme.muted_color} onChange={v => setTheme({...theme, muted_color: v})} />
                  </div>
-               </div>
-               <div className="space-y-2">
-                 <Label>Cor de Sotaque (Sucesso)</Label>
-                 <div className="flex gap-2">
-                   <Input 
-                     type="color" 
-                     className="w-12 h-10 p-1" 
-                     value={theme.accent_color} 
-                     onChange={e => setTheme({...theme, accent_color: e.target.value})}
-                   />
-                   <Input 
-                     value={theme.accent_color} 
-                     onChange={e => setTheme({...theme, accent_color: e.target.value})}
-                   />
+               </section>
+
+               <section className="space-y-4">
+                 <h3 className="text-lg font-semibold border-b pb-2">Estados e Status</h3>
+                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                   <ColorPicker label="Sucesso / Sotaque" value={theme.accent_color} onChange={v => setTheme({...theme, accent_color: v})} />
+                   <ColorPicker label="Erro / Destrutivo" value={theme.destructive_color} onChange={v => setTheme({...theme, destructive_color: v})} />
+                   <ColorPicker label="Status: AO VIVO" value={theme.live_color} onChange={v => setTheme({...theme, live_color: v})} />
+                   <ColorPicker label="Status: EM BREVE" value={theme.upcoming_color} onChange={v => setTheme({...theme, upcoming_color: v})} />
+                   <ColorPicker label="Status: ENCERRADO" value={theme.closed_color} onChange={v => setTheme({...theme, closed_color: v})} />
                  </div>
-               </div>
-               <div className="space-y-2">
-                 <Label>Cor de Fundo (Geral)</Label>
-                 <div className="flex gap-2">
-                   <Input 
-                     type="color" 
-                     className="w-12 h-10 p-1" 
-                     value={theme.background_color} 
-                     onChange={e => setTheme({...theme, background_color: e.target.value})}
-                   />
-                   <Input 
-                     value={theme.background_color} 
-                     onChange={e => setTheme({...theme, background_color: e.target.value})}
-                   />
-                 </div>
-               </div>
+               </section>
              </div>
  
              <div className="p-6 rounded-xl border bg-muted/10 space-y-4">
