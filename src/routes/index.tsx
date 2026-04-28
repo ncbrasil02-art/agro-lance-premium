@@ -74,11 +74,14 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
     errorComponent: ErrorFallback,
   });
 
- function Home() {
-     const router = useRouter();
-      const { events, lots, pastEvents, announcement, articles, sectionsSettings: initialSections } = Route.useLoaderData();
-      const { homepage: sectionsSettings, siteInfo } = useSiteSettings();
-      const activeSections = sectionsSettings || initialSections;
+  function Home() {
+      const router = useRouter();
+       const { events, lots, pastEvents, announcement, articles } = Route.useLoaderData();
+       const { siteInfo, theme, homepage } = Route.useRouteContext();
+       const { homepage: sectionsSettings, siteInfo: dynamicSiteInfo } = useSiteSettings({ siteInfo, theme, homepage });
+       
+       const activeSections = sectionsSettings || homepage || { show_articles: true, show_upcoming_events: true, show_featured_lots: true };
+       const currentSiteInfo = dynamicSiteInfo || siteInfo;
     const [now, setNow] = useState(Date.now());
 
      useEffect(() => {
