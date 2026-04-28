@@ -103,8 +103,9 @@
                      </p>
                      
                      <div className="mt-auto flex items-center justify-between">
-                       <Link 
-                         to={`/noticias/${article.slug}`} 
+                       <Link
+                         to="/noticias/$slug"
+                         params={{ slug: article.slug }}
                          className="inline-flex items-center gap-2 text-sm font-bold text-gold hover:text-gold-bright transition-colors"
                        >
                          Ler artigo completo
@@ -124,13 +125,13 @@
 
          <div className="mt-12 text-center">
             <div className="inline-flex flex-col md:flex-row items-center gap-4 p-6 rounded-2xl bg-gold/5 border border-gold/20 backdrop-blur-md">
-                <p className="text-sm text-white/80">Quer destacar seu criatório ou leilão com uma matéria exclusiva?</p>
-                <div className="flex gap-3">
-                    <Link to="/contato">
-                        <Button size="sm" className="bg-gold text-emerald-deep hover:bg-gold-bright font-bold">
-                            Entrar em contato
-                        </Button>
-                    </Link>
+                 <p className="text-sm text-white/80">Quer destacar seu criatório ou leilão com uma matéria exclusiva?</p>
+                 <div className="flex gap-3">
+                     <Link to="/sobre">
+                         <Button size="sm" className="bg-gold text-emerald-deep hover:bg-gold-bright font-bold">
+                             Entrar em contato
+                         </Button>
+                     </Link>
                     <Link to="/painel">
                         <Button size="sm" variant="outline" className="border-gold/40 text-gold hover:bg-gold/10 font-bold">
                             Criar meu evento

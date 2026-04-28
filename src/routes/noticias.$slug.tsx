@@ -22,7 +22,7 @@
    const { post } = Route.useLoaderData()
 
    if (!post) return <div className="container py-20 text-center">Post não encontrado</div>
-
+ 
    return (
      <article className="container mx-auto px-4 py-20 max-w-4xl">
        <Link to="/noticias" className="inline-flex items-center gap-2 text-muted-foreground hover:text-gold mb-8">
@@ -38,7 +38,7 @@
          <div className="flex items-center gap-6 text-sm text-muted-foreground border-y py-4">
            <div className="flex items-center gap-2">
              <Calendar className="h-4 w-4" />
-             {format(new Date(post.published_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+             {post.published_at && format(new Date(post.published_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
            </div>
            <div className="ml-auto flex gap-4">
              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full"><Share2 className="h-4 w-4" /></Button>
@@ -48,8 +48,8 @@
 
        <div className="aspect-[21/9] rounded-3xl overflow-hidden mb-12">
          <OptimizedImage 
-           src={post.featured_image} 
-           alt={post.title}
+           src={post.featured_image || ""} 
+           alt={post.title || ""}
            className="h-full w-full object-cover"
          />
        </div>
