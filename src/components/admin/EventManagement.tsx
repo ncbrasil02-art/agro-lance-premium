@@ -343,71 +343,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
             </CardContent>
           </Card>
 
-         <div className="flex flex-col gap-6">
-           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-gold/5 p-4 rounded-2xl border border-gold/10">
-             <div className="space-y-1">
-               <h3 className="font-bold text-lg text-gold">Quer realizar um evento?</h3>
-               <p className="text-xs text-muted-foreground">Fale conosco e organize seu leilão na Elite.</p>
-             </div>
-             <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
-               <DialogTrigger asChild>
-                 <Button className="bg-emerald-deep text-white hover:bg-emerald-deep/90 shadow-lg">
-                   <Send className="mr-2 h-4 w-4" /> Criar um Evento
-                 </Button>
-               </DialogTrigger>
-               <DialogContent className="sm:max-w-[450px]">
-                 <DialogHeader>
-                   <DialogTitle>Solicitar Novo Evento</DialogTitle>
-                   <DialogDescription>
-                     Preencha seus dados e as informações básicas do evento. Entraremos em contato via WhatsApp.
-                   </DialogDescription>
-                 </DialogHeader>
-                 <div className="grid gap-4 py-4">
-                   <div className="grid gap-2">
-                     <Label htmlFor="req-name">Seu Nome / Nome da Empresa</Label>
-                     <Input id="req-name" value={requestFormData.name} onChange={(e) => setRequestFormData({...requestFormData, name: e.target.value})} />
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="req-whatsapp">WhatsApp (com DDD)</Label>
-                     <Input id="req-whatsapp" value={requestFormData.whatsapp} onChange={(e) => setRequestFormData({...requestFormData, whatsapp: e.target.value})} placeholder="(00) 00000-0000" />
-                   </div>
-                   <div className="grid grid-cols-2 gap-4">
-                     <div className="grid gap-2">
-                       <Label htmlFor="req-cat">Categoria</Label>
-                       <Select onValueChange={(v) => setRequestFormData({...requestFormData, category: v})} value={requestFormData.category}>
-                         <SelectTrigger id="req-cat"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                         <SelectContent>
-                           <SelectItem value="Equinos">Equinos</SelectItem>
-                           <SelectItem value="Bovinos">Bovinos</SelectItem>
-                           <SelectItem value="Geral">Geral</SelectItem>
-                         </SelectContent>
-                       </Select>
-                     </div>
-                     <div className="grid gap-2">
-                       <Label htmlFor="req-loc">Localização</Label>
-                       <Input id="req-loc" value={requestFormData.location} onChange={(e) => setRequestFormData({...requestFormData, location: e.target.value})} placeholder="Cidade - UF" />
-                     </div>
-                   </div>
-                   <div className="grid gap-2">
-                     <Label htmlFor="req-info">Mais Informações</Label>
-                     <Textarea 
-                       id="req-info" 
-                       value={requestFormData.additional_info} 
-                       onChange={(e) => setRequestFormData({...requestFormData, additional_info: e.target.value})} 
-                       placeholder="Conte um pouco sobre o evento que deseja realizar..."
-                       className="min-h-[100px]"
-                     />
-                   </div>
-                 </div>
-                 <DialogFooter>
-                   <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)}>Cancelar</Button>
-                   <Button onClick={handleSendRequest} className="bg-gold text-emerald-deep">Enviar Pedido</Button>
-                 </DialogFooter>
-               </DialogContent>
-             </Dialog>
-           </div>
-
-           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mt-6">
              <div className="flex flex-wrap items-center gap-2">
                <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
@@ -686,11 +622,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
                   {editingEvent ? "Salvar Alterações" : "Criar Evento"}
                </Button>
              </DialogFooter>
-           </DialogContent>
-         </Dialog>
-       </div>
- 
-       <Card>
+            </DialogContent>
+          </Dialog>
+
+        <Card>
          <CardHeader>
            <CardTitle>Eventos de Leilão</CardTitle>
          </CardHeader>
