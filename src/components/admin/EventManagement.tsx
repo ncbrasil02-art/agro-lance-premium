@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -1070,6 +1070,79 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
              <DialogFooter>
                <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
              </DialogFooter>
+           </DialogContent>
+         </Dialog>
+
+         <Dialog open={!!selectedLotForBids} onOpenChange={(open) => !open && setSelectedLotForBids(null)}>
+           <DialogContent className="max-w-xl">
+             <DialogHeader>
+               <DialogTitle>Histórico de Lances: Lote #{selectedLotForBids?.lot_number}</DialogTitle>
+             </DialogHeader>
+             <div className="mt-4">
+               {isBidsLoading ? (
+                 <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+               ) : lotBids.length === 0 ? (
+                 <p className="text-center py-8 text-muted-foreground">Nenhum lance recebido.</p>
+               ) : (
+                 <Table>
+                   <TableHeader>
+                     <TableRow>
+                       <TableHead>Usuário</TableHead>
+                       <TableHead>Valor</TableHead>
+                       <TableHead>Data</TableHead>
+                     </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                     {lotBids.map((bid) => (
+                       <TableRow key={bid.id}>
+                         <TableCell>
+                           <div className="font-bold">{bid.profile?.full_name || bid.bidder_name || 'Usuário'}</div>
+                           <div className="text-[10px] text-muted-foreground">{bid.bid_type}</div>
+                         </TableCell>
+                         <TableCell className="font-bold text-emerald-600">{formatBRL(bid.amount)}</TableCell>
+                         <TableCell className="text-xs">{format(new Date(bid.created_at), "dd/MM HH:mm")}</TableCell>
+                       </TableRow>
+                     ))}
+                   </TableBody>
+                 </Table>
+               )}
+             </div>
+           </DialogContent>
+         </Dialog>
+
+         <Dialog open={!!selectedLotForWinner} onOpenChange={(open) => !open && setSelectedLotForWinner(null)}>
+           <DialogContent>
+             <DialogHeader>
+               <DialogTitle>Atribuir Ganhador: Lote #{selectedLotForWinner?.lot_number}</DialogTitle>
+               <DialogDescription>Pesquise o cadastro para vincular a este arremate.</DialogDescription>
+             </DialogHeader>
+             <div className="space-y-4 py-4">
+               <div className="relative">
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                 <Input 
+                   placeholder="Nome, CPF ou E-mail..." 
+                   className="pl-9"
+                   value={searchWinnerQuery}
+                   onChange={(e) => setSearchWinnerQuery(e.target.value)}
+                 />
+               </div>
+               <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                 {filteredProfiles.map((p) => (
+                   <div key={p.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                     <div>
+                       <p className="font-bold text-sm">{p.full_name}</p>
+                       <p className="text-[10px] text-muted-foreground">CPF: {p.cpf || '---'} | Tel: {p.phone || '---'}</p>
+                     </div>
+                     <Button size="sm" onClick={() => handleAssignWinner(p.id)} disabled={isAssigningWinner}>
+                       {isAssigningWinner ? <Loader2 className="h-4 w-4 animate-spin" /> : "Selecionar"}
+                     </Button>
+                   </div>
+                 ))}
+                 {searchWinnerQuery.length > 2 && filteredProfiles.length === 0 && (
+                   <p className="text-center text-xs text-muted-foreground py-4">Nenhum cadastro encontrado.</p>
+                 )}
+               </div>
+             </div>
            </DialogContent>
          </Dialog>
        </div>
