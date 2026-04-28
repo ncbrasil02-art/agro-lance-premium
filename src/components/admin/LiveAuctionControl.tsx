@@ -221,7 +221,17 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           .order("created_at", { ascending: false })
           .limit(10);
         
-        if (latestBids) setBids(latestBids);
+         if (latestBids) {
+           setBids(prev => {
+             const merged = [...latestBids];
+             prev.forEach(pb => {
+               if (pb.lot_id === activeLot.id && !merged.some(mb => mb.id === pb.id)) {
+                 merged.push(pb);
+               }
+             });
+             return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 15);
+           });
+         }
         setPollingRetryCount(0);
       } catch (err) {
         console.error("Erro na sincronização do narrador:", err);
