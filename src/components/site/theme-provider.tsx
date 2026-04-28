@@ -29,13 +29,18 @@ function applyTheme(theme: Theme) {
          root.style.setProperty("--secondary", siteTheme.secondary_color);
        }
        // Background
-       if (siteTheme.background_color) {
-         root.style.setProperty("--background", siteTheme.background_color);
-       }
-       // Accent
-       if (siteTheme.accent_color) {
-         root.style.setProperty("--accent", siteTheme.accent_color);
-       }
+        if (siteTheme.background_color) root.style.setProperty("--background", siteTheme.background_color);
+        if (siteTheme.foreground_color) root.style.setProperty("--foreground", siteTheme.foreground_color);
+        if (siteTheme.card_color) root.style.setProperty("--card", siteTheme.card_color);
+        if (siteTheme.card_foreground_color) root.style.setProperty("--card-foreground", siteTheme.card_foreground_color);
+        if (siteTheme.muted_color) root.style.setProperty("--muted", siteTheme.muted_color);
+        if (siteTheme.muted_foreground_color) root.style.setProperty("--muted-foreground", siteTheme.muted_foreground_color);
+        if (siteTheme.border_color) root.style.setProperty("--border", siteTheme.border_color);
+        if (siteTheme.accent_color) root.style.setProperty("--accent", siteTheme.accent_color);
+        if (siteTheme.destructive_color) root.style.setProperty("--destructive", siteTheme.destructive_color);
+        if (siteTheme.live_color) root.style.setProperty("--live", siteTheme.live_color);
+        if (siteTheme.upcoming_color) root.style.setProperty("--upcoming", siteTheme.upcoming_color);
+        if (siteTheme.closed_color) root.style.setProperty("--closed", siteTheme.closed_color);
      }
    }, [siteTheme]);
  
