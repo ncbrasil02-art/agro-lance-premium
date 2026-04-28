@@ -48,7 +48,7 @@ export const Route = createFileRoute("/sobre")({
  
   return (
     <div className="container mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Sobre a <span className="text-gradient-gold">Premium Agro</span></h1>
+       <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{settings?.title || "Sobre"} a <span className="text-gradient-gold">Premium Agro</span></h1>
       <p className="mt-6 text-lg text-muted-foreground">
         Somos a plataforma brasileira que está redefinindo a experiência dos leilões agropecuários — unindo
         tradição rural, curadoria genética rigorosa e tecnologia de tempo real.
