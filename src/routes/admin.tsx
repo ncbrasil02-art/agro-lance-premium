@@ -1,35 +1,34 @@
-     import { SiteSettings } from "@/components/admin/SiteSettings";
- import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { getCacheStats } from "@/utils/image-optimization";
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
- import { useAuth } from "@/components/auth/auth-provider";
-     import { Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, ClipboardList, ShoppingCart, ShieldCheck, Newspaper } from "lucide-react";
+ import { 
+   Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
+   LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, 
+   ClipboardList, ShoppingCart, ShieldCheck, Newspaper 
+ } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
+ import { useAuth } from "@/components/auth/auth-provider";
  import { Button } from "@/components/ui/button";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-export const Route = createFileRoute("/admin")({
-  component: AdminLayout,
-});
-
+ import { SiteSettings } from "@/components/admin/SiteSettings";
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
-  import { AnimalManagement } from "@/components/admin/AnimalManagement";
-  import { SellerManagement } from "@/components/admin/SellerManagement";
+ import { AnimalManagement } from "@/components/admin/AnimalManagement";
+ import { SellerManagement } from "@/components/admin/SellerManagement";
  import { CategoryManagement } from "@/components/admin/CategoryManagement";
-   import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
-   import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
-   import { UserManagement } from "@/components/admin/UserManagement";
-    import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
-    import { PostManagement } from "@/components/admin/PostManagement";
-  
-  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
+ import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
+ import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
+ import { UserManagement } from "@/components/admin/UserManagement";
+ import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+ import { PostManagement } from "@/components/admin/PostManagement";
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
+ 
+ type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
+
+ export const Route = createFileRoute("/admin")({
+   component: AdminLayout,
+ });
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -94,10 +93,11 @@ export const Route = createFileRoute("/admin")({
    );
  }
  
- function AdminLayout() {
-    const { profile, isLoading: authLoading, signOut } = useAuth();
-    const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
-    const [selectedEventId, setSelectedEventId] = useState<string>("all");
+  function AdminLayout() {
+     const { profile, isLoading: authLoading, signOut } = useAuth();
+     const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+     const [selectedEventId, setSelectedEventId] = useState<string>("all");
+     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [stats, setStats] = useState({
       totalBids: 0,
       pendingUsers: 0,
