@@ -50,13 +50,13 @@
      setIsLoadingLogs(true);
      setIsLogsDialogOpen(true);
      try {
-       const { data, error } = await supabase
-         .from("audit_logs")
-         .select(`
-           *,
-           admin:profiles!user_id(full_name)
-         `)
-         .eq("entity_id", userId)
+        const { data, error } = await supabase
+          .from("audit_logs")
+          .select(`
+            *,
+            admin:profiles!audit_logs_user_id_fkey(full_name)
+          `)
+          .eq("entity_id", userId)
          .eq("entity_type", "profile")
          .order("created_at", { ascending: false });
  
@@ -134,13 +134,13 @@
    const fetchUsers = async () => {
      setIsLoading(true);
      try {
-       const { data, error } = await supabase
-         .from("profiles")
-         .select(`
-           *,
-           approver:profiles!approved_by(full_name)
-         `)
-         .order("created_at", { ascending: false });
+        const { data, error } = await supabase
+          .from("profiles")
+          .select(`
+            *,
+            approver:profiles!profiles_approved_by_fkey(full_name)
+          `)
+          .order("created_at", { ascending: false });
  
        if (error) throw error;
        setUsers(data || []);
