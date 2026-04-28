@@ -45,7 +45,12 @@
  
  export function useSiteSettings() {
    const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
-   const [theme, setTheme] = useState<ThemeSettings | null>(null);
+    const [theme, setTheme] = useState<ThemeSettings>({
+      primary_color: "#D4AF37",
+      secondary_color: "#064E3B",
+      accent_color: "#10B981",
+      background_color: "#022C22"
+    });
    const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
    const [isLoading, setIsLoading] = useState(true);
  
@@ -58,11 +63,11 @@
          
          if (error) throw error;
  
-         data.forEach(item => {
-           if (item.key === "site_info") setSiteInfo(item.value as any);
-           if (item.key === "theme") setTheme(item.value as any);
-           if (item.key === "homepage_sections") setHomepage(item.value as any);
-         });
+          data.forEach(item => {
+            if (item.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(item.value as any) }));
+            if (item.key === "theme") setTheme(prev => ({ ...prev, ...(item.value as any) }));
+            if (item.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(item.value as any) }));
+          });
        } catch (error) {
          console.error("Error fetching site settings:", error);
        } finally {
