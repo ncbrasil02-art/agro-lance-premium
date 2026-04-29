@@ -45,17 +45,17 @@ export function BulkSeoAudit() {
       
       animals.data?.forEach(a => {
         const issues = analyzeSEO(a.seo_title || a.name, a.seo_description || "", "", a.photos?.[0], a.og_title || undefined, a.og_description || undefined);
-        allItems.push({ id: a.id, name: a.name, type: 'Animal', issues });
+        allItems.push({ id: a.id, name: a.name, type: 'Animal', issues, rawContent: a.seo_description });
       });
 
       posts.data?.forEach(p => {
         const issues = analyzeSEO(p.seo_title || p.title, p.seo_description || "", p.content || "", p.featured_image || undefined, p.og_title || undefined, p.og_description || undefined);
-        allItems.push({ id: p.id, name: p.title, type: 'Notícia', issues });
+        allItems.push({ id: p.id, name: p.title, type: 'Notícia', issues, rawContent: p.content });
       });
 
       events.data?.forEach(e => {
         const issues = analyzeSEO(e.seo_title || e.name, e.seo_description || "", "", e.banner_url || undefined, e.og_title || undefined, e.og_description || undefined);
-        allItems.push({ id: e.id, name: e.name, type: 'Evento', issues });
+        allItems.push({ id: e.id, name: e.name, type: 'Evento', issues, rawContent: e.seo_description });
       });
 
       setResults(allItems);
