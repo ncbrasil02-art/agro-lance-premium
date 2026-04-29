@@ -44,7 +44,8 @@ import { SocialPreview } from "./SocialPreview";
   const [selectedLotForWinner, setSelectedLotForWinner] = useState<any>(null);
   const [searchWinnerQuery, setSearchWinnerQuery] = useState("");
   const [isAssigningWinner, setIsAssigningWinner] = useState(false);
-  const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+   const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+   const [showBalanceReport, setShowBalanceReport] = useState(false);
 
    const handleAutoFix = async () => {
      if (!formData.name) {
