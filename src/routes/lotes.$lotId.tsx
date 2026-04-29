@@ -348,14 +348,11 @@ function LotDetail() {
         status = newStatus === 'SUBSCRIBED' ? 'SUBSCRIBED' : 'ERROR';
       });
 
-    // Polling fallback if WebSocket fails or lags
     const pollInterval = setInterval(async () => {
-      if (status === 'SUBSCRIBED' && Math.random() > 0.1) return; // Only poll 10% of time if subscribed to verify
-
+      if (status === 'SUBSCRIBED') return;
+      
       const { data: latestLot } = await supabase.from("lots").select("*").eq("id", lotId).single();
-      if (latestLot) {
-        setLot((prev: any) => ({ ...prev, ...latestLot }));
-      }
+      if (latestLot) setLot((prev: any) => ({ ...prev, ...latestLot }));
 
       const { data: latestBids } = await supabase
         .from("bids")
@@ -364,45 +361,25 @@ function LotDetail() {
         .order("created_at", { ascending: false })
         .limit(10);
       
-      if (latestBids) {
-        setRecentBids(latestBids);
-      }
-    }, status === 'SUBSCRIBED' ? 60000 : 10000);
+      if (latestBids) setRecentBids(latestBids);
+    }, 30000);
+
+    if (user) {
+      supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lotId).maybeSingle().then(r => setIsFavorite(!!r.data));
+    }
+    
+    if (!viewIncremented) {
+      supabase.rpc('increment_lot_viewers', { p_lot_id: lotId }).then(({ error }) => {
+        if (error) {
+          supabase.from('lots').update({ viewers: (lot.viewers || 0) + 1 }).eq('id', lotId);
+        }
+        setViewIncremented(true);
+      });
+    }
 
     return () => {
       supabase.removeChannel(lotChannel);
       clearInterval(pollInterval);
-    };
-
-     if (user) {
-       supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lot.id).maybeSingle().then(r => setIsFavorite(!!r.data));
-     }
-
-     // Increment viewers count
-     if (!viewIncremented) {
-       const incrementViewers = async () => {
-         try {
-           // @ts-ignore - The RPC might not be in the types yet
-           const { error } = await supabase.rpc('increment_lot_viewers', { p_lot_id: lot.id });
-           if (error) {
-             console.error("Error incrementing viewers:", error);
-             // Fallback to manual update if RPC fails
-             await supabase
-               .from('lots')
-               .update({ viewers: (lot.viewers || 0) + 1 })
-               .eq('id', lot.id);
-           }
-           setViewIncremented(true);
-         } catch (e) {
-           console.error("Failed to increment viewers:", e);
-         }
-       };
-       incrementViewers();
-     }
-
-    return () => { 
-      supabase.removeChannel(lotChannel); 
-      supabase.removeChannel(bidsChannel);
     };
   }, [lot.id, user]);
 
