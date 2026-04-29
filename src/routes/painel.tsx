@@ -400,7 +400,7 @@ export const Route = createFileRoute("/painel")({
                    <table className="w-full text-sm text-left">
                      <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
                        <tr>
-                         <th className="px-4 py-3">Data</th>
+                          <th className="px-4 py-3">Data/Últ. Att.</th>
                          <th className="px-4 py-3">Animal</th>
                          <th className="px-4 py-3">Valor</th>
                          <th className="px-4 py-3">Status</th>
