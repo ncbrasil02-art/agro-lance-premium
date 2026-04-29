@@ -24,6 +24,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { HomeSaleLots } from "@/components/site/HomeSaleLots";
 
     export const Route = createFileRoute("/")({
       head: ({ matches }) => {
@@ -354,57 +355,7 @@ import { Badge } from "@/components/ui/badge";
               <ArticleCarousel articles={articles} />
             )}
             {sectionId === "articles" && directSales.length > 0 && (
-              <section className="container mx-auto px-4 py-16">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                  <div>
-                    <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gold mb-3">
-                      <ShoppingCart className="h-3.5 w-3.5" /> Oportunidades Únicas
-                    </div>
-                    <h2 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">Venda Direta</h2>
-                    <p className="text-muted-foreground max-w-md">Garanta animais de elite com preço fixo, sem disputa de lances.</p>
-                  </div>
-                  <Link to="/compra-direta">
-                    <Button variant="ghost" className="text-gold hover:text-gold hover:bg-gold/10 gap-2 font-bold uppercase italic text-xs tracking-widest">
-                      Ver Catálogo Completo <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-                
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  {directSales.map((animal: any) => (
-                    <Link key={animal.id} to="/compra-direta" className="group">
-                      <Card className="overflow-hidden border-border/40 bg-card/30 hover:bg-card/50 transition-all duration-300 hover:shadow-2xl hover:shadow-gold/10 rounded-3xl h-full flex flex-col border-b-4 border-b-gold/20 hover:border-b-gold">
-                        <div className="relative aspect-[4/3] overflow-hidden">
-                          <OptimizedImage 
-                            src={animal.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-                            alt={animal.name} 
-                            className="group-hover:scale-110 transition-transform duration-500"
-                          />
-                          <div className="absolute top-3 left-3">
-                            <Badge className="bg-black/60 backdrop-blur-md border-white/10 text-[10px] font-bold uppercase tracking-widest">
-                              {animal.breed}
-                            </Badge>
-                          </div>
-                        </div>
-                        <CardContent className="p-5 flex-1 flex flex-col">
-                          <h3 className="text-lg font-black text-foreground uppercase italic tracking-tighter leading-tight mb-1 group-hover:text-gold transition-colors">{animal.name}</h3>
-                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-4">{animal.location || "Brasil"}</p>
-                          
-                          <div className="mt-auto pt-4 border-t border-border/40 flex items-center justify-between">
-                            <div className="flex flex-col">
-                              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Preço Fixo</span>
-                              <span className="text-xl font-black text-foreground">{formatBRL(animal.sale_price)}</span>
-                            </div>
-                            <div className="h-10 w-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-emerald-deep transition-all">
-                              <ShoppingCart className="h-5 w-5" />
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </section>
+              <HomeSaleLots directSales={directSales} />
             )}
             {sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu && (
               <section className="container mx-auto px-4 py-16">
