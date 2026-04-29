@@ -54,6 +54,10 @@ function DirectSalePage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isOfferDialogOpen, setIsCheckoutOfferOpen] = useState(false);
+  const [offerAmount, setOfferAmount] = useState("");
+  const [offerMessage, setOfferMessage] = useState("");
+  const [isSubmittingOffer, setIsSubmittingOffer] = useState(false);
   
   const [buyerInfo, setBuyerInfo] = useState({
     name: "",
@@ -74,6 +78,48 @@ function DirectSalePage() {
   const handlePurchase = (animal: any) => {
     setSelectedAnimal(animal);
     setIsCheckoutOpen(true);
+  };
+
+  const handleMakeOffer = (animal: any) => {
+    setSelectedAnimal(animal);
+    setOfferAmount((animal.sale_price * 0.9).toString()); // Default suggest 90%
+    setIsCheckoutOfferOpen(true);
+  };
+
+  const submitOffer = async () => {
+    const amount = parseFloat(offerAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Por favor, insira um valor válido para a proposta.");
+      return;
+    }
+
+    setIsSubmittingOffer(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Você precisa estar logado para enviar uma proposta.");
+        return;
+      }
+
+      const { error } = await supabase.from("offers").insert({
+        animal_id: selectedAnimal.id,
+        user_id: user.id,
+        amount: amount,
+        description: offerMessage || `Proposta de compra direta para o animal ${selectedAnimal.name}`,
+        status: "pending"
+      });
+
+      if (error) throw error;
+
+      toast.success("Proposta enviada com sucesso! O vendedor será notificado.");
+      setIsCheckoutOfferOpen(false);
+      setOfferMessage("");
+    } catch (error: any) {
+      toast.error("Erro ao enviar proposta: " + error.message);
+    } finally {
+      setIsSubmittingOffer(false);
+    }
   };
 
   const confirmPurchase = async () => {
@@ -216,14 +262,24 @@ function DirectSalePage() {
                   </div>
                 </div>
                 
-                <Button 
-                  className="w-full bg-gold-gradient text-emerald-deep font-bold h-12 rounded-xl shadow-gold hover:opacity-90 disabled:opacity-50 disabled:grayscale"
-                  onClick={() => handlePurchase(animal)}
-                  disabled={animal.sale_status !== 'available'}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {animal.sale_status === 'available' ? 'Comprar Agora' : 'Indisponível'}
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline"
+                    className="border-gold text-gold hover:bg-gold hover:text-emerald-deep font-bold h-12 rounded-xl disabled:opacity-50"
+                    onClick={() => handleMakeOffer(animal)}
+                    disabled={animal.sale_status !== 'available'}
+                  >
+                    Fazer Oferta
+                  </Button>
+                  <Button 
+                    className="bg-gold-gradient text-emerald-deep font-bold h-12 rounded-xl shadow-gold hover:opacity-90 disabled:opacity-50 disabled:grayscale"
+                    onClick={() => handlePurchase(animal)}
+                    disabled={animal.sale_status !== 'available'}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-1" />
+                    Comprar
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           ))
