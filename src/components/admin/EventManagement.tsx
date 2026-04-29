@@ -172,7 +172,7 @@ import { SocialPreview } from "./SocialPreview";
             .from("lots")
             .select(`
               *,
-              animal:animals(name, internal_code),
+               animal:animals(name, internal_code, seller:sellers(name)),
               winner:profiles!lots_winner_id_fkey(id, full_name, phone, cpf)
             `)
             .eq("event_id", eventId)
