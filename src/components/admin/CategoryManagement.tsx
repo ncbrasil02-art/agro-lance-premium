@@ -8,6 +8,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Tag } from "lucide-r
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
+import { generateSlug } from "@/utils/slug";
 import { toast } from "sonner";
 
 export function CategoryManagement() {
@@ -63,15 +64,18 @@ export function CategoryManagement() {
     }
 
     try {
+      const slug = generateSlug(formData.name);
+      const dataToSave = { ...formData, slug };
+      
       if (editingCategory) {
         const { error } = await supabase
           .from("categories")
-          .update(formData)
+          .update(dataToSave)
           .eq("id", editingCategory.id);
         if (error) throw error;
         toast.success("Categoria atualizada com sucesso");
       } else {
-        const { error } = await supabase.from("categories").insert(formData);
+        const { error } = await supabase.from("categories").insert(dataToSave);
         if (error) throw error;
         toast.success("Categoria cadastrada com sucesso");
       }
