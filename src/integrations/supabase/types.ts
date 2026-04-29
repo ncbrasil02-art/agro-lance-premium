@@ -36,6 +36,9 @@ export type Database = {
           is_direct_sale: boolean | null
           location: string | null
           name: string
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
           pedigree_url: string | null
           photos: string[] | null
           registration_1cc: string | null
@@ -77,6 +80,9 @@ export type Database = {
           is_direct_sale?: boolean | null
           location?: string | null
           name: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
           pedigree_url?: string | null
           photos?: string[] | null
           registration_1cc?: string | null
@@ -118,6 +124,9 @@ export type Database = {
           is_direct_sale?: boolean | null
           location?: string | null
           name?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
           pedigree_url?: string | null
           photos?: string[] | null
           registration_1cc?: string | null
@@ -570,6 +579,9 @@ export type Database = {
           location: string | null
           mode: string | null
           name: string
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
           photos: string[] | null
           promoter_company: string | null
           regulation: string | null
@@ -604,6 +616,9 @@ export type Database = {
           location?: string | null
           mode?: string | null
           name: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
           photos?: string[] | null
           promoter_company?: string | null
           regulation?: string | null
@@ -638,6 +653,9 @@ export type Database = {
           location?: string | null
           mode?: string | null
           name?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
           photos?: string[] | null
           promoter_company?: string | null
           regulation?: string | null
@@ -974,6 +992,9 @@ export type Database = {
           excerpt: string | null
           featured_image: string | null
           id: string
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
           published_at: string | null
           read_time: string | null
           seo_description: string | null
@@ -992,6 +1013,9 @@ export type Database = {
           excerpt?: string | null
           featured_image?: string | null
           id?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
           published_at?: string | null
           read_time?: string | null
           seo_description?: string | null
@@ -1010,6 +1034,9 @@ export type Database = {
           excerpt?: string | null
           featured_image?: string | null
           id?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
           published_at?: string | null
           read_time?: string | null
           seo_description?: string | null
