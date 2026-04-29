@@ -92,6 +92,15 @@ export function generateMetaTags({
      issues.push({ level: 'warn', message: 'Imagem para Twitter Card ausente (recomendado para melhor engajamento).' });
    }
  
+  // Open Graph checks
+  if (!ogTitle && title) {
+    issues.push({ level: 'info', message: 'Usando título padrão para Open Graph. Considere um título específico para redes sociais.' });
+  }
+
+  if (!ogDescription && description) {
+    issues.push({ level: 'info', message: 'Usando descrição padrão para Open Graph. Considere uma descrição otimizada para redes sociais.' });
+  }
+
    // Content keywords (basic check)
    if (content && title) {
      const mainKeywords = title.toLowerCase().split(' ').filter(w => w.length > 4);
