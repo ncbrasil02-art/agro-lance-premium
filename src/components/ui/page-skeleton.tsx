@@ -1,3 +1,31 @@
+ export function SectionSkeleton({ type = "cards", count = 3 }: { type?: "cards" | "lots" | "articles", count?: number }) {
+   return (
+     <section className="container mx-auto px-4 py-16 animate-pulse">
+       <div className="mb-8 space-y-4">
+         <Skeleton className="h-10 w-64 md:h-12 rounded-xl" />
+         <Skeleton className="h-5 w-96 max-w-full rounded-lg" />
+       </div>
+       <div className={`grid gap-6 ${
+         type === "lots" 
+           ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" 
+           : type === "articles"
+             ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+             : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+       }`}>
+         {Array.from({ length: count }).map((_, i) => (
+           <div key={i} className="space-y-4">
+             <Skeleton className={`${type === "lots" ? "aspect-[3/4]" : "aspect-video"} w-full rounded-3xl`} />
+             <div className="space-y-2 px-2">
+               <Skeleton className="h-6 w-3/4 rounded-lg" />
+               <Skeleton className="h-4 w-1/2 rounded-lg" />
+             </div>
+           </div>
+         ))}
+       </div>
+     </section>
+   );
+ }
+ 
 export function LotDetailSkeleton() {
   return (
     <div className="min-h-screen bg-background animate-in fade-in duration-500">
@@ -158,9 +186,9 @@ export function HomeSkeleton() {
         <div className="container relative mx-auto px-4">
           <div className="max-w-2xl space-y-6">
             <Skeleton className="h-7 w-48 rounded-full" />
-            <Skeleton className="h-16 w-3/4 md:h-24" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-16 w-3/4 md:h-24 rounded-2xl" />
+            <Skeleton className="h-5 w-full rounded-lg" />
+            <Skeleton className="h-5 w-2/3 rounded-lg" />
             <div className="flex flex-wrap gap-3 mt-8">
               <Skeleton className="h-12 w-40 rounded-xl" />
               <Skeleton className="h-12 w-48 rounded-xl" />
@@ -169,20 +197,10 @@ export function HomeSkeleton() {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-16 space-y-20">
-        <div className="space-y-8">
-          <Skeleton className="h-10 w-64" />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="aspect-video w-full rounded-2xl" />)}
-          </div>
-        </div>
-
-        <div className="space-y-8">
-          <Skeleton className="h-10 w-64" />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="aspect-[9/16] w-full rounded-2xl" />)}
-          </div>
-        </div>
+      <div className="container mx-auto px-4 py-16 space-y-0">
+        <SectionSkeleton type="cards" count={3} />
+        <SectionSkeleton type="lots" count={3} />
+        <SectionSkeleton type="articles" count={4} />
       </div>
     </div>
   );
