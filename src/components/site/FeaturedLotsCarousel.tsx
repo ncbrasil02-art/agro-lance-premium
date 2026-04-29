@@ -38,24 +38,24 @@
           <div className="flex items-center gap-3">
             <Link to="/lotes" className="mr-4 text-xs font-black uppercase italic tracking-widest text-gold hover:underline">Ver tudo</Link>
             <div className="flex gap-2">
-           <Button 
-             variant="outline" 
-             size="icon" 
-             onClick={scrollPrev}
-             className="rounded-full border-gold/30 hover:bg-gold/10 text-gold h-10 w-10"
-           >
-             <ChevronLeft className="h-5 w-5" />
-           </Button>
-           <Button 
-             variant="outline" 
-             size="icon" 
-             onClick={scrollNext}
-             className="rounded-full border-gold/30 hover:bg-gold/10 text-gold h-10 w-10"
-           >
-             <ChevronRight className="h-5 w-5" />
-           </Button>
-         </div>
-       </div>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={scrollPrev}
+                className="rounded-full border-gold/30 hover:bg-gold/10 text-gold h-10 w-10"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={scrollNext}
+                className="rounded-full border-gold/30 hover:bg-gold/10 text-gold h-10 w-10"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
 
        <div className="overflow-hidden p-2 -m-2" ref={emblaRef}>
          <div className="flex -ml-6">
