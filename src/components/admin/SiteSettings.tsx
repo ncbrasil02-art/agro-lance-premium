@@ -72,7 +72,8 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
      email: "",
      phone: "",
      cnpj: "",
-     logo_url: ""
+      logo_url: "",
+      site_url: ""
    });
  
    const [theme, setTheme] = useState<any>({
@@ -501,13 +502,22 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                    />
                  </div>
                  <div className="space-y-2">
-                   <Label htmlFor="site_cnpj">CNPJ</Label>
-                   <Input 
-                     id="site_cnpj" 
-                     value={siteInfo.cnpj} 
-                     onChange={e => setSiteInfo({...siteInfo, cnpj: e.target.value})}
-                   />
-                 </div>
+                    <Label htmlFor="site_cnpj">CNPJ</Label>
+                    <Input 
+                      id="site_cnpj" 
+                      value={siteInfo.cnpj} 
+                      onChange={e => setSiteInfo({...siteInfo, cnpj: e.target.value})} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="site_url">URL do Site (Canonical)</Label>
+                    <Input 
+                      id="site_url" 
+                      value={siteInfo.site_url} 
+                      onChange={e => setSiteInfo({...siteInfo, site_url: e.target.value})} 
+                      placeholder="https://agro-ncbrasil.lovable.app"
+                    />
+                  </div>
                </div>
  
                <div className="space-y-4">
