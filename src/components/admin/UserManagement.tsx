@@ -138,7 +138,7 @@
           .from("profiles")
           .select(`
             *,
-            approver:profiles!profiles_approved_by_fkey(full_name)
+            approver:profiles!approved_by(full_name)
           `)
           .order("created_at", { ascending: false });
  
