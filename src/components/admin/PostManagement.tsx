@@ -352,6 +352,8 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                          description={formData.seo_description || formData.excerpt}
                          content={formData.content}
                          image={formData.featured_image}
+                          ogTitle={formData.og_title}
+                          ogDescription={formData.og_description}
                        />
                        <div className="mt-6">
                          <SerpPreview 
