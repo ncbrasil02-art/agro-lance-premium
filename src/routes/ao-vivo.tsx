@@ -181,7 +181,7 @@ export const Route = createFileRoute("/ao-vivo")({
   const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
   const [lastSyncAt, setLastSyncAt] = useState<Date>(new Date());
   const [syncTrigger, setSyncTrigger] = useState(0);
-  const [pollingRetryCount, setPollingRetryCount] = useState(0);
+  // pollingRetryCount removido pois agora é controlado pelo hook useRealtimeFallback
    const [reconnectTrigger, setReconnectTrigger] = useState(0);
    const [isFavorite, setIsFavorite] = useState(false);
    const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
@@ -681,7 +681,6 @@ export const Route = createFileRoute("/ao-vivo")({
         }
       } catch (err) {
         console.error("Erro ao sincronizar dados:", err);
-        setPollingRetryCount(prev => prev + 1);
       }
     };
 
