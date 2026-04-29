@@ -24,10 +24,11 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
           table: 'lots',
           filter: `event_id=eq.${eventId}`,
         },
-        (payload) => {
-          logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
-          onUpdate();
-        }
+         (payload) => {
+           logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
+           onUpdate();
+           fallback?.onManualUpdate?.();
+         }
       )
       .on(
         'postgres_changes',
@@ -37,10 +38,11 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
           table: 'events',
           filter: `id=eq.${eventId}`,
         },
-        (payload) => {
-          logger.info('Mudança detectada nos dados do evento', { eventId, payload });
-          onUpdate();
-        }
+         (payload) => {
+           logger.info('Mudança detectada nos dados do evento', { eventId, payload });
+           onUpdate();
+           fallback?.onManualUpdate?.();
+         }
       )
       .subscribe((newStatus) => {
         logger.info(`Status do canal em tempo real (${eventId}): ${newStatus}`);
