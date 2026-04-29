@@ -33,12 +33,20 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
     if (!item) return;
 
     if (isNaN(offerAmount) || offerAmount <= 0) {
+      setAmountError(true);
       toast.error("Por favor, insira um valor válido para a proposta.");
       return;
     }
 
+    setAmountError(false);
+
     if (item.price > 0 && offerAmount < item.price * 0.1) {
       toast.error("Valor da proposta muito baixo em relação ao valor de referência.");
+      return;
+    }
+
+    if (message.length > 500) {
+      toast.error("A observação é muito longa (máximo 500 caracteres).");
       return;
     }
 
