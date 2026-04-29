@@ -1,5 +1,17 @@
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
+ import { SiteSettings } from "@/components/admin/SiteSettings";
+ import { EventManagement } from "@/components/admin/EventManagement";
+ import { LotManagement } from "@/components/admin/LotManagement";
+ import { AnimalManagement } from "@/components/admin/AnimalManagement";
+ import { SellerManagement } from "@/components/admin/SellerManagement";
+ import { CategoryManagement } from "@/components/admin/CategoryManagement";
+ import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
+ import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
+ import { UserManagement } from "@/components/admin/UserManagement";
+ import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
+ import { PostManagement } from "@/components/admin/PostManagement";
+ import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
  import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
    LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, 
