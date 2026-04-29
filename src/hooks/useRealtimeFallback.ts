@@ -7,6 +7,8 @@
    label: string;
    pollInterval?: number;
    initialPollInterval?: number;
+   maxInterval?: number;
+   backoffFactor?: number;
    enabled?: boolean;
  }
  
@@ -20,6 +22,8 @@
    label,
    pollInterval = 45000,
    initialPollInterval = 10000,
+   maxInterval = 120000,
+   backoffFactor = 1.2,
    enabled = true
  }: RealtimeFallbackOptions) {
    const onUpdateRef = useRef(onUpdate);
@@ -39,15 +43,13 @@
    useEffect(() => {
      if (!enabled || status === 'SUBSCRIBED') return;
  
-     // Cálculo de intervalo com backoff exponencial
-     // Baseado no status e no número de tentativas
-     let baseInterval = status === 'INITIAL' ? initialPollInterval : pollInterval;
+     const isInitial = status === 'INITIAL' || status === 'JOINING';
+     const baseInterval = isInitial ? initialPollInterval : pollInterval;
      
-     // Aplica backoff exponencial: base * (1.2 ^ retryCount)
-     // Limitado a um máximo de 2 minutos para não ficar muito lento
+     // Exponential backoff
      const intervalTime = Math.min(
-       baseInterval * Math.pow(1.2, retryCount), 
-       120000 
+       baseInterval * Math.pow(backoffFactor, retryCount), 
+       maxInterval 
      );
  
      logger.warn(`Realtime [${label}] status: ${status}. Polling fallback em ${Math.round(intervalTime/1000)}s (Tentativa: ${retryCount})`);
