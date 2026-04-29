@@ -223,9 +223,11 @@ import { generateSlug } from "@/utils/slug";
          auctioneer_name: "",
          seller_id: "none",
          seller_name: "",
-         regulation: "",
-         viewers: 0
-       });
+          regulation: "",
+          viewers: 0,
+          seo_title: "",
+          seo_description: ""
+        });
      };
 
      const handleEdit = (event: any) => {
