@@ -1,6 +1,7 @@
-import React, { Component, ReactNode } from "react";
+ import React, { Component, ReactNode, useEffect } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { AlertTriangle, RefreshCcw, Home } from "lucide-react";
+ import { logErrorToDb } from "@/utils/error-logger";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -24,6 +25,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: any) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
+     logErrorToDb("ErrorBoundary", error, errorInfo);
   }
 
   render() {
@@ -51,6 +53,10 @@ interface ErrorFallbackProps {
 
 export function ErrorFallback({ error, reset }: ErrorFallbackProps) {
   const router = useRouter();
+ 
+   useEffect(() => {
+     logErrorToDb("ErrorFallback", error);
+   }, [error]);
 
   const handleReset = () => {
     if (reset) {
