@@ -9,7 +9,7 @@
   export const Route = createFileRoute("/noticias/$slug")({
     head: (ctx: any) => {
       const post = ctx.loaderData?.post;
-      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+      const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
       const seoSuffix = rootData?.seoSettings?.global_title_suffix || "";
       
       const title = post?.seo_title || (post?.title ? `${post.title}${seoSuffix}` : "Notícia — Premium Agro Leilões");
