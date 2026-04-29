@@ -206,7 +206,10 @@ import { SocialPreview } from "./SocialPreview";
           viewers: 0,
           slug: "",
           seo_title: "",
-          seo_description: ""
+          seo_description: "",
+          og_title: "",
+          og_description: "",
+          og_image_url: ""
         });
 
      const resetForm = () => {
@@ -231,7 +234,10 @@ import { SocialPreview } from "./SocialPreview";
           viewers: 0,
           slug: "",
           seo_title: "",
-          seo_description: ""
+          seo_description: "",
+          og_title: "",
+          og_description: "",
+          og_image_url: ""
         });
      };
 
@@ -257,7 +263,10 @@ import { SocialPreview } from "./SocialPreview";
             viewers: event.viewers || 0,
             slug: event.slug || "",
             seo_title: event.seo_title || "",
-            seo_description: event.seo_description || ""
+          seo_description: event.seo_description || "",
+          og_title: event.og_title || "",
+          og_description: event.og_description || "",
+          og_image_url: event.og_image_url || ""
         });
        setIsDialogOpen(true);
      };
