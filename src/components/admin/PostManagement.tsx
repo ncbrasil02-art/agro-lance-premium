@@ -5,7 +5,8 @@
  import { Textarea } from "@/components/ui/textarea";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock } from "lucide-react";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
