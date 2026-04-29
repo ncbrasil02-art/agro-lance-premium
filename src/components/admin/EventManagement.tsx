@@ -461,6 +461,11 @@ import { useAuth } from "@/components/auth/auth-provider";
         return;
       }
 
+      if (formData.commission_rate < 0 || formData.commission_rate > 100) {
+        toast.error("A taxa de comissão deve estar entre 0 e 100%");
+        return;
+      }
+
       console.log("Saving event...", formData);
       try {
          if (editingEvent) {
@@ -928,6 +933,8 @@ import { useAuth } from "@/components/auth/auth-provider";
                         id="commission_rate"
                         type="number" 
                         step="0.01"
+                        min="0"
+                        max="100"
                         value={formData.commission_rate} 
                         onChange={(e) => setFormData({ ...formData, commission_rate: parseFloat(e.target.value) || 0 })} 
                         placeholder="Ex: 5" 
