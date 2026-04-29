@@ -22,6 +22,8 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
   import { HomeSkeleton, PageSkeleton } from "@/components/ui/page-skeleton";
   import { ErrorFallback, ErrorBoundary } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
     export const Route = createFileRoute("/")({
       head: ({ matches }) => {
