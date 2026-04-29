@@ -24,7 +24,7 @@ export function generateMetaTags({
   const seoSuffix = seoSettings?.global_title_suffix || " | Premium Agro Leilões";
   const defaultDesc = seoSettings?.global_description || "A plataforma brasileira de leilões agropecuários com tecnologia de ponta.";
   const siteUrl = seoSettings?.site_url || "https://agro-ncbrasil.lovable.app";
-  const supabaseUrl = "https://rqe5i25elidk1c06soeo.supabase.co"; // Get this from project context if possible
+  const supabaseUrl = "https://ccrslflbnxdazvadjlvj.supabase.co";
 
   const finalTitle = title ? `${title}${seoSuffix}` : "Premium Agro Leilões";
   const finalDesc = description || defaultDesc;
