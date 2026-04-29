@@ -23,7 +23,9 @@ interface OfferDialogProps {
 export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
    const [amount, setAmount] = useState<string>("");
    const [amountError, setAmountError] = useState(false);
-   const [installments, setInstallments] = useState<string>("30");
+   const [installments, setInstallments] = useState<string>(() => {
+     return localStorage.getItem("offer_installments_preference") || "30";
+   });
    const [message, setMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
