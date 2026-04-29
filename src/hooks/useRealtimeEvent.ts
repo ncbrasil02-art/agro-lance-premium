@@ -94,7 +94,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       initialPollInterval: 15000
     });
  
-    return { status, ...fallback };
+    return { ...fallback };
  }
  
  export function useHomeRealtime(onUpdate: () => void) {
@@ -134,7 +134,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       initialPollInterval: 10000
     });
  
-    return { status, ...fallback };
+    return { ...fallback };
  }
  export function useRealtimeLots(onUpdate: () => void) {
     return useHomeRealtime(onUpdate);
