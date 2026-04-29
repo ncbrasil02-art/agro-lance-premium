@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+ import { createFileRoute } from "@tanstack/react-router";
+ import { PAGE_LIMITS } from "@/config/limits";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 import { useState, useMemo } from "react";
@@ -24,9 +25,10 @@ export const Route = createFileRoute("/eventos/")({
       logger.info("Iniciando carregamento da página de Eventos");
       try {
         const { data: events, error } = await supabase
-          .from("events")
-          .select("*, lots!lots_event_id_fkey(id)")
-          .order("start_date");
+           .from("events")
+           .select("*, lots!lots_event_id_fkey(id)")
+           .order("start_date")
+           .limit(PAGE_LIMITS.EVENTS_LIST);
    
         if (error) {
           logger.error("Erro Supabase ao carregar eventos", { error });
