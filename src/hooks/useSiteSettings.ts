@@ -63,108 +63,77 @@
       }
     }, [initialData?.siteInfo, initialData?.theme, initialData?.homepage]);
 
-     useEffect(() => {
-       async function fetchSettings() {
-         // Only skip fetch if we actually have data in initialData
-         const hasInitialData = initialData && (initialData.siteInfo || initialData.theme || initialData.homepage);
-         
-         if (hasInitialData) {
-           setIsLoading(false);
-           return;
-         }
+      const [status, setStatus] = useState<string>("INITIAL");
 
-         try {
-         const { data, error } = await supabase
-           .from("site_settings")
-           .select("key, value");
-         
-         if (error) throw error;
- 
+      const fetchSettings = useCallback(async () => {
+        const hasInitialData = initialData && (initialData.siteInfo || initialData.theme || initialData.homepage);
+        if (hasInitialData && isLoading) {
+           setIsLoading(false);
+        }
+
+        try {
+          const { data, error } = await supabase
+            .from("site_settings")
+            .select("key, value");
+          
+          if (error) throw error;
+  
           const info = data.find(i => i.key === "site_info")?.value as any as SiteInfo;
           const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
-           const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
-           const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
-           const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
+          const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
+          const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
+          const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
-           if (homeSettings) setHomepage(homeSettings);
-           if (textsSettings) setCustomTexts(textsSettings);
-           if (aboutSettings) setAboutPage(aboutSettings);
+          if (homeSettings) setHomepage(homeSettings);
+          if (textsSettings) setCustomTexts(textsSettings);
+          if (aboutSettings) setAboutPage(aboutSettings);
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
-          setIsLoading(false);
         } finally {
-         setIsLoading(false);
-       }
-     }
- 
-     fetchSettings();
- 
-       // Real-time updates - using unique channel name to avoid "already subscribed" errors
-       const channelId = `site-settings-${Math.random().toString(36).substring(2, 9)}`;
-        const [status, setStatus] = useState<string>("INITIAL");
- 
-        const fetchSettings = useCallback(async () => {
-          try {
-            const { data, error } = await supabase
-              .from("site_settings")
-              .select("key, value");
-            
-            if (error) throw error;
-    
-            const info = data.find(i => i.key === "site_info")?.value as any as SiteInfo;
-            const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
-            const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
-            const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
-            const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
-   
-            if (info) setSiteInfo(info);
-            if (themeSettings) setTheme(themeSettings);
-            if (homeSettings) setHomepage(homeSettings);
-            if (textsSettings) setCustomTexts(textsSettings);
-            if (aboutSettings) setAboutPage(aboutSettings);
-          } catch (error) {
-            console.error("Error fetching site settings:", error);
-          }
-        }, []);
- 
-        useEffect(() => {
-          fetchSettings();
-        }, [fetchSettings]);
- 
+          setIsLoading(false);
+        }
+      }, [initialData, isLoading]);
+
+      useEffect(() => {
+        fetchSettings();
+      }, [fetchSettings]);
+
+      useEffect(() => {
+        const channelId = `site-settings-${Math.random().toString(36).substring(2, 9)}`;
         const channel = supabase
-         .channel(channelId)
-         .on(
-           "postgres_changes",
-           { event: "*", schema: "public", table: "site_settings" },
-           (payload) => {
-             const updated: any = payload.new;
-             if (!updated || !updated.key) return;
-             
-             if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
-             if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
+          .channel(channelId)
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "site_settings" },
+            (payload) => {
+              const updated: any = payload.new;
+              if (!updated || !updated.key) return;
+              
+              if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
+              if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "about_page") setAboutPage(prev => ({ ...prev, ...(updated.value as any) } as any));
-           }
-         )
+            }
+          )
           .subscribe((newStatus) => {
             setStatus(newStatus);
           });
- 
-        useRealtimeFallback({
-          status,
-          onUpdate: fetchSettings,
-          label: "Site Settings",
-          pollInterval: 60000,
-          initialPollInterval: 15000
-        });
 
-       return () => {
-         supabase.removeChannel(channel);
-       };
-   }, []);
+        return () => {
+          supabase.removeChannel(channel);
+        };
+      }, []);
+
+      useRealtimeFallback({
+        status,
+        onUpdate: fetchSettings,
+        label: "Site Settings",
+        pollInterval: 60000,
+        initialPollInterval: 15000
+      });
  
     return { siteInfo, theme, homepage, customTexts, aboutPage, isLoading };
  }
