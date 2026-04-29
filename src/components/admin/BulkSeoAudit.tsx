@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { analyzeSEO } from "@/utils/seo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
- import { Loader2, Search, AlertCircle, AlertTriangle, Info, CheckCircle2, ShieldCheck, Globe, ArrowRight, RefreshCw, History, Calendar, Play, Wand2 } from "lucide-react";
+ import { Loader2, Search, AlertCircle, AlertTriangle, Info, CheckCircle2, ShieldCheck, Globe, ArrowRight, RefreshCw, History, Calendar, Play, Wand2, Download, FileJson } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -17,6 +17,7 @@ export function BulkSeoAudit() {
   const [isAuditing, setIsAuditing] = useState(false);
   const [activeAudit, setActiveAudit] = useState<any>(null);
   const [results, setResults] = useState<any[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
   const [auditHistory, setAuditHistory] = useState<any[]>([]);
   const [summary, setSummary] = useState({
     total: 0,
@@ -34,7 +35,45 @@ export function BulkSeoAudit() {
     setAuditHistory(data || []);
   };
 
-  const runAudit = async () => {
+   const exportToCSV = () => {
+     if (results.length === 0) {
+       toast.error("Nenhum dado para exportar.");
+       return;
+     }
+     
+     setIsExporting(true);
+     try {
+       const headers = ["Tipo", "Nome", "Status", "Problemas"];
+       const rows = results.map(item => [
+         item.type,
+         item.name,
+         item.issues.length === 0 ? "Otimizado" : `${item.issues.length} problemas`,
+         item.issues.map((i: any) => i.message).join(" | ")
+       ]);
+ 
+       const csvContent = [
+         headers.join(","),
+         ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+       ].join("\n");
+ 
+       const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+       const url = URL.createObjectURL(blob);
+       const link = document.createElement("a");
+       link.setAttribute("href", url);
+       link.setAttribute("download", `relatorio-seo-${format(new Date(), "yyyy-MM-dd-HHmm")}.csv`);
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+       
+       toast.success("Relatório exportado com sucesso!");
+     } catch (error: any) {
+       toast.error("Erro ao exportar: " + error.message);
+     } finally {
+       setIsExporting(false);
+     }
+   };
+ 
+   const runAudit = async () => {
     setIsLoading(true);
     try {
       const [animals, posts, events] = await Promise.all([
@@ -201,7 +240,16 @@ export function BulkSeoAudit() {
                 <CardTitle>Detalhes da Auditoria em Lote</CardTitle>
                 <CardDescription>Analise individual de cada item do site para otimização SEO.</CardDescription>
               </div>
-              <Button onClick={runAudit} disabled={isLoading} size="sm" variant="outline" className="gap-2">
+             <div className="flex gap-2">
+               <Button onClick={exportToCSV} disabled={isLoading || results.length === 0} size="sm" variant="outline" className="gap-2 text-emerald-600 border-emerald-200 hover:bg-emerald-50">
+                 <Download className="h-4 w-4" />
+                 Exportar CSV
+               </Button>
+               <Button onClick={runAudit} disabled={isLoading} size="sm" variant="outline" className="gap-2">
+                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                 Atualizar
+               </Button>
+             </div>
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 Atualizar
               </Button>
