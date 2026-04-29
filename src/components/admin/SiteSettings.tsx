@@ -43,7 +43,9 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
       news_title: "Notícias",
       news_description: "",
       google_analytics_id: "",
-      facebook_pixel_id: ""
+      facebook_pixel_id: "",
+      twitter_handle: "@agropremium",
+      og_default_image: ""
     });
      const [aboutPage, setAboutPage] = useState({
        enabled: true,
@@ -809,6 +811,26 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                       id="fb_id" 
                       value={seoSettings.facebook_pixel_id} 
                       onChange={e => setSeoSettings({...seoSettings, facebook_pixel_id: e.target.value})} 
+                    />
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter_handle">Twitter Handle (Usuario X)</Label>
+                    <Input 
+                      id="twitter_handle" 
+                      value={seoSettings.twitter_handle} 
+                      onChange={e => setSeoSettings({...seoSettings, twitter_handle: e.target.value})} 
+                      placeholder="@usuario"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="og_image_default">Imagem Padrão de Compartilhamento (OG Image)</Label>
+                    <Input 
+                      id="og_image_default" 
+                      value={seoSettings.og_default_image} 
+                      onChange={e => setSeoSettings({...seoSettings, og_default_image: e.target.value})} 
+                      placeholder="URL da imagem padrão"
                     />
                   </div>
                 </div>
