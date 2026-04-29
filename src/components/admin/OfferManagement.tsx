@@ -91,7 +91,8 @@ export function OfferManagement() {
          user_id: offer.user_id,
          title: title,
          message: content,
-         is_read: false
+         is_read: false,
+         link: "/painel"
        });
 
        toast.success(`Proposta ${statusLabel.toLowerCase()} com sucesso! O usuário foi notificado.`);
