@@ -1,5 +1,47 @@
+import React, { Component, ReactNode } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { AlertTriangle, RefreshCcw, Home } from "lucide-react";
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="p-6 text-center border border-destructive/20 rounded-xl bg-destructive/5 my-4">
+          <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
+          <p className="text-sm font-medium text-destructive">Falha ao carregar componente</p>
+          {this.state.error && (
+            <p className="text-xs text-muted-foreground mt-1">{this.state.error.message}</p>
+          )}
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 import { Button } from "./button";
 
 interface ErrorFallbackProps {
