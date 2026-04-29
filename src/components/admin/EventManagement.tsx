@@ -1564,10 +1564,20 @@ import { SocialPreview } from "./SocialPreview";
                                           Este documento serve como registro administrativo do arremate. 
                                           O arremate foi realizado em {new Date(lot.updated_at).toLocaleString('pt-BR')}.
                                         </p>
-                                        <p className="text-[10px] text-gray-400 border-t pt-2">
-                                          * O site atua apenas como intermediador, facilitando a conexão entre comprador e vendedor. 
-                                          Toda a responsabilidade sobre o animal e a transação financeira direta é das partes envolvidas.
-                                        </p>
+                                         <div className="text-[10px] text-gray-500 border-t pt-4 space-y-2">
+                                           <p className="font-black text-emerald-900 uppercase">Cláusula de Intermediação:</p>
+                                           <p className="leading-relaxed">
+                                             As partes declaram ter ciência de que a plataforma <span className="font-bold">PREMIUM AGRO LEILÕES</span> atua exclusivamente como <span className="font-bold text-emerald-800">INTERMEDIADORA</span> do negócio, facilitando o encontro entre Vendedor e Comprador. 
+                                             Toda e qualquer responsabilidade civil, criminal ou administrativa sobre o estado físico, sanitário, reprodutivo e documental do animal é de inteira e exclusiva responsabilidade do <span className="font-bold">VENDEDOR</span>. 
+                                             Da mesma forma, a responsabilidade pelo pagamento pontual do valor do arremate e comissões é de inteira e exclusiva responsabilidade do <span className="font-bold">COMPRADOR</span>.
+                                           </p>
+                                           {viewingEventDetails?.regulation && (
+                                             <div className="mt-4 pt-4 border-t border-gray-100">
+                                               <p className="font-black text-emerald-900 uppercase mb-1">Regulamento do Evento:</p>
+                                               <p className="whitespace-pre-line leading-tight text-[9px]">{viewingEventDetails.regulation}</p>
+                                             </div>
+                                           )}
+                                         </div>
                                       </div>
 
                                      <div className="flex justify-between items-end pt-20">
