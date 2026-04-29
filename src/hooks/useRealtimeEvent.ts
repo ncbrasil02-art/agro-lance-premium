@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
+ import { useRealtimeFallback } from './useRealtimeFallback';
 
 type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL';
 
@@ -85,20 +86,13 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
     };
   }, [eventId, onUpdate, retryCount]);
 
-   // Fallback Polling if WebSocket is not connected for specific event
-   useEffect(() => {
-     if (status === 'SUBSCRIBED') return;
- 
-     const intervalTime = status === 'INITIAL' ? 15000 : 45000;
-     logger.warn(`Realtime do evento não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
-     
-     const pollInterval = setInterval(() => {
-       logger.info(`Executando polling de fallback para Evento ${eventId}...`);
-       onUpdate();
-     }, intervalTime);
- 
-     return () => clearInterval(pollInterval);
-   }, [status, onUpdate, eventId]);
+    useRealtimeFallback({
+      status,
+      onUpdate,
+      label: `Evento ${eventId}`,
+      pollInterval: 45000,
+      initialPollInterval: 15000
+    });
  
    return { status };
  }
@@ -132,20 +126,13 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
      };
    }, [onUpdate, retryCount]);
  
-   // Fallback Polling if WebSocket is not connected
-   useEffect(() => {
-     if (status === 'SUBSCRIBED') return;
- 
-     const intervalTime = status === 'INITIAL' ? 10000 : 30000;
-     logger.warn(`Realtime não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
-     
-     const pollInterval = setInterval(() => {
-       logger.info("Executando polling de fallback para Home...");
-       onUpdate();
-     }, intervalTime);
- 
-     return () => clearInterval(pollInterval);
-   }, [status, onUpdate]);
+    useRealtimeFallback({
+      status,
+      onUpdate,
+      label: "Home/Geral",
+      pollInterval: 30000,
+      initialPollInterval: 10000
+    });
  
    return { status };
  }

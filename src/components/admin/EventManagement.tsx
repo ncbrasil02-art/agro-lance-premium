@@ -1,4 +1,5 @@
- import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
+  import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
+  import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
@@ -330,18 +331,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
        }
      });
 
-    useEffect(() => {
-      const channel = supabase
-        .channel('admin-events-realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
-          fetchEvents();
-        })
-        .subscribe();
+      const [rtStatus, setRtStatus] = useState<string>("INITIAL");
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }, []);
+      useEffect(() => {
+        const channel = supabase
+          .channel('admin-events-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+            fetchEvents();
+          })
+          .subscribe((newStatus) => {
+            setRtStatus(newStatus);
+          });
+  
+        return () => {
+          supabase.removeChannel(channel);
+        };
+      }, []);
+
+      useRealtimeFallback({
+        status: rtStatus,
+        onUpdate: fetchEvents,
+        label: "Gestão de Eventos (Admin)",
+        pollInterval: 60000,
+        initialPollInterval: 30000
+      });
  
     const handleSave = async () => {
       if (!formData.name || !formData.start_date) {

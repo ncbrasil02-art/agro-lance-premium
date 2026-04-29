@@ -1,7 +1,8 @@
- import { useEffect, useState, useCallback, useRef } from 'react';
+  import { useEffect, useState, useRef } from 'react';
  import { supabase } from '@/integrations/supabase/client';
  import { logger } from '@/utils/logger';
  import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+  import { useRealtimeFallback } from './useRealtimeFallback';
  
  type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL';
  
@@ -73,20 +74,14 @@
      };
    }, [table, filter, event, schema, retryCount, enabled]);
  
-   // Fallback Polling
-   useEffect(() => {
-     if (!enabled) return;
-     if (status === 'SUBSCRIBED') return;
- 
-     const intervalTime = status === 'INITIAL' ? pollInterval / 2 : pollInterval;
-     
-     const interval = setInterval(() => {
-       logger.info(`Fallback polling for ${table} (Status: ${status})`);
-       if (onUpdateRef.current) onUpdateRef.current();
-     }, intervalTime);
- 
-     return () => clearInterval(interval);
-   }, [status, pollInterval, table, enabled]);
+    useRealtimeFallback({
+      status,
+      onUpdate: () => onUpdateRef.current?.(),
+      label: `Tabela ${table}`,
+      pollInterval,
+      initialPollInterval: pollInterval / 2,
+      enabled
+    });
  
    return { status };
  }

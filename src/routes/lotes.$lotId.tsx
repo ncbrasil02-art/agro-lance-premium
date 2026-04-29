@@ -22,8 +22,9 @@ import { Countdown } from "@/components/auctions/countdown";
 import { supabase } from "@/integrations/supabase/client";
 import { lotSchema } from "@/lib/schemas";
 import { useAuth } from "@/components/auth/auth-provider";
-import { useEffect, useState } from "react";
+ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
+ import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -308,61 +309,69 @@ function LotDetail() {
   const [isOfferLoading, setIsOfferLoading] = useState(false);
   const [offerData, setOfferData] = useState({ amount: "", description: "" });
 
-  // Real-time synchronization with fallback polling
-  useEffect(() => {
-    const lotId = lot.id;
-    let lastBidId = initialBids[0]?.id;
-    let status: 'SUBSCRIBED' | 'INITIAL' | 'ERROR' = 'INITIAL';
-
-    const lotChannel = supabase
-      .channel(`lot-dt-${lotId}`)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lotId}` }, (p) => {
-        setLot((prev: any) => ({ ...prev, ...p.new }));
-      })
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lotId}` }, (p) => {
-        const newBid = p.new;
-        if (!newBid || newBid.id === lastBidId) return;
-        lastBidId = newBid.id;
-
-        setRecentBids(prev => {
-          if (prev.some(b => b.id === newBid.id)) return prev;
-          const updated = [newBid, ...prev].slice(0, 10);
-          
-          toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
-            description: newBid.bidder_name || "Licitante",
-            icon: <Gavel className="h-4 w-4 text-gold" />,
-            duration: 3000
-          });
-          
-          return updated;
-        });
-
-        setLot((prev: any) => {
-          if (newBid.amount > (prev.current_price || 0)) {
-            return { ...prev, current_price: newBid.amount };
-          }
-          return prev;
-        });
-      })
-      .subscribe((newStatus) => {
-        status = newStatus === 'SUBSCRIBED' ? 'SUBSCRIBED' : 'ERROR';
-      });
-
-    const pollInterval = setInterval(async () => {
-      if (status === 'SUBSCRIBED') return;
-      
-      const { data: latestLot } = await supabase.from("lots").select("*").eq("id", lotId).single();
-      if (latestLot) setLot((prev: any) => ({ ...prev, ...latestLot }));
-
-      const { data: latestBids } = await supabase
-        .from("bids")
-        .select("*")
-        .eq("lot_id", lotId)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      
-      if (latestBids) setRecentBids(latestBids);
-    }, 30000);
+   const [rtStatus, setRtStatus] = useState<string>("INITIAL");
+ 
+   const fetchLatestData = useCallback(async () => {
+     const lotId = lot.id;
+     const { data: latestLot } = await supabase.from("lots").select("*").eq("id", lotId).single();
+     if (latestLot) setLot((prev: any) => ({ ...prev, ...latestLot }));
+ 
+     const { data: latestBids } = await supabase
+       .from("bids")
+       .select("*")
+       .eq("lot_id", lotId)
+       .order("created_at", { ascending: false })
+       .limit(10);
+     
+     if (latestBids) setRecentBids(latestBids);
+   }, [lot.id]);
+ 
+   useRealtimeFallback({
+     status: rtStatus,
+     onUpdate: fetchLatestData,
+     label: `Detalhe Lote ${lot.lot_number}`,
+     pollInterval: 30000,
+     initialPollInterval: 15000
+   });
+ 
+   // Real-time synchronization
+   useEffect(() => {
+     const lotId = lot.id;
+     let lastBidId = initialBids[0]?.id;
+ 
+     const lotChannel = supabase
+       .channel(`lot-dt-${lotId}`)
+       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lotId}` }, (p) => {
+         setLot((prev: any) => ({ ...prev, ...p.new }));
+       })
+       .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lotId}` }, (p) => {
+         const newBid = p.new;
+         if (!newBid || newBid.id === lastBidId) return;
+         lastBidId = newBid.id;
+ 
+         setRecentBids(prev => {
+           if (prev.some(b => b.id === newBid.id)) return prev;
+           const updated = [newBid, ...prev].slice(0, 10);
+           
+           toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
+             description: newBid.bidder_name || "Licitante",
+             icon: <Gavel className="h-4 w-4 text-gold" />,
+             duration: 3000
+           });
+           
+           return updated;
+         });
+ 
+         setLot((prev: any) => {
+           if (newBid.amount > (prev.current_price || 0)) {
+             return { ...prev, current_price: newBid.amount };
+           }
+           return prev;
+         });
+       })
+       .subscribe((newStatus) => {
+         setRtStatus(newStatus);
+       });
 
     if (user) {
       supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lotId).maybeSingle().then(r => setIsFavorite(!!r.data));
@@ -379,7 +388,6 @@ function LotDetail() {
 
     return () => {
       supabase.removeChannel(lotChannel);
-      clearInterval(pollInterval);
     };
   }, [lot.id, user]);
 
