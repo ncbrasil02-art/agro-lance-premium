@@ -752,7 +752,119 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
              </Button>
            </CardContent>
          </Card>
-       </TabsContent>
-     </Tabs>
-   );
- }
+        </TabsContent>
+
+        <TabsContent value="seo">
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-gold" /> Configurações Globais de SEO
+                </CardTitle>
+                <CardDescription>Defina os padrões de SEO para todo o site</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="seo_suffix">Sufixo de Título (Global)</Label>
+                    <Input 
+                      id="seo_suffix" 
+                      value={seoSettings.global_title_suffix} 
+                      onChange={e => setSeoSettings({...seoSettings, global_title_suffix: e.target.value})} 
+                      placeholder="Ex: | Minha Empresa"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="seo_description_global">Meta Descrição Padrão</Label>
+                    <Input 
+                      id="seo_description_global" 
+                      value={seoSettings.global_description} 
+                      onChange={e => setSeoSettings({...seoSettings, global_description: e.target.value})} 
+                    />
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label htmlFor="ga_id">Google Analytics ID</Label>
+                    <Input 
+                      id="ga_id" 
+                      value={seoSettings.google_analytics_id} 
+                      onChange={e => setSeoSettings({...seoSettings, google_analytics_id: e.target.value})} 
+                      placeholder="G-XXXXXXXXXX"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fb_id">Facebook Pixel ID</Label>
+                    <Input 
+                      id="fb_id" 
+                      value={seoSettings.facebook_pixel_id} 
+                      onChange={e => setSeoSettings({...seoSettings, facebook_pixel_id: e.target.value})} 
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5 text-gold" /> SEO por Página
+                </CardTitle>
+                <CardDescription>Personalize títulos e descrições de páginas específicas</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
+                  <h4 className="font-bold border-b pb-2">Página Inicial (Home)</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Título Customizado</Label>
+                      <Input 
+                        value={seoSettings.home_title} 
+                        onChange={e => setSeoSettings({...seoSettings, home_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Descrição Customizada</Label>
+                      <Input 
+                        value={seoSettings.home_description} 
+                        onChange={e => setSeoSettings({...seoSettings, home_description: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
+                  <h4 className="font-bold border-b pb-2">Página Sobre</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Título Customizado</Label>
+                      <Input 
+                        value={seoSettings.about_title} 
+                        onChange={e => setSeoSettings({...seoSettings, about_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Descrição Customizada</Label>
+                      <Input 
+                        value={seoSettings.about_description} 
+                        onChange={e => setSeoSettings({...seoSettings, about_description: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full bg-gold text-emerald-deep font-bold" 
+                  onClick={() => handleSave("seo_settings", seoSettings)}
+                  disabled={isSaving}
+                >
+                  {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Salvar Configurações de SEO
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    );
+  }
