@@ -101,6 +101,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+   useEffect(() => {
+     const cleanup = setupGlobalErrorLogging();
+     return () => cleanup?.();
+   }, []);
+ 
   return (
     <AuthProvider>
       <ThemeProvider>
