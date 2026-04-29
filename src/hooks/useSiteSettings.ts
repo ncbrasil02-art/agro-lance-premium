@@ -1,6 +1,12 @@
   export interface AboutPageSettings {
     enabled: boolean;
     title: string;
+    content?: string;
+    features?: Array<{
+      icon: string;
+      title: string;
+      desc: string;
+    }>;
   }
  
   import { useState, useEffect, useCallback } from "react";
