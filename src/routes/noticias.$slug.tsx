@@ -1,4 +1,5 @@
- import { createFileRoute, Link } from "@tanstack/react-router"
+  import { createFileRoute, Link } from "@tanstack/react-router"
+  import { generateMetaTags } from "@/utils/seo"
  import { supabase } from "@/integrations/supabase/client"
  import { OptimizedImage } from "@/components/ui/optimized-image"
  import { format } from "date-fns"
@@ -10,21 +11,16 @@
     head: (ctx: any) => {
       const post = ctx.loaderData?.post;
       const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
-      const seoSuffix = rootData?.seoSettings?.global_title_suffix || "";
+      const seoSettings = rootData?.seoSettings;
       
-      const title = post?.seo_title || (post?.title ? `${post.title}${seoSuffix}` : "Notícia — Premium Agro Leilões");
-      const description = post?.seo_description || post?.excerpt || "Confira os detalhes desta notícia na Premium Agro Leilões.";
-      
-      return {
-        meta: [
-          { title: title },
-          { name: "description", content: description },
-          { property: "og:title", content: title },
-          { property: "og:description", content: description },
-          { property: "og:image", content: post?.featured_image || "" },
-          { property: "og:type", content: "article" },
-        ],
-      };
+      return generateMetaTags({
+        title: post?.seo_title || post?.title,
+        description: post?.seo_description || post?.excerpt,
+        image: post?.featured_image,
+        type: 'article',
+        seoSettings,
+        canonical: `/noticias/${post?.slug}`
+      });
     },
     loader: async ({ params }: { params: any }) => {
      const { data: post } = await supabase

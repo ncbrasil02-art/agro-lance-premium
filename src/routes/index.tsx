@@ -1,3 +1,4 @@
+import { generateMetaTags } from "@/utils/seo";
   import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
  import { useSiteSettings } from "@/hooks/useSiteSettings";
  import { ArticleCarousel } from "@/components/site/ArticleCarousel";
@@ -25,18 +26,13 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
     export const Route = createFileRoute("/")({
       head: ({ matches }) => {
         const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
-        const seo = rootData?.seoSettings;
-        const title = seo?.home_title || (seo?.global_title_suffix ? `Home ${seo.global_title_suffix}` : "Premium Agro Leilões — Home");
-        const description = seo?.home_description || seo?.global_description || "A elite do agronegócio em tempo real.";
-        
-        return {
-          meta: [
-            { title: title },
-            { name: "description", content: description },
-            { property: "og:title", content: title },
-            { property: "og:description", content: description },
-          ],
-        };
+        const seoSettings = rootData?.seoSettings;
+        return generateMetaTags({
+          title: seoSettings?.home_title || "Home",
+          description: seoSettings?.home_description,
+          seoSettings,
+          canonical: ""
+        });
       },
       loader: async () => {
        try {

@@ -3,10 +3,21 @@
  import { OptimizedImage } from "@/components/ui/optimized-image"
  import { format } from "date-fns"
  import { ptBR } from "date-fns/locale"
- import { Calendar, ArrowRight } from "lucide-react"
+  import { Calendar, ArrowRight } from "lucide-react"
+  import { generateMetaTags } from "@/utils/seo"
 
- export const Route = createFileRoute("/noticias/")({
-   loader: async () => {
+  export const Route = createFileRoute("/noticias/")({
+    head: ({ matches }) => {
+      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+      const seoSettings = rootData?.seoSettings;
+      return generateMetaTags({
+        title: "Notícias",
+        description: "Acompanhe as últimas notícias, tendências e informações do mercado agropecuário brasileiro.",
+        seoSettings,
+        canonical: "/noticias"
+      });
+    },
+    loader: async () => {
      const { data: posts } = await supabase
        .from("posts")
        .select("*, category:categories(name)")

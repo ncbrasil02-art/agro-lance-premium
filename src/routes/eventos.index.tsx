@@ -1,3 +1,4 @@
+import { generateMetaTags } from "@/utils/seo";
  import { createFileRoute } from "@tanstack/react-router";
  import { PAGE_LIMITS } from "@/config/limits";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
@@ -12,15 +13,17 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getEffectiveEventStatus } from "@/utils/auction-status";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
-export const Route = createFileRoute("/eventos/")({
-  head: () => ({
-    meta: [
-      { title: "Eventos — Premium Agro Leilões" },
-      { name: "description", content: "Calendário completo de leilões premium de cavalos, bovinos e embriões." },
-      { property: "og:title", content: "Eventos — Premium Agro Leilões" },
-      { property: "og:description", content: "Próximos leilões agropecuários premium do Brasil." },
-    ],
-  }),
+ export const Route = createFileRoute("/eventos/")({
+   head: ({ matches }) => {
+     const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+     const seoSettings = rootData?.seoSettings;
+     return generateMetaTags({
+       title: "Eventos",
+       description: "Calendário completo de leilões premium de cavalos, bovinos e embriões.",
+       seoSettings,
+       canonical: "/eventos"
+     });
+   },
     loader: async () => {
       logger.info("Iniciando carregamento da página de Eventos");
       try {

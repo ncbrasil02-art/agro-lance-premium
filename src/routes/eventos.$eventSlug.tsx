@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+import { generateMetaTags } from "@/utils/seo";
 import { EventDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 import { Calendar, MapPin, Gavel, Users, Trophy, Zap, RefreshCw, Maximize2, Image as ImageIcon, FileText } from "lucide-react";
@@ -51,15 +52,19 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
         throw err;
       }
    },
-  head: ({ loaderData }) => ({
-    meta: loaderData?.event ? [
-      { title: `${loaderData.event.name} — Premium Agro Leilões` },
-      { name: "description", content: loaderData.event.description || "" },
-      { property: "og:title", content: loaderData.event.name },
-      { property: "og:description", content: loaderData.event.description || "" },
-      { property: "og:image", content: loaderData.event.banner_url || "" },
-    ] : [],
-  }),
+  head: (ctx: any) => {
+    const event = ctx.loaderData?.event;
+    const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
+    const seoSettings = rootData?.seoSettings;
+    
+    return generateMetaTags({
+      title: event?.seo_title || event?.name,
+      description: event?.seo_description || event?.description,
+      image: event?.banner_url,
+      seoSettings,
+      canonical: `/eventos/${event?.slug}`
+    });
+  },
   notFoundComponent: () => (
     <div className="container mx-auto px-4 py-20 text-center">
       <h1 className="text-3xl font-bold">Evento não encontrado</h1>

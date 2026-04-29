@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { generateMetaTags } from "@/utils/seo";
 import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
@@ -90,11 +91,19 @@ export const Route = createFileRoute("/lotes/$lotId")({
       throw notFound();
     }
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: "Lote " + loaderData.lot.lot_number + " — " + (loaderData.lot.animal?.name || 'Animal') },
-    ] : [],
-  }),
+  head: (ctx: any) => {
+    const lot = ctx.loaderData?.lot;
+    const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
+    const seoSettings = rootData?.seoSettings;
+    
+    return generateMetaTags({
+      title: lot ? `Lote ${lot.lot_number} — ${lot.animal?.name || 'Animal'}` : "Detalhe do Lote",
+      description: lot?.animal?.description,
+      image: lot?.animal?.photos?.[0],
+      seoSettings,
+      canonical: `/lotes/${lot?.id}`
+    });
+  },
   component: LotDetail,
   pendingComponent: LotDetailSkeleton,
   errorComponent: ErrorFallback,
