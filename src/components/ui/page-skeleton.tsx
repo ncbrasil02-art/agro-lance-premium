@@ -186,9 +186,9 @@ export function HomeSkeleton() {
         <div className="container relative mx-auto px-4">
           <div className="max-w-2xl space-y-6">
             <Skeleton className="h-7 w-48 rounded-full" />
-            <Skeleton className="h-16 w-3/4 md:h-24" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-16 w-3/4 md:h-24 rounded-2xl" />
+            <Skeleton className="h-5 w-full rounded-lg" />
+            <Skeleton className="h-5 w-2/3 rounded-lg" />
             <div className="flex flex-wrap gap-3 mt-8">
               <Skeleton className="h-12 w-40 rounded-xl" />
               <Skeleton className="h-12 w-48 rounded-xl" />
@@ -197,20 +197,10 @@ export function HomeSkeleton() {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-16 space-y-20">
-        <div className="space-y-8">
-          <Skeleton className="h-10 w-64" />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="aspect-video w-full rounded-2xl" />)}
-          </div>
-        </div>
-
-        <div className="space-y-8">
-          <Skeleton className="h-10 w-64" />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="aspect-[9/16] w-full rounded-2xl" />)}
-          </div>
-        </div>
+      <div className="container mx-auto px-4 py-16 space-y-0">
+        <SectionSkeleton type="cards" count={3} />
+        <SectionSkeleton type="lots" count={3} />
+        <SectionSkeleton type="articles" count={4} />
       </div>
     </div>
   );
