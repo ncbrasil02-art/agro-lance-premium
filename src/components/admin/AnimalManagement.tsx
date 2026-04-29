@@ -516,6 +516,7 @@ import { SocialPreview } from "./SocialPreview";
                         <SeoAnalysis 
                           title={formData.seo_title || formData.name}
                           description={formData.seo_description || formData.description}
+                          image={formData.photos_urls?.split(',')[0]}
                         />
                         <SerpPreview 
                           title={formData.seo_title || formData.name}
