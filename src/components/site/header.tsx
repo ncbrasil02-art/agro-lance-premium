@@ -56,8 +56,9 @@ import {
                 <span className="text-foreground">{siteInfo?.name?.split(' ')?.[0] || "Premium"}</span>
                 <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ') || "Agro"}</span>
               </span>
-            </>
-          )}
+             </>
+           )}
+         </Link>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
