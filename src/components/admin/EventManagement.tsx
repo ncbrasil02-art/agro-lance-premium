@@ -16,7 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { toast } from "sonner";
  import { format } from "date-fns";
  import { ptBR } from "date-fns/locale";
- import { validateLiveLink, formatBRL } from "@/utils/format";
+import { validateLiveLink, formatBRL } from "@/utils/format";
+import { generateSlug } from "@/utils/slug";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
@@ -400,10 +401,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
         } else {
-          const baseSlug = formData.name.toLowerCase().trim()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
-            .replace(/ /g, "-").replace(/[^\w-]+/g, "");
-           const slug = `${baseSlug}-${Math.floor(Math.random() * 1000000)}`;
+          const baseSlug = generateSlug(formData.name);
+          const slug = `${baseSlug}-${Math.floor(Math.random() * 1000000)}`;
           
           const { error } = await supabase.from("events").insert({
             name: formData.name,
