@@ -57,8 +57,8 @@
        try {
          onUpdateRef.current();
          setRetryCount(prev => prev + 1);
-       } catch (err) {
-         logger.error(`Erro no polling de fallback para ${label}:`, err);
+       } catch (err: any) {
+         logger.error(`Erro no polling de fallback para ${label}:`, { error: err?.message || String(err) });
        }
      }, intervalTime);
  
