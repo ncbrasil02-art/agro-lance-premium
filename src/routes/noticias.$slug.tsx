@@ -6,8 +6,27 @@
  import { Calendar, ChevronLeft, Share2, Mail } from "lucide-react"
  import { Button } from "@/components/ui/button"
 
- export const Route = createFileRoute("/noticias/$slug")({
-   loader: async ({ params }) => {
+  export const Route = createFileRoute("/noticias/$slug")({
+    head: ({ loaderData, matches }) => {
+      const post = loaderData?.post;
+      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+      const seoSuffix = rootData?.seoSettings?.global_title_suffix || "";
+      
+      const title = post?.seo_title || (post?.title ? `${post.title}${seoSuffix}` : "Notícia — Premium Agro Leilões");
+      const description = post?.seo_description || post?.excerpt || "Confira os detalhes desta notícia na Premium Agro Leilões.";
+      
+      return {
+        meta: [
+          { title: title },
+          { name: "description", content: description },
+          { property: "og:title", content: title },
+          { property: "og:description", content: description },
+          { property: "og:image", content: post?.featured_image || "" },
+          { property: "og:type", content: "article" },
+        ],
+      };
+    },
+    loader: async ({ params }) => {
      const { data: post } = await supabase
        .from("posts")
        .select("*, category:categories(name)")
