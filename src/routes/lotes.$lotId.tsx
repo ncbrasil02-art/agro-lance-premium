@@ -97,11 +97,14 @@ export const Route = createFileRoute("/lotes/$lotId")({
     const seoSettings = rootData?.seoSettings;
     
     return generateMetaTags({
-      title: lot?.animal?.seo_title || (lot ? `Lote ${lot.lot_number} — ${lot.animal?.name || 'Animal'}` : "Detalhe do Lote"),
-      description: lot?.animal?.seo_description || lot?.animal?.description,
-      image: lot?.animal?.photos?.[0],
+       title: lot?.animal?.og_title || lot?.animal?.seo_title || (lot ? `Lote ${lot.lot_number} — ${lot.animal?.name || 'Animal'}` : "Detalhe do Lote"),
+       description: lot?.animal?.og_description || lot?.animal?.seo_description || lot?.animal?.description,
+       image: lot?.animal?.og_image_url || lot?.animal?.photos?.[0],
       seoSettings,
-      canonical: `/lotes/${lot?.id}`
+       canonical: `/lotes/${lot?.id}`,
+       ogTitle: lot?.animal?.og_title,
+       ogDescription: lot?.animal?.og_description,
+       ogImage: lot?.animal?.og_image_url
     });
   },
   component: LotDetail,

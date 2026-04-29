@@ -28,7 +28,10 @@ export const Route = createFileRoute("/sobre")({
       title: seoSettings?.about_title || "Sobre",
       description: seoSettings?.about_description,
       seoSettings,
-      canonical: "/sobre"
+      canonical: "/sobre",
+      ogTitle: seoSettings?.about_og_title,
+      ogDescription: seoSettings?.about_og_description,
+      ogImage: seoSettings?.about_og_image
     });
   },
   component: AboutPage,

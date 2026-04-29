@@ -86,7 +86,10 @@ import { SocialPreview } from "./SocialPreview";
             accepts_offers: false,
             slug: "",
             seo_title: "",
-            seo_description: ""
+            seo_description: "",
+            og_title: "",
+            og_description: "",
+            og_image_url: ""
      });
 
      const resetForm = () => {
@@ -138,7 +141,10 @@ import { SocialPreview } from "./SocialPreview";
             accepts_offers: false,
             slug: "",
             seo_title: "",
-            seo_description: ""
+            seo_description: "",
+            og_title: "",
+            og_description: "",
+            og_image_url: ""
        });
     };
 
@@ -191,7 +197,10 @@ import { SocialPreview } from "./SocialPreview";
            accepts_offers: animal.accepts_offers || false,
            slug: animal.slug || "",
            seo_title: animal.seo_title || "",
-           seo_description: animal.seo_description || ""
+            seo_description: animal.seo_description || "",
+            og_title: animal.og_title || "",
+            og_description: animal.og_description || "",
+            og_image_url: animal.og_image_url || ""
        });
       setIsDialogOpen(true);
     };
@@ -462,15 +471,16 @@ import { SocialPreview } from "./SocialPreview";
                </DialogDescription>
              </DialogHeader>
                <Tabs defaultValue="geral" className="w-full">
-                   <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4">
-                     <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
-                     <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
-                      <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
-                      <TabsTrigger value="saude" className="text-xs">Saúde</TabsTrigger>
-                      <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
-                     <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
-                     <TabsTrigger value="seo" className="text-xs">SEO</TabsTrigger>
-                   </TabsList>
+                    <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-4">
+                      <TabsTrigger value="geral" className="text-[10px] md:text-xs">Geral</TabsTrigger>
+                      <TabsTrigger value="registros" className="text-[10px] md:text-xs">Registros</TabsTrigger>
+                       <TabsTrigger value="genealogia" className="text-[10px] md:text-xs">Genealogia</TabsTrigger>
+                       <TabsTrigger value="saude" className="text-[10px] md:text-xs">Saúde</TabsTrigger>
+                       <TabsTrigger value="midia" className="text-[10px] md:text-xs">Mídia</TabsTrigger>
+                      <TabsTrigger value="venda" className="text-[10px] md:text-xs">Venda</TabsTrigger>
+                      <TabsTrigger value="seo" className="text-[10px] md:text-xs">SEO</TabsTrigger>
+                      <TabsTrigger value="social" className="text-[10px] md:text-xs">Social</TabsTrigger>
+                    </TabsList>
                   <TabsContent value="seo" className="space-y-4 pt-4">
                     <div className="grid gap-2">
                       <Label htmlFor="slug">Slug (URL amigável)</Label>
@@ -511,27 +521,61 @@ import { SocialPreview } from "./SocialPreview";
                       />
                     </div>
 
-                    <div className="pt-4 border-t grid md:grid-cols-2 gap-6">
-                      <div className="space-y-6">
-                        <SeoAnalysis 
-                          title={formData.seo_title || formData.name}
-                          description={formData.seo_description || formData.description}
-                          image={formData.photos_urls?.split(',')[0]}
-                        />
-                        <SerpPreview 
-                          title={formData.seo_title || formData.name}
-                          description={formData.seo_description || formData.description}
-                          slug={formData.slug}
-                          basePath="/lotes"
+                     <div className="pt-4 border-t">
+                       <SeoAnalysis 
+                         title={formData.seo_title || formData.name}
+                         description={formData.seo_description || formData.description}
+                         image={formData.photos_urls?.split(',')[0]}
+                        ogTitle={formData.og_title}
+                        ogDescription={formData.og_description}
+                       />
+                       <div className="mt-6">
+                         <SerpPreview 
+                           title={formData.seo_title || formData.name}
+                           description={formData.seo_description || formData.description}
+                           slug={formData.slug}
+                           basePath="/lotes"
+                         />
+                       </div>
+                     </div>
+                  </TabsContent>
+                  <TabsContent value="social" className="space-y-4 pt-4">
+                    <div className="grid gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="og_title">Título Open Graph (Opcional)</Label>
+                        <Input 
+                          id="og_title"
+                          value={formData.og_title} 
+                          onChange={(e) => setFormData({ ...formData, og_title: e.target.value })} 
+                          placeholder="Override do título para redes sociais"
                         />
                       </div>
-                      <div className="space-y-6">
-                        <SocialPreview 
-                          title={formData.seo_title || formData.name}
-                          description={formData.seo_description || formData.description}
-                          image={formData.photos_urls?.split(',')[0]}
+                      <div className="grid gap-2">
+                        <Label htmlFor="og_description">Descrição Open Graph (Opcional)</Label>
+                        <textarea 
+                          id="og_description"
+                          className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          value={formData.og_description} 
+                          onChange={(e) => setFormData({ ...formData, og_description: e.target.value })} 
+                          placeholder="Override da descrição para redes sociais"
                         />
                       </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="og_image_url">Imagem Open Graph (Opcional)</Label>
+                        <Input 
+                          id="og_image_url"
+                          value={formData.og_image_url} 
+                          onChange={(e) => setFormData({ ...formData, og_image_url: e.target.value })} 
+                          placeholder="URL da imagem específica para compartilhamento"
+                        />
+                      </div>
+                    </div>
+                    <div className="pt-4 border-t">
+                      <SocialPreview 
+                        title={formData.og_title || formData.seo_title || formData.name}
+                        description={formData.og_description || formData.seo_description || formData.description}
+                        image={formData.og_image_url || formData.photos_urls?.split(',')[0]}
+                      />
                     </div>
                   </TabsContent>
 

@@ -42,8 +42,16 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
       about_description: "",
       news_title: "Notícias",
       news_description: "",
+      home_og_title: "",
+      home_og_description: "",
+      home_og_image: "",
+      about_og_title: "",
+      about_og_description: "",
+      about_og_image: "",
       google_analytics_id: "",
-      facebook_pixel_id: ""
+      facebook_pixel_id: "",
+      twitter_handle: "@agropremium",
+      og_default_image: ""
     });
      const [aboutPage, setAboutPage] = useState({
        enabled: true,
@@ -812,6 +820,26 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                     />
                   </div>
                 </div>
+                <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter_handle">Twitter Handle (Usuario X)</Label>
+                    <Input 
+                      id="twitter_handle" 
+                      value={seoSettings.twitter_handle} 
+                      onChange={e => setSeoSettings({...seoSettings, twitter_handle: e.target.value})} 
+                      placeholder="@usuario"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="og_image_default">Imagem Padrão de Compartilhamento (OG Image)</Label>
+                    <Input 
+                      id="og_image_default" 
+                      value={seoSettings.og_default_image} 
+                      onChange={e => setSeoSettings({...seoSettings, og_default_image: e.target.value})} 
+                      placeholder="URL da imagem padrão"
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -841,6 +869,32 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                       />
                     </div>
                   </div>
+                  <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-dashed">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Título (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.home_og_title} 
+                        onChange={e => setSeoSettings({...seoSettings, home_og_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Descrição (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.home_og_description} 
+                        onChange={e => setSeoSettings({...seoSettings, home_og_description: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Imagem (URL)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.home_og_image} 
+                        onChange={e => setSeoSettings({...seoSettings, home_og_image: e.target.value})} 
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
@@ -858,6 +912,32 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                       <Input 
                         value={seoSettings.about_description} 
                         onChange={e => setSeoSettings({...seoSettings, about_description: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-dashed">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Título (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.about_og_title} 
+                        onChange={e => setSeoSettings({...seoSettings, about_og_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Descrição (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.about_og_description} 
+                        onChange={e => setSeoSettings({...seoSettings, about_og_description: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Imagem (URL)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.about_og_image} 
+                        onChange={e => setSeoSettings({...seoSettings, about_og_image: e.target.value})} 
                       />
                     </div>
                   </div>

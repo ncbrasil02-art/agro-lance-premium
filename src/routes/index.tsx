@@ -31,7 +31,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
           title: seoSettings?.home_title || "Home",
           description: seoSettings?.home_description,
           seoSettings,
-          canonical: ""
+          canonical: "",
+          ogTitle: seoSettings?.home_og_title,
+          ogDescription: seoSettings?.home_og_description,
+          ogImage: seoSettings?.home_og_image
         });
       },
       loader: async () => {

@@ -62,7 +62,10 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
       description: event?.seo_description || event?.description,
       image: event?.banner_url,
       seoSettings,
-      canonical: `/eventos/${event?.slug}`
+      canonical: `/eventos/${event?.slug}`,
+      ogTitle: event?.og_title,
+      ogDescription: event?.og_description,
+      ogImage: event?.og_image_url
     });
   },
   notFoundComponent: () => (
