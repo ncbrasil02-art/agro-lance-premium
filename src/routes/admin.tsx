@@ -1,7 +1,3 @@
- 
- export const Route = createFileRoute("/admin")({
-   component: AdminLayout,
- });
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
  import { 
@@ -15,36 +11,28 @@
  import { Button } from "@/components/ui/button";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
- import { SiteSettings } from "@/components/admin/SiteSettings";
- import { EventManagement } from "@/components/admin/EventManagement";
- import { LotManagement } from "@/components/admin/LotManagement";
- import { AnimalManagement } from "@/components/admin/AnimalManagement";
- import { SellerManagement } from "@/components/admin/SellerManagement";
- import { CategoryManagement } from "@/components/admin/CategoryManagement";
- import { EventRequestManagement } from "@/components/admin/EventRequestManagement";
- import { DirectSaleManagement } from "@/components/admin/DirectSaleManagement";
- import { UserManagement } from "@/components/admin/UserManagement";
- import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
- import { PostManagement } from "@/components/admin/PostManagement";
- import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
  
  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
  
-  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
-    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
-    { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
-    { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
-    { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
-    { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
-    { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
-    { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
-    { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
-    { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
-    { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
-    { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
-    { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
-    { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
-  ];
+ const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
+   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+   { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
+   { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
+   { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
+   { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+   { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
+   { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
+   { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
+   { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
+   { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+   { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
+   { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
+   { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
+ ];
+ 
+ export const Route = createFileRoute("/admin")({
+   component: AdminLayout,
+ });
  
  interface SidebarProps {
    activeTab: AdminTab;
