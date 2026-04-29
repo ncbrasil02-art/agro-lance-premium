@@ -23,8 +23,9 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
     export const Route = createFileRoute("/")({
-      head: ({ loaderData, context }) => {
-        const seo = (context as any).seoSettings;
+      head: ({ matches }) => {
+        const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+        const seo = rootData?.seoSettings;
         const title = seo?.home_title || (seo?.global_title_suffix ? `Home ${seo.global_title_suffix}` : "Premium Agro Leilões — Home");
         const description = seo?.home_description || seo?.global_description || "A elite do agronegócio em tempo real.";
         
