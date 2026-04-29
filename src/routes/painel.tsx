@@ -116,9 +116,10 @@ export const Route = createFileRoute("/painel")({
     const [activeTab, setActiveTab] = useState("arremates");
     const [myLots, setMyLots] = useState<any[]>([]);
     const [myBids, setMyBids] = useState<any[]>([]);
-    const [myFavorites, setMyFavorites] = useState<any[]>([]);
-    const [messages, setMessages] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+     const [myFavorites, setMyFavorites] = useState<any[]>([]);
+     const [messages, setMessages] = useState<any[]>([]);
+     const [siteInfo, setSiteInfo] = useState<any>(null);
+     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     
@@ -152,14 +153,22 @@ export const Route = createFileRoute("/painel")({
         if (wonError) throw wonError;
         setMyLots(wonLots || []);
  
-        const { data: userBids } = await supabase
-          .from("bids")
-          .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(10);
-        
-         setMyBids(userBids || []);
+         const { data: userBids } = await supabase
+           .from("bids")
+           .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
+           .eq("user_id", user.id)
+           .order("created_at", { ascending: false })
+           .limit(10);
+         
+          setMyBids(userBids || []);
+
+          const { data: settingsData } = await supabase
+            .from("site_settings")
+            .select("value")
+            .eq("key", "site_info")
+            .single();
+          
+          setSiteInfo(settingsData?.value || null);
    
           const { data: followedData } = await supabase
             .from("followed_lots")
@@ -389,9 +398,9 @@ export const Route = createFileRoute("/painel")({
             </Card>
           ) : (
             <div className="grid gap-6">
-              {myLots.map((lot) => (
-                <LotPurchaseCard key={lot.id} lot={lot} profile={profile} />
-              ))}
+               {myLots.map((lot) => (
+                 <LotPurchaseCard key={lot.id} lot={lot} profile={profile} siteInfo={siteInfo} />
+               ))}
             </div>
           )}
         </TabsContent>
