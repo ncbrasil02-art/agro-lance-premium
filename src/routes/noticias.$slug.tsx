@@ -7,8 +7,8 @@
  import { Button } from "@/components/ui/button"
 
   export const Route = createFileRoute("/noticias/$slug")({
-    head: ({ loaderData, matches }: { loaderData: any, matches: any[] }) => {
-      const post = loaderData?.post;
+    head: (ctx: any) => {
+      const post = ctx.loaderData?.post;
       const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
       const seoSuffix = rootData?.seoSettings?.global_title_suffix || "";
       
@@ -26,7 +26,7 @@
         ],
       };
     },
-    loader: async ({ params }) => {
+    loader: async ({ params }: { params: any }) => {
      const { data: post } = await supabase
        .from("posts")
        .select("*, category:categories(name)")
