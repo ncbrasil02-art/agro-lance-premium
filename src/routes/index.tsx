@@ -360,7 +360,17 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
               />
             )}
             {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-              <FeaturedLotsCarousel lots={mappedLots} />
+              <>
+                <FeaturedLotsCarousel lots={mappedLots} />
+                {/* Mobile/Alternative Grid for "chamativo" feel */}
+                <section className="container mx-auto px-4 py-8 lg:hidden">
+                   <div className="grid gap-6 sm:grid-cols-2">
+                      {mappedLots.slice(0, 4).map((lot) => (
+                         <LotCard key={lot.id} lot={lot} />
+                      ))}
+                   </div>
+                </section>
+              </>
             )}
             {sectionId === "articles" && (activeSections as any)?.show_articles && (
               <ArticleCarousel articles={articles} />
