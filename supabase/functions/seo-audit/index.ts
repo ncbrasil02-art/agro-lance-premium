@@ -6,30 +6,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-function analyzeSEO(title: string, description: string, content?: string, image?: string, ogTitle?: string, ogDescription?: string) {
+function analyzeSEO(title: string, description: string, content?: string, image?: string) {
   const issues = [];
-  
-  if (!title) {
-    issues.push({ level: 'error', message: 'Título SEO ausente.' });
-  } else if (title.length < 30) {
-    issues.push({ level: 'warn', message: 'Título curto demais.' });
-  } else if (title.length > 60) {
-    issues.push({ level: 'warn', message: 'Título longo demais.' });
-  }
-
-  if (!description) {
-    issues.push({ level: 'error', message: 'Meta descrição ausente.' });
-  } else if (description.length < 120) {
-    issues.push({ level: 'warn', message: 'Descrição curta.' });
-  }
-
+  if (!title) issues.push({ level: 'error', message: 'Título SEO ausente.' });
+  else if (title.length < 30) issues.push({ level: 'warn', message: 'Título curto.' });
+  if (!description) issues.push({ level: 'error', message: 'Meta descrição ausente.' });
+  else if (description.length < 120) issues.push({ level: 'warn', message: 'Descrição curta.' });
   return issues;
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
     const supabase = createClient(
@@ -39,7 +26,7 @@ serve(async (req) => {
 
     const { data: audit, error: auditError } = await supabase
       .from('seo_audits')
-      .insert({ status: 'running' })
+      .insert({ status: 'running', progress_message: 'Iniciando coleta de dados...' })
       .select().single()
 
     if (auditError) throw auditError;
@@ -50,49 +37,58 @@ serve(async (req) => {
       supabase.from("events").select("id, name, seo_title, seo_description, banner_url")
     ]);
 
-    const auditDetails = [];
+    const allItems = [
+      ...(animals.data || []).map(i => ({ ...i, type: 'animal' })),
+      ...(posts.data || []).map(i => ({ ...i, type: 'post', name: i.title })),
+      ...(events.data || []).map(i => ({ ...i, type: 'event' }))
+    ];
+
+    await supabase.from('seo_audits').update({ 
+      total_items: allItems.length,
+      status: 'processing',
+      progress_message: `Analisando ${allItems.length} itens...`
+    }).eq('id', audit.id);
+
     let errorCount = 0;
     let warningCount = 0;
     let healthyCount = 0;
+    let processed = 0;
 
-    const processItem = (item: any, type: string) => {
-      const issues = analyzeSEO(item.seo_title || item.name || item.title, item.seo_description || "", "", item.photos?.[0] || item.featured_image || item.banner_url);
+    for (const item of allItems) {
+      const issues = analyzeSEO(item.seo_title || item.name, item.seo_description || "", "", item.photos?.[0] || item.featured_image || item.banner_url);
+      
       if (issues.length === 0) healthyCount++;
       else if (issues.some(i => i.level === 'error')) errorCount++;
       else warningCount++;
-      
-      auditDetails.push({
+
+      await supabase.from('seo_audit_details').insert({
         audit_id: audit.id,
         item_id: item.id,
-        item_type: type,
-        item_name: item.name || item.title,
+        item_type: item.type,
+        item_name: item.name,
         issues: issues
       });
-    };
 
-    animals.data?.forEach(a => processItem(a, 'animal'));
-    posts.data?.forEach(p => processItem(p, 'post'));
-    events.data?.forEach(e => processItem(e, 'event'));
-
-    if (auditDetails.length > 0) {
-      await supabase.from('seo_audit_details').insert(auditDetails);
+      processed++;
+      
+      // Update progress every 5 items to avoid too many DB calls but show progress
+      if (processed % 5 === 0 || processed === allItems.length) {
+        await supabase.from('seo_audits').update({ 
+          processed_items: processed,
+          progress_message: `Processado ${processed} de ${allItems.length} itens...`
+        }).eq('id', audit.id);
+      }
     }
 
     await supabase.from('seo_audits').update({
       status: 'completed',
-      total_items: auditDetails.length,
+      progress_message: 'Auditoria finalizada com sucesso.',
       error_count: errorCount,
       warning_count: warningCount,
       healthy_count: healthyCount
     }).eq('id', audit.id);
 
-    // If there are errors, notify admins (hypothetical action)
-    if (errorCount > 0) {
-      console.log(`Auditoria concluída com ${errorCount} erros. Notificando administradores...`);
-      // Here we could invoke the user-notifications function or similar
-    }
-
-    return new Response(JSON.stringify({ success: true, auditId: audit.id, stats: { errorCount, warningCount, healthyCount } }), {
+    return new Response(JSON.stringify({ success: true, auditId: audit.id }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
