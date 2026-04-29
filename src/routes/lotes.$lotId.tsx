@@ -292,12 +292,15 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
              </div>
              <span className="font-black text-lg text-gold">{formatBRL((price * 0.95) + buyerCommission)}</span>
            </div>
-           {options.filter(o => o !== 1).map((opt) => (
-             <div key={opt} className="flex items-center justify-between p-3 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors rounded-lg">
-               <span className="text-sm font-medium text-white/80">{opt} parcelas iguais</span>
-               <span className="font-bold text-white">{formatBRL(price / opt)}</span>
-             </div>
-           ))}
+            {options.filter(o => o !== 1).map((opt) => {
+              const totalWithCommission = price + buyerCommission;
+              return (
+                <div key={opt} className="flex items-center justify-between p-3 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors rounded-lg">
+                  <span className="text-sm font-medium text-white/80">{opt} parcelas iguais</span>
+                  <span className="font-bold text-white">{formatBRL(totalWithCommission / opt)}</span>
+                </div>
+              );
+            })}
         </div>
       </DialogContent>
     </Dialog>
@@ -487,10 +490,10 @@ function LotDetail() {
   const isBiddingOpen = (dynamicStatus === 'live' || dynamicStatus === 'recebendo_lances' || dynamicStatus === 'pre_lance') && !isSold && !isPassed;
 
   const [isUrgent, setIsUrgent] = useState(false);
-  const installments = 30;
-  const installmentValue = currentPrice / installments;
    const COMMISSION_RATE = lot.event?.commission_rate ?? 5;
-  const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
+   const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
+   const installments = lot.installment_count || 30;
+   const installmentValue = (currentPrice + BUYER_COMMISSION) / installments;
 
   const getAge = (birthDate: string) => {
     if (!birthDate) return null;

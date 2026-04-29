@@ -59,9 +59,10 @@ import {
          status: "active",
          allows_pre_bidding: true,
          is_featured: false,
-         payment_methods: "",
-         viewers: 0
-       });
+          payment_methods: "",
+          viewers: 0,
+          installment_count: 30
+        });
 
        const fetchData = async () => {
          setIsLoading(true);
@@ -185,9 +186,10 @@ import {
            status: "active",
            allows_pre_bidding: true,
            is_featured: false,
-           payment_methods: "",
-           viewers: 0
-         });
+            payment_methods: "",
+            viewers: 0,
+            installment_count: 30
+          });
        };
 
       const handleEdit = (lot: any) => {
@@ -201,9 +203,10 @@ import {
            status: lot.status || "active",
            allows_pre_bidding: lot.allows_pre_bidding !== false,
            is_featured: lot.is_featured || false,
-           payment_methods: lot.payment_methods?.join(", ") || "",
-           viewers: lot.viewers || 0
-         });
+            payment_methods: lot.payment_methods?.join(", ") || "",
+            viewers: lot.viewers || 0,
+            installment_count: lot.installment_count || 30
+          });
         setIsDialogOpen(true);
       };
    
@@ -353,8 +356,9 @@ import {
                  allows_pre_bidding: formData.allows_pre_bidding,
                  is_featured: formData.is_featured,
                  payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
-                 viewers: formData.viewers
-               })
+                  viewers: formData.viewers,
+                  installment_count: formData.installment_count
+                })
               .eq("id", editingLot.id);
             if (error) throw error;
             toast.success("Lote atualizado com sucesso");
@@ -370,9 +374,10 @@ import {
                allows_pre_bidding: formData.allows_pre_bidding,
                is_featured: formData.is_featured,
                payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
-               viewers: formData.viewers,
-               end_date: null // Lotes agora seguem a data de término do evento por padrão
-             });
+                viewers: formData.viewers,
+                installment_count: formData.installment_count,
+                end_date: null // Lotes agora seguem a data de término do evento por padrão
+              });
             if (error) throw error;
             toast.success("Lote alocado com sucesso");
           }
@@ -629,11 +634,12 @@ import {
                      />
                    </div>
                    <div className="grid gap-2">
-                     <Label htmlFor="viewers">Visualizações Iniciais</Label>
+                     <Label htmlFor="installments">Qtd. Parcelas</Label>
                      <Input 
                        type="number"
-                       value={formData.viewers} 
-                       onChange={(e) => setFormData({ ...formData, viewers: parseInt(e.target.value) || 0 })} 
+                       value={formData.installment_count} 
+                       onChange={(e) => setFormData({ ...formData, installment_count: parseInt(e.target.value) || 1 })} 
+                       placeholder="Ex: 30"
                      />
                    </div>
                  </div>
