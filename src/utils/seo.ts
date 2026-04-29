@@ -43,6 +43,11 @@ export function generateMetaTags({
     { name: "twitter:image", content: finalImage },
   ];
 
+  if (seoSettings?.twitter_handle) {
+    meta.push({ name: "twitter:site", content: seoSettings.twitter_handle });
+    meta.push({ name: "twitter:creator", content: seoSettings.twitter_handle });
+  }
+
   const links = [];
   if (canonical) {
     links.push({ rel: "canonical", href: `${siteUrl}${canonical}` });
