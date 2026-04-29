@@ -70,7 +70,7 @@ import {
            const [lotsRes, eventsRes, animalsRes, profilesRes] = await Promise.all([
              supabase
                .from("lots")
-                .select("*, event:events!event_id(name, end_date), animal:animals(name, internal_code)")
+                .select("*, event:events!event_id(name, end_date, commission_rate), animal:animals(name, internal_code)")
                .order("is_featured", { ascending: false })
                .order("lot_number", { ascending: true }),
              supabase
@@ -712,7 +712,7 @@ import {
                     <TableHead className="font-bold">Animal</TableHead>
                     <TableHead className="font-bold">Evento</TableHead>
                     <TableHead className="font-bold">Destaque</TableHead>
-                    <TableHead className="font-bold">Valores</TableHead>
+                     <TableHead className="font-bold">Arremate / Comissão</TableHead>
                     <TableHead className="font-bold">Lances</TableHead>
                     <TableHead className="font-bold">Status</TableHead>
                     <TableHead className="text-right font-bold">Ações de Gestão</TableHead>
@@ -771,15 +771,26 @@ import {
                                <span className="text-muted-foreground text-[10px] uppercase font-bold opacity-30">Normal</span>
                              )}
                            </TableCell>
-                           <TableCell>
-                             <div className="flex flex-col">
-                               <span className="text-[10px] text-muted-foreground uppercase font-bold">Atual</span>
-                               <span className="font-black text-sm text-emerald-deep">
-                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
-                               </span>
-                               <span className="text-[9px] text-muted-foreground italic">Início: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.starting_price)}</span>
-                             </div>
-                           </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-1">
+                                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Lote:</span>
+                                  <span className="font-black text-sm text-emerald-deep">
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
+                                  </span>
+                                </div>
+                                {lot.event?.commission_rate > 0 && (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[10px] text-muted-foreground uppercase font-bold">Com:</span>
+                                    <span className="font-bold text-xs text-amber-600">
+                                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice * (lot.event.commission_rate / 100))}
+                                    </span>
+                                    <span className="text-[9px] text-muted-foreground">({lot.event.commission_rate}%)</span>
+                                  </div>
+                                )}
+                                <span className="text-[9px] text-muted-foreground italic border-t mt-1 pt-1 w-fit">Total: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice + (currentPrice * (lot.event?.commission_rate || 0) / 100))}</span>
+                              </div>
+                            </TableCell>
                            <TableCell>
                              <div className="flex flex-col items-center">
                                <span className={`text-sm font-black ${hasNoBids ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
