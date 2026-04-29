@@ -13,7 +13,8 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { generateSlug } from "@/utils/slug";
   import { toast } from "sonner";
  
  const VETERINARY_CHECKLIST = [
@@ -257,9 +258,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                description: formData.description,
                 is_direct_sale: formData.is_direct_sale,
                 accepts_offers: formData.accepts_offers,
-               sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
-               sale_status: formData.sale_status
-             })
+                sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
+                sale_status: formData.sale_status,
+                slug,
+                seo_title: formData.seo_title,
+                seo_description: formData.seo_description
+              })
              .eq("id", editingAnimal.id)
              .neq("sale_status", "sold");
           if (error) throw error;
@@ -314,9 +318,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
              description: formData.description,
               is_direct_sale: formData.is_direct_sale,
               accepts_offers: formData.accepts_offers,
-             sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
-             sale_status: formData.sale_status
-          });
+              sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
+              sale_status: formData.sale_status,
+              slug,
+              seo_title: formData.seo_title,
+              seo_description: formData.seo_description
+           });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
         }
