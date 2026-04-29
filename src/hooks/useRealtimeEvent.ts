@@ -5,7 +5,7 @@ import { logger } from '@/utils/logger';
 
 type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL';
 
-export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
+ export function useRealtimeEvent(eventId: string, onUpdate: () => void, onManualUpdate?: () => void) {
   const [status, setStatus] = useState<ChannelStatus>('INITIAL');
   const [retryCount, setRetryCount] = useState(0);
 
@@ -24,10 +24,11 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
           table: 'lots',
           filter: `event_id=eq.${eventId}`,
         },
-        (payload) => {
-          logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
-          onUpdate();
-        }
+         (payload) => {
+           logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
+           onUpdate();
+           onManualUpdate?.();
+         }
       )
       .on(
         'postgres_changes',
@@ -37,10 +38,11 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
           table: 'events',
           filter: `id=eq.${eventId}`,
         },
-        (payload) => {
-          logger.info('Mudança detectada nos dados do evento', { eventId, payload });
-          onUpdate();
-        }
+         (payload) => {
+           logger.info('Mudança detectada nos dados do evento', { eventId, payload });
+           onUpdate();
+           onManualUpdate?.();
+         }
       )
       .subscribe((newStatus) => {
         logger.info(`Status do canal em tempo real (${eventId}): ${newStatus}`);
@@ -86,7 +88,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
     };
   }, [eventId, onUpdate, retryCount]);
 
-    useRealtimeFallback({
+    const fallback = useRealtimeFallback({
       status,
       onUpdate,
       label: `Evento ${eventId}`,
@@ -94,10 +96,10 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       initialPollInterval: 15000
     });
  
-   return { status };
+    return { ...fallback };
  }
  
- export function useHomeRealtime(onUpdate: () => void) {
+   export function useHomeRealtime(onUpdate: () => void, onManualUpdate?: () => void) {
    const [status, setStatus] = useState<ChannelStatus>('INITIAL');
    const [retryCount, setRetryCount] = useState(0);
  
@@ -108,11 +110,13 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
        .channel(channelId)
        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
          logger.info("Evento alterado, atualizando via realtime...");
-         onUpdate();
+          onUpdate();
+          onManualUpdate?.();
        })
        .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
          logger.info("Lote alterado, atualizando via realtime...");
-         onUpdate();
+          onUpdate();
+          onManualUpdate?.();
        })
        .subscribe((newStatus) => {
          setStatus(newStatus);
@@ -126,7 +130,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
      };
    }, [onUpdate, retryCount]);
  
-    useRealtimeFallback({
+    const fallback = useRealtimeFallback({
       status,
       onUpdate,
       label: "Home/Geral",
@@ -134,9 +138,8 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       initialPollInterval: 10000
     });
  
-   return { status };
+    return { ...fallback };
  }
  export function useRealtimeLots(onUpdate: () => void) {
-   const { status } = useHomeRealtime(onUpdate);
-   return { status };
+    return useHomeRealtime(onUpdate);
  }

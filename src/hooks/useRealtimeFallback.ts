@@ -1,4 +1,4 @@
- import { useEffect, useRef, useState } from 'react';
+ import { useEffect, useRef, useState, useMemo } from 'react';
  import { logger } from '@/utils/logger';
  
  export interface RealtimeFallbackOptions {
@@ -28,6 +28,16 @@
  }: RealtimeFallbackOptions) {
    const onUpdateRef = useRef(onUpdate);
    const [retryCount, setRetryCount] = useState(0);
+   const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now());
+   const [currentDelay, setCurrentDelay] = useState<number>(0);
+ 
+   // Calcula o atraso atual (tempo desde a última atualização)
+   useEffect(() => {
+     const interval = setInterval(() => {
+       setCurrentDelay(Math.floor((Date.now() - lastUpdateTime) / 1000));
+     }, 1000);
+     return () => clearInterval(interval);
+   }, [lastUpdateTime]);
  
    useEffect(() => {
      onUpdateRef.current = onUpdate;
@@ -35,10 +45,11 @@
  
    // Reset retry count when status changes or when it successfully connects
    useEffect(() => {
-     if (status === 'SUBSCRIBED') {
-       setRetryCount(0);
-     }
-   }, [status]);
+       if (status === 'SUBSCRIBED') {
+         setRetryCount(0);
+         setLastUpdateTime(Date.now());
+       }
+     }, [status]);
  
    useEffect(() => {
      if (!enabled || status === 'SUBSCRIBED') return;
@@ -60,6 +71,7 @@
        try {
          onUpdateRef.current();
          setRetryCount(prev => prev + 1);
+         setLastUpdateTime(Date.now());
        } catch (err: any) {
          logger.error(`Erro no polling de fallback para ${label}:`, { error: err?.message || String(err) });
        }
@@ -67,4 +79,16 @@
  
      return () => clearTimeout(timeoutId);
    }, [status, label, pollInterval, initialPollInterval, enabled, retryCount]);
+ 
+     const onManualUpdate = () => {
+       setLastUpdateTime(Date.now());
+     };
+ 
+     return {
+       delaySeconds: currentDelay,
+       lastUpdate: lastUpdateTime,
+       isPolling: status !== 'SUBSCRIBED',
+       status,
+       onManualUpdate
+     };
  }
