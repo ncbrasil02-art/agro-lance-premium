@@ -1504,12 +1504,29 @@ import { SocialPreview } from "./SocialPreview";
                                             </div>
                                           </div>
                                         )}
-                                        <div className="flex justify-between items-center border-t-2 border-emerald-200 pt-3">
-                                           <div className="uppercase font-black text-emerald-900">Total Geral</div>
-                                           <div className="text-3xl font-black text-emerald-600">
-                                             {formatBRL(lot.current_price + (lot.current_price * ((viewingEventDetails?.commission_rate || 0) / 100)))}
+                                         <div className="space-y-4 pt-3 border-t-2 border-emerald-200">
+                                           <div className="flex justify-between items-center">
+                                              <div className="uppercase font-black text-emerald-900">Total Geral</div>
+                                              <div className="text-3xl font-black text-emerald-600">
+                                                {formatBRL(lot.current_price + (lot.current_price * ((viewingEventDetails?.commission_rate || 0) / 100)))}
+                                              </div>
                                            </div>
-                                        </div>
+                                           
+                                           {lot.installment_count && (
+                                             <div className="bg-white/50 p-4 rounded-lg border border-emerald-100 mt-2">
+                                               <div className="flex justify-between items-center">
+                                                 <div className="text-[10px] font-black uppercase text-emerald-800">Condição de Pagamento</div>
+                                                 <div className="text-sm font-bold text-emerald-900">{lot.installment_count}x Iguais</div>
+                                               </div>
+                                               <div className="flex justify-between items-center mt-1">
+                                                 <div className="text-[10px] font-black uppercase text-emerald-800">Valor da Parcela (c/ comissão)</div>
+                                                 <div className="text-xl font-black text-emerald-600">
+                                                   {formatBRL((lot.current_price + (lot.current_price * ((viewingEventDetails?.commission_rate || 0) / 100))) / lot.installment_count)}
+                                                 </div>
+                                               </div>
+                                             </div>
+                                           )}
+                                         </div>
                                       </div>
 
                                       <div className="pt-10 space-y-4">
