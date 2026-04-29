@@ -1,3 +1,31 @@
+ export function SectionSkeleton({ type = "cards", count = 3 }: { type?: "cards" | "lots" | "articles", count?: number }) {
+   return (
+     <section className="container mx-auto px-4 py-16 animate-pulse">
+       <div className="mb-8 space-y-4">
+         <Skeleton className="h-10 w-64 md:h-12 rounded-xl" />
+         <Skeleton className="h-5 w-96 max-w-full rounded-lg" />
+       </div>
+       <div className={`grid gap-6 ${
+         type === "lots" 
+           ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" 
+           : type === "articles"
+             ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+             : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+       }`}>
+         {Array.from({ length: count }).map((_, i) => (
+           <div key={i} className="space-y-4">
+             <Skeleton className={`${type === "lots" ? "aspect-[3/4]" : "aspect-video"} w-full rounded-3xl`} />
+             <div className="space-y-2 px-2">
+               <Skeleton className="h-6 w-3/4 rounded-lg" />
+               <Skeleton className="h-4 w-1/2 rounded-lg" />
+             </div>
+           </div>
+         ))}
+       </div>
+     </section>
+   );
+ }
+ 
 export function LotDetailSkeleton() {
   return (
     <div className="min-h-screen bg-background animate-in fade-in duration-500">
