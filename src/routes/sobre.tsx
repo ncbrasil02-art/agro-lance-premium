@@ -1,3 +1,4 @@
+import { generateMetaTags } from "@/utils/seo";
  import { createFileRoute, Navigate } from "@tanstack/react-router";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
@@ -22,18 +23,13 @@ const iconMap: Record<string, any> = {
 export const Route = createFileRoute("/sobre")({
   head: ({ matches }) => {
     const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
-    const seo = rootData?.seoSettings;
-    const title = seo?.about_title || (seo?.global_title_suffix ? `Sobre ${seo.global_title_suffix}` : "Sobre — Premium Agro Leilões");
-    const description = seo?.about_description || seo?.global_description || "Conheça a Premium Agro Leilões, plataforma referência em leilões agropecuários no Brasil.";
-    
-    return {
-      meta: [
-        { title: title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-      ],
-    };
+    const seoSettings = rootData?.seoSettings;
+    return generateMetaTags({
+      title: seoSettings?.about_title || "Sobre",
+      description: seoSettings?.about_description,
+      seoSettings,
+      canonical: "/sobre"
+    });
   },
   component: AboutPage,
 });
