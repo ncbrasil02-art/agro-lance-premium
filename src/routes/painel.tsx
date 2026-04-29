@@ -811,10 +811,11 @@ export const Route = createFileRoute("/painel")({
                <div className="bg-emerald-deep p-2 rounded-lg">
                  <Gavel className="h-8 w-8 text-gold" />
                </div>
-               <div>
-                 <h2 className="text-2xl font-black text-emerald-deep leading-none uppercase tracking-tighter italic">Premium Agro</h2>
-                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Leilões Agropecuários de Elite</p>
-               </div>
+                <div>
+                  <h2 className="text-2xl font-black text-emerald-deep leading-none uppercase tracking-tighter italic">{siteInfo?.name || "Premium Agro"}</h2>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{siteInfo?.description || "Leilões Agropecuários de Elite"}</p>
+                  {siteInfo?.cnpj && <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">CNPJ: {siteInfo.cnpj}</p>}
+                </div>
             </div>
             <div className="text-right">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">ID do Documento</p>
@@ -876,10 +877,10 @@ export const Route = createFileRoute("/painel")({
               </div>
 
               <div className="flex justify-between items-end pt-20">
-                 <div className="w-64 border-t border-gray-400 text-center pt-2">
-                   <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Premium Agro Leilões</p>
-                   <p className="text-[10px] text-gray-400">Assinatura Digital Auditada</p>
-                 </div>
+                  <div className="w-64 border-t border-gray-400 text-center pt-2">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{siteInfo?.name || "Premium Agro Leilões"}</p>
+                    <p className="text-[10px] text-gray-400">Assinatura Digital Auditada</p>
+                  </div>
                  <div className="w-64 border-t border-gray-400 text-center pt-2">
                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{profile?.full_name}</p>
                    <p className="text-[10px] text-gray-400">Arrematante</p>
@@ -923,10 +924,10 @@ export const Route = createFileRoute("/painel")({
               <div className="grid grid-cols-2 gap-8 mt-10">
                 <div className="p-4 rounded-xl border-2 border-dashed border-gray-100">
                   <h4 className="text-[10px] font-black uppercase text-emerald-deep mb-3 tracking-widest">Informações de Pagamento</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed mb-4">
-                    O pagamento deve ser realizado através dos canais oficiais da Premium Agro. 
-                    Utilize a chave PIX ou os dados bancários informados no painel do cliente.
-                  </p>
+                   <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                     O pagamento deve ser realizado através dos canais oficiais da {siteInfo?.name || "Premium Agro"}. 
+                     Utilize a chave PIX ou os dados bancários informados no painel do cliente.
+                   </p>
                   <div className="bg-white p-3 rounded border text-center flex flex-col items-center">
                     <div className="h-32 w-32 bg-gray-100 flex items-center justify-center mb-2">
                       <Badge variant="outline">QR CODE PIX</Badge>
@@ -955,9 +956,9 @@ export const Route = createFileRoute("/painel")({
                  Pelo presente instrumento particular, as partes abaixo identificadas têm entre si, justo e contratado, a compra e venda do animal descrito, mediante as cláusulas e condições seguintes:
                </p>
 
-               <p>
-                 <strong>VENDEDOR:</strong> FAZENDA EXEMPLAR AGROPECUÁRIA LTDA, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 00.000.000/0001-00, com sede na Estrada Rural, Km 10, Uberaba/MG.
-               </p>
+                <p>
+                  <strong>VENDEDOR:</strong> <strong>{siteInfo?.name?.toUpperCase() || "PREMIUM AGRO"}</strong>, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº <strong>{siteInfo?.cnpj || "00.000.000/0001-00"}</strong>.
+                </p>
 
                <p>
                  <strong>COMPRADOR:</strong> <strong>{profile?.full_name?.toUpperCase()}</strong>, residente e domiciliado conforme dados cadastrais no portal Premium Agro, inscrito no CPF sob o nº <strong>{profile?.cpf || "---"}</strong>.
@@ -975,18 +976,24 @@ export const Route = createFileRoute("/painel")({
                  <strong>CLÁUSULA TERCEIRA - DA ENTREGA:</strong> A entrega do animal ao COMPRADOR somente se efetivará após a quitação da primeira parcela ou do valor integral, conforme o caso, e assinatura das notas promissórias e deste contrato.
                </p>
 
-               <div className="bg-gray-50 p-4 border-l-4 border-emerald-deep my-6 italic text-xs">
-                 "Este contrato é gerado eletronicamente e possui validade jurídica mediante a confirmação do arremate pelo sistema de auditoria da Premium Agro Leilões, com registro de IP {lot.last_bid_ip || '187.52.14.92'} em {new Date(lot.updated_at).toLocaleString('pt-BR')}."
-               </div>
+                <div className="bg-gray-50 p-4 border-l-4 border-emerald-deep my-6 italic text-xs">
+                  "Este contrato é gerado eletronicamente e possui validade jurídica mediante a confirmação do arremate pelo sistema de auditoria da {siteInfo?.name || "Premium Agro Leilões"}, com registro de IP {lot.last_bid_ip || '187.52.14.92'} em {new Date(lot.updated_at).toLocaleString('pt-BR')}."
+                </div>
 
                <p>
                  Uberaba/MG, {new Date().toLocaleDateString('pt-BR', {day: 'numeric', month: 'long', year: 'numeric'})}.
                </p>
 
-               <div className="grid grid-cols-2 gap-20 pt-20">
-                 <div className="border-t border-black pt-2 text-center text-xs">VENDEDOR</div>
-                 <div className="border-t border-black pt-2 text-center text-xs">COMPRADOR</div>
-               </div>
+                <div className="grid grid-cols-2 gap-20 pt-20">
+                  <div className="border-t border-black pt-2 text-center text-xs">
+                    <p className="font-bold">{siteInfo?.name?.toUpperCase() || "VENDEDOR"}</p>
+                    <p className="text-[10px]">CNPJ: {siteInfo?.cnpj || "00.000.000/0001-00"}</p>
+                  </div>
+                  <div className="border-t border-black pt-2 text-center text-xs">
+                    <p className="font-bold">{profile?.full_name?.toUpperCase() || "COMPRADOR"}</p>
+                    <p className="text-[10px]">CPF/CNPJ: {profile?.cnpj || profile?.cpf || "---"}</p>
+                  </div>
+                </div>
             </div>
           )}
 
