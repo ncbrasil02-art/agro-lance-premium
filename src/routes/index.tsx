@@ -3,7 +3,8 @@
  import { ArticleCarousel } from "@/components/site/ArticleCarousel";
  import { EventCarousel } from "@/components/site/EventCarousel";
  import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
-  import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+   import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+   import { PAGE_LIMITS } from "@/config/limits";
 import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2 } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
@@ -27,11 +28,11 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
          console.log("Loader Home started");
           // Execute all queries in parallel, but handle individual failures
           const results = await Promise.allSettled([
-            supabase.from("events").select("*, lots!lots_event_id_fkey(id)").or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento").order("start_date", { ascending: true }).limit(15),
-            supabase.from("lots").select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)").eq("is_featured", true).order("created_at", { ascending: false }).limit(12),
-            supabase.from("events").select("*, lots!lots_event_id_fkey(id)").eq("status", "finished").order("start_date", { ascending: false }).limit(3),
+             supabase.from("events").select("*, lots!lots_event_id_fkey(id)").or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento").order("start_date", { ascending: true }).limit(PAGE_LIMITS.HOME_EVENTS),
+             supabase.from("lots").select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)").eq("is_featured", true).order("created_at", { ascending: false }).limit(PAGE_LIMITS.HOME_FEATURED_LOTS),
+             supabase.from("events").select("*, lots!lots_event_id_fkey(id)").eq("status", "finished").order("start_date", { ascending: false }).limit(PAGE_LIMITS.HOME_PAST_EVENTS),
             supabase.from("site_settings").select("*").eq("key", "announcement").maybeSingle(),
-            supabase.from("posts").select("*, category:categories(name)").eq("status", "published").order("published_at", { ascending: false }).limit(10),
+             supabase.from("posts").select("*, category:categories(name)").eq("status", "published").order("published_at", { ascending: false }).limit(PAGE_LIMITS.HOME_ARTICLES),
           ]);
 
           const getVal = (res: any) => res.status === 'fulfilled' ? res.value : { data: [] };
