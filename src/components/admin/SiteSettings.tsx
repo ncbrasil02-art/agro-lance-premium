@@ -269,8 +269,89 @@
           <TabsTrigger value="content" className="gap-2">
             <FileText className="h-4 w-4" /> Conteúdo
           </TabsTrigger>
-       </TabsList>
- 
+        </TabsList>
+
+        <TabsContent value="content">
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-gold" /> Página Sobre
+                </CardTitle>
+                <CardDescription>Gerencie a visibilidade e o nome da página institucional</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="about_enabled">Habilitar Página Sobre</Label>
+                  <Switch 
+                    id="about_enabled" 
+                    checked={aboutPage.enabled} 
+                    onCheckedChange={v => setAboutPage({...aboutPage, enabled: v})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="about_title">Nome da Página (Menu/Título)</Label>
+                  <Input 
+                    id="about_title" 
+                    value={aboutPage.title} 
+                    onChange={e => setAboutPage({...aboutPage, title: e.target.value})} 
+                  />
+                </div>
+                <Button 
+                  className="bg-gold text-emerald-deep font-bold" 
+                  onClick={() => handleSave("about_page", aboutPage)}
+                  disabled={isSaving}
+                >
+                  {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Salvar Configuração Sobre
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Type className="h-5 w-5 text-gold" /> Textos Customizáveis
+                </CardTitle>
+                <CardDescription>Edite blocos de texto importantes em todo o site</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="hero_title">Título da Home (Hero)</Label>
+                  <Input 
+                    id="hero_title" 
+                    value={customTexts.hero_title} 
+                    onChange={e => setCustomTexts({...customTexts, hero_title: e.target.value})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hero_subtitle">Subtítulo da Home</Label>
+                  <Textarea 
+                    id="hero_subtitle" 
+                    value={customTexts.hero_subtitle} 
+                    onChange={e => setCustomTexts({...customTexts, hero_subtitle: e.target.value})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="footer_text">Texto Institucional (Rodapé)</Label>
+                  <Textarea 
+                    id="footer_text" 
+                    value={customTexts.footer_text} 
+                    onChange={e => setCustomTexts({...customTexts, footer_text: e.target.value})} 
+                  />
+                </div>
+                <Button 
+                  className="bg-gold text-emerald-deep font-bold" 
+                  onClick={() => handleSave("custom_texts", customTexts)}
+                  disabled={isSaving}
+                >
+                  {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Salvar Textos Customizáveis
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
        <TabsContent value="geral">
          <Card>
            <CardHeader>
