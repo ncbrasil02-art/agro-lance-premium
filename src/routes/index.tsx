@@ -202,12 +202,23 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
     <>
       {/* ANNOUNCEMENT BANNER */}
       {announcement && (announcement as any).active && (
-        <div className="bg-gold py-2 px-4 text-emerald-deep">
-          <div className="container mx-auto flex items-center justify-center gap-2 text-sm font-bold">
-            <Bell className="h-4 w-4" />
-            {(announcement as any).text}
+        <div className="bg-gold py-2.5 px-4 text-emerald-deep border-b border-gold-bright/30">
+          <div className="container mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+               <div className="h-8 w-8 bg-emerald-deep/5 rounded-lg p-1 hidden sm:flex items-center justify-center">
+                  <img 
+                    src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
+                    alt="Logo" 
+                    className="h-full object-contain"
+                  />
+               </div>
+               <div className="flex items-center gap-2 text-xs sm:text-sm font-black uppercase italic tracking-tighter">
+                 <Bell className="h-4 w-4 animate-bounce" />
+                 {(announcement as any).text}
+               </div>
+            </div>
             {(announcement as any).link && (
-              <Link to={(announcement as any).link} className="underline ml-2">Saiba mais</Link>
+              <Link to={(announcement as any).link} className="bg-emerald-deep text-gold px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">Saiba mais</Link>
             )}
           </div>
         </div>
