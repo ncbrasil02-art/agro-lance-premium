@@ -1,0 +1,18 @@
+ export const PAGE_LIMITS = {
+   HOME_EVENTS: 15,
+   HOME_FEATURED_LOTS: 12,
+   HOME_PAST_EVENTS: 3,
+   HOME_ARTICLES: 10,
+   EVENTS_LIST: 12,
+   LOTS_LIST: 24,
+   ADMIN_LIST: 10,
+   SIDEBAR_RECENT: 5,
+ };
+ 
+ export const RATE_LIMITS = {
+   BID_COOLDOWN_MS: 1500, // Tempo entre lances do mesmo usuário
+   SEARCH_DEBOUNCE_MS: 300,
+   POLLING_INITIAL_MS: 10000,
+   POLLING_BASE_MS: 30000,
+   POLLING_MAX_MS: 120000,
+ };
