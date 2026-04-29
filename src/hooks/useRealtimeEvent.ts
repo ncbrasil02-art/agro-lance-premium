@@ -147,7 +147,8 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
      return () => clearInterval(pollInterval);
    }, [status, onUpdate]);
  
- 
+   return { status };
+ }
  export function useRealtimeLots(onUpdate: () => void) {
    const { status } = useHomeRealtime(onUpdate);
    return { status };
