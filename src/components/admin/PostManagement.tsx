@@ -309,12 +309,11 @@ import { generateSlug, validateSlug } from "@/utils/slug";
               setIsDialogOpen(open);
               if (!open) resetForm();
             }}>
-              <DialogTrigger asChild>
-                <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
-                </Button>
-              </DialogTrigger>
-           </DialogTrigger>
+               <DialogTrigger asChild>
+                 <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+                   <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
+                 </Button>
+               </DialogTrigger>
              <DialogContent className={`${isFullScreen ? "sm:max-w-[95vw] h-[95vh]" : "sm:max-w-[700px] max-h-[90vh]"} overflow-y-auto transition-all duration-300`}>
              <DialogHeader>
                  <div className="flex items-center justify-between pr-8">
