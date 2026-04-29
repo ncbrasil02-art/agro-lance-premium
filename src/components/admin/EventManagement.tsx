@@ -622,11 +622,52 @@ import { generateSlug } from "@/utils/slug";
                </DialogDescription>
              </DialogHeader>
               <Tabs defaultValue="basico" className="w-full mt-4">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                 <TabsTrigger value="basico">Básico</TabsTrigger>
-                 <TabsTrigger value="agenda">Agenda</TabsTrigger>
-                 <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
-                </TabsList>
+                 <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsTrigger value="basico">Básico</TabsTrigger>
+                  <TabsTrigger value="agenda">Agenda</TabsTrigger>
+                  <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
+                  <TabsTrigger value="seo">SEO</TabsTrigger>
+                 </TabsList>
+                <TabsContent value="seo" className="space-y-4 animate-in fade-in slide-in-from-left-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="slug">Slug (URL amigável)</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="slug"
+                        value={formData.slug} 
+                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })} 
+                        placeholder="exemplo-de-link-seo"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setFormData({ ...formData, slug: generateSlug(formData.name) })}
+                        type="button"
+                      >
+                        Gerar da Nome
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                    <Input 
+                      id="seo_title"
+                      value={formData.seo_title} 
+                      onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })} 
+                      placeholder="Título para buscadores"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="seo_description">SEO Description</Label>
+                    <Textarea 
+                      id="seo_description"
+                      className="min-h-[100px]"
+                      value={formData.seo_description} 
+                      onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
+                      placeholder="Meta descrição para o Google"
+                    />
+                  </div>
+                </TabsContent>
 
                 <TabsContent value="basico" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                   <div className="grid gap-2">
