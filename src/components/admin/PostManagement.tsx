@@ -5,7 +5,7 @@
  import { Textarea } from "@/components/ui/textarea";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock, Sparkles } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock, Sparkles, Maximize2, Minimize2 } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -45,6 +45,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
    const [isGenerating, setIsGenerating] = useState(false);
    const [aiPrompt, setAiPrompt] = useState("");
    const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+   const [isFullScreen, setIsFullScreen] = useState(false);
    const [searchQuery, setSearchQuery] = useState("");
  
    const handleAutoFix = async () => {
@@ -297,9 +298,19 @@ import { generateSlug, validateSlug } from "@/utils/slug";
              </Button>
            </div>
            </DialogTrigger>
-           <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+             <DialogContent className={`${isFullScreen ? "sm:max-w-[95vw] h-[95vh]" : "sm:max-w-[700px] max-h-[90vh]"} overflow-y-auto transition-all duration-300`}>
              <DialogHeader>
-               <DialogTitle>{editingPost ? "Editar Notícia" : "Criar Nova Notícia"}</DialogTitle>
+                 <div className="flex items-center justify-between pr-8">
+                   <DialogTitle>{editingPost ? "Editar Notícia" : "Criar Nova Notícia"}</DialogTitle>
+                   <Button 
+                     variant="ghost" 
+                     size="icon" 
+                     onClick={() => setIsFullScreen(!isFullScreen)}
+                     title={isFullScreen ? "Reduzir" : "Tela Cheia"}
+                   >
+                     {isFullScreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                   </Button>
+                 </div>
                <DialogDescription>
                  Preencha os campos abaixo para publicar uma notícia no site.
                </DialogDescription>
@@ -374,7 +385,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                     <TabsTrigger value="rich">Rich Results</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="editor" className="space-y-4 pt-4">
+                   <TabsContent value="editor" className={`space-y-4 pt-4 ${isFullScreen ? "h-[calc(95vh-250px)]" : ""}`}>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="author_name">Autor</Label>
@@ -395,11 +406,11 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                         />
                       </div>
                     </div>
-                    <div className="grid gap-2">
+                     <div className={`grid gap-2 ${isFullScreen ? "h-full" : ""}`}>
                       <Label htmlFor="content">Conteúdo (Markdown suportado)</Label>
                       <Textarea 
                         id="content"
-                        className="min-h-[300px] font-mono"
+                         className={`${isFullScreen ? "flex-1 min-h-[400px]" : "min-h-[300px]"} font-mono`}
                         value={formData.content} 
                         onChange={(e) => setFormData({ ...formData, content: e.target.value })} 
                         placeholder="Conteúdo completo da notícia..."
