@@ -7,7 +7,7 @@
  import { Button } from "@/components/ui/button"
 
   export const Route = createFileRoute("/noticias/$slug")({
-    head: ({ loaderData, matches }) => {
+    head: ({ loaderData, matches }: { loaderData: any, matches: any[] }) => {
       const post = loaderData?.post;
       const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
       const seoSuffix = rootData?.seoSettings?.global_title_suffix || "";
@@ -37,8 +37,8 @@
    component: NewsDetail,
  })
 
- function NewsDetail() {
-   const { post } = Route.useLoaderData()
+  function NewsDetail() {
+    const { post } = Route.useLoaderData() as any
 
    if (!post) return <div className="container py-20 text-center">Post não encontrado</div>
  
