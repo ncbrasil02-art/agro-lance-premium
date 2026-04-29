@@ -16,14 +16,18 @@
  export function PostManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingPost, setEditingPost] = useState<any>(null);
-   const [formData, setFormData] = useState({
-     title: "",
-     excerpt: "",
-     content: "",
-     featured_image: "",
-     category_id: "",
-     status: "published"
-   });
+    const [formData, setFormData] = useState<any>({
+      title: "",
+      excerpt: "",
+      content: "",
+      featured_image: "",
+      category_id: "",
+      status: "draft",
+      seo_title: "",
+      seo_description: "",
+      author: "",
+      read_time: ""
+    });
    const [posts, setPosts] = useState<any[]>([]);
    const [categories, setCategories] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
@@ -56,26 +60,34 @@
  
    const resetForm = () => {
      setEditingPost(null);
-     setFormData({
-       title: "",
-       excerpt: "",
-       content: "",
-       featured_image: "",
-       category_id: "",
-       status: "published"
-     });
+      setFormData({
+        title: "",
+        excerpt: "",
+        content: "",
+        featured_image: "",
+        category_id: "",
+        status: "draft",
+        seo_title: "",
+        seo_description: "",
+        author: "",
+        read_time: ""
+      });
    };
  
    const handleEdit = (post: any) => {
      setEditingPost(post);
-     setFormData({
-       title: post.title || "",
-       excerpt: post.excerpt || "",
-       content: post.content || "",
-       featured_image: post.featured_image || "",
-       category_id: post.category_id || "",
-       status: post.status || "published"
-     });
+      setFormData({
+        title: post.title || "",
+        excerpt: post.excerpt || "",
+        content: post.content || "",
+        featured_image: post.featured_image || "",
+        category_id: post.category_id || "",
+        status: post.status || "draft",
+        seo_title: post.seo_title || "",
+        seo_description: post.seo_description || "",
+        author: post.author || "",
+        read_time: post.read_time || ""
+      });
      setIsDialogOpen(true);
    };
  
@@ -204,10 +216,11 @@
                      <SelectTrigger>
                        <SelectValue placeholder="Status" />
                      </SelectTrigger>
-                     <SelectContent>
-                       <SelectItem value="published">Publicado</SelectItem>
-                       <SelectItem value="draft">Rascunho</SelectItem>
-                     </SelectContent>
+                      <SelectContent>
+                        <SelectItem value="draft">Rascunho</SelectItem>
+                        <SelectItem value="pending_review">Pendente de Revisão</SelectItem>
+                        <SelectItem value="published">Publicado</SelectItem>
+                      </SelectContent>
                    </Select>
                  </div>
                </div>
@@ -229,16 +242,81 @@
                    placeholder="Breve resumo da notícia"
                  />
                </div>
-               <div className="grid gap-2">
-                 <Label htmlFor="content">Conteúdo (Markdown suportado)</Label>
-                 <Textarea 
-                   id="content"
-                   className="min-h-[200px]"
-                   value={formData.content} 
-                   onChange={(e) => setFormData({ ...formData, content: e.target.value })} 
-                   placeholder="Conteúdo completo da notícia..."
-                 />
-               </div>
+                <Tabs defaultValue="editor" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="editor">Conteúdo</TabsTrigger>
+                    <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
+                    <TabsTrigger value="preview">Preview</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="editor" className="space-y-4 pt-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="author">Autor</Label>
+                        <Input 
+                          id="author"
+                          value={formData.author} 
+                          onChange={(e) => setFormData({ ...formData, author: e.target.value })} 
+                          placeholder="Nome do autor"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="read_time">Tempo de Leitura</Label>
+                        <Input 
+                          id="read_time"
+                          value={formData.read_time} 
+                          onChange={(e) => setFormData({ ...formData, read_time: e.target.value })} 
+                          placeholder="Ex: 5 min"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="content">Conteúdo (Markdown suportado)</Label>
+                      <Textarea 
+                        id="content"
+                        className="min-h-[300px] font-mono"
+                        value={formData.content} 
+                        onChange={(e) => setFormData({ ...formData, content: e.target.value })} 
+                        placeholder="Conteúdo completo da notícia..."
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="seo" className="space-y-4 pt-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                      <Input 
+                        id="seo_title"
+                        value={formData.seo_title} 
+                        onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })} 
+                        placeholder="Título para buscadores"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="seo_description">SEO Description</Label>
+                      <Textarea 
+                        id="seo_description"
+                        value={formData.seo_description} 
+                        onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
+                        placeholder="Meta descrição para o Google"
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="preview" className="pt-4">
+                    <div className="prose prose-sm dark:prose-invert max-w-none border rounded-lg p-6 bg-muted/20 min-h-[400px]">
+                      <h1 className="text-2xl font-bold mb-4">{formData.title || "Título da Notícia"}</h1>
+                      {formData.featured_image && (
+                        <img src={formData.featured_image} alt="" className="w-full h-48 object-cover rounded-lg mb-4" />
+                      )}
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-4 border-b">
+                        <span>{formData.author || "Autor Anônimo"}</span>
+                        <span>•</span>
+                        <span>{formData.read_time || "5 min"} de leitura</span>
+                      </div>
+                      <div className="whitespace-pre-wrap">
+                        {formData.content || "Sem conteúdo para exibir."}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
              </div>
              <DialogFooter>
                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
@@ -291,11 +369,16 @@
                            </div>
                          </TableCell>
                          <TableCell>{post.category?.name || "Sem categoria"}</TableCell>
-                         <TableCell>
-                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${post.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
-                             {post.status === 'published' ? 'Publicado' : 'Rascunho'}
-                           </span>
-                         </TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                              post.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 
+                              post.status === 'pending_review' ? 'bg-amber-100 text-amber-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {post.status === 'published' ? 'Publicado' : 
+                               post.status === 'pending_review' ? 'Pendente' : 'Rascunho'}
+                            </span>
+                          </TableCell>
                          <TableCell className="text-muted-foreground text-xs">
                            {new Date(post.created_at).toLocaleDateString('pt-BR')}
                          </TableCell>

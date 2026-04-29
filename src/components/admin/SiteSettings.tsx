@@ -8,7 +8,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
-import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star } from "lucide-react";
+import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe } from "lucide-react";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -33,6 +33,18 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
  
   export function SiteSettings() {
     const [isLoading, setIsLoading] = useState(true);
+    const [seoSettings, setSeoSettings] = useState({
+      global_title_suffix: " | Premium Agro Leilões",
+      global_description: "A melhor plataforma de leilões agropecuários do Brasil.",
+      home_title: "Home",
+      home_description: "",
+      about_title: "Sobre",
+      about_description: "",
+      news_title: "Notícias",
+      news_description: "",
+      google_analytics_id: "",
+      facebook_pixel_id: ""
+    });
      const [aboutPage, setAboutPage] = useState({
        enabled: true,
        title: "Sobre",
@@ -112,17 +124,19 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
  
         const info = data.find(i => i.key === "site_info")?.value;
         const themeData = data.find(i => i.key === "theme")?.value;
-         const homeData = data.find(i => i.key === "homepage_sections")?.value;
-         const aboutData = data.find(i => i.key === "about_page")?.value;
-         const textsData = data.find(i => i.key === "custom_texts")?.value;
-        const palettes = data.find(i => i.key === "saved_palettes")?.value;
-
-        if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
-        if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
-         if (homeData) setHomepage((prev: any) => ({ ...prev, ...(homeData as any) }));
-         if (aboutData) setAboutPage((prev: any) => ({ ...prev, ...(aboutData as any) }));
-         if (textsData) setCustomTexts((prev: any) => ({ ...prev, ...(textsData as any) }));
-        if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
+          const homeData = data.find(i => i.key === "homepage_sections")?.value;
+          const aboutData = data.find(i => i.key === "about_page")?.value;
+          const textsData = data.find(i => i.key === "custom_texts")?.value;
+          const seoData = data.find(i => i.key === "seo_settings")?.value;
+         const palettes = data.find(i => i.key === "saved_palettes")?.value;
+ 
+         if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
+         if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
+          if (homeData) setHomepage((prev: any) => ({ ...prev, ...(homeData as any) }));
+          if (aboutData) setAboutPage((prev: any) => ({ ...prev, ...(aboutData as any) }));
+          if (textsData) setCustomTexts((prev: any) => ({ ...prev, ...(textsData as any) }));
+          if (seoData) setSeoSettings((prev: any) => ({ ...prev, ...(seoData as any) }));
+         if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
 
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
@@ -275,6 +289,9 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
           </TabsTrigger>
           <TabsTrigger value="content" className="gap-2">
             <FileText className="h-4 w-4" /> Conteúdo
+          </TabsTrigger>
+          <TabsTrigger value="seo" className="gap-2">
+            <Globe className="h-4 w-4" /> SEO
           </TabsTrigger>
         </TabsList>
 
@@ -735,7 +752,119 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
              </Button>
            </CardContent>
          </Card>
-       </TabsContent>
-     </Tabs>
-   );
- }
+        </TabsContent>
+
+        <TabsContent value="seo">
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-gold" /> Configurações Globais de SEO
+                </CardTitle>
+                <CardDescription>Defina os padrões de SEO para todo o site</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="seo_suffix">Sufixo de Título (Global)</Label>
+                    <Input 
+                      id="seo_suffix" 
+                      value={seoSettings.global_title_suffix} 
+                      onChange={e => setSeoSettings({...seoSettings, global_title_suffix: e.target.value})} 
+                      placeholder="Ex: | Minha Empresa"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="seo_description_global">Meta Descrição Padrão</Label>
+                    <Input 
+                      id="seo_description_global" 
+                      value={seoSettings.global_description} 
+                      onChange={e => setSeoSettings({...seoSettings, global_description: e.target.value})} 
+                    />
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label htmlFor="ga_id">Google Analytics ID</Label>
+                    <Input 
+                      id="ga_id" 
+                      value={seoSettings.google_analytics_id} 
+                      onChange={e => setSeoSettings({...seoSettings, google_analytics_id: e.target.value})} 
+                      placeholder="G-XXXXXXXXXX"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fb_id">Facebook Pixel ID</Label>
+                    <Input 
+                      id="fb_id" 
+                      value={seoSettings.facebook_pixel_id} 
+                      onChange={e => setSeoSettings({...seoSettings, facebook_pixel_id: e.target.value})} 
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5 text-gold" /> SEO por Página
+                </CardTitle>
+                <CardDescription>Personalize títulos e descrições de páginas específicas</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
+                  <h4 className="font-bold border-b pb-2">Página Inicial (Home)</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Título Customizado</Label>
+                      <Input 
+                        value={seoSettings.home_title} 
+                        onChange={e => setSeoSettings({...seoSettings, home_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Descrição Customizada</Label>
+                      <Input 
+                        value={seoSettings.home_description} 
+                        onChange={e => setSeoSettings({...seoSettings, home_description: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
+                  <h4 className="font-bold border-b pb-2">Página Sobre</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Título Customizado</Label>
+                      <Input 
+                        value={seoSettings.about_title} 
+                        onChange={e => setSeoSettings({...seoSettings, about_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Descrição Customizada</Label>
+                      <Input 
+                        value={seoSettings.about_description} 
+                        onChange={e => setSeoSettings({...seoSettings, about_description: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full bg-gold text-emerald-deep font-bold" 
+                  onClick={() => handleSave("seo_settings", seoSettings)}
+                  disabled={isSaving}
+                >
+                  {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Salvar Configurações de SEO
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    );
+  }
