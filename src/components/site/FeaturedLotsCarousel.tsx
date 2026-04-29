@@ -56,6 +56,7 @@
               </Button>
             </div>
           </div>
+        </div>
 
        <div className="overflow-hidden p-2 -m-2" ref={emblaRef}>
          <div className="flex -ml-6">
