@@ -5,7 +5,7 @@
  import { Textarea } from "@/components/ui/textarea";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock, Sparkles } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -42,6 +42,9 @@ import { generateSlug, validateSlug } from "@/utils/slug";
    const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
    const [isAiFixing, setIsAiFixing] = useState(false);
+   const [isGenerating, setIsGenerating] = useState(false);
+   const [aiPrompt, setAiPrompt] = useState("");
+   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
    const [searchQuery, setSearchQuery] = useState("");
  
    const handleAutoFix = async () => {
@@ -67,6 +70,36 @@ import { generateSlug, validateSlug } from "@/utils/slug";
        toast.error("Erro ao otimizar: " + error.message);
      } finally {
        setIsAiFixing(false);
+     }
+   };
+
+   const handleGenerateAi = async () => {
+     if (!aiPrompt) {
+       toast.error("Descreva o tema do artigo");
+       return;
+     }
+     setIsGenerating(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('generate-article', {
+         body: { prompt: aiPrompt }
+       });
+       if (error) throw error;
+       
+       setFormData({
+         ...formData,
+         title: data.title,
+         excerpt: data.excerpt,
+         content: data.content,
+         status: 'pending_review'
+       });
+       
+       setIsAiDialogOpen(false);
+       setIsDialogOpen(true);
+       toast.success("Artigo gerado! Revise e publique.");
+     } catch (error: any) {
+       toast.error("Erro ao gerar: " + error.message);
+     } finally {
+       setIsGenerating(false);
      }
    };
 
@@ -223,9 +256,46 @@ import { generateSlug, validateSlug } from "@/utils/slug";
            if (!open) resetForm();
          }}>
            <DialogTrigger asChild>
-             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+           <div className="flex gap-2">
+             <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+               <DialogTrigger asChild>
+                 <Button variant="outline" className="border-gold text-gold hover:bg-gold/10">
+                   <Sparkles className="mr-2 h-4 w-4" /> Gerar com IA
+                 </Button>
+               </DialogTrigger>
+               <DialogContent>
+                 <DialogHeader>
+                   <DialogTitle>Gerar Artigo com IA</DialogTitle>
+                   <DialogDescription>
+                     Descreva o tema ou envie um fato e nossa IA criará um rascunho completo.
+                   </DialogDescription>
+                 </DialogHeader>
+                 <div className="py-4 space-y-4">
+                   <Label>O que você quer escrever?</Label>
+                   <Textarea 
+                     placeholder="Ex: Resultados do Leilão de Touros Nelore em Uberaba, destacando recorde de preços..."
+                     value={aiPrompt}
+                     onChange={(e) => setAiPrompt(e.target.value)}
+                     className="min-h-[100px]"
+                   />
+                 </div>
+                 <DialogFooter>
+                   <Button 
+                     className="bg-gold text-emerald-deep w-full" 
+                     onClick={handleGenerateAi}
+                     disabled={isGenerating}
+                   >
+                     {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                     Gerar Rascunho para Aprovação
+                   </Button>
+                 </DialogFooter>
+               </DialogContent>
+             </Dialog>
+
+             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => { resetForm(); setIsDialogOpen(true); }}>
                <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
              </Button>
+           </div>
            </DialogTrigger>
            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
              <DialogHeader>
