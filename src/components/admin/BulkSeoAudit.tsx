@@ -249,10 +249,7 @@ export function BulkSeoAudit() {
                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                  Atualizar
                </Button>
-             </div>
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                Atualizar
-              </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border max-h-[500px] overflow-y-auto">
