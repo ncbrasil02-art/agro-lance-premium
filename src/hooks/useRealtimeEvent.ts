@@ -85,47 +85,71 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
     };
   }, [eventId, onUpdate, retryCount]);
 
-  return { status };
-}
-
-export function useRealtimeLots(onUpdate: () => void) {
-  const [retryCount, setRetryCount] = useState(0);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('all-lots-updates')
-       .on(
-         'postgres_changes',
-         { event: '*', schema: 'public', table: 'lots' },
-         () => {
-           logger.info('Mudança detectada em algum lote (global)');
-           onUpdate();
+   // Fallback Polling if WebSocket is not connected for specific event
+   useEffect(() => {
+     if (status === 'SUBSCRIBED') return;
+ 
+     const intervalTime = status === 'INITIAL' ? 15000 : 45000;
+     logger.warn(`Realtime do evento não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
+     
+     const pollInterval = setInterval(() => {
+       logger.info(`Executando polling de fallback para Evento ${eventId}...`);
+       onUpdate();
+     }, intervalTime);
+ 
+     return () => clearInterval(pollInterval);
+   }, [status, onUpdate, eventId]);
+ 
+   return { status };
+ }
+ 
+ export function useHomeRealtime(onUpdate: () => void) {
+   const [status, setStatus] = useState<ChannelStatus>('INITIAL');
+   const [retryCount, setRetryCount] = useState(0);
+ 
+   useEffect(() => {
+     const channelId = `home-updates-${Math.random().toString(36).substring(2, 9)}`;
+     
+     const channel = supabase
+       .channel(channelId)
+       .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+         logger.info("Evento alterado, atualizando via realtime...");
+         onUpdate();
+       })
+       .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
+         logger.info("Lote alterado, atualizando via realtime...");
+         onUpdate();
+       })
+       .subscribe((newStatus) => {
+         setStatus(newStatus);
+         if (newStatus === 'CHANNEL_ERROR' || newStatus === 'TIMED_OUT') {
+           setTimeout(() => setRetryCount(prev => prev + 1), 5000);
          }
-       )
-       .on(
-         'postgres_changes',
-         { event: 'INSERT', schema: 'public', table: 'bids' },
-         () => {
-           logger.info('Novo lance detectado (global)');
-           onUpdate();
-         }
-       )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          setTimeout(() => setRetryCount(c => c + 1), 5000);
-        }
-      });
-
-    const handleOnline = () => {
-      onUpdate();
-      setRetryCount(c => c + 1);
-    };
-
-    window.addEventListener('online', handleOnline);
-
-    return () => {
-      supabase.removeChannel(channel);
-      window.removeEventListener('online', handleOnline);
-    };
-  }, [onUpdate, retryCount]);
-}
+       });
+ 
+     return () => {
+       supabase.removeChannel(channel);
+     };
+   }, [onUpdate, retryCount]);
+ 
+   // Fallback Polling if WebSocket is not connected
+   useEffect(() => {
+     if (status === 'SUBSCRIBED') return;
+ 
+     const intervalTime = status === 'INITIAL' ? 10000 : 30000;
+     logger.warn(`Realtime não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
+     
+     const pollInterval = setInterval(() => {
+       logger.info("Executando polling de fallback para Home...");
+       onUpdate();
+     }, intervalTime);
+ 
+     return () => clearInterval(pollInterval);
+   }, [status, onUpdate]);
+ 
+   return { status };
+ }
+ export function useRealtimeLots(onUpdate: () => void) {
+   const { status } = useHomeRealtime(onUpdate);
+   return { status };
+ }
