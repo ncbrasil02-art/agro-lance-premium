@@ -1,6 +1,8 @@
-  import { Outlet, Link, HeadContent, Scripts, useRouter, createRootRouteWithContext } from "@tanstack/react-router";
+ import { Outlet, Link, HeadContent, Scripts, useRouter, createRootRouteWithContext } from "@tanstack/react-router";
+ import { useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
-import { ErrorFallback } from "@/components/ui/error-fallback";
+ import { ErrorFallback } from "@/components/ui/error-fallback";
+ import { setupGlobalErrorLogging } from "@/utils/error-logger";
 function GlobalErrorComponent({ error }: { error: Error }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
