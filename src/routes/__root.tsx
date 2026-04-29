@@ -64,23 +64,29 @@ function NotFoundComponent() {
        return { siteInfo: null, theme: null, homepage: null };
      }
    },
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Premium Agro Leilões — Plataforma premium de leilões agropecuários" },
-      { name: "description", content: "A plataforma brasileira de leilões de cavalos, bovinos e embriões com transmissão ao vivo, lances em tempo real e curadoria premium." },
-      { property: "og:title", content: "Premium Agro Leilões — Plataforma premium de leilões agropecuários" },
-      { property: "og:description", content: "A plataforma brasileira de leilões de cavalos, bovinos e embriões com transmissão ao vivo, lances em tempo real e curadoria premium." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Premium Agro Leilões — Plataforma premium de leilões agropecuários" },
-      { name: "twitter:description", content: "A plataforma brasileira de leilões de cavalos, bovinos e embriões com transmissão ao vivo, lances em tempo real e curadoria premium." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp" },
-    ],
-    links: [{ rel: "stylesheet", href: appCss }],
-  }),
+   head: ({ loaderData }) => {
+     const seo = loaderData?.seoSettings;
+     const title = seo?.global_title_suffix ? `Premium Agro Leilões ${seo.global_title_suffix}` : "Premium Agro Leilões — Plataforma premium de leilões agropecuários";
+     const description = seo?.global_description || "A plataforma brasileira de leilões de cavalos, bovinos e embriões com transmissão ao vivo, lances em tempo real e curadoria premium.";
+     
+     return {
+       meta: [
+         { charSet: "utf-8" },
+         { name: "viewport", content: "width=device-width, initial-scale=1" },
+         { title: title },
+         { name: "description", content: description },
+         { property: "og:title", content: title },
+         { property: "og:description", content: description },
+         { property: "og:type", content: "website" },
+         { name: "twitter:card", content: "summary_large_image" },
+         { name: "twitter:title", content: title },
+         { name: "twitter:description", content: description },
+         { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp" },
+         { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp" },
+       ],
+       links: [{ rel: "stylesheet", href: appCss }],
+     };
+   },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
