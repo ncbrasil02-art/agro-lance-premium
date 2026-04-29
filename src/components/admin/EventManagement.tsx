@@ -1747,7 +1747,7 @@ import { SocialPreview } from "./SocialPreview";
                           <TableHead className="text-white font-bold">Animal / Vendedor</TableHead>
                           <TableHead className="text-white font-bold">Arrematante</TableHead>
                           <TableHead className="text-white font-bold text-right">Martelo</TableHead>
-                          <TableHead className="text-white font-bold text-right">Comissão</TableHead>
+                          <TableHead className="text-white font-bold text-right">Comissão (Audit)</TableHead>
                           <TableHead className="text-white font-bold text-right">Total</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1767,7 +1767,12 @@ import { SocialPreview } from "./SocialPreview";
                                 <div className="text-[9px] text-gray-400">CPF: {lot.winner?.cpf || "---"}</div>
                               </TableCell>
                               <TableCell className="text-right font-medium">{formatBRL(hammer)}</TableCell>
-                              <TableCell className="text-right text-amber-600 font-bold">{formatBRL(commission)}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="text-amber-600 font-bold">{formatBRL(commission)}</div>
+                                <div className="text-[8px] text-gray-400 font-mono">
+                                  {formatBRL(hammer)} x {(viewingEventDetails?.commission_rate || 0)/100}
+                                </div>
+                              </TableCell>
                               <TableCell className="text-right font-black text-emerald-900">{formatBRL(hammer + commission)}</TableCell>
                             </TableRow>
                           );
