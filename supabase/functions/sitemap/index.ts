@@ -29,7 +29,6 @@ serve(async (req) => {
     const siteName = siteSettings?.value?.name || 'Premium Agro Leilões';
 
     if (type === 'news') {
-      // Google News Sitemap (last 2 days)
       const twoDaysAgo = new Date();
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
@@ -48,7 +47,7 @@ serve(async (req) => {
         xml += `    <loc>${siteUrl}/noticias/${post.slug}</loc>\n`;
         xml += '    <news:news>\n';
         xml += '      <news:publication>\n';
-        xml += `        <news:name>${siteName}</news:publication_name>\n`;
+        xml += `        <news:name>${siteName}</news:name>\n`;
         xml += '        <news:language>pt-br</news:language>\n';
         xml += '      </news:publication>\n';
         xml += `      <news:publication_date>${new Date(post.published_at).toISOString()}</news:publication_date>\n`;
@@ -64,7 +63,6 @@ serve(async (req) => {
       });
     }
 
-    // Default Sitemap
     const [eventsRes, postsRes] = await Promise.all([
       supabase.from('events').select('slug, updated_at').order('updated_at', { ascending: false }),
       supabase.from('posts').select('slug, updated_at').eq('status', 'published').order('updated_at', { ascending: false })
