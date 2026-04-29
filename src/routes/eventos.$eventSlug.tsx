@@ -170,8 +170,17 @@ function EventDetail() {
                       width={1600}
                       className="max-w-full max-h-[90vh] object-contain" 
                     />
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
-                      Resolução Sugerida: 1080x1350px ou Superior
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                      <div className="h-8 w-8 bg-white/10 rounded-lg p-1.5 backdrop-blur-md">
+                        <img 
+                          src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
+                          alt="Logo" 
+                          className="h-full object-contain opacity-60"
+                        />
+                      </div>
+                      <div className="text-[8px] text-white/30 uppercase tracking-[0.3em] font-bold text-center">
+                        NC Agro Leilões - Encarte Oficial
+                      </div>
                     </div>
                   </div>
                 </DialogContent>
