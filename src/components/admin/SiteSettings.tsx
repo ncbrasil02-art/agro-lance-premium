@@ -8,7 +8,8 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
-import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe } from "lucide-react";
+ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck } from "lucide-react";
+ import { BulkSeoAudit } from "./BulkSeoAudit";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -301,6 +302,9 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
           </TabsTrigger>
           <TabsTrigger value="seo" className="gap-2">
             <Globe className="h-4 w-4" /> SEO
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="gap-2">
+            <ShieldCheck className="h-4 w-4" /> Auditoria SEO
           </TabsTrigger>
         </TabsList>
 
@@ -985,6 +989,10 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <BulkSeoAudit />
         </TabsContent>
       </Tabs>
     );

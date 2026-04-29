@@ -20,6 +20,7 @@ import { validateLiveLink, formatBRL } from "@/utils/format";
 import { generateSlug } from "@/utils/slug";
 import { SerpPreview } from "./SerpPreview";
 import { SeoAnalysis } from "./SeoAnalysis";
+import { RichResultsPreview } from "./RichResultsPreview";
 import { SocialPreview } from "./SocialPreview";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
@@ -634,12 +635,13 @@ import { SocialPreview } from "./SocialPreview";
                </DialogDescription>
              </DialogHeader>
               <Tabs defaultValue="basico" className="w-full mt-4">
-                  <TabsList className="grid w-full grid-cols-5 mb-6">
+                  <TabsList className="grid w-full grid-cols-6 mb-6">
                   <TabsTrigger value="basico">Básico</TabsTrigger>
                   <TabsTrigger value="agenda">Agenda</TabsTrigger>
                   <TabsTrigger value="transmissao">Transmissão</TabsTrigger>
                   <TabsTrigger value="seo">SEO</TabsTrigger>
                    <TabsTrigger value="social">Social</TabsTrigger>
+                   <TabsTrigger value="rich">Rich Results</TabsTrigger>
                  </TabsList>
                 <TabsContent value="seo" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                   <div className="grid gap-2">
@@ -736,6 +738,16 @@ import { SocialPreview } from "./SocialPreview";
                       image={formData.og_image_url || formData.banner_url}
                     />
                   </div>
+                </TabsContent>
+                <TabsContent value="rich" className="space-y-4 pt-4">
+                  <RichResultsPreview 
+                    type="event"
+                    title={formData.og_title || formData.seo_title || formData.name}
+                    data={{
+                      startDate: formData.start_date,
+                      location: formData.location || "Arena Digital"
+                    }}
+                  />
                 </TabsContent>
 
                 <TabsContent value="basico" className="space-y-4 animate-in fade-in slide-in-from-left-2">

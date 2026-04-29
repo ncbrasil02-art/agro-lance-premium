@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SerpPreview } from "./SerpPreview";
 import { SeoAnalysis } from "./SeoAnalysis";
 import { SocialPreview } from "./SocialPreview";
+import { RichResultsPreview } from "./RichResultsPreview";
 import { generateSlug, validateSlug } from "@/utils/slug";
  import { toast } from "sonner";
  
@@ -269,10 +270,11 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                  />
                </div>
                 <Tabs defaultValue="editor" className="w-full">
-                   <TabsList className="grid w-full grid-cols-4">
+                   <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="editor">Conteúdo</TabsTrigger>
                     <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
                     <TabsTrigger value="social">Social / OG</TabsTrigger>
+                    <TabsTrigger value="rich">Rich Results</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
                   <TabsContent value="editor" className="space-y-4 pt-4">
@@ -402,6 +404,16 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                         image={formData.og_image_url || formData.featured_image}
                       />
                     </div>
+                  </TabsContent>
+                  <TabsContent value="rich" className="space-y-4 pt-4">
+                    <RichResultsPreview 
+                      type="article"
+                      title={formData.seo_title || formData.title}
+                      data={{
+                        author: formData.author_name || "Premium Agro",
+                        date: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+                      }}
+                    />
                   </TabsContent>
                   <TabsContent value="preview" className="pt-4">
                     <div className="prose prose-sm dark:prose-invert max-w-none border rounded-lg p-6 bg-muted/20 min-h-[400px]">
