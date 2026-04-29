@@ -66,7 +66,7 @@ export function generateMetaTags({
   return { meta, links };
 }
 
- export function analyzeSEO(title: string, description: string, content?: string, image?: string) {
+  export function analyzeSEO(title: string, description: string, content?: string, image?: string, ogTitle?: string, ogDescription?: string) {
   const issues = [];
   
   // Title checks
