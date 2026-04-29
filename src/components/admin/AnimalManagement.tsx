@@ -18,6 +18,7 @@ import { generateSlug } from "@/utils/slug";
 import { SerpPreview } from "./SerpPreview";
 import { SeoAnalysis } from "./SeoAnalysis";
 import { SocialPreview } from "./SocialPreview";
+import { RichResultsPreview } from "./RichResultsPreview";
   import { toast } from "sonner";
  
  const VETERINARY_CHECKLIST = [
