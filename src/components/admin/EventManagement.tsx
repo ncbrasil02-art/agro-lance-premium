@@ -1746,7 +1746,27 @@ import { useAuth } from "@/components/auth/auth-provider";
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 {discrepancies.length > 0 && (
+                   <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-6 space-y-3">
+                     <div className="flex items-center gap-2 text-red-700">
+                       <AlertCircle className="h-5 w-5" />
+                       <h3 className="font-black uppercase text-xs tracking-widest">Divergências e Inconsistências Detectadas</h3>
+                     </div>
+                     <ul className="space-y-1">
+                       {discrepancies.map((msg, i) => (
+                         <li key={i} className="text-xs text-red-600 flex items-start gap-2">
+                           <span className="mt-1 h-1.5 w-1.5 rounded-full bg-red-400 shrink-0" />
+                           {msg}
+                         </li>
+                       ))}
+                     </ul>
+                     <p className="text-[10px] text-red-400 italic font-medium">
+                       * Verifique estes pontos antes de oficializar o balanço.
+                     </p>
+                   </div>
+                 )}
+
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
                     <div className="flex items-center gap-3 mb-2">
                       <TrendingUp className="h-5 w-5 text-emerald-600" />
