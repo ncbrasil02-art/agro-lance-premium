@@ -294,18 +294,21 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          slug: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          slug?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          slug?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1106,6 +1109,7 @@ export type Database = {
           location: string | null
           name: string
           phone: string | null
+          slug: string | null
           type: string
           updated_at: string
         }
@@ -1116,6 +1120,7 @@ export type Database = {
           location?: string | null
           name: string
           phone?: string | null
+          slug?: string | null
           type: string
           updated_at?: string
         }
@@ -1126,6 +1131,7 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          slug?: string | null
           type?: string
           updated_at?: string
         }
