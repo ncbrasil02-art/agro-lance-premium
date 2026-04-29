@@ -431,15 +431,28 @@ export const Route = createFileRoute("/painel")({
                              {formatBRL(offer.amount)}
                            </td>
                            <td className="px-4 py-4">
-                             <Badge variant={
-                               offer.status === 'approved' ? 'default' :
-                               offer.status === 'rejected' ? 'destructive' :
-                               offer.status === 'under_review' ? 'outline' : 'secondary'
-                             } className="text-[10px]">
-                               {offer.status === 'pending' ? 'Pendente' :
-                                offer.status === 'approved' ? 'Aprovada' :
-                                offer.status === 'under_review' ? 'Em Análise' : 'Rejeitada'}
-                             </Badge>
+                             <div className="flex flex-col gap-2 min-w-[150px]">
+                               <Badge variant={
+                                 offer.status === 'approved' ? 'default' :
+                                 offer.status === 'rejected' ? 'destructive' :
+                                 offer.status === 'under_review' ? 'outline' : 'secondary'
+                               } className="text-[10px] w-fit">
+                                 {offer.status === 'pending' ? 'Pendente' :
+                                  offer.status === 'approved' ? 'Aprovada' :
+                                  offer.status === 'under_review' ? 'Em Análise' : 'Rejeitada'}
+                               </Badge>
+                               <div className="flex items-center gap-1 w-full max-w-[120px]">
+                                 <div className={`h-1 flex-1 rounded-full ${['pending', 'under_review', 'approved'].includes(offer.status) ? 'bg-emerald-500' : 'bg-muted'}`} />
+                                 <div className={`h-1 flex-1 rounded-full ${['under_review', 'approved'].includes(offer.status) ? 'bg-emerald-500' : 'bg-muted'}`} />
+                                 <div className={`h-1 flex-1 rounded-full ${offer.status === 'approved' ? 'bg-emerald-500' : offer.status === 'rejected' ? 'bg-red-500' : 'bg-muted'}`} />
+                               </div>
+                               <p className="text-[9px] text-muted-foreground italic">
+                                 {offer.status === 'pending' && "Aguardando triagem inicial"}
+                                 {offer.status === 'under_review' && "Em análise pela equipe"}
+                                 {offer.status === 'approved' && "Oferta aceita! Aguarde contato."}
+                                 {offer.status === 'rejected' && "Não foi possível aceitar a oferta."}
+                               </p>
+                             </div>
                            </td>
                            <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px] truncate" title={offer.description}>
                              {offer.description || "-"}
