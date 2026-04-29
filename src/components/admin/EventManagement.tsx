@@ -1303,7 +1303,38 @@ import { SocialPreview } from "./SocialPreview";
                  <div className="flex justify-center py-12">
                    <Loader2 className="h-8 w-8 animate-spin text-gold" />
                  </div>
-               ) : eventLots.length === 0 ? (
+                ) : eventLots.length === 0 ? (
+                  const totalHammer = eventLots.reduce((acc, lot) => acc + (lot.current_price || 0), 0);
+                  const totalCommission = eventLots.reduce((acc, lot) => {
+                    const rate = viewingEventDetails?.commission_rate || 0;
+                    return acc + ((lot.current_price || 0) * (rate / 100));
+                  }, 0);
+                  const totalGeneral = totalHammer + totalCommission;
+
+                  return (
+                    <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <Card className="bg-emerald-50 border-emerald-100">
+                        <CardContent className="pt-6">
+                          <div className="text-xs font-bold text-emerald-800 uppercase mb-1">Total Arrematado</div>
+                          <div className="text-2xl font-black text-emerald-900">{formatBRL(totalHammer)}</div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-amber-50 border-amber-100">
+                        <CardContent className="pt-6">
+                          <div className="text-xs font-bold text-amber-800 uppercase mb-1">Total Comissão ({viewingEventDetails?.commission_rate}%)</div>
+                          <div className="text-2xl font-black text-amber-900">{formatBRL(totalCommission)}</div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-emerald-900 border-emerald-800">
+                        <CardContent className="pt-6">
+                          <div className="text-xs font-bold text-emerald-100 uppercase mb-1">Balanço Geral</div>
+                          <div className="text-2xl font-black text-white">{formatBRL(totalGeneral)}</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    
+                    <div className="border rounded-xl overflow-hidden bg-card">
                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
                    Nenhum lote cadastrado para este evento.
                  </div>
