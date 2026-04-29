@@ -90,7 +90,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
     MapPin, Globe, Loader2, Send
  } from "lucide-react";
-  import { useEffect, useState, useRef, useCallback } from "react";
+   import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -131,77 +131,117 @@ export const Route = createFileRoute("/painel")({
       nationality: "Brasileira",
     });
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const docInputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-      if (!user) return;
-      fetchDashboardData();
-      fetchMessages();
-      
-      if (profile) {
-        setFormData({
-          full_name: profile.full_name || "",
-          cpf: profile.cpf || "",
-          phone: profile.phone || "",
-          address: profile.address || "",
-          cep: profile.cep || "",
-          nationality: profile.nationality || "Brasileira",
-        });
+     const fileInputRef = useRef<HTMLInputElement>(null);
+     const docInputRef = useRef<HTMLInputElement>(null);
+     const [rtStatus, setRtStatus] = useState<string>("INITIAL");
+ 
+    const fetchDashboardData = useCallback(async () => {
+      setIsLoading(true);
+      if (!user?.id) return;
+      try {
+        const { data: wonLots, error: wonError } = await supabase
+          .from("lots")
+          .select(`
+            id, lot_number, status, current_price, winner_id, updated_at,
+            animal:animals!lots_animal_id_fkey(id, name, breed, species, photos, internal_code),
+            event:events!lots_event_id_fkey(id, name)
+          `)
+          .eq("winner_id", user.id)
+          .order("updated_at", { ascending: false });
+        
+        if (wonError) throw wonError;
+        setMyLots(wonLots || []);
+ 
+        const { data: userBids } = await supabase
+          .from("bids")
+          .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        
+         setMyBids(userBids || []);
+   
+          const { data: followedData } = await supabase
+            .from("followed_lots")
+            .select("*, lot:lots!followed_lots_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(*), event:events!lots_event_id_fkey(*))")
+            .eq("user_id", user.id);
+         
+         setMyFavorites(followedData || []);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast.error("Erro ao carregar dados do painel");
+      } finally {
+        setIsLoading(false);
       }
-
-      const [rtStatus, setRtStatus] = useState<string>("INITIAL");
-
-      useRealtimeFallback({
-        status: rtStatus,
-        onUpdate: fetchDashboardData,
-        label: "Painel do Usuário",
-        pollInterval: 60000,
-        initialPollInterval: 30000
-      });
-
-      // Add real-time listeners for the dashboard
-      const lotsChannel = supabase
-        .channel('dashboard-lots-realtime')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'lots',
-          filter: `winner_id=eq.${user.id}` 
-        }, () => {
-          fetchDashboardData();
-        })
-        .subscribe((newStatus) => {
-          setRtStatus(newStatus);
-        });
-
-      const bidsChannel = supabase
-        .channel('dashboard-bids-realtime')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'bids',
-          filter: `user_id=eq.${user.id}` 
-        }, () => {
-          fetchDashboardData();
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(lotsChannel);
-        supabase.removeChannel(bidsChannel);
-      };
-    }, [user, profile]);
-
-   const fetchMessages = async () => {
-     if (!user?.id) return;
-     const { data } = await supabase
-       .from("messages")
-       .select("*")
-       .eq("recipient_id", user.id)
-       .order("created_at", { ascending: false });
-     setMessages(data || []);
-   };
+    }, [user?.id]);
+ 
+    const fetchMessages = useCallback(async () => {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("recipient_id", user.id)
+        .order("created_at", { ascending: false });
+      setMessages(data || []);
+    }, [user?.id]);
+ 
+     useRealtimeFallback({
+       status: rtStatus,
+       onUpdate: fetchDashboardData,
+       label: "Painel do Usuário",
+       pollInterval: 60000,
+       initialPollInterval: 30000
+     });
+ 
+     useEffect(() => {
+       if (!user) return;
+       fetchDashboardData();
+       fetchMessages();
+       
+       if (profile) {
+         setFormData({
+           full_name: profile.full_name || "",
+           cpf: profile.cpf || "",
+           phone: profile.phone || "",
+           address: profile.address || "",
+           cep: profile.cep || "",
+           nationality: profile.nationality || "Brasileira",
+         });
+       }
+ 
+       // Add real-time listeners for the dashboard
+       const lotsChannel = supabase
+         .channel('dashboard-lots-realtime')
+         .on('postgres_changes', { 
+           event: '*', 
+           schema: 'public', 
+           table: 'lots',
+           filter: `winner_id=eq.${user.id}` 
+         }, () => {
+           fetchDashboardData();
+         })
+         .subscribe((newStatus) => {
+           setRtStatus(newStatus);
+         });
+ 
+       const bidsChannel = supabase
+         .channel('dashboard-bids-realtime')
+         .on('postgres_changes', { 
+           event: '*', 
+           schema: 'public', 
+           table: 'bids',
+           filter: `user_id=eq.${user.id}` 
+         }, () => {
+           fetchDashboardData();
+         })
+         .subscribe();
+ 
+       return () => {
+         supabase.removeChannel(lotsChannel);
+         supabase.removeChannel(bidsChannel);
+       };
+     }, [user, profile, fetchDashboardData, fetchMessages]);
+ 
 
    const handleUpdateProfile = async (e: React.FormEvent) => {
      e.preventDefault();
@@ -277,48 +317,6 @@ export const Route = createFileRoute("/painel")({
      }
    };
 
-  const fetchDashboardData = async () => {
-    setIsLoading(true);
-    if (!user?.id) return;
-    try {
-      // Fetch lots won by the user - Using explicit relationship names to avoid ambiguity
-      const { data: wonLots, error: wonError } = await supabase
-        .from("lots")
-        .select(`
-          id, lot_number, status, current_price, winner_id, updated_at,
-          animal:animals!lots_animal_id_fkey(id, name, breed, species, photos, internal_code),
-          event:events!lots_event_id_fkey(id, name)
-        `)
-        .eq("winner_id", user.id)
-        .order("updated_at", { ascending: false });
-      
-      if (wonError) throw wonError;
-      setMyLots(wonLots || []);
-
-      // Fetch recent bids by the user
-      const { data: userBids } = await supabase
-        .from("bids")
-        .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      
-       setMyBids(userBids || []);
- 
-        // Fetch followed lots
-        const { data: followedData } = await supabase
-          .from("followed_lots")
-          .select("*, lot:lots!followed_lots_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(*), event:events!lots_event_id_fkey(*))")
-          .eq("user_id", user.id);
-       
-       setMyFavorites(followedData || []);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      toast.error("Erro ao carregar dados do painel");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (!user) {
     return (
