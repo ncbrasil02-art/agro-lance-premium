@@ -72,7 +72,8 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
      email: "",
      phone: "",
      cnpj: "",
-     logo_url: ""
+      logo_url: "",
+      site_url: ""
    });
  
    const [theme, setTheme] = useState<any>({
@@ -501,13 +502,22 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                    />
                  </div>
                  <div className="space-y-2">
-                   <Label htmlFor="site_cnpj">CNPJ</Label>
-                   <Input 
-                     id="site_cnpj" 
-                     value={siteInfo.cnpj} 
-                     onChange={e => setSiteInfo({...siteInfo, cnpj: e.target.value})}
-                   />
-                 </div>
+                    <Label htmlFor="site_cnpj">CNPJ</Label>
+                    <Input 
+                      id="site_cnpj" 
+                      value={siteInfo.cnpj} 
+                      onChange={e => setSiteInfo({...siteInfo, cnpj: e.target.value})} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="site_url">URL do Site (Canonical)</Label>
+                    <Input 
+                      id="site_url" 
+                      value={siteInfo.site_url} 
+                      onChange={e => setSiteInfo({...siteInfo, site_url: e.target.value})} 
+                      placeholder="https://agro-ncbrasil.lovable.app"
+                    />
+                  </div>
                </div>
  
                <div className="space-y-4">
@@ -861,6 +871,37 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                   {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                   Salvar Configurações de SEO
                 </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-gold" /> Indexação e Sitemap
+                </CardTitle>
+                <CardDescription>Status dos arquivos de rastreamento para buscadores</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 border rounded-xl bg-muted/5 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-bold">Sitemap Automático</h4>
+                    <p className="text-sm text-muted-foreground">Gerado dinamicamente com todos os eventos e notícias.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-xs font-bold uppercase">Ativo</span>
+                  </div>
+                </div>
+                <div className="p-4 border rounded-xl bg-muted/5 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-bold">Robots.txt</h4>
+                    <p className="text-sm text-muted-foreground">Configurado para permitir rastreamento global.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-xs font-bold uppercase">Ativo</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
