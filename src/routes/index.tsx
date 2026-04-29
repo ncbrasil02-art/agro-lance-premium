@@ -6,7 +6,7 @@ import { generateMetaTags } from "@/utils/seo";
  import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
    import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
    import { PAGE_LIMITS } from "@/config/limits";
-import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2 } from "lucide-react";
+ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2, ShoppingCart } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
 import { useEffect, useState } from "react";
