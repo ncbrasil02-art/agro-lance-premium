@@ -873,6 +873,37 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                 </Button>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-gold" /> Indexação e Sitemap
+                </CardTitle>
+                <CardDescription>Status dos arquivos de rastreamento para buscadores</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 border rounded-xl bg-muted/5 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-bold">Sitemap Automático</h4>
+                    <p className="text-sm text-muted-foreground">Gerado dinamicamente com todos os eventos e notícias.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-xs font-bold uppercase">Ativo</span>
+                  </div>
+                </div>
+                <div className="p-4 border rounded-xl bg-muted/5 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-bold">Robots.txt</h4>
+                    <p className="text-sm text-muted-foreground">Configurado para permitir rastreamento global.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-xs font-bold uppercase">Ativo</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
