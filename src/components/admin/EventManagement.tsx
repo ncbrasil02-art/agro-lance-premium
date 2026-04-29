@@ -1179,10 +1179,29 @@ import { SocialPreview } from "./SocialPreview";
                                      <Eye className="h-4 w-4" />
                                    </Button>
                                  </TooltipTrigger>
-                                 <TooltipContent>Ver detalhes e arrematantes</TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                             <TooltipProvider>
+                                  <TooltipContent>Ver detalhes e arrematantes</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="text-amber-600"
+                                      onClick={() => {
+                                        setViewingEventDetails(event);
+                                        fetchEventLots(event.id);
+                                        setShowBalanceReport(true);
+                                      }}
+                                    >
+                                      <BarChart3 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Gerar Balanço Financeiro</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
                                <Tooltip>
                                  <TooltipTrigger asChild>
                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
