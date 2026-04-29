@@ -1807,7 +1807,8 @@ import { useAuth } from "@/components/auth/auth-provider";
                           <TableHead className="text-white font-bold">Arrematante</TableHead>
                           <TableHead className="text-white font-bold text-right">Martelo</TableHead>
                           <TableHead className="text-white font-bold text-right">Comissão (Audit)</TableHead>
-                          <TableHead className="text-white font-bold text-right">Total</TableHead>
+                           <TableHead className="text-white font-bold text-right">Total</TableHead>
+                           <TableHead className="text-white font-bold text-center print:hidden">Audit</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1833,6 +1834,19 @@ import { useAuth } from "@/components/auth/auth-provider";
                                 </div>
                               </TableCell>
                               <TableCell className="text-right font-black text-emerald-900">{formatBRL(hammer + commission)}</TableCell>
+                              <TableCell className="text-center print:hidden">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    // Redirect or open audit for this lot
+                                    toast.info(`Trilha de auditoria do Lote #${lot.lot_number} disponível no menu 'Auditoria Completa'`);
+                                  }}
+                                >
+                                  <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                                </Button>
+                              </TableCell>
                             </TableRow>
                           );
                         })}
