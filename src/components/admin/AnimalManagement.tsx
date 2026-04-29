@@ -86,7 +86,10 @@ import { SocialPreview } from "./SocialPreview";
             accepts_offers: false,
             slug: "",
             seo_title: "",
-            seo_description: ""
+            seo_description: "",
+            og_title: "",
+            og_description: "",
+            og_image_url: ""
      });
 
      const resetForm = () => {
@@ -138,7 +141,10 @@ import { SocialPreview } from "./SocialPreview";
             accepts_offers: false,
             slug: "",
             seo_title: "",
-            seo_description: ""
+            seo_description: "",
+            og_title: "",
+            og_description: "",
+            og_image_url: ""
        });
     };
 
@@ -191,7 +197,10 @@ import { SocialPreview } from "./SocialPreview";
            accepts_offers: animal.accepts_offers || false,
            slug: animal.slug || "",
            seo_title: animal.seo_title || "",
-           seo_description: animal.seo_description || ""
+            seo_description: animal.seo_description || "",
+            og_title: animal.og_title || "",
+            og_description: animal.og_description || "",
+            og_image_url: animal.og_image_url || ""
        });
       setIsDialogOpen(true);
     };
