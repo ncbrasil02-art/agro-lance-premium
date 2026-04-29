@@ -1,7 +1,7 @@
   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
- import { useState, useEffect } from "react";
+ import { useState, useEffect, useCallback } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
