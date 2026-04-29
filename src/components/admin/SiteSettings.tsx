@@ -8,18 +8,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
-   import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type } from "lucide-react";
-    const [aboutPage, setAboutPage] = useState({
-      enabled: true,
-      title: "Sobre"
-    });
- 
-    const [customTexts, setCustomTexts] = useState({
-      hero_title: "",
-      hero_subtitle: "",
-      footer_text: ""
-    });
- 
+ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type } from "lucide-react";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -42,8 +31,18 @@
    );
  }
  
- export function SiteSettings() {
-   const [isLoading, setIsLoading] = useState(true);
+  export function SiteSettings() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [aboutPage, setAboutPage] = useState({
+      enabled: true,
+      title: "Sobre"
+    });
+
+    const [customTexts, setCustomTexts] = useState({
+      hero_title: "",
+      hero_subtitle: "",
+      footer_text: ""
+    });
    const [isSaving, setIsSaving] = useState(false);
    const [isUploading, setIsUploading] = useState(false);
     const [baseColor, setBaseColor] = useState("#D4AF37");
