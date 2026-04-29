@@ -1,4 +1,5 @@
  import * as React from "react"
+ import { Link } from "@tanstack/react-router"
  import useEmblaCarousel from "embla-carousel-react"
  import { ChevronLeft, ChevronRight, Star } from "lucide-react"
  import { Button } from "@/components/ui/button"
