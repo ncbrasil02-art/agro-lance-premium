@@ -1,4 +1,4 @@
- import { useEffect, useRef } from 'react';
+ import { useEffect, useRef, useState } from 'react';
  import { logger } from '@/utils/logger';
  
  export interface RealtimeFallbackOptions {
@@ -7,37 +7,64 @@
    label: string;
    pollInterval?: number;
    initialPollInterval?: number;
+   maxInterval?: number;
+   backoffFactor?: number;
    enabled?: boolean;
  }
  
  /**
-  * Hook padronizado para fornecer fallback de polling quando o WebSocket do Supabase não está conectado.
+  * Hook padronizado para fornecer fallback de polling com backoff exponencial 
+  * quando o WebSocket do Supabase não está conectado.
   */
  export function useRealtimeFallback({
    status,
    onUpdate,
    label,
-   pollInterval = 30000,
+   pollInterval = 45000,
    initialPollInterval = 10000,
+   maxInterval = 120000,
+   backoffFactor = 1.2,
    enabled = true
  }: RealtimeFallbackOptions) {
    const onUpdateRef = useRef(onUpdate);
+   const [retryCount, setRetryCount] = useState(0);
  
    useEffect(() => {
      onUpdateRef.current = onUpdate;
    }, [onUpdate]);
  
+   // Reset retry count when status changes or when it successfully connects
+   useEffect(() => {
+     if (status === 'SUBSCRIBED') {
+       setRetryCount(0);
+     }
+   }, [status]);
+ 
    useEffect(() => {
      if (!enabled || status === 'SUBSCRIBED') return;
  
-     const intervalTime = status === 'INITIAL' ? initialPollInterval : pollInterval;
-     logger.warn(`Realtime [${label}] não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
+     const isInitial = status === 'INITIAL' || status === 'JOINING';
+     const baseInterval = isInitial ? initialPollInterval : pollInterval;
      
-     const pollIntervalId = setInterval(() => {
+      // Exponential backoff with jitter (±10%)
+      const jitter = 0.9 + Math.random() * 0.2;
+      const intervalTime = Math.min(
+        baseInterval * Math.pow(backoffFactor, retryCount) * jitter, 
+        maxInterval 
+      );
+ 
+     logger.warn(`Realtime [${label}] status: ${status}. Polling fallback em ${Math.round(intervalTime/1000)}s (Tentativa: ${retryCount})`);
+     
+     const timeoutId = setTimeout(() => {
        logger.info(`Executando polling de fallback para ${label}...`);
-       onUpdateRef.current();
+       try {
+         onUpdateRef.current();
+         setRetryCount(prev => prev + 1);
+       } catch (err: any) {
+         logger.error(`Erro no polling de fallback para ${label}:`, { error: err?.message || String(err) });
+       }
      }, intervalTime);
  
-     return () => clearInterval(pollIntervalId);
-   }, [status, label, pollInterval, initialPollInterval, enabled]);
+     return () => clearTimeout(timeoutId);
+   }, [status, label, pollInterval, initialPollInterval, enabled, retryCount]);
  }

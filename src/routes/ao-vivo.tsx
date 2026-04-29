@@ -28,8 +28,9 @@ import {
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema } from "@/lib/schemas";
   import { z } from "zod";
- import { useEffect, useState } from "react";
+  import { useEffect, useState, useCallback } from "react";
  import { toast } from "sonner";
+  import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
  import { useAuth } from "@/components/auth/auth-provider";
 
 export const Route = createFileRoute("/ao-vivo")({
@@ -180,7 +181,7 @@ export const Route = createFileRoute("/ao-vivo")({
   const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
   const [lastSyncAt, setLastSyncAt] = useState<Date>(new Date());
   const [syncTrigger, setSyncTrigger] = useState(0);
-  const [pollingRetryCount, setPollingRetryCount] = useState(0);
+  // pollingRetryCount removido pois agora é controlado pelo hook useRealtimeFallback
    const [reconnectTrigger, setReconnectTrigger] = useState(0);
    const [isFavorite, setIsFavorite] = useState(false);
    const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
@@ -676,38 +677,32 @@ export const Route = createFileRoute("/ao-vivo")({
              }
           }
           setLastSyncAt(new Date());
-          setPollingRetryCount(0); // Reset retry count on success
         }
       } catch (err) {
         console.error("Erro ao sincronizar dados:", err);
-        setPollingRetryCount(prev => prev + 1);
       }
     };
 
-    // Periodically refresh event data with exponential backoff if realtime fails or offline
+    const handleRefresh = useCallback(() => {
+      refreshAllData();
+    }, [liveEvent?.id]);
+
+    useRealtimeFallback({
+      status: realtimeStatus,
+      onUpdate: handleRefresh,
+      label: "Leilão ao Vivo",
+      // Polling agressivo se estiver online sem realtime
+      initialPollInterval: isOffline ? 30000 : 2000,
+      pollInterval: isOffline ? 60000 : 5000,
+      maxInterval: isOffline ? 120000 : 15000,
+      backoffFactor: 1.3
+    });
+
     useEffect(() => {
-      if (!liveEvent?.id) return;
-      
-      let intervalTime = 30000; // Sincronização padrão (30s)
-
-      if (realtimeStatus !== "SUBSCRIBED" && !isOffline) {
-        // Online mas sem Realtime: Polling agressivo para não perder lances
-        // Começa em 2s e aumenta levemente se houver erros (backoff suave)
-        intervalTime = Math.min(2000 * Math.pow(1.5, pollingRetryCount), 10000);
-      } else if (isOffline) {
-        // Modo Offline: Backoff pesado para economizar recursos
-        intervalTime = Math.min(10000 * Math.pow(2, pollingRetryCount), 60000);
-      }
-      
-      console.log(`Setting refresh interval to ${intervalTime}ms (retry count: ${pollingRetryCount}, status: ${realtimeStatus})`);
-      const interval = setInterval(refreshAllData, intervalTime);
-
       if (syncTrigger > 0) {
         refreshAllData();
       }
-
-      return () => clearInterval(interval);
-    }, [liveEvent?.id, liveEvent?.active_lot_id, realtimeStatus, isOffline, syncTrigger, pollingRetryCount]);
+    }, [syncTrigger]);
 
     // Monitor realtime status and nudge reconnection if stuck
     useEffect(() => {
