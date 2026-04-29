@@ -47,6 +47,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
    const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
    const [isFullScreen, setIsFullScreen] = useState(false);
    const [searchQuery, setSearchQuery] = useState("");
+   const [statusFilter, setStatusFilter] = useState<string>("all");
  
    const handleAutoFix = async () => {
      if (!formData.title) {
@@ -231,9 +232,11 @@ import { generateSlug, validateSlug } from "@/utils/slug";
      }
    };
  
-   const filteredPosts = posts.filter(post => 
-     post.title?.toLowerCase().includes(searchQuery.toLowerCase())
-   );
+    const filteredPosts = posts.filter(post => {
+      const matchesSearch = post.title?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || post.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
  
    return (
      <div className="space-y-6">
@@ -243,14 +246,28 @@ import { generateSlug, validateSlug } from "@/utils/slug";
              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
            </Button>
          </div>
-         <div className="relative flex-1 max-w-sm">
-           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-           <Input
-             placeholder="Buscar notícia..."
-             className="pl-10"
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-           />
+          <div className="flex flex-1 items-center gap-2 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar notícia..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="draft">Rascunho</SelectItem>
+                <SelectItem value="pending_review">Pendente de Revisão</SelectItem>
+                <SelectItem value="published">Publicado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
          </div>
          <Dialog open={isDialogOpen} onOpenChange={(open) => {
            setIsDialogOpen(open);
