@@ -86,7 +86,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
     };
   }, [eventId, onUpdate, retryCount]);
 
-    useRealtimeFallback({
+    const fallback = useRealtimeFallback({
       status,
       onUpdate,
       label: `Evento ${eventId}`,
@@ -94,7 +94,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       initialPollInterval: 15000
     });
  
-   return { status };
+    return { status, ...fallback };
  }
  
  export function useHomeRealtime(onUpdate: () => void) {
@@ -126,7 +126,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
      };
    }, [onUpdate, retryCount]);
  
-    useRealtimeFallback({
+    const fallback = useRealtimeFallback({
       status,
       onUpdate,
       label: "Home/Geral",
@@ -134,9 +134,8 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
       initialPollInterval: 10000
     });
  
-   return { status };
+    return { status, ...fallback };
  }
  export function useRealtimeLots(onUpdate: () => void) {
-   const { status } = useHomeRealtime(onUpdate);
-   return { status };
+    return useHomeRealtime(onUpdate);
  }
