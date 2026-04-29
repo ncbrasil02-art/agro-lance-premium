@@ -79,4 +79,11 @@
  
      return () => clearTimeout(timeoutId);
    }, [status, label, pollInterval, initialPollInterval, enabled, retryCount]);
+ 
+   return {
+     delaySeconds: currentDelay,
+     lastUpdate: lastUpdateTime,
+     isPolling: status !== 'SUBSCRIBED',
+     status
+   };
  }
