@@ -14,6 +14,7 @@
  import { RLSSecurityTests } from "@/components/admin/RLSSecurityTests";
  import { SystemLogs } from "@/components/admin/SystemLogs";
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
+import { AuditLogManagement } from "@/components/admin/AuditLogManagement";
  import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
    LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
@@ -26,7 +27,7 @@
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
- type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "rls_test" | "logs" | "settings" | "posts";
+ type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
@@ -42,6 +43,7 @@
    { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
    { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
    { id: "rls_test", label: "Testes RLS", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
+  { id: "audit", label: "Auditoria Completa", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
    { id: "logs", label: "Logs de Erro", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
    { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
  ];
@@ -327,6 +329,7 @@
              {activeTab === "posts" && <PostManagement />}
              {activeTab === "security" && <BidSecurityAudit />}
              {activeTab === "rls_test" && <RLSSecurityTests />}
+             {activeTab === "audit" && <AuditLogManagement />}
              {activeTab === "logs" && <SystemLogs />}
                {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
        </main>
