@@ -116,9 +116,10 @@ export const Route = createFileRoute("/painel")({
     const [activeTab, setActiveTab] = useState("arremates");
     const [myLots, setMyLots] = useState<any[]>([]);
     const [myBids, setMyBids] = useState<any[]>([]);
-    const [myFavorites, setMyFavorites] = useState<any[]>([]);
-    const [messages, setMessages] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+     const [myFavorites, setMyFavorites] = useState<any[]>([]);
+     const [messages, setMessages] = useState<any[]>([]);
+     const [siteInfo, setSiteInfo] = useState<any>(null);
+     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     
@@ -152,14 +153,22 @@ export const Route = createFileRoute("/painel")({
         if (wonError) throw wonError;
         setMyLots(wonLots || []);
  
-        const { data: userBids } = await supabase
-          .from("bids")
-          .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(10);
-        
-         setMyBids(userBids || []);
+         const { data: userBids } = await supabase
+           .from("bids")
+           .select("*, lot:lots!bids_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(name))")
+           .eq("user_id", user.id)
+           .order("created_at", { ascending: false })
+           .limit(10);
+         
+          setMyBids(userBids || []);
+
+          const { data: settingsData } = await supabase
+            .from("site_settings")
+            .select("value")
+            .eq("key", "site_info")
+            .single();
+          
+          setSiteInfo(settingsData?.value || null);
    
           const { data: followedData } = await supabase
             .from("followed_lots")
@@ -389,9 +398,9 @@ export const Route = createFileRoute("/painel")({
             </Card>
           ) : (
             <div className="grid gap-6">
-              {myLots.map((lot) => (
-                <LotPurchaseCard key={lot.id} lot={lot} profile={profile} />
-              ))}
+               {myLots.map((lot) => (
+                 <LotPurchaseCard key={lot.id} lot={lot} profile={profile} siteInfo={siteInfo} />
+               ))}
             </div>
           )}
         </TabsContent>
@@ -693,7 +702,7 @@ export const Route = createFileRoute("/painel")({
   );
 }
 
-function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
+ function LotPurchaseCard({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
   return (
     <Card className="overflow-hidden border-2 hover:border-gold/30 transition-all shadow-md">
       <div className="grid md:grid-cols-[240px_1fr] lg:grid-cols-[300px_1fr]">
@@ -749,24 +758,27 @@ function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
           <Separator className="mb-6" />
 
           <div className="flex flex-wrap gap-3 mt-auto">
-            <DocumentButton 
-              title="Termo de Arrematação" 
-              lot={lot} 
-              profile={profile}
-              type="termo"
-            />
-            <DocumentButton 
-              title="Nota de Venda" 
-              lot={lot} 
-              profile={profile}
-              type="nota"
-            />
-            <DocumentButton 
-              title="Contrato de Compra" 
-              lot={lot} 
-              profile={profile}
-              type="contrato"
-            />
+             <DocumentButton 
+               title="Termo de Arrematação" 
+               lot={lot} 
+               profile={profile}
+               siteInfo={siteInfo}
+               type="termo"
+             />
+             <DocumentButton 
+               title="Nota de Venda" 
+               lot={lot} 
+               profile={profile}
+               siteInfo={siteInfo}
+               type="nota"
+             />
+             <DocumentButton 
+               title="Contrato de Compra" 
+               lot={lot} 
+               profile={profile}
+               siteInfo={siteInfo}
+               type="contrato"
+             />
             <PaymentDialog lot={lot} profile={profile} />
           </div>
         </div>
@@ -775,7 +787,7 @@ function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
   );
 }
 
-function DocumentButton({ title, lot, profile, type }: { title: string, lot: any, profile: any, type: string }) {
+ function DocumentButton({ title, lot, profile, siteInfo, type }: { title: string, lot: any, profile: any, siteInfo: any, type: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -799,10 +811,11 @@ function DocumentButton({ title, lot, profile, type }: { title: string, lot: any
                <div className="bg-emerald-deep p-2 rounded-lg">
                  <Gavel className="h-8 w-8 text-gold" />
                </div>
-               <div>
-                 <h2 className="text-2xl font-black text-emerald-deep leading-none uppercase tracking-tighter italic">Premium Agro</h2>
-                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Leilões Agropecuários de Elite</p>
-               </div>
+                <div>
+                  <h2 className="text-2xl font-black text-emerald-deep leading-none uppercase tracking-tighter italic">{siteInfo?.name || "Premium Agro"}</h2>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{siteInfo?.description || "Leilões Agropecuários de Elite"}</p>
+                  {siteInfo?.cnpj && <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">CNPJ: {siteInfo.cnpj}</p>}
+                </div>
             </div>
             <div className="text-right">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">ID do Documento</p>
@@ -864,10 +877,10 @@ function DocumentButton({ title, lot, profile, type }: { title: string, lot: any
               </div>
 
               <div className="flex justify-between items-end pt-20">
-                 <div className="w-64 border-t border-gray-400 text-center pt-2">
-                   <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Premium Agro Leilões</p>
-                   <p className="text-[10px] text-gray-400">Assinatura Digital Auditada</p>
-                 </div>
+                  <div className="w-64 border-t border-gray-400 text-center pt-2">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{siteInfo?.name || "Premium Agro Leilões"}</p>
+                    <p className="text-[10px] text-gray-400">Assinatura Digital Auditada</p>
+                  </div>
                  <div className="w-64 border-t border-gray-400 text-center pt-2">
                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{profile?.full_name}</p>
                    <p className="text-[10px] text-gray-400">Arrematante</p>
@@ -911,10 +924,10 @@ function DocumentButton({ title, lot, profile, type }: { title: string, lot: any
               <div className="grid grid-cols-2 gap-8 mt-10">
                 <div className="p-4 rounded-xl border-2 border-dashed border-gray-100">
                   <h4 className="text-[10px] font-black uppercase text-emerald-deep mb-3 tracking-widest">Informações de Pagamento</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed mb-4">
-                    O pagamento deve ser realizado através dos canais oficiais da Premium Agro. 
-                    Utilize a chave PIX ou os dados bancários informados no painel do cliente.
-                  </p>
+                   <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                     O pagamento deve ser realizado através dos canais oficiais da {siteInfo?.name || "Premium Agro"}. 
+                     Utilize a chave PIX ou os dados bancários informados no painel do cliente.
+                   </p>
                   <div className="bg-white p-3 rounded border text-center flex flex-col items-center">
                     <div className="h-32 w-32 bg-gray-100 flex items-center justify-center mb-2">
                       <Badge variant="outline">QR CODE PIX</Badge>
@@ -943,9 +956,9 @@ function DocumentButton({ title, lot, profile, type }: { title: string, lot: any
                  Pelo presente instrumento particular, as partes abaixo identificadas têm entre si, justo e contratado, a compra e venda do animal descrito, mediante as cláusulas e condições seguintes:
                </p>
 
-               <p>
-                 <strong>VENDEDOR:</strong> FAZENDA EXEMPLAR AGROPECUÁRIA LTDA, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 00.000.000/0001-00, com sede na Estrada Rural, Km 10, Uberaba/MG.
-               </p>
+                <p>
+                  <strong>VENDEDOR:</strong> <strong>{siteInfo?.name?.toUpperCase() || "PREMIUM AGRO"}</strong>, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº <strong>{siteInfo?.cnpj || "00.000.000/0001-00"}</strong>.
+                </p>
 
                <p>
                  <strong>COMPRADOR:</strong> <strong>{profile?.full_name?.toUpperCase()}</strong>, residente e domiciliado conforme dados cadastrais no portal Premium Agro, inscrito no CPF sob o nº <strong>{profile?.cpf || "---"}</strong>.
@@ -963,18 +976,24 @@ function DocumentButton({ title, lot, profile, type }: { title: string, lot: any
                  <strong>CLÁUSULA TERCEIRA - DA ENTREGA:</strong> A entrega do animal ao COMPRADOR somente se efetivará após a quitação da primeira parcela ou do valor integral, conforme o caso, e assinatura das notas promissórias e deste contrato.
                </p>
 
-               <div className="bg-gray-50 p-4 border-l-4 border-emerald-deep my-6 italic text-xs">
-                 "Este contrato é gerado eletronicamente e possui validade jurídica mediante a confirmação do arremate pelo sistema de auditoria da Premium Agro Leilões, com registro de IP {lot.last_bid_ip || '187.52.14.92'} em {new Date(lot.updated_at).toLocaleString('pt-BR')}."
-               </div>
+                <div className="bg-gray-50 p-4 border-l-4 border-emerald-deep my-6 italic text-xs">
+                  "Este contrato é gerado eletronicamente e possui validade jurídica mediante a confirmação do arremate pelo sistema de auditoria da {siteInfo?.name || "Premium Agro Leilões"}, com registro de IP {lot.last_bid_ip || '187.52.14.92'} em {new Date(lot.updated_at).toLocaleString('pt-BR')}."
+                </div>
 
                <p>
                  Uberaba/MG, {new Date().toLocaleDateString('pt-BR', {day: 'numeric', month: 'long', year: 'numeric'})}.
                </p>
 
-               <div className="grid grid-cols-2 gap-20 pt-20">
-                 <div className="border-t border-black pt-2 text-center text-xs">VENDEDOR</div>
-                 <div className="border-t border-black pt-2 text-center text-xs">COMPRADOR</div>
-               </div>
+                <div className="grid grid-cols-2 gap-20 pt-20">
+                  <div className="border-t border-black pt-2 text-center text-xs">
+                    <p className="font-bold">{siteInfo?.name?.toUpperCase() || "VENDEDOR"}</p>
+                    <p className="text-[10px]">CNPJ: {siteInfo?.cnpj || "00.000.000/0001-00"}</p>
+                  </div>
+                  <div className="border-t border-black pt-2 text-center text-xs">
+                    <p className="font-bold">{profile?.full_name?.toUpperCase() || "COMPRADOR"}</p>
+                    <p className="text-[10px]">CPF/CNPJ: {profile?.cnpj || profile?.cpf || "---"}</p>
+                  </div>
+                </div>
             </div>
           )}
 
