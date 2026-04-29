@@ -1179,6 +1179,74 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_audit_details: {
+        Row: {
+          audit_id: string | null
+          created_at: string
+          id: string
+          issues: Json
+          item_id: string
+          item_name: string | null
+          item_type: string
+        }
+        Insert: {
+          audit_id?: string | null
+          created_at?: string
+          id?: string
+          issues: Json
+          item_id: string
+          item_name?: string | null
+          item_type: string
+        }
+        Update: {
+          audit_id?: string | null
+          created_at?: string
+          id?: string
+          issues?: Json
+          item_id?: string
+          item_name?: string | null
+          item_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_audit_details_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "seo_audits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_audits: {
+        Row: {
+          created_at: string
+          error_count: number | null
+          healthy_count: number | null
+          id: string
+          status: string
+          total_items: number | null
+          warning_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          error_count?: number | null
+          healthy_count?: number | null
+          id?: string
+          status?: string
+          total_items?: number | null
+          warning_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          error_count?: number | null
+          healthy_count?: number | null
+          id?: string
+          status?: string
+          total_items?: number | null
+          warning_count?: number | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string | null
