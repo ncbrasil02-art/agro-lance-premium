@@ -131,67 +131,66 @@ export const Route = createFileRoute("/painel")({
       nationality: "Brasileira",
     });
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const docInputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-      if (!user) return;
-      fetchDashboardData();
-      fetchMessages();
-      
-      if (profile) {
-        setFormData({
-          full_name: profile.full_name || "",
-          cpf: profile.cpf || "",
-          phone: profile.phone || "",
-          address: profile.address || "",
-          cep: profile.cep || "",
-          nationality: profile.nationality || "Brasileira",
-        });
-      }
-
-      const [rtStatus, setRtStatus] = useState<string>("INITIAL");
-
-      useRealtimeFallback({
-        status: rtStatus,
-        onUpdate: fetchDashboardData,
-        label: "Painel do Usuário",
-        pollInterval: 60000,
-        initialPollInterval: 30000
-      });
-
-      // Add real-time listeners for the dashboard
-      const lotsChannel = supabase
-        .channel('dashboard-lots-realtime')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'lots',
-          filter: `winner_id=eq.${user.id}` 
-        }, () => {
-          fetchDashboardData();
-        })
-        .subscribe((newStatus) => {
-          setRtStatus(newStatus);
-        });
-
-      const bidsChannel = supabase
-        .channel('dashboard-bids-realtime')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'bids',
-          filter: `user_id=eq.${user.id}` 
-        }, () => {
-          fetchDashboardData();
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(lotsChannel);
-        supabase.removeChannel(bidsChannel);
-      };
-    }, [user, profile]);
+     const fileInputRef = useRef<HTMLInputElement>(null);
+     const docInputRef = useRef<HTMLInputElement>(null);
+     const [rtStatus, setRtStatus] = useState<string>("INITIAL");
+ 
+     useRealtimeFallback({
+       status: rtStatus,
+       onUpdate: fetchDashboardData,
+       label: "Painel do Usuário",
+       pollInterval: 60000,
+       initialPollInterval: 30000
+     });
+ 
+     useEffect(() => {
+       if (!user) return;
+       fetchDashboardData();
+       fetchMessages();
+       
+       if (profile) {
+         setFormData({
+           full_name: profile.full_name || "",
+           cpf: profile.cpf || "",
+           phone: profile.phone || "",
+           address: profile.address || "",
+           cep: profile.cep || "",
+           nationality: profile.nationality || "Brasileira",
+         });
+       }
+ 
+       // Add real-time listeners for the dashboard
+       const lotsChannel = supabase
+         .channel('dashboard-lots-realtime')
+         .on('postgres_changes', { 
+           event: '*', 
+           schema: 'public', 
+           table: 'lots',
+           filter: `winner_id=eq.${user.id}` 
+         }, () => {
+           fetchDashboardData();
+         })
+         .subscribe((newStatus) => {
+           setRtStatus(newStatus);
+         });
+ 
+       const bidsChannel = supabase
+         .channel('dashboard-bids-realtime')
+         .on('postgres_changes', { 
+           event: '*', 
+           schema: 'public', 
+           table: 'bids',
+           filter: `user_id=eq.${user.id}` 
+         }, () => {
+           fetchDashboardData();
+         })
+         .subscribe();
+ 
+       return () => {
+         supabase.removeChannel(lotsChannel);
+         supabase.removeChannel(bidsChannel);
+       };
+     }, [user, profile]);
 
    const fetchMessages = async () => {
      if (!user?.id) return;
