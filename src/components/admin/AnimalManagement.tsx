@@ -15,6 +15,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
  import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateSlug } from "@/utils/slug";
+import { SerpPreview } from "./SerpPreview";
   import { toast } from "sonner";
  
  const VETERINARY_CHECKLIST = [
@@ -505,6 +506,15 @@ import { generateSlug } from "@/utils/slug";
                         value={formData.seo_description} 
                         onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
                         placeholder="Meta descrição para o Google"
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t">
+                      <SerpPreview 
+                        title={formData.seo_title || formData.name}
+                        description={formData.seo_description || formData.description}
+                        slug={formData.slug}
+                        basePath="/lotes"
                       />
                     </div>
                   </TabsContent>
