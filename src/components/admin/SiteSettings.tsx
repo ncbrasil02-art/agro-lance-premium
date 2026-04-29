@@ -33,10 +33,17 @@
  
   export function SiteSettings() {
     const [isLoading, setIsLoading] = useState(true);
-    const [aboutPage, setAboutPage] = useState({
-      enabled: true,
-      title: "Sobre"
-    });
+     const [aboutPage, setAboutPage] = useState({
+       enabled: true,
+       title: "Sobre",
+       content: "Somos a plataforma brasileira que está redefinindo a experiência dos leilões agropecuários — unindo tradição rural, curadoria genética rigorosa e tecnologia de tempo real.",
+       features: [
+         { icon: "Radio", title: "Tempo real", desc: "Lances instantâneos com WebSocket de baixa latência." },
+         { icon: "ShieldCheck", title: "Segurança total", desc: "Aprovação manual de cadastros e contratos digitais." },
+         { icon: "Trophy", title: "Curadoria premium", desc: "Avaliação veterinária e genealógica dos animais." },
+         { icon: "Users", title: "Comunidade qualificada", desc: "Compradores e vendedores verificados." }
+       ]
+     });
 
     const [customTexts, setCustomTexts] = useState({
       hero_title: "",
