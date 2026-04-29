@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://agro-ncbrasil.lovable.app/sitemap.xml
