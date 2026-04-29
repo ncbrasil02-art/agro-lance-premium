@@ -1338,9 +1338,19 @@ import { SocialPreview } from "./SocialPreview";
                               <div className="text-2xl font-black text-white">{formatBRL(totalGeneral)}</div>
                             </CardContent>
                           </Card>
-                        </div>
-                        
-                        <div className="border rounded-xl overflow-hidden bg-card">
+                         </div>
+
+                         <div className="flex justify-between items-center mb-4">
+                           <div className="text-sm font-bold text-emerald-deep uppercase tracking-wider">Lotes e Arrematantes</div>
+                           <Button 
+                             className="bg-emerald-deep text-gold gap-2 font-bold"
+                             onClick={() => setShowBalanceReport(true)}
+                           >
+                             <BarChart3 className="h-4 w-4" /> Gerar Balanço Completo
+                           </Button>
+                         </div>
+                         
+                         <div className="border rounded-xl overflow-hidden bg-card">
                    <Table>
                      <TableHeader className="bg-muted/50">
                        <TableRow>
