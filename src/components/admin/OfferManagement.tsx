@@ -63,6 +63,9 @@ export function OfferManagement() {
   }, []);
 
    const handleUpdateStatus = async (offer: any, status: 'approved' | 'rejected' | 'under_review') => {
+     const { data: { user } } = await supabase.auth.getUser();
+     if (!user) return;
+
     try {
        const { error } = await supabase
          .from("offers")
@@ -76,12 +79,13 @@ export function OfferManagement() {
        const title = `Sua proposta foi ${statusLabel.toLowerCase()}`;
        const content = `A proposta de ${formatBRL(offer.amount)} para o animal ${offer.animal?.name} foi alterada para o status: ${statusLabel}.`;
 
-       await supabase.from("messages").insert({
-         recipient_id: offer.user_id,
-         title: title,
-         content: content,
-         is_read: false
-       });
+        await supabase.from("messages").insert({
+          sender_id: user.id,
+          recipient_id: offer.user_id,
+          title: title,
+          content: content,
+          is_read: false
+        });
 
        await supabase.from("notifications").insert({
          user_id: offer.user_id,
