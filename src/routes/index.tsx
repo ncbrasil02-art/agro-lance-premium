@@ -43,14 +43,6 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
             announcement: getVal(results[3]).data?.value || null,
             articles: getVal(results[4]).data || [],
           };
- 
-         return {
-           events: eventsRes.data || [],
-           lots: lotsRes.data || [],
-           pastEvents: pastEventsRes.data || [],
-           announcement: announcementRes.data?.value || null,
-           articles: articlesRes.data || [],
-         };
        } catch (err) {
          console.error("Loader Home fatal error:", err);
          return {
