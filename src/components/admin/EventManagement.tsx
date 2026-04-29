@@ -228,8 +228,9 @@ import { SocialPreview } from "./SocialPreview";
        banner_url: "",
        promoter_company: "",
         auctioneer_name: "",
-         seller_id: "none",
-         seller_name: "",
+          seller_id: "none",
+          seller_name: "",
+          commission_rate: 0,
           regulation: "",
           viewers: 0,
           slug: "",
@@ -256,8 +257,9 @@ import { SocialPreview } from "./SocialPreview";
          banner_url: "",
          promoter_company: "",
          auctioneer_name: "",
-         seller_id: "none",
-         seller_name: "",
+          seller_id: "none",
+          seller_name: "",
+          commission_rate: 0,
           regulation: "",
           viewers: 0,
           slug: "",
@@ -285,8 +287,9 @@ import { SocialPreview } from "./SocialPreview";
          banner_url: event.banner_url || "",
          promoter_company: event.promoter_company || "",
          auctioneer_name: event.auctioneer_name || "",
-           seller_id: event.seller_id || "none",
-           seller_name: event.seller_name || "",
+            seller_id: event.seller_id || "none",
+            seller_name: event.seller_name || "",
+            commission_rate: event.commission_rate || 0,
             regulation: event.regulation || "",
             viewers: event.viewers || 0,
             slug: event.slug || "",
@@ -441,8 +444,9 @@ import { SocialPreview } from "./SocialPreview";
                banner_url: formData.banner_url,
                promoter_company: formData.promoter_company,
                auctioneer_name: formData.auctioneer_name,
-                seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
-                 seller_name: formData.seller_name,
+                  seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
+                  seller_name: formData.seller_name,
+                  commission_rate: formData.commission_rate,
                   regulation: formData.regulation,
                   viewers: formData.viewers,
                   seo_title: formData.seo_title,
@@ -476,6 +480,7 @@ import { SocialPreview } from "./SocialPreview";
             auctioneer_name: formData.auctioneer_name,
             seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
              seller_name: formData.seller_name,
+             commission_rate: formData.commission_rate,
               slug: slug,
               regulation: formData.regulation,
               viewers: formData.viewers,
@@ -880,6 +885,17 @@ import { SocialPreview } from "./SocialPreview";
                     <div className="grid gap-2">
                       <Label htmlFor="seller_name">Nome do Vendedor (Manual)</Label>
                       <Input value={formData.seller_name} onChange={(e) => setFormData({ ...formData, seller_name: e.target.value })} placeholder="Ex: João da Silva" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="commission_rate">Comissão do Leiloeiro (%)</Label>
+                      <Input 
+                        id="commission_rate"
+                        type="number" 
+                        step="0.01"
+                        value={formData.commission_rate} 
+                        onChange={(e) => setFormData({ ...formData, commission_rate: parseFloat(e.target.value) || 0 })} 
+                        placeholder="Ex: 5" 
+                      />
                     </div>
                   </div>
                 </TabsContent>
@@ -1430,19 +1446,37 @@ import { SocialPreview } from "./SocialPreview";
                                        </div>
                                      </div>
 
-                                     <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
-                                       <div className="flex justify-between items-center">
-                                          <div className="uppercase font-black text-emerald-900">Valor do Arremate</div>
-                                          <div className="text-3xl font-black text-emerald-600">{formatBRL(lot.current_price)}</div>
-                                       </div>
-                                     </div>
+                                      <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 space-y-3">
+                                        <div className="flex justify-between items-center">
+                                           <div className="uppercase font-black text-emerald-900">Valor do Arremate</div>
+                                           <div className="text-xl font-black text-emerald-600">{formatBRL(lot.current_price)}</div>
+                                        </div>
+                                        {viewingEventDetails?.commission_rate > 0 && (
+                                          <div className="flex justify-between items-center border-t border-emerald-100 pt-3">
+                                            <div className="uppercase font-bold text-emerald-800 text-xs">Comissão do Leiloeiro ({viewingEventDetails.commission_rate}%)</div>
+                                            <div className="text-lg font-bold text-emerald-700">
+                                              {formatBRL(lot.current_price * (viewingEventDetails.commission_rate / 100))}
+                                            </div>
+                                          </div>
+                                        )}
+                                        <div className="flex justify-between items-center border-t-2 border-emerald-200 pt-3">
+                                           <div className="uppercase font-black text-emerald-900">Total Geral</div>
+                                           <div className="text-3xl font-black text-emerald-600">
+                                             {formatBRL(lot.current_price + (lot.current_price * ((viewingEventDetails?.commission_rate || 0) / 100)))}
+                                           </div>
+                                        </div>
+                                      </div>
 
-                                     <div className="pt-10">
-                                       <p className="text-xs leading-relaxed text-gray-500 italic">
-                                         Este documento serve como registro administrativo do arremate. 
-                                         O arremate foi realizado em {new Date(lot.updated_at).toLocaleString('pt-BR')}.
-                                       </p>
-                                     </div>
+                                      <div className="pt-10 space-y-4">
+                                        <p className="text-xs leading-relaxed text-gray-500 italic">
+                                          Este documento serve como registro administrativo do arremate. 
+                                          O arremate foi realizado em {new Date(lot.updated_at).toLocaleString('pt-BR')}.
+                                        </p>
+                                        <p className="text-[10px] text-gray-400 border-t pt-2">
+                                          * O site atua apenas como intermediador, facilitando a conexão entre comprador e vendedor. 
+                                          Toda a responsabilidade sobre o animal e a transação financeira direta é das partes envolvidas.
+                                        </p>
+                                      </div>
 
                                      <div className="flex justify-between items-end pt-20">
                                         <div className="w-48 border-t border-black text-center pt-2 text-[10px] uppercase font-bold">Premium Agro</div>
