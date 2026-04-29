@@ -8,7 +8,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
- import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type } from "lucide-react";
+import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star } from "lucide-react";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -296,21 +296,112 @@
                     onCheckedChange={v => setAboutPage({...aboutPage, enabled: v})} 
                   />
                 </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="about_title">Nome da Página (Menu/Título)</Label>
+                    <Input 
+                      id="about_title" 
+                      value={aboutPage.title} 
+                      onChange={e => setAboutPage({...aboutPage, title: e.target.value})} 
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="about_title">Nome da Página (Menu/Título)</Label>
-                  <Input 
-                    id="about_title" 
-                    value={aboutPage.title} 
-                    onChange={e => setAboutPage({...aboutPage, title: e.target.value})} 
+                  <Label htmlFor="about_content">Conteúdo Principal</Label>
+                  <Textarea 
+                    id="about_content" 
+                    className="min-h-[120px]"
+                    placeholder="Breve descrição da empresa..."
+                    value={aboutPage.content} 
+                    onChange={e => setAboutPage({...aboutPage, content: e.target.value})} 
                   />
                 </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-bold">Itens de Destaque (Features)</Label>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setAboutPage({
+                        ...aboutPage, 
+                        features: [...aboutPage.features, { icon: "Star", title: "Novo Item", desc: "Descrição curta do diferencial" }]
+                      })}
+                    >
+                      <Plus className="h-4 w-4 mr-2" /> Adicionar Item
+                    </Button>
+                  </div>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {aboutPage.features.map((feature, idx) => (
+                      <div key={idx} className="p-4 border rounded-xl space-y-3 relative group bg-muted/5">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute top-1 right-1 h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => {
+                            const newFeatures = [...aboutPage.features];
+                            newFeatures.splice(idx, 1);
+                            setAboutPage({...aboutPage, features: newFeatures});
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-[10px] uppercase font-bold text-muted-foreground">Título</Label>
+                              <Input 
+                                className="h-8 text-sm"
+                                value={feature.title} 
+                                onChange={e => {
+                                  const newFeatures = [...aboutPage.features];
+                                  newFeatures[idx] = { ...newFeatures[idx], title: e.target.value };
+                                  setAboutPage({...aboutPage, features: newFeatures});
+                                }}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[10px] uppercase font-bold text-muted-foreground">Ícone</Label>
+                              <Input 
+                                className="h-8 text-sm"
+                                placeholder="Ex: Radio, Star..."
+                                value={feature.icon} 
+                                onChange={e => {
+                                  const newFeatures = [...aboutPage.features];
+                                  newFeatures[idx] = { ...newFeatures[idx], icon: e.target.value };
+                                  setAboutPage({...aboutPage, features: newFeatures});
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Descrição</Label>
+                            <Textarea 
+                              className="min-h-[60px] text-sm py-2"
+                              value={feature.desc} 
+                              onChange={e => {
+                                const newFeatures = [...aboutPage.features];
+                                newFeatures[idx] = { ...newFeatures[idx], desc: e.target.value };
+                                setAboutPage({...aboutPage, features: newFeatures});
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <Button 
-                  className="bg-gold text-emerald-deep font-bold" 
+                  className="w-full bg-gold text-emerald-deep font-bold mt-4" 
                   onClick={() => handleSave("about_page", aboutPage)}
                   disabled={isSaving}
                 >
                   {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                  Salvar Configuração Sobre
+                  Salvar Página Sobre Completa
                 </Button>
               </CardContent>
             </Card>
