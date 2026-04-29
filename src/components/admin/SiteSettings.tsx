@@ -863,6 +863,32 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                       />
                     </div>
                   </div>
+                  <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-dashed">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Título (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.home_og_title} 
+                        onChange={e => setSeoSettings({...seoSettings, home_og_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Descrição (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.home_og_description} 
+                        onChange={e => setSeoSettings({...seoSettings, home_og_description: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Imagem (URL)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.home_og_image} 
+                        onChange={e => setSeoSettings({...seoSettings, home_og_image: e.target.value})} 
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
@@ -880,6 +906,32 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
                       <Input 
                         value={seoSettings.about_description} 
                         onChange={e => setSeoSettings({...seoSettings, about_description: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-dashed">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Título (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.about_og_title} 
+                        onChange={e => setSeoSettings({...seoSettings, about_og_title: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Descrição (Social)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.about_og_description} 
+                        onChange={e => setSeoSettings({...seoSettings, about_og_description: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-gold/60">OG Imagem (URL)</Label>
+                      <Input 
+                        className="h-8 text-xs"
+                        value={seoSettings.about_og_image} 
+                        onChange={e => setSeoSettings({...seoSettings, about_og_image: e.target.value})} 
                       />
                     </div>
                   </div>
