@@ -10,7 +10,8 @@
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { generateSlug, validateSlug } from "@/utils/slug";
  import { toast } from "sonner";
  
  export function PostManagement() {
@@ -98,10 +99,15 @@
      }
  
      setIsSaving(true);
-     try {
-       const slug = formData.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-       
-       const dataToSave = {
+    try {
+      const slug = generateSlug(formData.title);
+      
+      if (!validateSlug(slug)) {
+        toast.error("O título gerou um link inválido. Tente usar apenas letras e números.");
+        return;
+      }
+
+      const dataToSave = {
          ...formData,
          slug,
          published_at: formData.status === "published" ? new Date().toISOString() : null
