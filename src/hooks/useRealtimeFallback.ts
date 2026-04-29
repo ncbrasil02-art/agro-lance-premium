@@ -1,5 +1,6 @@
- import { useEffect, useRef, useState, useMemo } from 'react';
+  import { useEffect, useRef, useState } from 'react';
  import { logger } from '@/utils/logger';
+  import { RATE_LIMITS } from '@/config/limits';
  
  export interface RealtimeFallbackOptions {
    status: string;
@@ -20,9 +21,9 @@
    status,
    onUpdate,
    label,
-   pollInterval = 45000,
-   initialPollInterval = 10000,
-   maxInterval = 120000,
+    pollInterval = RATE_LIMITS.POLLING_BASE_MS,
+    initialPollInterval = RATE_LIMITS.POLLING_INITIAL_MS,
+    maxInterval = RATE_LIMITS.POLLING_MAX_MS,
    backoffFactor = 1.2,
    enabled = true
  }: RealtimeFallbackOptions) {
