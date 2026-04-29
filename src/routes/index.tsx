@@ -22,8 +22,22 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
   import { ErrorFallback, ErrorBoundary } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
-   export const Route = createFileRoute("/")({
-     loader: async () => {
+    export const Route = createFileRoute("/")({
+      head: ({ loaderData, context }) => {
+        const seo = (context as any).seoSettings;
+        const title = seo?.home_title || (seo?.global_title_suffix ? `Home ${seo.global_title_suffix}` : "Premium Agro Leilões — Home");
+        const description = seo?.home_description || seo?.global_description || "A elite do agronegócio em tempo real.";
+        
+        return {
+          meta: [
+            { title: title },
+            { name: "description", content: description },
+            { property: "og:title", content: title },
+            { property: "og:description", content: description },
+          ],
+        };
+      },
+      loader: async () => {
        try {
          console.log("Loader Home started");
           // Execute all queries in parallel, but handle individual failures
