@@ -1,4 +1,5 @@
- import { createFileRoute, useRouter } from "@tanstack/react-router";
+  import { createFileRoute, useRouter } from "@tanstack/react-router";
+  import { PAGE_LIMITS } from "@/config/limits";
  import { PageSkeleton } from "@/components/ui/page-skeleton";
  import { ErrorFallback } from "@/components/ui/error-fallback";
  import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
@@ -28,9 +29,10 @@ export const Route = createFileRoute("/lotes/")({
       logger.info("Iniciando carregamento da página de Lotes");
       try {
          const { data: lots, error } = await supabase
-           .from("lots")
-           .select("*, animal:animals!lots_animal_id_fkey(*, sellers!animals_seller_id_fkey(name)), event:events!lots_event_id_fkey(*)")
-           .order("created_at", { ascending: false });
+            .from("lots")
+            .select("*, animal:animals!lots_animal_id_fkey(*, sellers!animals_seller_id_fkey(name)), event:events!lots_event_id_fkey(*)")
+            .order("created_at", { ascending: false })
+            .limit(PAGE_LIMITS.LOTS_LIST);
        
         if (error) {
           logger.error("Erro Supabase ao carregar lotes", { error });
