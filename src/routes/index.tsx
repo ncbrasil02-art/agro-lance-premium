@@ -365,7 +365,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                 {/* Mobile/Alternative Grid for "chamativo" feel */}
                 <section className="container mx-auto px-4 py-8 lg:hidden">
                    <div className="grid gap-6 sm:grid-cols-2">
-                      {mappedLots.slice(0, 4).map((lot) => (
+                      {mappedLots.slice(0, 4).map((lot: any) => (
                          <LotCard key={lot.id} lot={lot} />
                       ))}
                    </div>
