@@ -3,3 +3,4 @@ Allow: /
 
 # Sitemaps
 Sitemap: https://agro-ncbrasil.lovable.app/sitemap.xml
+Sitemap: https://agro-ncbrasil.lovable.app/sitemap.xml?type=news
