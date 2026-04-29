@@ -526,6 +526,8 @@ import { SocialPreview } from "./SocialPreview";
                          title={formData.seo_title || formData.name}
                          description={formData.seo_description || formData.description}
                          image={formData.photos_urls?.split(',')[0]}
+                        ogTitle={formData.og_title}
+                        ogDescription={formData.og_description}
                        />
                        <div className="mt-6">
                          <SerpPreview 
