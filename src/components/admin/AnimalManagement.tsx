@@ -78,9 +78,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
            description: "",
           is_direct_sale: false,
            sale_price: "",
-           sale_status: "available",
-           accepts_offers: false
-    });
+            sale_status: "available",
+            accepts_offers: false,
+            slug: "",
+            seo_title: "",
+            seo_description: ""
+     });
 
      const resetForm = () => {
        setEditingAnimal(null);
@@ -127,9 +130,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
            description: "",
           is_direct_sale: false,
            sale_price: "",
-           sale_status: "available",
-           accepts_offers: false
-      });
+            sale_status: "available",
+            accepts_offers: false,
+            slug: "",
+            seo_title: "",
+            seo_description: ""
+       });
     };
 
      const handleEdit = (animal: any) => {
@@ -176,20 +182,30 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
           genealogy_great_grandmother_mm: animal.genealogy?.great_grandmother_mm || "",
          description: animal.description || "",
          is_direct_sale: animal.is_direct_sale || false,
-          sale_price: animal.sale_price || "",
-          sale_status: animal.sale_status || "available",
-          accepts_offers: animal.accepts_offers || false
-      });
+           sale_price: animal.sale_price || "",
+           sale_status: animal.sale_status || "available",
+           accepts_offers: animal.accepts_offers || false,
+           slug: animal.slug || "",
+           seo_title: animal.seo_title || "",
+           seo_description: animal.seo_description || ""
+       });
       setIsDialogOpen(true);
     };
  
-    const handleSave = async () => {
-      if (!formData.name || !formData.breed) {
-        toast.error("Preencha o nome e a raça");
-        return;
-      }
- 
-      try {
+     const handleSave = async () => {
+       if (!formData.name || !formData.breed) {
+         toast.error("Preencha o nome e a raça");
+         return;
+       }
+
+       let slug = formData.slug?.trim();
+       if (!slug) {
+         slug = generateSlug(formData.name) + '-' + (formData.internal_code || Math.floor(Math.random() * 1000));
+       } else {
+         slug = generateSlug(slug);
+       }
+  
+       try {
         if (editingAnimal) {
           const { error } = await supabase
             .from("animals")
