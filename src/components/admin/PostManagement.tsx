@@ -5,7 +5,7 @@
  import { Textarea } from "@/components/ui/textarea";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Newspaper, Image as ImageIcon, Eye, Wand2, CheckCircle2, Clock, Sparkles, Maximize2, Minimize2 } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -42,7 +42,12 @@ import { generateSlug, validateSlug } from "@/utils/slug";
    const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
    const [isAiFixing, setIsAiFixing] = useState(false);
+   const [isGenerating, setIsGenerating] = useState(false);
+   const [aiPrompt, setAiPrompt] = useState("");
+   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+   const [isFullScreen, setIsFullScreen] = useState(false);
    const [searchQuery, setSearchQuery] = useState("");
+   const [statusFilter, setStatusFilter] = useState<string>("all");
  
    const handleAutoFix = async () => {
      if (!formData.title) {
@@ -67,6 +72,36 @@ import { generateSlug, validateSlug } from "@/utils/slug";
        toast.error("Erro ao otimizar: " + error.message);
      } finally {
        setIsAiFixing(false);
+     }
+   };
+
+   const handleGenerateAi = async () => {
+     if (!aiPrompt) {
+       toast.error("Descreva o tema do artigo");
+       return;
+     }
+     setIsGenerating(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('generate-article', {
+         body: { prompt: aiPrompt }
+       });
+       if (error) throw error;
+       
+       setFormData({
+         ...formData,
+         title: data.title,
+         excerpt: data.excerpt,
+         content: data.content,
+         status: 'pending_review'
+       });
+       
+       setIsAiDialogOpen(false);
+       setIsDialogOpen(true);
+       toast.success("Artigo gerado! Revise e publique.");
+     } catch (error: any) {
+       toast.error("Erro ao gerar: " + error.message);
+     } finally {
+       setIsGenerating(false);
      }
    };
 
@@ -197,9 +232,11 @@ import { generateSlug, validateSlug } from "@/utils/slug";
      }
    };
  
-   const filteredPosts = posts.filter(post => 
-     post.title?.toLowerCase().includes(searchQuery.toLowerCase())
-   );
+    const filteredPosts = posts.filter(post => {
+      const matchesSearch = post.title?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || post.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
  
    return (
      <div className="space-y-6">
@@ -209,27 +246,87 @@ import { generateSlug, validateSlug } from "@/utils/slug";
              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
            </Button>
          </div>
-         <div className="relative flex-1 max-w-sm">
-           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-           <Input
-             placeholder="Buscar notícia..."
-             className="pl-10"
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-           />
+          <div className="flex flex-1 items-center gap-2 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar notícia..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="draft">Rascunho</SelectItem>
+                <SelectItem value="pending_review">Pendente de Revisão</SelectItem>
+                <SelectItem value="published">Publicado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
          </div>
-         <Dialog open={isDialogOpen} onOpenChange={(open) => {
-           setIsDialogOpen(open);
-           if (!open) resetForm();
-         }}>
-           <DialogTrigger asChild>
-             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
-               <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
-             </Button>
-           </DialogTrigger>
-           <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <div className="flex gap-2">
+            <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="border-gold text-gold hover:bg-gold/10">
+                  <Sparkles className="mr-2 h-4 w-4" /> Gerar com IA
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Gerar Artigo com IA</DialogTitle>
+                  <DialogDescription>
+                    Descreva o tema ou envie um fato e nossa IA criará um rascunho completo.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 space-y-4">
+                  <Label>O que você quer escrever?</Label>
+                  <Textarea 
+                    placeholder="Ex: Resultados do Leilão de Touros Nelore em Uberaba, destacando recorde de preços..."
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button 
+                    className="bg-gold text-emerald-deep w-full" 
+                    onClick={handleGenerateAi}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Gerar Rascunho para Aprovação
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) resetForm();
+            }}>
+               <DialogTrigger asChild>
+                 <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+                   <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
+                 </Button>
+               </DialogTrigger>
+             <DialogContent className={`${isFullScreen ? "sm:max-w-[95vw] h-[95vh]" : "sm:max-w-[700px] max-h-[90vh]"} overflow-y-auto transition-all duration-300`}>
              <DialogHeader>
-               <DialogTitle>{editingPost ? "Editar Notícia" : "Criar Nova Notícia"}</DialogTitle>
+                 <div className="flex items-center justify-between pr-8">
+                   <DialogTitle>{editingPost ? "Editar Notícia" : "Criar Nova Notícia"}</DialogTitle>
+                   <Button 
+                     variant="ghost" 
+                     size="icon" 
+                     onClick={() => setIsFullScreen(!isFullScreen)}
+                     title={isFullScreen ? "Reduzir" : "Tela Cheia"}
+                   >
+                     {isFullScreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                   </Button>
+                 </div>
                <DialogDescription>
                  Preencha os campos abaixo para publicar uma notícia no site.
                </DialogDescription>
@@ -304,7 +401,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                     <TabsTrigger value="rich">Rich Results</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="editor" className="space-y-4 pt-4">
+                   <TabsContent value="editor" className={`space-y-4 pt-4 ${isFullScreen ? "h-[calc(95vh-250px)]" : ""}`}>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="author_name">Autor</Label>
@@ -325,11 +422,11 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                         />
                       </div>
                     </div>
-                    <div className="grid gap-2">
+                     <div className={`grid gap-2 ${isFullScreen ? "h-full" : ""}`}>
                       <Label htmlFor="content">Conteúdo (Markdown suportado)</Label>
                       <Textarea 
                         id="content"
-                        className="min-h-[300px] font-mono"
+                         className={`${isFullScreen ? "flex-1 min-h-[400px]" : "min-h-[300px]"} font-mono`}
                         value={formData.content} 
                         onChange={(e) => setFormData({ ...formData, content: e.target.value })} 
                         placeholder="Conteúdo completo da notícia..."
