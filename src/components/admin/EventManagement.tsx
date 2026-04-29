@@ -1,4 +1,5 @@
- import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
+  import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
+  import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
