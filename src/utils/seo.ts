@@ -24,10 +24,22 @@ export function generateMetaTags({
   const seoSuffix = seoSettings?.global_title_suffix || " | Premium Agro Leilões";
   const defaultDesc = seoSettings?.global_description || "A plataforma brasileira de leilões agropecuários com tecnologia de ponta.";
   const siteUrl = seoSettings?.site_url || "https://agro-ncbrasil.lovable.app";
+  const supabaseUrl = "https://rqe5i25elidk1c06soeo.supabase.co"; // Get this from project context if possible
 
   const finalTitle = title ? `${title}${seoSuffix}` : "Premium Agro Leilões";
   const finalDesc = description || defaultDesc;
-  const finalImage = image || seoSettings?.og_default_image || "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp";
+  
+  // Logic for dynamic OG image
+  let dynamicOgImage = "";
+  if (title) {
+    const params = new URLSearchParams();
+    params.append('title', title);
+    if (type) params.append('type', type);
+    if (image) params.append('imageUrl', image);
+    dynamicOgImage = `${supabaseUrl}/functions/v1/og-image?${params.toString()}`;
+  }
+
+  const finalImage = ogImage || dynamicOgImage || image || seoSettings?.og_default_image || "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp";
 
   const finalOgTitle = ogTitle || finalTitle;
   const finalOgDesc = ogDescription || finalDesc;
