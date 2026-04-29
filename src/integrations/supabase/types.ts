@@ -1381,6 +1381,7 @@ export type Database = {
           }
       revert_sold_lot: { Args: { p_lot_id: string }; Returns: undefined }
       slugify: { Args: { "": string }; Returns: string }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
