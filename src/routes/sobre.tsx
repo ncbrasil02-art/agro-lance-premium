@@ -20,14 +20,21 @@ const iconMap: Record<string, any> = {
 };
 
 export const Route = createFileRoute("/sobre")({
-  head: () => ({
-    meta: [
-      { title: "Sobre — Premium Agro Leilões" },
-      { name: "description", content: "Conheça a Premium Agro Leilões, plataforma referência em leilões agropecuários no Brasil." },
-      { property: "og:title", content: "Sobre a Premium Agro" },
-      { property: "og:description", content: "Tecnologia, curadoria e tradição para o mercado agropecuário." },
-    ],
-  }),
+  head: ({ matches }) => {
+    const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+    const seo = rootData?.seoSettings;
+    const title = seo?.about_title || (seo?.global_title_suffix ? `Sobre ${seo.global_title_suffix}` : "Sobre — Premium Agro Leilões");
+    const description = seo?.about_description || seo?.global_description || "Conheça a Premium Agro Leilões, plataforma referência em leilões agropecuários no Brasil.";
+    
+    return {
+      meta: [
+        { title: title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+      ],
+    };
+  },
   component: AboutPage,
 });
 
