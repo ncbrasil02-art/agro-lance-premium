@@ -227,6 +227,35 @@ import { Countdown } from "./countdown";
           </div>
         </div>
       </div>
-    </Link>
+      </Link>
+
+      {lot.acceptsOffers && (dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento' || dynamicStatus === 'pre_lance') && (
+        <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20">
+          <Button 
+            size="sm"
+            className="bg-emerald-bright text-white font-bold gap-1 rounded-full shadow-lg hover:scale-110 transition-transform h-8 px-3 border border-white/20"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOfferOpen(true);
+            }}
+          >
+            <MessageSquare className="h-3 w-3" />
+            Oferta
+          </Button>
+        </div>
+      )}
+
+      <OfferDialog 
+        isOpen={isOfferOpen} 
+        onOpenChange={setIsOfferOpen} 
+        item={{
+          id: lot.id,
+          name: lot.name,
+          price: lot.currentBid,
+          type: 'lot'
+        }}
+      />
+    </div>
   );
 }
