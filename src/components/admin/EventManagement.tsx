@@ -444,8 +444,9 @@ import { SocialPreview } from "./SocialPreview";
                banner_url: formData.banner_url,
                promoter_company: formData.promoter_company,
                auctioneer_name: formData.auctioneer_name,
-                seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
-                 seller_name: formData.seller_name,
+                  seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
+                  seller_name: formData.seller_name,
+                  commission_rate: formData.commission_rate,
                   regulation: formData.regulation,
                   viewers: formData.viewers,
                   seo_title: formData.seo_title,
@@ -479,6 +480,7 @@ import { SocialPreview } from "./SocialPreview";
             auctioneer_name: formData.auctioneer_name,
             seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
              seller_name: formData.seller_name,
+             commission_rate: formData.commission_rate,
               slug: slug,
               regulation: formData.regulation,
               viewers: formData.viewers,
@@ -883,6 +885,17 @@ import { SocialPreview } from "./SocialPreview";
                     <div className="grid gap-2">
                       <Label htmlFor="seller_name">Nome do Vendedor (Manual)</Label>
                       <Input value={formData.seller_name} onChange={(e) => setFormData({ ...formData, seller_name: e.target.value })} placeholder="Ex: João da Silva" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="commission_rate">Comissão do Leiloeiro (%)</Label>
+                      <Input 
+                        id="commission_rate"
+                        type="number" 
+                        step="0.01"
+                        value={formData.commission_rate} 
+                        onChange={(e) => setFormData({ ...formData, commission_rate: parseFloat(e.target.value) || 0 })} 
+                        placeholder="Ex: 5" 
+                      />
                     </div>
                   </div>
                 </TabsContent>
