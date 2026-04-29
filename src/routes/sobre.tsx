@@ -2,7 +2,15 @@
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Loader2 } from "lucide-react";
-import { ShieldCheck, Trophy, Users, Radio } from "lucide-react";
+ import { ShieldCheck, Trophy, Users, Radio, Check } from "lucide-react";
+ 
+ const iconMap: Record<string, any> = {
+   Radio,
+   ShieldCheck,
+   Trophy,
+   Users,
+   Check
+ };
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
