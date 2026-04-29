@@ -15,10 +15,12 @@
  import { SystemLogs } from "@/components/admin/SystemLogs";
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
 import { AuditLogManagement } from "@/components/admin/AuditLogManagement";
+ import { OfferManagement } from "@/components/admin/OfferManagement";
  import { 
-   Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
+   Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
    LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
-   ClipboardList, ShoppingCart, ShieldCheck, Newspaper, Info
+   ClipboardList, ShoppingCart, ShieldCheck, Newspaper, Info,
+   MessageSquare
  } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
@@ -27,7 +29,7 @@ import { AuditLogManagement } from "@/components/admin/AuditLogManagement";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
- type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts";
+ type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
@@ -38,6 +40,7 @@ import { AuditLogManagement } from "@/components/admin/AuditLogManagement";
    { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
    { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
    { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
+   { id: "offers", label: "Ofertas/Propostas", icon: <MessageSquare className="mr-2 h-4 w-4" /> },
    { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
    { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
    { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
@@ -322,8 +325,9 @@ import { AuditLogManagement } from "@/components/admin/AuditLogManagement";
           )}
           {activeTab === "animals" && <AnimalManagement />}
           {activeTab === "categories" && <CategoryManagement />}
-          {activeTab === "event_requests" && <EventRequestManagement />}
-          {activeTab === "direct_sales" && <DirectSaleManagement />}
+           {activeTab === "event_requests" && <EventRequestManagement />}
+           {activeTab === "direct_sales" && <DirectSaleManagement />}
+           {activeTab === "offers" && <OfferManagement />}
           {activeTab === "sellers" && <SellerManagement />}
              {activeTab === "users" && <UserManagement />}
              {activeTab === "posts" && <PostManagement />}
