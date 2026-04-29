@@ -24,6 +24,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
       featured_image: "",
       category_id: "",
       status: "draft",
+      slug: "",
       seo_title: "",
       seo_description: "",
       author_name: "",
@@ -68,6 +69,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
         featured_image: "",
         category_id: "",
         status: "draft",
+        slug: "",
         seo_title: "",
         seo_description: "",
         author_name: "",
@@ -84,6 +86,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
         featured_image: post.featured_image || "",
         category_id: post.category_id || "",
         status: post.status || "draft",
+        slug: post.slug || "",
         seo_title: post.seo_title || "",
         seo_description: post.seo_description || "",
         author_name: post.author_name || "",
@@ -100,18 +103,23 @@ import { generateSlug, validateSlug } from "@/utils/slug";
  
      setIsSaving(true);
     try {
-      const slug = generateSlug(formData.title);
+      let slug = formData.slug?.trim();
+      if (!slug) {
+        slug = generateSlug(formData.title);
+      } else {
+        slug = generateSlug(slug); // Ensure it's valid format even if manual
+      }
       
       if (!validateSlug(slug)) {
-        toast.error("O título gerou um link inválido. Tente usar apenas letras e números.");
+        toast.error("Link inválido. Tente usar apenas letras, números e hifens.");
         return;
       }
 
       const dataToSave = {
-         ...formData,
-         slug,
-         published_at: formData.status === "published" ? new Date().toISOString() : null
-       };
+        ...formData,
+        slug,
+        published_at: formData.status === "published" ? new Date().toISOString() : null
+      };
  
        if (editingPost) {
          const { error } = await supabase
@@ -287,6 +295,25 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                     </div>
                   </TabsContent>
                   <TabsContent value="seo" className="space-y-4 pt-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="slug">Slug (URL amigável)</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          id="slug"
+                          value={formData.slug} 
+                          onChange={(e) => setFormData({ ...formData, slug: e.target.value })} 
+                          placeholder="exemplo-de-link-seo"
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setFormData({ ...formData, slug: generateSlug(formData.title) })}
+                          type="button"
+                        >
+                          Gerar da Titulo
+                        </Button>
+                      </div>
+                    </div>
                     <div className="grid gap-2">
                       <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
                       <Input 
