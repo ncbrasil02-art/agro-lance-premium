@@ -28,12 +28,18 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
 
   const handleSubmit = async () => {
     const offerAmount = parseFloat(amount);
+    
+    if (!item) return;
+
     if (isNaN(offerAmount) || offerAmount <= 0) {
       toast.error("Por favor, insira um valor válido para a proposta.");
       return;
     }
 
-    if (!item) return;
+    if (item.price > 0 && offerAmount < item.price * 0.1) {
+      toast.error("Valor da proposta muito baixo em relação ao valor de referência.");
+      return;
+    }
 
     setIsLoading(true);
     try {
