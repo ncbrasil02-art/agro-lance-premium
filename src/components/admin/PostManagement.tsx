@@ -11,6 +11,7 @@
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SerpPreview } from "./SerpPreview";
 import { generateSlug, validateSlug } from "@/utils/slug";
  import { toast } from "sonner";
  
@@ -330,6 +331,15 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                         value={formData.seo_description} 
                         onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
                         placeholder="Meta descrição para o Google"
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t">
+                      <SerpPreview 
+                        title={formData.seo_title || formData.title}
+                        description={formData.seo_description || formData.excerpt}
+                        slug={formData.slug}
+                        basePath="/noticias"
                       />
                     </div>
                   </TabsContent>
