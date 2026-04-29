@@ -97,8 +97,8 @@ export const Route = createFileRoute("/lotes/$lotId")({
     const seoSettings = rootData?.seoSettings;
     
     return generateMetaTags({
-      title: lot ? `Lote ${lot.lot_number} — ${lot.animal?.name || 'Animal'}` : "Detalhe do Lote",
-      description: lot?.animal?.description,
+      title: lot?.animal?.seo_title || (lot ? `Lote ${lot.lot_number} — ${lot.animal?.name || 'Animal'}` : "Detalhe do Lote"),
+      description: lot?.animal?.seo_description || lot?.animal?.description,
       image: lot?.animal?.photos?.[0],
       seoSettings,
       canonical: `/lotes/${lot?.id}`

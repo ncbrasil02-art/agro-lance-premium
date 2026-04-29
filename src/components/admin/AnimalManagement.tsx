@@ -13,7 +13,8 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { generateSlug } from "@/utils/slug";
   import { toast } from "sonner";
  
  const VETERINARY_CHECKLIST = [
@@ -78,9 +79,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
            description: "",
           is_direct_sale: false,
            sale_price: "",
-           sale_status: "available",
-           accepts_offers: false
-    });
+            sale_status: "available",
+            accepts_offers: false,
+            slug: "",
+            seo_title: "",
+            seo_description: ""
+     });
 
      const resetForm = () => {
        setEditingAnimal(null);
@@ -127,9 +131,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
            description: "",
           is_direct_sale: false,
            sale_price: "",
-           sale_status: "available",
-           accepts_offers: false
-      });
+            sale_status: "available",
+            accepts_offers: false,
+            slug: "",
+            seo_title: "",
+            seo_description: ""
+       });
     };
 
      const handleEdit = (animal: any) => {
@@ -176,20 +183,30 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
           genealogy_great_grandmother_mm: animal.genealogy?.great_grandmother_mm || "",
          description: animal.description || "",
          is_direct_sale: animal.is_direct_sale || false,
-          sale_price: animal.sale_price || "",
-          sale_status: animal.sale_status || "available",
-          accepts_offers: animal.accepts_offers || false
-      });
+           sale_price: animal.sale_price || "",
+           sale_status: animal.sale_status || "available",
+           accepts_offers: animal.accepts_offers || false,
+           slug: animal.slug || "",
+           seo_title: animal.seo_title || "",
+           seo_description: animal.seo_description || ""
+       });
       setIsDialogOpen(true);
     };
  
-    const handleSave = async () => {
-      if (!formData.name || !formData.breed) {
-        toast.error("Preencha o nome e a raça");
-        return;
-      }
- 
-      try {
+     const handleSave = async () => {
+       if (!formData.name || !formData.breed) {
+         toast.error("Preencha o nome e a raça");
+         return;
+       }
+
+       let slug = formData.slug?.trim();
+       if (!slug) {
+         slug = generateSlug(formData.name) + '-' + (formData.internal_code || Math.floor(Math.random() * 1000));
+       } else {
+         slug = generateSlug(slug);
+       }
+  
+       try {
         if (editingAnimal) {
           const { error } = await supabase
             .from("animals")
@@ -241,9 +258,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                description: formData.description,
                 is_direct_sale: formData.is_direct_sale,
                 accepts_offers: formData.accepts_offers,
-               sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
-               sale_status: formData.sale_status
-             })
+                sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
+                sale_status: formData.sale_status,
+                slug,
+                seo_title: formData.seo_title,
+                seo_description: formData.seo_description
+              })
              .eq("id", editingAnimal.id)
              .neq("sale_status", "sold");
           if (error) throw error;
@@ -298,9 +318,12 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
              description: formData.description,
               is_direct_sale: formData.is_direct_sale,
               accepts_offers: formData.accepts_offers,
-             sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
-             sale_status: formData.sale_status
-          });
+              sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
+              sale_status: formData.sale_status,
+              slug,
+              seo_title: formData.seo_title,
+              seo_description: formData.seo_description
+           });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
         }
@@ -436,14 +459,55 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
                </DialogDescription>
              </DialogHeader>
                <Tabs defaultValue="geral" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 mb-4">
-                    <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
-                    <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
-                     <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
-                     <TabsTrigger value="saude" className="text-xs">Saúde do Animal</TabsTrigger>
-                     <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
-                    <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
-                  </TabsList>
+                   <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4">
+                     <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
+                     <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
+                      <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
+                      <TabsTrigger value="saude" className="text-xs">Saúde</TabsTrigger>
+                      <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
+                     <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
+                     <TabsTrigger value="seo" className="text-xs">SEO</TabsTrigger>
+                   </TabsList>
+                  <TabsContent value="seo" className="space-y-4 pt-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="slug">Slug (URL amigável)</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          id="slug"
+                          value={formData.slug} 
+                          onChange={(e) => setFormData({ ...formData, slug: e.target.value })} 
+                          placeholder="exemplo-de-link-seo"
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setFormData({ ...formData, slug: generateSlug(formData.name) })}
+                          type="button"
+                        >
+                          Gerar da Nome
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                      <Input 
+                        id="seo_title"
+                        value={formData.seo_title} 
+                        onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })} 
+                        placeholder="Título para buscadores"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="seo_description">SEO Description</Label>
+                      <textarea 
+                        id="seo_description"
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        value={formData.seo_description} 
+                        onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
+                        placeholder="Meta descrição para o Google"
+                      />
+                    </div>
+                  </TabsContent>
 
                   <TabsContent value="venda" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                    <div className="flex items-center space-x-2 border p-4 rounded-md bg-muted/20">

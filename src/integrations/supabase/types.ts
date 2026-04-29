@@ -44,7 +44,10 @@ export type Database = {
           sale_price: number | null
           sale_status: string | null
           seller_id: string | null
+          seo_description: string | null
+          seo_title: string | null
           sex: string | null
+          slug: string | null
           species: string | null
           updated_at: string
           vaccination_records: Json | null
@@ -82,7 +85,10 @@ export type Database = {
           sale_price?: number | null
           sale_status?: string | null
           seller_id?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           sex?: string | null
+          slug?: string | null
           species?: string | null
           updated_at?: string
           vaccination_records?: Json | null
@@ -120,7 +126,10 @@ export type Database = {
           sale_price?: number | null
           sale_status?: string | null
           seller_id?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           sex?: string | null
+          slug?: string | null
           species?: string | null
           updated_at?: string
           vaccination_records?: Json | null
