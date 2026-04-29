@@ -22,18 +22,33 @@ interface OfferDialogProps {
 
 export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
    const [amount, setAmount] = useState<string>("");
+   const [amountError, setAmountError] = useState(false);
    const [installments, setInstallments] = useState<string>("30");
    const [message, setMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
     const offerAmount = parseFloat(amount);
+    
+    if (!item) return;
+
     if (isNaN(offerAmount) || offerAmount <= 0) {
+      setAmountError(true);
       toast.error("Por favor, insira um valor válido para a proposta.");
       return;
     }
 
-    if (!item) return;
+    setAmountError(false);
+
+    if (item.price > 0 && offerAmount < item.price * 0.1) {
+      toast.error("Valor da proposta muito baixo em relação ao valor de referência.");
+      return;
+    }
+
+    if (message.length > 500) {
+      toast.error("A observação é muito longa (máximo 500 caracteres).");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -119,8 +134,11 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
                 type="number"
                 placeholder="0,00" 
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="h-12 pl-10 bg-white/5 border-white/10 text-xl font-bold text-white focus:ring-gold"
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (amountError) setAmountError(false);
+                }}
+                className={`h-12 pl-10 bg-white/5 border-white/10 text-xl font-bold text-white focus:ring-gold ${amountError ? 'border-red-500 ring-1 ring-red-500' : ''}`}
               />
             </div>
             
@@ -168,7 +186,12 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
           </div>
           
           <div className="grid gap-2">
-            <Label htmlFor="offer_message" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Observações (Opcional)</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="offer_message" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Observações (Opcional)</Label>
+              <span className={`text-[9px] ${message.length > 500 ? 'text-red-500' : 'text-white/40'}`}>
+                {message.length}/500
+              </span>
+            </div>
             <Textarea 
               id="offer_message"
               className="flex min-h-[80px] bg-white/5 border-white/10 text-white placeholder:text-white/20 text-sm"
