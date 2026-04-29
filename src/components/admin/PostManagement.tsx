@@ -269,51 +269,51 @@ import { generateSlug, validateSlug } from "@/utils/slug";
             </Select>
           </div>
          </div>
-         <Dialog open={isDialogOpen} onOpenChange={(open) => {
-           setIsDialogOpen(open);
-           if (!open) resetForm();
-         }}>
-           <DialogTrigger asChild>
-           <div className="flex gap-2">
-             <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
-               <DialogTrigger asChild>
-                 <Button variant="outline" className="border-gold text-gold hover:bg-gold/10">
-                   <Sparkles className="mr-2 h-4 w-4" /> Gerar com IA
-                 </Button>
-               </DialogTrigger>
-               <DialogContent>
-                 <DialogHeader>
-                   <DialogTitle>Gerar Artigo com IA</DialogTitle>
-                   <DialogDescription>
-                     Descreva o tema ou envie um fato e nossa IA criará um rascunho completo.
-                   </DialogDescription>
-                 </DialogHeader>
-                 <div className="py-4 space-y-4">
-                   <Label>O que você quer escrever?</Label>
-                   <Textarea 
-                     placeholder="Ex: Resultados do Leilão de Touros Nelore em Uberaba, destacando recorde de preços..."
-                     value={aiPrompt}
-                     onChange={(e) => setAiPrompt(e.target.value)}
-                     className="min-h-[100px]"
-                   />
-                 </div>
-                 <DialogFooter>
-                   <Button 
-                     className="bg-gold text-emerald-deep w-full" 
-                     onClick={handleGenerateAi}
-                     disabled={isGenerating}
-                   >
-                     {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     Gerar Rascunho para Aprovação
-                   </Button>
-                 </DialogFooter>
-               </DialogContent>
-             </Dialog>
+          <div className="flex gap-2">
+            <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="border-gold text-gold hover:bg-gold/10">
+                  <Sparkles className="mr-2 h-4 w-4" /> Gerar com IA
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Gerar Artigo com IA</DialogTitle>
+                  <DialogDescription>
+                    Descreva o tema ou envie um fato e nossa IA criará um rascunho completo.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 space-y-4">
+                  <Label>O que você quer escrever?</Label>
+                  <Textarea 
+                    placeholder="Ex: Resultados do Leilão de Touros Nelore em Uberaba, destacando recorde de preços..."
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button 
+                    className="bg-gold text-emerald-deep w-full" 
+                    onClick={handleGenerateAi}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Gerar Rascunho para Aprovação
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
-             <Button className="bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => { resetForm(); setIsDialogOpen(true); }}>
-               <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
-             </Button>
-           </div>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) resetForm();
+            }}>
+              <DialogTrigger asChild>
+                <Button className="bg-gold hover:bg-gold/90 text-emerald-deep">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Nova Notícia
+                </Button>
+              </DialogTrigger>
            </DialogTrigger>
              <DialogContent className={`${isFullScreen ? "sm:max-w-[95vw] h-[95vh]" : "sm:max-w-[700px] max-h-[90vh]"} overflow-y-auto transition-all duration-300`}>
              <DialogHeader>
