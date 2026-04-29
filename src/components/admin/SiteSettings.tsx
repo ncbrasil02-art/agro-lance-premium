@@ -32,7 +32,7 @@
    );
  }
  
-  export function SiteSettings() {
+ export function SiteSettings({ initialTab = "geral" }: { initialTab?: string }) {
     const [isLoading, setIsLoading] = useState(true);
     const [seoSettings, setSeoSettings] = useState({
       global_title_suffix: " | Premium Agro Leilões",
@@ -285,8 +285,8 @@
       await handleSave("saved_palettes", newPalettes);
     };
 
-   return (
-     <Tabs defaultValue="geral" className="space-y-6">
+    return (
+      <Tabs defaultValue={initialTab} className="space-y-6">
        <TabsList className="bg-muted/50 p-1">
          <TabsTrigger value="geral" className="gap-2">
            <Info className="h-4 w-4" /> Geral
