@@ -369,11 +369,16 @@
                            </div>
                          </TableCell>
                          <TableCell>{post.category?.name || "Sem categoria"}</TableCell>
-                         <TableCell>
-                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${post.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
-                             {post.status === 'published' ? 'Publicado' : 'Rascunho'}
-                           </span>
-                         </TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                              post.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 
+                              post.status === 'pending_review' ? 'bg-amber-100 text-amber-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {post.status === 'published' ? 'Publicado' : 
+                               post.status === 'pending_review' ? 'Pendente' : 'Rascunho'}
+                            </span>
+                          </TableCell>
                          <TableCell className="text-muted-foreground text-xs">
                            {new Date(post.created_at).toLocaleDateString('pt-BR')}
                          </TableCell>
