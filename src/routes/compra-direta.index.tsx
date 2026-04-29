@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { OfferDialog } from "@/components/auctions/OfferDialog";
 
  export const Route = createFileRoute("/compra-direta/")({
    head: ({ matches }) => {
@@ -54,10 +55,7 @@ function DirectSalePage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isOfferDialogOpen, setIsCheckoutOfferOpen] = useState(false);
-  const [offerAmount, setOfferAmount] = useState("");
-  const [offerMessage, setOfferMessage] = useState("");
-  const [isSubmittingOffer, setIsSubmittingOffer] = useState(false);
+  const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
   
   const [buyerInfo, setBuyerInfo] = useState({
     name: "",
@@ -80,47 +78,6 @@ function DirectSalePage() {
     setIsCheckoutOpen(true);
   };
 
-  const handleMakeOffer = (animal: any) => {
-    setSelectedAnimal(animal);
-    setOfferAmount((animal.sale_price * 0.9).toString()); // Default suggest 90%
-    setIsCheckoutOfferOpen(true);
-  };
-
-  const submitOffer = async () => {
-    const amount = parseFloat(offerAmount);
-    if (isNaN(amount) || amount <= 0) {
-      toast.error("Por favor, insira um valor válido para a proposta.");
-      return;
-    }
-
-    setIsSubmittingOffer(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error("Você precisa estar logado para enviar uma proposta.");
-        return;
-      }
-
-      const { error } = await supabase.from("offers").insert({
-        animal_id: selectedAnimal.id,
-        user_id: user.id,
-        amount: amount,
-        description: offerMessage || `Proposta de compra direta para o animal ${selectedAnimal.name}`,
-        status: "pending"
-      });
-
-      if (error) throw error;
-
-      toast.success("Proposta enviada com sucesso! O vendedor será notificado.");
-      setIsCheckoutOfferOpen(false);
-      setOfferMessage("");
-    } catch (error: any) {
-      toast.error("Erro ao enviar proposta: " + error.message);
-    } finally {
-      setIsSubmittingOffer(false);
-    }
-  };
 
   const confirmPurchase = async () => {
     if (!buyerInfo.name || !buyerInfo.email || !buyerInfo.phone) {
