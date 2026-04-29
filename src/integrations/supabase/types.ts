@@ -1223,6 +1223,8 @@ export type Database = {
           error_count: number | null
           healthy_count: number | null
           id: string
+          processed_items: number | null
+          progress_message: string | null
           status: string
           total_items: number | null
           warning_count: number | null
@@ -1232,6 +1234,8 @@ export type Database = {
           error_count?: number | null
           healthy_count?: number | null
           id?: string
+          processed_items?: number | null
+          progress_message?: string | null
           status?: string
           total_items?: number | null
           warning_count?: number | null
@@ -1241,6 +1245,8 @@ export type Database = {
           error_count?: number | null
           healthy_count?: number | null
           id?: string
+          processed_items?: number | null
+          progress_message?: string | null
           status?: string
           total_items?: number | null
           warning_count?: number | null
