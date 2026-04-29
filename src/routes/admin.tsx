@@ -1,20 +1,5 @@
- 
- export const Route = createFileRoute("/admin")({
-   component: AdminLayout,
- });
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
- import { 
-   Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
-   LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, 
-   ClipboardList, ShoppingCart, ShieldCheck, Newspaper 
- } from "lucide-react";
- import { supabase } from "@/integrations/supabase/client";
- import { toast } from "sonner";
- import { useAuth } from "@/components/auth/auth-provider";
- import { Button } from "@/components/ui/button";
- import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
- import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  import { SiteSettings } from "@/components/admin/SiteSettings";
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
@@ -27,24 +12,39 @@
  import { BidSecurityAudit } from "@/components/admin/BidSecurityAudit";
  import { PostManagement } from "@/components/admin/PostManagement";
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
+ import { 
+   Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
+   LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, 
+   ClipboardList, ShoppingCart, ShieldCheck, Newspaper 
+ } from "lucide-react";
+ import { supabase } from "@/integrations/supabase/client";
+ import { toast } from "sonner";
+ import { useAuth } from "@/components/auth/auth-provider";
+ import { Button } from "@/components/ui/button";
+ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "users" | "security" | "settings" | "posts";
  
-  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
-    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
-    { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
-    { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
-    { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
-    { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
-    { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
-    { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
-    { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
-    { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
-    { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
-    { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
-    { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
-    { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
-  ];
+ const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
+   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+   { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
+   { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
+   { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
+   { id: "animals", label: "Animais", icon: <Package className="mr-2 h-4 w-4" /> },
+   { id: "categories", label: "Categorias", icon: <Tag className="mr-2 h-4 w-4" /> },
+   { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
+   { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
+   { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
+   { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
+   { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
+   { id: "security", label: "Segurança", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
+   { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
+ ];
+ 
+ export const Route = createFileRoute("/admin")({
+   component: AdminLayout,
+ });
  
  interface SidebarProps {
    activeTab: AdminTab;
@@ -94,6 +94,7 @@
   }
 
   function AdminLayout() {
+     const [isMounted, setIsMounted] = useState(false);
      const { profile, isLoading: authLoading, signOut } = useAuth();
      const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
      const [selectedEventId, setSelectedEventId] = useState<string>("all");
@@ -127,18 +128,19 @@
       }
     };
  
-     useEffect(() => {
-       if (activeTab === "dashboard") {
-         fetchStats();
-       }
-     }, [activeTab]);
+      useEffect(() => {
+        setIsMounted(true);
+        if (activeTab === "dashboard") {
+          fetchStats();
+        }
+      }, [activeTab]);
 
    const handleManageLots = (eventId: string) => {
      setSelectedEventId(eventId);
      setActiveTab("lots");
    };
 
-   if (authLoading) {
+    if (!isMounted || authLoading) {
     return (
       <div className="flex min-h-screen bg-muted/30 flex-col md:flex-row animate-in fade-in duration-500">
         <aside className="w-64 border-r bg-card p-6 hidden md:block">
