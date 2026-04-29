@@ -14,42 +14,51 @@ serve(async (req) => {
   const title = url.searchParams.get('title') || 'Premium Agro Leilões'
   const subtitle = url.searchParams.get('subtitle') || ''
   const imageUrl = url.searchParams.get('imageUrl') || ''
-  const type = url.searchParams.get('type') || 'website'
+  
+  // Clean up title and subtitle for SVG
+  const cleanTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const cleanSubtitle = subtitle.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const svg = `
     <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background -->
+      <defs>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&amp;display=swap');
+          .title { font-family: 'Inter', sans-serif; font-size: 72px; font-weight: 700; fill: white; }
+          .brand { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; fill: #D4AF37; letter-spacing: 4px; }
+          .subtitle { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; fill: #022C22; }
+        </style>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(2,44,34,0.3);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgba(2,44,34,0.95);stop-opacity:1" />
+        </linearGradient>
+      </defs>
+
+      <!-- Background Color -->
       <rect width="1200" height="630" fill="#022C22" />
       
+      <!-- Background Image -->
       ${imageUrl ? `
-        <image href="${imageUrl}" x="0" y="0" width="1200" height="630" preserveAspectRatio="xMidYMid slice" opacity="0.6" />
+        <image href="${imageUrl}" x="0" y="0" width="1200" height="630" preserveAspectRatio="xMidYMid slice" />
       ` : ''}
       
       <!-- Gradient Overlay -->
-      <defs>
-        <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:rgba(2,44,34,0.4);stop-opacity:1" />
-          <stop offset="100%" style="stop-color:rgba(2,44,34,0.9);stop-opacity:1" />
-        </linearGradient>
-      </defs>
       <rect width="1200" height="630" fill="url(#grad1)" />
 
-      <!-- Branding -->
-      <text x="60" y="80" font-family="sans-serif" font-size="24" font-weight="bold" fill="#D4AF37" letter-spacing="2">PREMIUM AGRO LEILÕES</text>
+      <!-- Content -->
+      <text x="80" y="100" class="brand">PREMIUM AGRO LEILÕES</text>
       
-      <!-- Title -->
-      <text x="60" y="350" font-family="sans-serif" font-size="72" font-weight="bold" fill="white">
-        ${title.length > 40 ? title.substring(0, 37) + '...' : title}
+      <text x="80" y="380" class="title">
+        ${cleanTitle.length > 35 ? cleanTitle.substring(0, 32) + '...' : cleanTitle}
       </text>
       
-      <!-- Subtitle/Category -->
-      ${subtitle ? `
-        <rect x="60" y="380" width="${subtitle.length * 15}" height="40" rx="10" fill="#D4AF37" />
-        <text x="75" y="408" font-family="sans-serif" font-size="24" font-weight="bold" fill="#022C22">${subtitle.toUpperCase()}</text>
+      ${cleanSubtitle ? `
+        <rect x="80" y="415" width="${cleanSubtitle.length * 20 + 40}" height="50" rx="12" fill="#D4AF37" />
+        <text x="100" y="450" class="subtitle">${cleanSubtitle.toUpperCase()}</text>
       ` : ''}
       
-      <!-- Footer -->
-      <rect x="0" y="620" width="1200" height="10" fill="#D4AF37" />
+      <!-- Decorative element -->
+      <rect x="80" y="120" width="100" height="4" fill="#D4AF37" />
     </svg>
   `
 
