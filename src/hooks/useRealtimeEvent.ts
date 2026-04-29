@@ -5,7 +5,7 @@ import { logger } from '@/utils/logger';
 
 type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'JOINING' | 'INITIAL';
 
-export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
+ export function useRealtimeEvent(eventId: string, onUpdate: () => void, onManualUpdate?: () => void) {
   const [status, setStatus] = useState<ChannelStatus>('INITIAL');
   const [retryCount, setRetryCount] = useState(0);
 
@@ -27,6 +27,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
          (payload) => {
            logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
            onUpdate();
+           onManualUpdate?.();
          }
       )
       .on(
@@ -40,6 +41,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
          (payload) => {
            logger.info('Mudança detectada nos dados do evento', { eventId, payload });
            onUpdate();
+           onManualUpdate?.();
          }
       )
       .subscribe((newStatus) => {
@@ -97,7 +99,7 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
     return { ...fallback };
  }
  
- export function useHomeRealtime(onUpdate: () => void) {
+   export function useHomeRealtime(onUpdate: () => void, onManualUpdate?: () => void) {
    const [status, setStatus] = useState<ChannelStatus>('INITIAL');
    const [retryCount, setRetryCount] = useState(0);
  
@@ -108,11 +110,13 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
        .channel(channelId)
        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
          logger.info("Evento alterado, atualizando via realtime...");
-         onUpdate();
+          onUpdate();
+          onManualUpdate?.();
        })
        .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
          logger.info("Lote alterado, atualizando via realtime...");
-         onUpdate();
+          onUpdate();
+          onManualUpdate?.();
        })
        .subscribe((newStatus) => {
          setStatus(newStatus);
