@@ -348,6 +348,30 @@ export type Database = {
           },
         ]
       }
+      db_errors: {
+        Row: {
+          created_at: string | null
+          error_context: string | null
+          error_message: string | null
+          function_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_context?: string | null
+          error_message?: string | null
+          function_name?: string | null
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          error_context?: string | null
+          error_message?: string | null
+          function_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       direct_sales: {
         Row: {
           animal_id: string
@@ -1201,6 +1225,14 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_approved: { Args: never; Returns: boolean }
+      log_db_error: {
+        Args: {
+          p_error_context: string
+          p_error_message: string
+          p_function_name: string
+        }
+        Returns: undefined
+      }
       place_bid: {
         Args: { p_amount: number; p_lot_id: string; p_user_id: string }
         Returns: Json
