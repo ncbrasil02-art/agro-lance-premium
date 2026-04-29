@@ -19,7 +19,10 @@
         image: post?.featured_image,
         type: 'article',
         seoSettings,
-        canonical: `/noticias/${post?.slug}`
+        canonical: `/noticias/${post?.slug}`,
+        ogTitle: post?.og_title,
+        ogDescription: post?.og_description,
+        ogImage: post?.og_image_url
       });
     },
     loader: async ({ params }: { params: any }) => {
