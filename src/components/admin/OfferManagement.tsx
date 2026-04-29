@@ -17,9 +17,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-   CheckCircle2, 
-   XCircle, 
-   Clock, 
+   CheckCircle2,
+   XCircle,
+   Clock,
+   AlertCircle,
    Search, 
    Package, 
    User, 
@@ -61,16 +62,35 @@ export function OfferManagement() {
     fetchOffers();
   }, []);
 
-  const handleUpdateStatus = async (id: string, status: 'approved' | 'rejected') => {
+   const handleUpdateStatus = async (offer: any, status: 'approved' | 'rejected' | 'under_review') => {
     try {
-      const { error } = await supabase
-        .from("offers")
-        .update({ status })
-        .eq("id", id);
+       const { error } = await supabase
+         .from("offers")
+         .update({ status })
+         .eq("id", offer.id);
 
       if (error) throw error;
-      
-      toast.success(`Proposta ${status === 'approved' ? 'aprovada' : 'rejeitada'} com sucesso!`);
+
+       // Create notification for the user
+       const statusLabel = status === 'approved' ? 'APROVADA' : status === 'rejected' ? 'REJEITADA' : 'EM ANÁLISE';
+       const title = `Sua proposta foi ${statusLabel.toLowerCase()}`;
+       const content = `A proposta de ${formatBRL(offer.amount)} para o animal ${offer.animal?.name} foi alterada para o status: ${statusLabel}.`;
+
+       await supabase.from("messages").insert({
+         recipient_id: offer.user_id,
+         title: title,
+         content: content,
+         is_read: false
+       });
+
+       await supabase.from("notifications").insert({
+         user_id: offer.user_id,
+         title: title,
+         message: content,
+         is_read: false
+       });
+
+       toast.success(`Proposta ${statusLabel.toLowerCase()} com sucesso! O usuário foi notificado.`);
       fetchOffers();
     } catch (error: any) {
       toast.error("Erro ao atualizar status: " + error.message);
@@ -99,8 +119,9 @@ export function OfferManagement() {
               <SelectContent>
                 <SelectItem value="all">Todas as Propostas</SelectItem>
                 <SelectItem value="pending">Pendentes</SelectItem>
-                <SelectItem value="approved">Aprovadas</SelectItem>
-                <SelectItem value="rejected">Rejeitadas</SelectItem>
+                 <SelectItem value="approved">Aprovadas</SelectItem>
+                 <SelectItem value="under_review">Em Análise</SelectItem>
+                 <SelectItem value="rejected">Rejeitadas</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -197,14 +218,17 @@ export function OfferManagement() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={
-                          offer.status === 'approved' ? 'default' : 
-                          offer.status === 'rejected' ? 'destructive' : 'secondary'
+                           offer.status === 'approved' ? 'default' :
+                           offer.status === 'rejected' ? 'destructive' :
+                           offer.status === 'under_review' ? 'outline' : 'secondary'
                         } className="flex w-fit items-center gap-1">
-                          {offer.status === 'approved' && <CheckCircle2 className="h-3 w-3" />}
-                          {offer.status === 'rejected' && <XCircle className="h-3 w-3" />}
-                          {offer.status === 'pending' && <Clock className="h-3 w-3" />}
-                          {offer.status === 'pending' ? 'Pendente' : 
-                           offer.status === 'approved' ? 'Aprovada' : 'Rejeitada'}
+                           {offer.status === 'approved' && <CheckCircle2 className="h-3 w-3" />}
+                           {offer.status === 'rejected' && <XCircle className="h-3 w-3" />}
+                           {offer.status === 'under_review' && <AlertCircle className="h-3 w-3" />}
+                           {offer.status === 'pending' && <Clock className="h-3 w-3" />}
+                           {offer.status === 'pending' ? 'Pendente' :
+                            offer.status === 'approved' ? 'Aprovada' :
+                            offer.status === 'under_review' ? 'Em Análise' : 'Rejeitada'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -214,18 +238,26 @@ export function OfferManagement() {
                               size="sm" 
                               variant="outline" 
                               className="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                              onClick={() => handleUpdateStatus(offer.id, 'approved')}
+                               onClick={() => handleUpdateStatus(offer, 'approved')}
                             >
                               Aprovar
                             </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="h-8 text-destructive hover:bg-destructive/5"
-                              onClick={() => handleUpdateStatus(offer.id, 'rejected')}
-                            >
-                              Rejeitar
-                            </Button>
+                             <Button
+                               size="sm"
+                               variant="outline"
+                               className="h-8 text-amber-600 border-amber-200 hover:bg-amber-50"
+                               onClick={() => handleUpdateStatus(offer, 'under_review')}
+                             >
+                               Analisar
+                             </Button>
+                             <Button
+                               size="sm"
+                               variant="outline"
+                               className="h-8 text-destructive hover:bg-destructive/5"
+                               onClick={() => handleUpdateStatus(offer, 'rejected')}
+                             >
+                               Rejeitar
+                             </Button>
                           </div>
                         )}
                       </TableCell>
