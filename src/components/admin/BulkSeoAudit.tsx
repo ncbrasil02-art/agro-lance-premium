@@ -305,14 +305,24 @@ export function BulkSeoAudit() {
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Para habilitar a auditoria recorrente, configure um <strong>Cron Job</strong> no Supabase para chamar a Edge Function <code>seo-audit</code> diariamente.
                 </p>
-                <Button 
-                  onClick={triggerServerAudit} 
-                  disabled={isAuditing} 
-                  className="w-full bg-gold text-emerald-deep font-bold gap-2"
-                >
-                  {isAuditing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                  Rodar agora no Servidor
-                </Button>
+                {!isAuditing ? (
+                  <Button 
+                    onClick={triggerServerAudit} 
+                    className="w-full bg-gold text-emerald-deep font-bold gap-2"
+                  >
+                    <Play className="h-4 w-4" />
+                    Rodar agora no Servidor
+                  </Button>
+                ) : (
+                  <div className="space-y-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="flex justify-between items-center text-[10px] font-bold uppercase text-emerald-600">
+                      <span>{activeAudit?.progress_message || 'Processando...'}</span>
+                      <span>{activeAudit?.total_items ? Math.round((activeAudit.processed_items / activeAudit.total_items) * 100) : 0}%</span>
+                    </div>
+                    <Progress value={activeAudit?.total_items ? (activeAudit.processed_items / activeAudit.total_items) * 100 : 0} className="h-1.5" />
+                    <p className="text-[9px] text-muted-foreground italic text-center">Não feche esta aba para acompanhar em tempo real.</p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">
