@@ -36,13 +36,19 @@
     footer_text: string;
   }
  
-   export function useSiteSettings(initialData?: { siteInfo?: SiteInfo | null, theme?: ThemeSettings | null, homepage?: HomepageSettings | null, customTexts?: CustomTexts | null, aboutPage?: AboutPageSettings | null }) {
-     const [aboutPage, setAboutPage] = useState<AboutPageSettings | null>(null);
-     const [customTexts, setCustomTexts] = useState<CustomTexts | null>(null);
-    const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(null);
-    const [theme, setTheme] = useState<ThemeSettings | null>(null);
-    const [homepage, setHomepage] = useState<HomepageSettings | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    export function useSiteSettings(initialData?: { 
+      siteInfo?: SiteInfo | null, 
+      theme?: ThemeSettings | null, 
+      homepage?: HomepageSettings | null, 
+      customTexts?: CustomTexts | null, 
+      aboutPage?: AboutPageSettings | null 
+    }) {
+      const [aboutPage, setAboutPage] = useState<AboutPageSettings | null>(initialData?.aboutPage || null);
+      const [customTexts, setCustomTexts] = useState<CustomTexts | null>(initialData?.customTexts || null);
+      const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(initialData?.siteInfo || null);
+      const [theme, setTheme] = useState<ThemeSettings | null>(initialData?.theme || null);
+      const [homepage, setHomepage] = useState<HomepageSettings | null>(initialData?.homepage || null);
+      const [isLoading, setIsLoading] = useState(!initialData);
 
     // Sync with initialData changes
     useEffect(() => {

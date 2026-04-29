@@ -308,84 +308,78 @@ function LotDetail() {
   const [isOfferLoading, setIsOfferLoading] = useState(false);
   const [offerData, setOfferData] = useState({ amount: "", description: "" });
 
+  // Real-time synchronization with fallback polling
   useEffect(() => {
-    const lotChannel = supabase
-      .channel(`lot-${lot.id}`)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lots", filter: "id=eq." + lot.id }, (p) => setLot((prev:any) => ({...prev, ...p.new})))
-      .subscribe();
+    const lotId = lot.id;
+    let lastBidId = initialBids[0]?.id;
+    let status: 'SUBSCRIBED' | 'INITIAL' | 'ERROR' = 'INITIAL';
 
-    const bidsChannel = supabase
-      .channel(`bids-${lot.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "bids", filter: "lot_id=eq." + lot.id }, (p: any) => {
-        console.log("Bid change detected on lot details:", p.eventType, p.new);
-        
-        if (p.eventType === "DELETE") {
-          setRecentBids(prev => prev.filter(b => b.id !== p.old.id));
-          return;
-        }
-        
-        const updatedBid = p.new;
-        if (!updatedBid || !updatedBid.id) return;
-        
+    const lotChannel = supabase
+      .channel(`lot-dt-${lotId}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lotId}` }, (p) => {
+        setLot((prev: any) => ({ ...prev, ...p.new }));
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids", filter: `lot_id=eq.${lotId}` }, (p) => {
+        const newBid = p.new;
+        if (!newBid || newBid.id === lastBidId) return;
+        lastBidId = newBid.id;
+
         setRecentBids(prev => {
-          const exists = prev.some(b => b.id === updatedBid.id);
-          let newBids;
-          if (exists) {
-            newBids = prev.map(b => b.id === updatedBid.id ? { ...b, ...updatedBid } : b);
-          } else {
-            newBids = [updatedBid, ...prev];
-            
-            // Notify of new bid if we are on the page
-            toast.info(`Novo lance: ${formatBRL(updatedBid.amount)}`, {
-              description: updatedBid.bidder_name || "Licitante",
-              icon: <Gavel className="h-4 w-4 text-gold" />,
-              duration: 3000
-            });
-          }
-          return newBids
-            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .slice(0, 10);
+          if (prev.some(b => b.id === newBid.id)) return prev;
+          const updated = [newBid, ...prev].slice(0, 10);
+          
+          toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
+            description: newBid.bidder_name || "Licitante",
+            icon: <Gavel className="h-4 w-4 text-gold" />,
+            duration: 3000
+          });
+          
+          return updated;
         });
 
-        // Also update the lot current price in local state if the bid is higher
         setLot((prev: any) => {
-          if (updatedBid.amount > (prev.current_price || 0)) {
-            return { ...prev, current_price: updatedBid.amount };
+          if (newBid.amount > (prev.current_price || 0)) {
+            return { ...prev, current_price: newBid.amount };
           }
           return prev;
         });
       })
-      .subscribe();
+      .subscribe((newStatus) => {
+        status = newStatus === 'SUBSCRIBED' ? 'SUBSCRIBED' : 'ERROR';
+      });
 
-     if (user) {
-       supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lot.id).maybeSingle().then(r => setIsFavorite(!!r.data));
-     }
+    const pollInterval = setInterval(async () => {
+      if (status === 'SUBSCRIBED') return;
+      
+      const { data: latestLot } = await supabase.from("lots").select("*").eq("id", lotId).single();
+      if (latestLot) setLot((prev: any) => ({ ...prev, ...latestLot }));
 
-     // Increment viewers count
-     if (!viewIncremented) {
-       const incrementViewers = async () => {
-         try {
-           // @ts-ignore - The RPC might not be in the types yet
-           const { error } = await supabase.rpc('increment_lot_viewers', { p_lot_id: lot.id });
-           if (error) {
-             console.error("Error incrementing viewers:", error);
-             // Fallback to manual update if RPC fails
-             await supabase
-               .from('lots')
-               .update({ viewers: (lot.viewers || 0) + 1 })
-               .eq('id', lot.id);
-           }
-           setViewIncremented(true);
-         } catch (e) {
-           console.error("Failed to increment viewers:", e);
-         }
-       };
-       incrementViewers();
-     }
+      const { data: latestBids } = await supabase
+        .from("bids")
+        .select("*")
+        .eq("lot_id", lotId)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      
+      if (latestBids) setRecentBids(latestBids);
+    }, 30000);
 
-    return () => { 
-      supabase.removeChannel(lotChannel); 
-      supabase.removeChannel(bidsChannel);
+    if (user) {
+      supabase.from("followed_lots").select("id").eq("user_id", user.id).eq("lot_id", lotId).maybeSingle().then(r => setIsFavorite(!!r.data));
+    }
+    
+    if (!viewIncremented) {
+      supabase.rpc('increment_lot_viewers', { p_lot_id: lotId }).then(({ error }) => {
+        if (error) {
+          supabase.from('lots').update({ viewers: (lot.viewers || 0) + 1 }).eq('id', lotId);
+        }
+        setViewIncremented(true);
+      });
+    }
+
+    return () => {
+      supabase.removeChannel(lotChannel);
+      clearInterval(pollInterval);
     };
   }, [lot.id, user]);
 
