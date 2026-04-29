@@ -226,6 +226,7 @@ import { generateSlug } from "@/utils/slug";
          seller_name: "",
           regulation: "",
           viewers: 0,
+          slug: "",
           seo_title: "",
           seo_description: ""
         });
