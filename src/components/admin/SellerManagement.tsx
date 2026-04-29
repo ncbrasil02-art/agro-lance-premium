@@ -8,6 +8,7 @@ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Building2, User } fr
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
+import { generateSlug } from "@/utils/slug";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
@@ -76,15 +77,18 @@ export function SellerManagement() {
     }
 
     try {
+      const slug = generateSlug(formData.name);
+      const dataToSave = { ...formData, slug };
+      
       if (editingSeller) {
         const { error } = await supabase
           .from("sellers")
-          .update(formData)
+          .update(dataToSave)
           .eq("id", editingSeller.id);
         if (error) throw error;
         toast.success("Vendedor atualizado com sucesso");
       } else {
-        const { error } = await supabase.from("sellers").insert(formData);
+        const { error } = await supabase.from("sellers").insert(dataToSave);
         if (error) throw error;
         toast.success("Vendedor cadastrado com sucesso");
       }
