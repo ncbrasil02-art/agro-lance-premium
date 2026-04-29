@@ -47,6 +47,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
              supabase.from("events").select("*, lots!lots_event_id_fkey(id)").eq("status", "finished").order("start_date", { ascending: false }).limit(PAGE_LIMITS.HOME_PAST_EVENTS),
             supabase.from("site_settings").select("*").eq("key", "announcement").maybeSingle(),
              supabase.from("posts").select("*, category:categories(name)").eq("status", "published").order("published_at", { ascending: false }).limit(PAGE_LIMITS.HOME_ARTICLES),
+             supabase.from("animals").select("*, categories(name)").eq("is_direct_sale", true).eq("sale_status", "available").order("created_at", { ascending: false }).limit(4),
           ]);
 
           const getVal = (res: any) => res.status === 'fulfilled' ? res.value : { data: [] };
@@ -57,6 +58,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
             pastEvents: getVal(results[2]).data || [],
             announcement: getVal(results[3]).data?.value || null,
             articles: getVal(results[4]).data || [],
+            directSales: getVal(results[5]).data || [],
           };
        } catch (err) {
          console.error("Loader Home fatal error:", err);
@@ -66,6 +68,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
            pastEvents: [],
            announcement: null,
            articles: [],
+           directSales: [],
          };
        }
      },
@@ -76,7 +79,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 
   function Home() {
       const router = useRouter();
-       const { events, lots, pastEvents, announcement, articles } = Route.useLoaderData();
+       const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData();
         const context = Route.useRouteContext();
         const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
          const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts } = useSiteSettings({ 
