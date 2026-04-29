@@ -1540,9 +1540,11 @@ import { SocialPreview } from "./SocialPreview";
                        ))}
                      </TableBody>
                    </Table>
-                 </div>
-               )}
-             </div>
+                      </>
+                    );
+                  })()
+                )}
+              </div>
              <DialogFooter>
                <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
              </DialogFooter>
