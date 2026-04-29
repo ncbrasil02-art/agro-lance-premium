@@ -30,6 +30,9 @@ import { generateSlug, validateSlug } from "@/utils/slug";
       slug: "",
       seo_title: "",
       seo_description: "",
+      og_title: "",
+      og_description: "",
+      og_image_url: "",
       author_name: "",
       read_time: ""
     });
@@ -75,6 +78,9 @@ import { generateSlug, validateSlug } from "@/utils/slug";
         slug: "",
         seo_title: "",
         seo_description: "",
+        og_title: "",
+        og_description: "",
+        og_image_url: "",
         author_name: "",
         read_time: ""
       });
@@ -92,6 +98,9 @@ import { generateSlug, validateSlug } from "@/utils/slug";
         slug: post.slug || "",
         seo_title: post.seo_title || "",
         seo_description: post.seo_description || "",
+        og_title: post.og_title || "",
+        og_description: post.og_description || "",
+        og_image_url: post.og_image_url || "",
         author_name: post.author_name || "",
         read_time: post.read_time || ""
       });
