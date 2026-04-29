@@ -269,9 +269,10 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                  />
                </div>
                 <Tabs defaultValue="editor" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
+                   <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="editor">Conteúdo</TabsTrigger>
                     <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
+                    <TabsTrigger value="social">Social / OG</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
                   <TabsContent value="editor" className="space-y-4 pt-4">
@@ -345,28 +346,59 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                       />
                     </div>
 
-                    <div className="pt-4 border-t grid md:grid-cols-2 gap-6">
-                      <div className="space-y-6">
-                        <SeoAnalysis 
-                          title={formData.seo_title || formData.title}
-                          description={formData.seo_description || formData.excerpt}
-                          content={formData.content}
-                          image={formData.featured_image}
-                        />
-                        <SerpPreview 
-                          title={formData.seo_title || formData.title}
-                          description={formData.seo_description || formData.excerpt}
-                          slug={formData.slug}
-                          basePath="/noticias"
+                     <div className="pt-4 border-t">
+                       <SeoAnalysis 
+                         title={formData.seo_title || formData.title}
+                         description={formData.seo_description || formData.excerpt}
+                         content={formData.content}
+                         image={formData.featured_image}
+                       />
+                       <div className="mt-6">
+                         <SerpPreview 
+                           title={formData.seo_title || formData.title}
+                           description={formData.seo_description || formData.excerpt}
+                           slug={formData.slug}
+                           basePath="/noticias"
+                         />
+                       </div>
+                     </div>
+                  </TabsContent>
+                  <TabsContent value="social" className="space-y-4 pt-4">
+                    <div className="grid gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="og_title">Título Open Graph (Opcional)</Label>
+                        <Input 
+                          id="og_title"
+                          value={formData.og_title} 
+                          onChange={(e) => setFormData({ ...formData, og_title: e.target.value })} 
+                          placeholder="Override do título para redes sociais"
                         />
                       </div>
-                      <div className="space-y-6">
-                        <SocialPreview 
-                          title={formData.seo_title || formData.title}
-                          description={formData.seo_description || formData.excerpt}
-                          image={formData.featured_image}
+                      <div className="grid gap-2">
+                        <Label htmlFor="og_description">Descrição Open Graph (Opcional)</Label>
+                        <Textarea 
+                          id="og_description"
+                          value={formData.og_description} 
+                          onChange={(e) => setFormData({ ...formData, og_description: e.target.value })} 
+                          placeholder="Override da descrição para redes sociais"
                         />
                       </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="og_image_url">Imagem Open Graph (Opcional)</Label>
+                        <Input 
+                          id="og_image_url"
+                          value={formData.og_image_url} 
+                          onChange={(e) => setFormData({ ...formData, og_image_url: e.target.value })} 
+                          placeholder="URL da imagem específica para compartilhamento"
+                        />
+                      </div>
+                    </div>
+                    <div className="pt-4 border-t">
+                      <SocialPreview 
+                        title={formData.og_title || formData.seo_title || formData.title}
+                        description={formData.og_description || formData.seo_description || formData.excerpt}
+                        image={formData.og_image_url || formData.featured_image}
+                      />
                     </div>
                   </TabsContent>
                   <TabsContent value="preview" className="pt-4">
