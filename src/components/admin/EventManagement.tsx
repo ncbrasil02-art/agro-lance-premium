@@ -22,8 +22,10 @@ import { SerpPreview } from "./SerpPreview";
 import { SeoAnalysis } from "./SeoAnalysis";
 import { RichResultsPreview } from "./RichResultsPreview";
 import { SocialPreview } from "./SocialPreview";
+import { useAuth } from "@/components/auth/auth-provider";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
+    const { profile: adminProfile } = useAuth();
     const [events, setEvents] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -47,11 +49,10 @@ import { SocialPreview } from "./SocialPreview";
    const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
    const [showBalanceReport, setShowBalanceReport] = useState(false);
 
-    const logAuditAction = async (action: string, entityId: string, details: any) => {
+    const logAuditAction = useCallback(async (action: string, entityId: string, details: any) => {
       try {
-        const { profile } = await supabase.auth.getUser();
         await supabase.from("audit_logs").insert({
-          user_id: profile?.id,
+          user_id: adminProfile?.id,
           action: action,
           entity_type: "event",
           entity_id: entityId,
@@ -60,7 +61,7 @@ import { SocialPreview } from "./SocialPreview";
       } catch (e) {
         console.error("Erro ao registrar auditoria:", e);
       }
-    };
+    }, [adminProfile?.id]);
 
    const handleAutoFix = async () => {
      if (!formData.name) {
