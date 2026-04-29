@@ -28,6 +28,7 @@ import { SocialPreview } from "./SocialPreview";
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isAiFixing, setIsAiFixing] = useState(false);
    const [statusFilter, setStatusFilter] = useState("all");
    const [pendingWinnerLots, setPendingWinnerLots] = useState<any[]>([]);
    const [isPendingLoading, setIsPendingLoading] = useState(false);
@@ -44,6 +45,32 @@ import { SocialPreview } from "./SocialPreview";
   const [searchWinnerQuery, setSearchWinnerQuery] = useState("");
   const [isAssigningWinner, setIsAssigningWinner] = useState(false);
   const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+
+   const handleAutoFix = async () => {
+     if (!formData.name) {
+       toast.error("Preencha ao menos o nome para usar a IA");
+       return;
+     }
+     setIsAiFixing(true);
+     try {
+       const { data: aiFix, error: aiError } = await supabase.functions.invoke('seo-fixer', {
+         body: { type: 'Evento', title: formData.name, content: formData.description }
+       });
+       if (aiError) throw aiError;
+       setFormData({
+         ...formData,
+         seo_title: aiFix.seo_title,
+         seo_description: aiFix.seo_description,
+         og_title: aiFix.og_title,
+         og_description: aiFix.og_description
+       });
+       toast.success("SEO otimizado com IA!");
+     } catch (error: any) {
+       toast.error("Erro ao otimizar: " + error.message);
+     } finally {
+       setIsAiFixing(false);
+     }
+   };
 
   const fetchLotBids = async (lotId: string) => {
     setIsBidsLoading(true);
