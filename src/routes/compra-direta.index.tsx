@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { OfferDialog } from "@/components/auctions/OfferDialog";
 
  export const Route = createFileRoute("/compra-direta/")({
    head: ({ matches }) => {
@@ -54,10 +55,7 @@ function DirectSalePage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isOfferDialogOpen, setIsCheckoutOfferOpen] = useState(false);
-  const [offerAmount, setOfferAmount] = useState("");
-  const [offerMessage, setOfferMessage] = useState("");
-  const [isSubmittingOffer, setIsSubmittingOffer] = useState(false);
+  const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
   
   const [buyerInfo, setBuyerInfo] = useState({
     name: "",
@@ -80,47 +78,6 @@ function DirectSalePage() {
     setIsCheckoutOpen(true);
   };
 
-  const handleMakeOffer = (animal: any) => {
-    setSelectedAnimal(animal);
-    setOfferAmount((animal.sale_price * 0.9).toString()); // Default suggest 90%
-    setIsCheckoutOfferOpen(true);
-  };
-
-  const submitOffer = async () => {
-    const amount = parseFloat(offerAmount);
-    if (isNaN(amount) || amount <= 0) {
-      toast.error("Por favor, insira um valor válido para a proposta.");
-      return;
-    }
-
-    setIsSubmittingOffer(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error("Você precisa estar logado para enviar uma proposta.");
-        return;
-      }
-
-      const { error } = await supabase.from("offers").insert({
-        animal_id: selectedAnimal.id,
-        user_id: user.id,
-        amount: amount,
-        description: offerMessage || `Proposta de compra direta para o animal ${selectedAnimal.name}`,
-        status: "pending"
-      });
-
-      if (error) throw error;
-
-      toast.success("Proposta enviada com sucesso! O vendedor será notificado.");
-      setIsCheckoutOfferOpen(false);
-      setOfferMessage("");
-    } catch (error: any) {
-      toast.error("Erro ao enviar proposta: " + error.message);
-    } finally {
-      setIsSubmittingOffer(false);
-    }
-  };
 
   const confirmPurchase = async () => {
     if (!buyerInfo.name || !buyerInfo.email || !buyerInfo.phone) {
@@ -263,14 +220,19 @@ function DirectSalePage() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    variant="outline"
-                    className="border-gold text-gold hover:bg-gold hover:text-emerald-deep font-bold h-12 rounded-xl disabled:opacity-50"
-                    onClick={() => handleMakeOffer(animal)}
-                    disabled={animal.sale_status !== 'available'}
-                  >
-                    Fazer Oferta
-                  </Button>
+                 {animal.accepts_offers && (
+                   <Button 
+                     variant="outline"
+                     className="border-gold text-gold hover:bg-gold hover:text-emerald-deep font-bold h-12 rounded-xl disabled:opacity-50"
+                     onClick={() => {
+                       setSelectedAnimal(animal);
+                       setIsOfferDialogOpen(true);
+                     }}
+                     disabled={animal.sale_status !== 'available'}
+                   >
+                     Fazer Oferta
+                   </Button>
+                 )}
                   <Button 
                     className="bg-gold-gradient text-emerald-deep font-bold h-12 rounded-xl shadow-gold hover:opacity-90 disabled:opacity-50 disabled:grayscale"
                     onClick={() => handlePurchase(animal)}
@@ -286,58 +248,16 @@ function DirectSalePage() {
         )}
       </div>
 
-      <Dialog open={isOfferDialogOpen} onOpenChange={setIsCheckoutOfferOpen}>
-        <DialogContent className="sm:max-w-[450px] rounded-3xl border-gold/20">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <DollarSign className="h-6 w-6 text-gold" />
-              Enviar Proposta
-            </DialogTitle>
-            <DialogDescription>
-              Faça uma oferta de valor para o animal <strong>{selectedAnimal?.name}</strong>.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="offer_amount">Valor da Oferta (R$)</Label>
-              <Input 
-                id="offer_amount" 
-                type="number"
-                placeholder="0,00" 
-                value={offerAmount}
-                onChange={(e) => setOfferAmount(e.target.value)}
-                className="text-xl font-bold text-emerald-deep"
-              />
-              <p className="text-[10px] text-muted-foreground italic">
-                Preço sugerido: {selectedAnimal && new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedAnimal.sale_price)}
-              </p>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="offer_message">Mensagem Adicional (Opcional)</Label>
-              <textarea 
-                id="offer_message"
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Condições de pagamento, frete, etc..."
-                value={offerMessage}
-                onChange={(e) => setOfferMessage(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter className="sm:justify-between items-center gap-4">
-            <Button variant="ghost" onClick={() => setIsCheckoutOfferOpen(false)}>Cancelar</Button>
-            <Button 
-              className="bg-gold text-emerald-deep font-bold px-8 rounded-xl shadow-gold h-12"
-              onClick={submitOffer}
-              disabled={isSubmittingOffer}
-            >
-              {isSubmittingOffer ? "Enviando..." : "Enviar Proposta"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <OfferDialog 
+        isOpen={isOfferDialogOpen} 
+        onOpenChange={setIsOfferDialogOpen} 
+        item={selectedAnimal ? {
+          id: selectedAnimal.id,
+          name: selectedAnimal.name,
+          price: selectedAnimal.sale_price,
+          type: 'animal'
+        } : null}
+      />
 
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
         <DialogContent className="sm:max-w-[500px] rounded-3xl border-gold/20 shadow-2xl shadow-gold/10">

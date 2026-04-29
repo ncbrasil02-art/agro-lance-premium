@@ -28,6 +28,7 @@ import { toast } from "sonner";
  import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OfferDialog } from "@/components/auctions/OfferDialog";
 import {
   Dialog,
   DialogContent,
@@ -321,8 +322,6 @@ function LotDetail() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
-  const [isOfferLoading, setIsOfferLoading] = useState(false);
-  const [offerData, setOfferData] = useState({ amount: "", description: "" });
 
    const [rtStatus, setRtStatus] = useState<string>("INITIAL");
  
@@ -441,29 +440,6 @@ function LotDetail() {
     }
   };
 
-  const handleSendOffer = async () => {
-    if (!user) { toast.error("Faça login para enviar uma proposta."); return; }
-    if (!offerData.amount) { toast.error("Informe o valor da proposta."); return; }
-    
-    setIsOfferLoading(true);
-    try {
-      const { error } = await supabase.from("offers").insert({
-        lot_id: lot.id,
-        user_id: user.id,
-        amount: parseFloat(offerData.amount),
-        description: offerData.description
-      });
-
-      if (error) throw error;
-      toast.success("Proposta enviada com sucesso! O vendedor entrará em contato.");
-      setIsOfferDialogOpen(false);
-      setOfferData({ amount: "", description: "" });
-    } catch (e: any) {
-      toast.error("Erro ao enviar proposta: " + e.message);
-    } finally {
-      setIsOfferLoading(false);
-    }
-  };
 
   const toggleFavorite = async () => {
     if (!user) { toast.error("Faça login."); return; }
@@ -981,55 +957,25 @@ function LotDetail() {
                       </Button>
                    </div>
                      <div className="flex flex-col gap-3 mt-2">
-                        {lot.animal?.accepts_offers && (dynamicStatus === 'pre_lance' || dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento') && (
-                         <Dialog open={isOfferDialogOpen} onOpenChange={setIsOfferDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              className="w-full h-14 rounded-2xl bg-emerald-bright text-white hover:bg-emerald-bright/90 gap-2 font-black italic shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                            >
-                              <MessageSquare className="h-5 w-5" /> FAZER OFERTA DE COMPRA
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-emerald-deep border-gold/20 text-white sm:max-w-[400px]">
-                            <DialogHeader>
-                              <DialogTitle className="text-xl font-black italic text-white flex items-center gap-2">
-                                <MessageSquare className="h-5 w-5 text-gold" /> Enviar Proposta
-                              </DialogTitle>
-                              <DialogDescription className="text-white/60">
-                                Envie uma proposta informal para o lote {lot.lot_number}. Esta oferta será analisada pelo vendedor.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-black text-gold/60">Valor da Proposta (R$)</label>
-                                <input 
-                                  type="number" 
-                                  className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:ring-1 focus:ring-gold"
-                                  placeholder="0,00"
-                                  value={offerData.amount}
-                                  onChange={(e) => setOfferData({ ...offerData, amount: e.target.value })}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-black text-gold/60">Detalhes / Condição de Pagamento</label>
-                                <textarea 
-                                  className="w-full min-h-[100px] bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:ring-1 focus:ring-gold text-sm"
-                                  placeholder="Descreva sua proposta, prazos ou condições..."
-                                  value={offerData.description}
-                                  onChange={(e) => setOfferData({ ...offerData, description: e.target.value })}
-                                />
-                              </div>
-                              <Button 
-                                className="w-full h-14 rounded-xl bg-gold text-emerald-deep font-black uppercase tracking-widest"
-                                onClick={handleSendOffer}
-                                disabled={isOfferLoading}
-                              >
-                                {isOfferLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "ENVIAR PROPOSTA"}
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                      {lot.animal?.accepts_offers && (dynamicStatus === 'pre_lance' || dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento') && (
+                        <Button 
+                          className="w-full h-14 rounded-2xl bg-emerald-bright text-white hover:bg-emerald-bright/90 gap-2 font-black italic shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                          onClick={() => setIsOfferDialogOpen(true)}
+                        >
+                          <MessageSquare className="h-5 w-5" /> FAZER OFERTA DE COMPRA
+                        </Button>
                       )}
+
+                      <OfferDialog 
+                        isOpen={isOfferDialogOpen} 
+                        onOpenChange={setIsOfferDialogOpen} 
+                        item={{
+                          id: lot.id,
+                          name: lot.animal?.name || `Lote ${lot.lot_number}`,
+                          price: currentPrice,
+                          type: 'lot'
+                        }}
+                      />
                       
                       <Button
                         variant="outline"

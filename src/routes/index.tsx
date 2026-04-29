@@ -158,6 +158,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
       birthDate: (l as any).animal?.birth_date,
       seller: (l as any).animal?.seller?.name,
       location: (l as any).animal?.location,
+      acceptsOffers: (l as any).animal?.accepts_offers,
     }));
  
     const liveEvents = mappedEvents.filter((e: any) => {

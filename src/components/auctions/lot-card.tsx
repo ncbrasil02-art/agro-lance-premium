@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Eye, Gavel, Info, ChevronRight } from "lucide-react";
+ import { Eye, Gavel, Info, ChevronRight, MessageSquare } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
@@ -32,6 +32,8 @@ import { Countdown } from "./countdown";
      </svg>
    );
  };
+ import { Button } from "@/components/ui/button";
+ import { OfferDialog } from "./OfferDialog";
  
   export function LotCard({ lot }: { 
     lot: Lot & { 
@@ -48,9 +50,11 @@ import { Countdown } from "./countdown";
        seller?: string;
        location?: string;
        winnerName?: string;
+       acceptsOffers?: boolean;
     } 
   }) {
    const [isUrgent, setIsUrgent] = useState(false);
+   const [isOfferOpen, setIsOfferOpen] = useState(false);
    
    const dynamicStatus = useEffectiveLotStatus({
      status: lot.status,
@@ -74,12 +78,13 @@ import { Countdown } from "./countdown";
    }, [lot.endsAt, lot.eventEndDate]);
 
   return (
-    <Link
-      to="/lotes/$lotId"
-      params={{ lotId: lot.id }}
-       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
-      aria-labelledby={`lot-title-${lot.id}`}
-    >
+    <div className="relative h-full flex">
+      <Link
+        to="/lotes/$lotId"
+        params={{ lotId: lot.id }}
+        className={`group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
+        aria-labelledby={`lot-title-${lot.id}`}
+      >
       <div className="relative overflow-hidden bg-muted">
         <OptimizedImage 
           src={lot?.cover || ""} 
@@ -222,6 +227,35 @@ import { Countdown } from "./countdown";
           </div>
         </div>
       </div>
-    </Link>
+      </Link>
+
+      {lot.acceptsOffers && (dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento' || dynamicStatus === 'pre_lance') && (
+        <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20">
+          <Button 
+            size="sm"
+            className="bg-emerald-bright text-white font-bold gap-1 rounded-full shadow-lg hover:scale-110 transition-transform h-8 px-3 border border-white/20"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOfferOpen(true);
+            }}
+          >
+            <MessageSquare className="h-3 w-3" />
+            Oferta
+          </Button>
+        </div>
+      )}
+
+      <OfferDialog 
+        isOpen={isOfferOpen} 
+        onOpenChange={setIsOfferOpen} 
+        item={{
+          id: lot.id,
+          name: lot.name,
+          price: lot.currentBid,
+          type: 'lot'
+        }}
+      />
+    </div>
   );
 }

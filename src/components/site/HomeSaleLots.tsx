@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, ArrowRight, MapPin, Tag, Star } from "lucide-react";
+import { ShoppingCart, ArrowRight, MapPin, Tag, Star, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { formatBRL } from "@/utils/format";
+import { useState } from "react";
+import { OfferDialog } from "@/components/auctions/OfferDialog";
 
 export function HomeSaleLots({ directSales }: { directSales: any[] }) {
+  const [selectedForOffer, setSelectedForOffer] = useState<any>(null);
   if (!directSales || directSales.length === 0) return null;
 
   return (
@@ -64,7 +67,23 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
                 </div>
               </div>
               
-              <CardContent className="p-6 flex-1 flex flex-col">
+              <CardContent className="p-6 flex-1 flex flex-col relative">
+                {animal.accepts_offers && (
+                  <div className="absolute -top-10 right-6">
+                    <Button 
+                      size="sm"
+                      className="bg-emerald-bright text-white font-bold gap-1.5 rounded-full shadow-lg hover:scale-105 transition-transform h-9 px-4 border border-white/20"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedForOffer(animal);
+                      }}
+                    >
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      Oferta
+                    </Button>
+                  </div>
+                )}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
                     <Tag className="h-3 w-3 text-gold" />
@@ -87,6 +106,17 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
           </Link>
         ))}
       </div>
+
+      <OfferDialog 
+        isOpen={!!selectedForOffer} 
+        onOpenChange={(open) => !open && setSelectedForOffer(null)} 
+        item={selectedForOffer ? {
+          id: selectedForOffer.id,
+          name: selectedForOffer.name,
+          price: selectedForOffer.sale_price,
+          type: 'animal'
+        } : null}
+      />
     </section>
   );
 }

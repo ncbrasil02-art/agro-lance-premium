@@ -7,6 +7,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
 import { useAuth } from "../auth/auth-provider";
+import { NotificationBell } from "./NotificationBell";
  import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { 
   DropdownMenu, 
@@ -134,7 +135,8 @@ import {
              </Tooltip>
            </TooltipProvider>
  
-           <div className="flex items-center gap-2">
+           <div className="flex items-center gap-1.5 md:gap-2">
+          {user && <NotificationBell userId={user.id} />}
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
