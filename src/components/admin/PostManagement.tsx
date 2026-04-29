@@ -357,7 +357,20 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                       </div>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                       <div className="flex items-center justify-between">
+                         <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                         <Button 
+                           variant="ghost" 
+                           size="sm" 
+                           className="h-7 text-[10px] uppercase font-bold text-emerald-600 gap-1"
+                           onClick={handleAutoFix}
+                           disabled={isAiFixing}
+                           type="button"
+                         >
+                           {isAiFixing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                           Auto-completar com IA
+                         </Button>
+                       </div>
                       <Input 
                         id="seo_title"
                         value={formData.seo_title} 
