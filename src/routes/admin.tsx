@@ -94,6 +94,7 @@
   }
 
   function AdminLayout() {
+     const [isMounted, setIsMounted] = useState(false);
      const { profile, isLoading: authLoading, signOut } = useAuth();
      const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
      const [selectedEventId, setSelectedEventId] = useState<string>("all");
@@ -127,18 +128,19 @@
       }
     };
  
-     useEffect(() => {
-       if (activeTab === "dashboard") {
-         fetchStats();
-       }
-     }, [activeTab]);
+      useEffect(() => {
+        setIsMounted(true);
+        if (activeTab === "dashboard") {
+          fetchStats();
+        }
+      }, [activeTab]);
 
    const handleManageLots = (eventId: string) => {
      setSelectedEventId(eventId);
      setActiveTab("lots");
    };
 
-   if (authLoading) {
+    if (!isMounted || authLoading) {
     return (
       <div className="flex min-h-screen bg-muted/30 flex-col md:flex-row animate-in fade-in duration-500">
         <aside className="w-64 border-r bg-card p-6 hidden md:block">
