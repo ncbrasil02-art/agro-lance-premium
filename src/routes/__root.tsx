@@ -39,11 +39,12 @@ function NotFoundComponent() {
   );
 }
 
-   export const Route = createRootRouteWithContext<{
-    siteInfo: any;
-    theme: any;
-    homepage: any;
-  }>()({
+    export const Route = createRootRouteWithContext<{
+     siteInfo: any;
+     theme: any;
+     homepage: any;
+     seoSettings: any;
+   }>()({
    loader: async () => {
      try {
        const { data, error } = await supabase
@@ -52,11 +53,12 @@ function NotFoundComponent() {
        
        if (error) throw error;
        
-       const info = data.find((i: any) => i.key === "site_info")?.value as any;
-       const theme = data.find((i: any) => i.key === "theme")?.value as any;
-       const homepage = data.find((i: any) => i.key === "homepage_sections")?.value as any;
-       
-       return { siteInfo: info, theme, homepage };
+        const info = data.find((i: any) => i.key === "site_info")?.value as any;
+        const theme = data.find((i: any) => i.key === "theme")?.value as any;
+        const homepage = data.find((i: any) => i.key === "homepage_sections")?.value as any;
+        const seoSettings = data.find((i: any) => i.key === "seo_settings")?.value as any;
+        
+        return { siteInfo: info, theme, homepage, seoSettings };
      } catch (error) {
        console.error("Error loading root settings:", error);
        return { siteInfo: null, theme: null, homepage: null };
