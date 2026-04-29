@@ -63,7 +63,16 @@ export function EventRequestDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] bg-emerald-deep border-gold/20 text-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase italic text-gold">Realize seu Evento Conosco</DialogTitle>
+         <DialogTitle className="text-2xl font-black uppercase italic text-gold flex items-center justify-between">
+           Realize seu Evento Conosco
+           <div className="h-10 w-10 bg-white/10 rounded-lg p-1.5 flex items-center justify-center">
+              <img 
+                src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
+                alt="Logo" 
+                className="h-full object-contain"
+              />
+           </div>
+         </DialogTitle>
           <DialogDescription className="text-white/60">
             Preencha os dados abaixo e nossa equipe entrará em contato para organizar seu leilão.
           </DialogDescription>
