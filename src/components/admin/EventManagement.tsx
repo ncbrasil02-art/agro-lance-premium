@@ -1539,11 +1539,12 @@ import { SocialPreview } from "./SocialPreview";
                          </TableRow>
                        ))}
                      </TableBody>
-                   </Table>
-                      </>
-                    );
-                  })()
-                )}
+                    </Table>
+                  </div>
+                </>
+              );
+            })()
+          )}
               </div>
              <DialogFooter>
                <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
