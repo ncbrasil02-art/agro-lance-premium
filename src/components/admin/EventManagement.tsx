@@ -1251,7 +1251,7 @@ import { SocialPreview } from "./SocialPreview";
                          <TableHead>Lote</TableHead>
                          <TableHead>Evento</TableHead>
                          <TableHead>Animal</TableHead>
-                         <TableHead>Valor</TableHead>
+                          <TableHead>Valor / Comissão</TableHead>
                          <TableHead className="text-right">Ação</TableHead>
                        </TableRow>
                      </TableHeader>
@@ -1261,7 +1261,16 @@ import { SocialPreview } from "./SocialPreview";
                            <TableCell className="font-bold">#{lot.lot_number}</TableCell>
                            <TableCell className="text-xs">{lot.event?.name}</TableCell>
                            <TableCell className="font-medium uppercase">{lot.animal?.name}</TableCell>
-                           <TableCell className="font-bold text-emerald-deep">{formatBRL(lot.current_price)}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-emerald-deep">{formatBRL(lot.current_price)}</span>
+                                {lot.event?.commission_rate > 0 && (
+                                  <span className="text-[10px] text-amber-600 font-medium">
+                                    + {formatBRL(lot.current_price * (lot.event.commission_rate / 100))} ({lot.event.commission_rate}%)
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
                            <TableCell className="text-right">
                              <Button size="sm" onClick={() => setSelectedLotForWinner(lot)}>
                                <UserPlus className="mr-2 h-4 w-4" /> Atribuir Ganhador
@@ -1294,12 +1303,43 @@ import { SocialPreview } from "./SocialPreview";
                  <div className="flex justify-center py-12">
                    <Loader2 className="h-8 w-8 animate-spin text-gold" />
                  </div>
-               ) : eventLots.length === 0 ? (
-                 <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
-                   Nenhum lote cadastrado para este evento.
-                 </div>
-               ) : (
-                 <div className="border rounded-xl overflow-hidden bg-card">
+                ) : eventLots.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+                    Nenhum lote cadastrado para este evento.
+                  </div>
+                ) : (
+                  (() => {
+                    const totalHammer = eventLots.reduce((acc, lot) => acc + (lot.current_price || 0), 0);
+                    const totalCommission = eventLots.reduce((acc, lot) => {
+                      const rate = viewingEventDetails?.commission_rate || 0;
+                      return acc + ((lot.current_price || 0) * (rate / 100));
+                    }, 0);
+                    const totalGeneral = totalHammer + totalCommission;
+
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          <Card className="bg-emerald-50 border-emerald-100">
+                            <CardContent className="pt-6">
+                              <div className="text-xs font-bold text-emerald-800 uppercase mb-1">Total Arrematado</div>
+                              <div className="text-2xl font-black text-emerald-900">{formatBRL(totalHammer)}</div>
+                            </CardContent>
+                          </Card>
+                          <Card className="bg-amber-50 border-amber-100">
+                            <CardContent className="pt-6">
+                              <div className="text-xs font-bold text-amber-800 uppercase mb-1">Total Comissão ({viewingEventDetails?.commission_rate}%)</div>
+                              <div className="text-2xl font-black text-amber-900">{formatBRL(totalCommission)}</div>
+                            </CardContent>
+                          </Card>
+                          <Card className="bg-emerald-900 border-emerald-800">
+                            <CardContent className="pt-6">
+                              <div className="text-xs font-bold text-emerald-100 uppercase mb-1">Balanço Geral</div>
+                              <div className="text-2xl font-black text-white">{formatBRL(totalGeneral)}</div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                        
+                        <div className="border rounded-xl overflow-hidden bg-card">
                    <Table>
                      <TableHeader className="bg-muted/50">
                        <TableRow>
@@ -1342,21 +1382,26 @@ import { SocialPreview } from "./SocialPreview";
                                <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
                              )}
                            </TableCell>
-                           <TableCell>
-                             <div className="flex flex-col">
-                               <span className="font-black text-emerald-deep">
-                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
-                               </span>
-                               <Button 
-                                 variant="ghost" 
-                                 size="sm" 
-                                 className="h-6 px-0 text-[10px] text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
-                                 onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}
-                               >
-                                 <ListOrdered className="h-3 w-3" /> Ver {lot.bids_count || 0} lances
-                               </Button>
-                             </div>
-                           </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-black text-emerald-deep">
+                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                                </span>
+                                {viewingEventDetails?.commission_rate > 0 && (
+                                  <span className="text-[10px] text-amber-600 font-bold">
+                                    + {formatBRL(lot.current_price * (viewingEventDetails.commission_rate / 100))}
+                                  </span>
+                                )}
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-6 px-0 text-[10px] text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
+                                  onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}
+                                >
+                                  <ListOrdered className="h-3 w-3" /> Ver {lot.bids_count || 0} lances
+                                </Button>
+                              </div>
+                            </TableCell>
                            <TableCell className="text-right">
                              <div className="flex justify-end gap-1">
                                <TooltipProvider>
@@ -1494,10 +1539,13 @@ import { SocialPreview } from "./SocialPreview";
                          </TableRow>
                        ))}
                      </TableBody>
-                   </Table>
-                 </div>
-               )}
-             </div>
+                    </Table>
+                  </div>
+                </>
+              );
+            })()
+          )}
+              </div>
              <DialogFooter>
                <Button variant="outline" onClick={() => setViewingEventDetails(null)}>Fechar</Button>
              </DialogFooter>

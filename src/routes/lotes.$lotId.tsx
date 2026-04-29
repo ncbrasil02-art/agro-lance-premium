@@ -897,7 +897,14 @@ function LotDetail() {
                   
                   <div className="mt-4 p-8 bg-black/40 rounded-[2rem] border border-white/5">
                    <p className="text-gold font-black uppercase text-[10px]">Oferta Atual</p>
-                   <p className="text-5xl font-black text-white italic">{formatBRL(currentPrice)}</p>
+                    <div className="flex flex-col">
+                      <p className="text-5xl font-black text-white italic">{formatBRL(currentPrice)}</p>
+                      {COMMISSION_RATE > 0 && (
+                        <p className="text-[10px] text-white/40 mt-1 uppercase font-bold tracking-widest">
+                          + {COMMISSION_RATE}% de comissão do leiloeiro
+                        </p>
+                      )}
+                    </div>
                    <div className="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
                      <p className="text-white/60 font-bold">30x {formatBRL(installmentValue)}</p>
                      <InstallmentSimulator price={currentPrice} commissionRate={COMMISSION_RATE} />
