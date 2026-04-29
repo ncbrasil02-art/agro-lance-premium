@@ -5,10 +5,11 @@ interface SeoAnalysisProps {
   title: string;
   description: string;
   content?: string;
+  image?: string;
 }
 
-export function SeoAnalysis({ title, description, content }: SeoAnalysisProps) {
-  const issues = analyzeSEO(title, description, content);
+ export function SeoAnalysis({ title, description, content, image }: SeoAnalysisProps) {
+   const issues = analyzeSEO(title, description, content, image);
 
   if (issues.length === 0 && title && description) {
     return (

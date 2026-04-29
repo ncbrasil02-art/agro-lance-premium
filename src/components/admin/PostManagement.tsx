@@ -342,6 +342,7 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                           title={formData.seo_title || formData.title}
                           description={formData.seo_description || formData.excerpt}
                           content={formData.content}
+                          image={formData.featured_image}
                         />
                         <SerpPreview 
                           title={formData.seo_title || formData.title}

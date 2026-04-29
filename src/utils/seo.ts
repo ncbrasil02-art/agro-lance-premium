@@ -43,6 +43,11 @@ export function generateMetaTags({
     { name: "twitter:image", content: finalImage },
   ];
 
+  if (seoSettings?.twitter_handle) {
+    meta.push({ name: "twitter:site", content: seoSettings.twitter_handle });
+    meta.push({ name: "twitter:creator", content: seoSettings.twitter_handle });
+  }
+
   const links = [];
   if (canonical) {
     links.push({ rel: "canonical", href: `${siteUrl}${canonical}` });
@@ -51,7 +56,7 @@ export function generateMetaTags({
   return { meta, links };
 }
 
-export function analyzeSEO(title: string, description: string, content?: string) {
+ export function analyzeSEO(title: string, description: string, content?: string, image?: string) {
   const issues = [];
   
   // Title checks
@@ -72,14 +77,19 @@ export function analyzeSEO(title: string, description: string, content?: string)
     issues.push({ level: 'warn', message: 'Descrição longa demais (máximo 160 caracteres recomendados).' });
   }
 
-  // Content keywords (basic check)
-  if (content && title) {
-    const mainKeywords = title.toLowerCase().split(' ').filter(w => w.length > 4);
-    const foundKeywords = mainKeywords.filter(k => content.toLowerCase().includes(k));
-    if (foundKeywords.length === 0 && mainKeywords.length > 0) {
-      issues.push({ level: 'info', message: 'Considere usar palavras-chave do título no conteúdo do texto.' });
-    }
-  }
-
-  return issues;
-}
+   // Twitter Card checks
+   if (!image) {
+     issues.push({ level: 'warn', message: 'Imagem para Twitter Card ausente (recomendado para melhor engajamento).' });
+   }
+ 
+   // Content keywords (basic check)
+   if (content && title) {
+     const mainKeywords = title.toLowerCase().split(' ').filter(w => w.length > 4);
+     const foundKeywords = mainKeywords.filter(k => content.toLowerCase().includes(k));
+     if (foundKeywords.length === 0 && mainKeywords.length > 0) {
+       issues.push({ level: 'info', message: 'Considere usar palavras-chave do título no conteúdo do texto.' });
+     }
+   }
+ 
+   return issues;
+ }
