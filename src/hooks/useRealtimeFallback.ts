@@ -80,10 +80,15 @@
      return () => clearTimeout(timeoutId);
    }, [status, label, pollInterval, initialPollInterval, enabled, retryCount]);
  
-   return {
-     delaySeconds: currentDelay,
-     lastUpdate: lastUpdateTime,
-     isPolling: status !== 'SUBSCRIBED',
-     status
-   };
+     const onManualUpdate = () => {
+       setLastUpdateTime(Date.now());
+     };
+ 
+     return {
+       delaySeconds: currentDelay,
+       lastUpdate: lastUpdateTime,
+       isPolling: status !== 'SUBSCRIBED',
+       status,
+       onManualUpdate
+     };
  }
