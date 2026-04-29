@@ -1,5 +1,4 @@
-import { Star, MapPin, Calendar, DollarSign, ExternalLink } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Star, MapPin, Calendar, DollarSign, ExternalLink, Info } from "lucide-react";
 
 interface RichResultsPreviewProps {
   type: 'article' | 'product' | 'event';
@@ -55,7 +54,7 @@ export function RichResultsPreview({ type, title, data }: RichResultsPreviewProp
               <span>•</span>
               <span className="font-bold text-[#202124] dark:text-white">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: data.currency || 'BRL' }).format(data.price || 0)}
-              </Button>
+              </span>
               <span>•</span>
               <span className="text-emerald-600 dark:text-emerald-400 font-medium">{data.availability || "Em estoque"}</span>
             </div>
@@ -94,5 +93,3 @@ export function RichResultsPreview({ type, title, data }: RichResultsPreviewProp
     </div>
   );
 }
-
-import { Button } from "@/components/ui/button";
