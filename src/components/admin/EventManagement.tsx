@@ -193,6 +193,12 @@ import { useAuth } from "@/components/auth/auth-provider";
       if (lot.status === 'sold' && !lot.winner_id) {
         issues.push(`Lote #${lot.lot_number}: Vendido mas sem arrematante vinculado.`);
       }
+      if (lot.status === 'active' && lot.bids_count > 0 && event?.status === 'finished') {
+        issues.push(`Lote #${lot.lot_number}: Possui lances mas não foi finalizado como vendido (evento encerrado).`);
+      }
+      if (lot.current_price > 0 && lot.bids_count === 0) {
+        issues.push(`Lote #${lot.lot_number}: Possui preço atual mas o contador de lances está zerado (inconsistência).`);
+      }
     });
     if (event && (event.commission_rate === 0 || !event.commission_rate)) {
       issues.push(`Evento: Taxa de comissão está zerada ou não definida.`);
