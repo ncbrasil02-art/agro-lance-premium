@@ -490,10 +490,10 @@ function LotDetail() {
   const isBiddingOpen = (dynamicStatus === 'live' || dynamicStatus === 'recebendo_lances' || dynamicStatus === 'pre_lance') && !isSold && !isPassed;
 
   const [isUrgent, setIsUrgent] = useState(false);
-  const installments = lot.installment_count || 30;
-  const installmentValue = (currentPrice + BUYER_COMMISSION) / installments;
    const COMMISSION_RATE = lot.event?.commission_rate ?? 5;
-  const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
+   const BUYER_COMMISSION = currentPrice * (COMMISSION_RATE / 100);
+   const installments = lot.installment_count || 30;
+   const installmentValue = (currentPrice + BUYER_COMMISSION) / installments;
 
   const getAge = (birthDate: string) => {
     if (!birthDate) return null;
