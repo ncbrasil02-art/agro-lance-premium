@@ -286,6 +286,59 @@ function DirectSalePage() {
         )}
       </div>
 
+      <Dialog open={isOfferDialogOpen} onOpenChange={setIsCheckoutOfferOpen}>
+        <DialogContent className="sm:max-w-[450px] rounded-3xl border-gold/20">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <DollarSign className="h-6 w-6 text-gold" />
+              Enviar Proposta
+            </DialogTitle>
+            <DialogDescription>
+              Faça uma oferta de valor para o animal <strong>{selectedAnimal?.name}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="offer_amount">Valor da Oferta (R$)</Label>
+              <Input 
+                id="offer_amount" 
+                type="number"
+                placeholder="0,00" 
+                value={offerAmount}
+                onChange={(e) => setOfferAmount(e.target.value)}
+                className="text-xl font-bold text-emerald-deep"
+              />
+              <p className="text-[10px] text-muted-foreground italic">
+                Preço sugerido: {selectedAnimal && new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedAnimal.sale_price)}
+              </p>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="offer_message">Mensagem Adicional (Opcional)</Label>
+              <textarea 
+                id="offer_message"
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder="Condições de pagamento, frete, etc..."
+                value={offerMessage}
+                onChange={(e) => setOfferMessage(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter className="sm:justify-between items-center gap-4">
+            <Button variant="ghost" onClick={() => setIsCheckoutOfferOpen(false)}>Cancelar</Button>
+            <Button 
+              className="bg-gold text-emerald-deep font-bold px-8 rounded-xl shadow-gold h-12"
+              onClick={submitOffer}
+              disabled={isSubmittingOffer}
+            >
+              {isSubmittingOffer ? "Enviando..." : "Enviar Proposta"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
         <DialogContent className="sm:max-w-[500px] rounded-3xl border-gold/20 shadow-2xl shadow-gold/10">
           <DialogHeader>
