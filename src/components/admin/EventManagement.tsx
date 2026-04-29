@@ -166,6 +166,24 @@ import { SocialPreview } from "./SocialPreview";
     }
   }, [searchWinnerQuery]);
 
+  const [discrepancies, setDiscrepancies] = useState<string[]>([]);
+
+  const detectDiscrepancies = (lots: any[], event: any) => {
+    const issues: string[] = [];
+    lots.forEach(lot => {
+      if (lot.status === 'sold' && (lot.current_price || 0) === 0) {
+        issues.push(`Lote #${lot.lot_number}: Marcado como vendido mas com valor zero.`);
+      }
+      if (lot.status === 'sold' && !lot.winner_id) {
+        issues.push(`Lote #${lot.lot_number}: Vendido mas sem arrematante vinculado.`);
+      }
+    });
+    if (event && (event.commission_rate === 0 || !event.commission_rate)) {
+      issues.push(`Evento: Taxa de comissão está zerada ou não definida.`);
+    }
+    setDiscrepancies(issues);
+  };
+
      const fetchEventLots = async (eventId: string) => {
        setIsDetailsLoading(true);
        try {
@@ -181,6 +199,7 @@ import { SocialPreview } from "./SocialPreview";
  
          if (error) throw error;
          setEventLots(data || []);
+         if (viewingEventDetails) detectDiscrepancies(data || [], viewingEventDetails);
        } catch (error: any) {
          toast.error("Erro ao carregar lotes do evento: " + error.message);
        } finally {
