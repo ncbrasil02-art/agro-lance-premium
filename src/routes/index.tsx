@@ -1,3 +1,4 @@
+  import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
  import { useSiteSettings } from "@/hooks/useSiteSettings";
  import { ArticleCarousel } from "@/components/site/ArticleCarousel";
  import { EventCarousel } from "@/components/site/EventCarousel";
@@ -95,27 +96,14 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
         };
     const [now, setNow] = useState(Date.now());
 
-     useEffect(() => {
-       const interval = setInterval(() => setNow(Date.now()), 1000);
-       
-        const homeChannelId = `home-updates-${Math.random().toString(36).substring(2, 9)}`;
-        const channel = supabase
-          .channel(homeChannelId)
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
-            logger.info("Evento alterado, atualizando home...");
-            router.invalidate();
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
-            logger.info("Lote alterado, atualizando home...");
-            router.invalidate();
-          })
-          .subscribe();
+      useEffect(() => {
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+      }, []);
  
-       return () => {
-         clearInterval(interval);
-         supabase.removeChannel(channel);
-       };
-     }, [router]);
+      useHomeRealtime(() => {
+        router.invalidate();
+      });
 
     const mapEvent = (e: any) => ({
       id: e?.id || Math.random().toString(),
