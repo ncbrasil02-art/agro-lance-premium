@@ -1,13 +1,13 @@
   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
- import { useState, useEffect } from "react";
+ import { useState, useEffect, useCallback } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign, ShieldCheck } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -22,8 +22,10 @@ import { SerpPreview } from "./SerpPreview";
 import { SeoAnalysis } from "./SeoAnalysis";
 import { RichResultsPreview } from "./RichResultsPreview";
 import { SocialPreview } from "./SocialPreview";
+import { useAuth } from "@/components/auth/auth-provider";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
+    const { profile: adminProfile } = useAuth();
     const [events, setEvents] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +48,20 @@ import { SocialPreview } from "./SocialPreview";
   const [isAssigningWinner, setIsAssigningWinner] = useState(false);
    const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
    const [showBalanceReport, setShowBalanceReport] = useState(false);
+
+    const logAuditAction = useCallback(async (action: string, entityId: string, details: any) => {
+      try {
+        await supabase.from("audit_logs").insert({
+          user_id: adminProfile?.id,
+          action: action,
+          entity_type: "event",
+          entity_id: entityId,
+          new_data: details
+        });
+      } catch (e) {
+        console.error("Erro ao registrar auditoria:", e);
+      }
+    }, [adminProfile?.id]);
 
    const handleAutoFix = async () => {
      if (!formData.name) {
@@ -166,6 +182,30 @@ import { SocialPreview } from "./SocialPreview";
     }
   }, [searchWinnerQuery]);
 
+  const [discrepancies, setDiscrepancies] = useState<string[]>([]);
+
+  const detectDiscrepancies = (lots: any[], event: any) => {
+    const issues: string[] = [];
+    lots.forEach(lot => {
+      if (lot.status === 'sold' && (lot.current_price || 0) === 0) {
+        issues.push(`Lote #${lot.lot_number}: Marcado como vendido mas com valor zero.`);
+      }
+      if (lot.status === 'sold' && !lot.winner_id) {
+        issues.push(`Lote #${lot.lot_number}: Vendido mas sem arrematante vinculado.`);
+      }
+      if (lot.status === 'active' && lot.bids_count > 0 && event?.status === 'finished') {
+        issues.push(`Lote #${lot.lot_number}: Possui lances mas não foi finalizado como vendido (evento encerrado).`);
+      }
+      if (lot.current_price > 0 && lot.bids_count === 0) {
+        issues.push(`Lote #${lot.lot_number}: Possui preço atual mas o contador de lances está zerado (inconsistência).`);
+      }
+    });
+    if (event && (event.commission_rate === 0 || !event.commission_rate)) {
+      issues.push(`Evento: Taxa de comissão está zerada ou não definida.`);
+    }
+    setDiscrepancies(issues);
+  };
+
      const fetchEventLots = async (eventId: string) => {
        setIsDetailsLoading(true);
        try {
@@ -181,6 +221,7 @@ import { SocialPreview } from "./SocialPreview";
  
          if (error) throw error;
          setEventLots(data || []);
+         if (viewingEventDetails) detectDiscrepancies(data || [], viewingEventDetails);
        } catch (error: any) {
          toast.error("Erro ao carregar lotes do evento: " + error.message);
        } finally {
@@ -423,6 +464,11 @@ import { SocialPreview } from "./SocialPreview";
       
       if (formData.transmission_link && !validateLiveLink(formData.transmission_link)) {
         toast.error("Por favor, insira um link válido do YouTube ou Vimeo");
+        return;
+      }
+
+      if (formData.commission_rate < 0 || formData.commission_rate > 100) {
+        toast.error("A taxa de comissão deve estar entre 0 e 100%");
         return;
       }
 
@@ -893,6 +939,8 @@ import { SocialPreview } from "./SocialPreview";
                         id="commission_rate"
                         type="number" 
                         step="0.01"
+                        min="0"
+                        max="100"
                         value={formData.commission_rate} 
                         onChange={(e) => setFormData({ ...formData, commission_rate: parseFloat(e.target.value) || 0 })} 
                         placeholder="Ex: 5" 
@@ -1192,7 +1240,8 @@ import { SocialPreview } from "./SocialPreview";
                                       onClick={() => {
                                         setViewingEventDetails(event);
                                         fetchEventLots(event.id);
-                                        setShowBalanceReport(true);
+                                         setShowBalanceReport(true);
+                                         logAuditAction("VIEW_FINANCIAL_BALANCE", event.id, { event_name: event.name });
                                       }}
                                     >
                                       <BarChart3 className="h-4 w-4" />
@@ -1363,7 +1412,10 @@ import { SocialPreview } from "./SocialPreview";
                            <div className="text-sm font-bold text-emerald-deep uppercase tracking-wider">Lotes e Arrematantes</div>
                            <Button 
                              className="bg-emerald-deep text-gold gap-2 font-bold"
-                             onClick={() => setShowBalanceReport(true)}
+                             onClick={() => {
+                               setShowBalanceReport(true);
+                               logAuditAction("VIEW_FINANCIAL_BALANCE", viewingEventDetails.id, { event_name: viewingEventDetails.name });
+                             }}
                            >
                              <BarChart3 className="h-4 w-4" /> Gerar Balanço Completo
                            </Button>
@@ -1707,7 +1759,27 @@ import { SocialPreview } from "./SocialPreview";
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 {discrepancies.length > 0 && (
+                   <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-6 space-y-3">
+                     <div className="flex items-center gap-2 text-red-700">
+                       <AlertCircle className="h-5 w-5" />
+                       <h3 className="font-black uppercase text-xs tracking-widest">Divergências e Inconsistências Detectadas</h3>
+                     </div>
+                     <ul className="space-y-1">
+                       {discrepancies.map((msg, i) => (
+                         <li key={i} className="text-xs text-red-600 flex items-start gap-2">
+                           <span className="mt-1 h-1.5 w-1.5 rounded-full bg-red-400 shrink-0" />
+                           {msg}
+                         </li>
+                       ))}
+                     </ul>
+                     <p className="text-[10px] text-red-400 italic font-medium">
+                       * Verifique estes pontos antes de oficializar o balanço.
+                     </p>
+                   </div>
+                 )}
+
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
                     <div className="flex items-center gap-3 mb-2">
                       <TrendingUp className="h-5 w-5 text-emerald-600" />
@@ -1748,7 +1820,8 @@ import { SocialPreview } from "./SocialPreview";
                           <TableHead className="text-white font-bold">Arrematante</TableHead>
                           <TableHead className="text-white font-bold text-right">Martelo</TableHead>
                           <TableHead className="text-white font-bold text-right">Comissão (Audit)</TableHead>
-                          <TableHead className="text-white font-bold text-right">Total</TableHead>
+                           <TableHead className="text-white font-bold text-right">Total</TableHead>
+                           <TableHead className="text-white font-bold text-center print:hidden">Audit</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1774,6 +1847,19 @@ import { SocialPreview } from "./SocialPreview";
                                 </div>
                               </TableCell>
                               <TableCell className="text-right font-black text-emerald-900">{formatBRL(hammer + commission)}</TableCell>
+                              <TableCell className="text-center print:hidden">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    // Redirect or open audit for this lot
+                                    toast.info(`Trilha de auditoria do Lote #${lot.lot_number} disponível no menu 'Auditoria Completa'`);
+                                  }}
+                                >
+                                  <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                                </Button>
+                              </TableCell>
                             </TableRow>
                           );
                         })}
