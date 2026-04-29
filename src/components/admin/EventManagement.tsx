@@ -19,6 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { validateLiveLink, formatBRL } from "@/utils/format";
 import { generateSlug } from "@/utils/slug";
 import { SerpPreview } from "./SerpPreview";
+import { SeoAnalysis } from "./SeoAnalysis";
+import { SocialPreview } from "./SocialPreview";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
@@ -669,13 +671,26 @@ import { SerpPreview } from "./SerpPreview";
                     />
                   </div>
 
-                  <div className="pt-4 border-t">
-                    <SerpPreview 
-                      title={formData.seo_title || formData.name}
-                      description={formData.seo_description || formData.description}
-                      slug={formData.slug}
-                      basePath="/eventos"
-                    />
+                  <div className="pt-4 border-t grid md:grid-cols-2 gap-6">
+                    <div className="space-y-6">
+                      <SeoAnalysis 
+                        title={formData.seo_title || formData.name}
+                        description={formData.seo_description || formData.description}
+                      />
+                      <SerpPreview 
+                        title={formData.seo_title || formData.name}
+                        description={formData.seo_description || formData.description}
+                        slug={formData.slug}
+                        basePath="/eventos"
+                      />
+                    </div>
+                    <div className="space-y-6">
+                      <SocialPreview 
+                        title={formData.seo_title || formData.name}
+                        description={formData.seo_description || formData.description}
+                        image={formData.banner_url}
+                      />
+                    </div>
                   </div>
                 </TabsContent>
 
