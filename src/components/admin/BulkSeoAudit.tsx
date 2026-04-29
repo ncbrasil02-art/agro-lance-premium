@@ -30,17 +30,17 @@ export function BulkSeoAudit() {
       const allItems: any[] = [];
       
       animals.data?.forEach(a => {
-        const issues = analyzeSEO(a.seo_title || a.name, a.seo_description || "", "", a.photos?.[0], a.og_title, a.og_description);
+        const issues = analyzeSEO(a.seo_title || a.name, a.seo_description || "", "", a.photos?.[0], a.og_title || undefined, a.og_description || undefined);
         allItems.push({ id: a.id, name: a.name, type: 'Animal', issues });
       });
 
       posts.data?.forEach(p => {
-        const issues = analyzeSEO(p.seo_title || p.title, p.seo_description || "", p.content || "", p.featured_image, p.og_title, p.og_description);
+        const issues = analyzeSEO(p.seo_title || p.title, p.seo_description || "", p.content || "", p.featured_image || undefined, p.og_title || undefined, p.og_description || undefined);
         allItems.push({ id: p.id, name: p.title, type: 'Notícia', issues });
       });
 
       events.data?.forEach(e => {
-        const issues = analyzeSEO(e.seo_title || e.name, e.seo_description || "", "", e.banner_url, e.og_title, e.og_description);
+        const issues = analyzeSEO(e.seo_title || e.name, e.seo_description || "", "", e.banner_url || undefined, e.og_title || undefined, e.og_description || undefined);
         allItems.push({ id: e.id, name: e.name, type: 'Evento', issues });
       });
 
