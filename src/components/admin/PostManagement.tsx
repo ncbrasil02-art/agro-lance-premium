@@ -25,7 +25,7 @@
       status: "draft",
       seo_title: "",
       seo_description: "",
-      author: "",
+      author_name: "",
       read_time: ""
     });
    const [posts, setPosts] = useState<any[]>([]);
@@ -69,7 +69,7 @@
         status: "draft",
         seo_title: "",
         seo_description: "",
-        author: "",
+        author_name: "",
         read_time: ""
       });
    };
@@ -85,7 +85,7 @@
         status: post.status || "draft",
         seo_title: post.seo_title || "",
         seo_description: post.seo_description || "",
-        author: post.author || "",
+        author_name: post.author_name || "",
         read_time: post.read_time || ""
       });
      setIsDialogOpen(true);
@@ -251,11 +251,11 @@
                   <TabsContent value="editor" className="space-y-4 pt-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="author">Autor</Label>
+                        <Label htmlFor="author_name">Autor</Label>
                         <Input 
-                          id="author"
-                          value={formData.author} 
-                          onChange={(e) => setFormData({ ...formData, author: e.target.value })} 
+                          id="author_name"
+                          value={formData.author_name} 
+                          onChange={(e) => setFormData({ ...formData, author_name: e.target.value })} 
                           placeholder="Nome do autor"
                         />
                       </div>
@@ -307,7 +307,7 @@
                         <img src={formData.featured_image} alt="" className="w-full h-48 object-cover rounded-lg mb-4" />
                       )}
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-4 border-b">
-                        <span>{formData.author || "Autor Anônimo"}</span>
+                        <span>{formData.author_name || "Autor Anônimo"}</span>
                         <span>•</span>
                         <span>{formData.read_time || "5 min"} de leitura</span>
                       </div>

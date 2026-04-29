@@ -949,6 +949,7 @@ export type Database = {
       posts: {
         Row: {
           author_id: string | null
+          author_name: string | null
           category_id: string | null
           content: string
           created_at: string
@@ -956,6 +957,9 @@ export type Database = {
           featured_image: string | null
           id: string
           published_at: string | null
+          read_time: string | null
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           status: string | null
           title: string
@@ -963,6 +967,7 @@ export type Database = {
         }
         Insert: {
           author_id?: string | null
+          author_name?: string | null
           category_id?: string | null
           content: string
           created_at?: string
@@ -970,6 +975,9 @@ export type Database = {
           featured_image?: string | null
           id?: string
           published_at?: string | null
+          read_time?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           status?: string | null
           title: string
@@ -977,6 +985,7 @@ export type Database = {
         }
         Update: {
           author_id?: string | null
+          author_name?: string | null
           category_id?: string | null
           content?: string
           created_at?: string
@@ -984,6 +993,9 @@ export type Database = {
           featured_image?: string | null
           id?: string
           published_at?: string | null
+          read_time?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string | null
           title?: string

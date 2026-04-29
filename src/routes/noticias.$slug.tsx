@@ -3,7 +3,7 @@
  import { OptimizedImage } from "@/components/ui/optimized-image"
  import { format } from "date-fns"
  import { ptBR } from "date-fns/locale"
- import { Calendar, ChevronLeft, Share2, Mail } from "lucide-react"
+  import { Calendar, ChevronLeft, Share2, Mail, User, Clock } from "lucide-react"
  import { Button } from "@/components/ui/button"
 
   export const Route = createFileRoute("/noticias/$slug")({
@@ -55,10 +55,24 @@
          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">{post.title}</h1>
          
          <div className="flex items-center gap-6 text-sm text-muted-foreground border-y py-4">
-           <div className="flex items-center gap-2">
-             <Calendar className="h-4 w-4" />
-             {post.published_at && format(new Date(post.published_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-           </div>
+            <div className="flex flex-wrap items-center gap-y-2 gap-x-6">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                {post.published_at && format(new Date(post.published_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              </div>
+              {post.author_name && (
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {post.author_name}
+                </div>
+              )}
+              {post.read_time && (
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  {post.read_time} de leitura
+                </div>
+              )}
+            </div>
            <div className="ml-auto flex gap-4">
              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full"><Share2 className="h-4 w-4" /></Button>
            </div>
