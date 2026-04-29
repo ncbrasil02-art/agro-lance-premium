@@ -58,8 +58,7 @@ import {
               </span>
              </>
            )}
-         </Link>
-        </Link>
+          </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           {nav.map((item) => (
