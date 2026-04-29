@@ -1446,19 +1446,37 @@ import { SocialPreview } from "./SocialPreview";
                                        </div>
                                      </div>
 
-                                     <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
-                                       <div className="flex justify-between items-center">
-                                          <div className="uppercase font-black text-emerald-900">Valor do Arremate</div>
-                                          <div className="text-3xl font-black text-emerald-600">{formatBRL(lot.current_price)}</div>
-                                       </div>
-                                     </div>
+                                      <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 space-y-3">
+                                        <div className="flex justify-between items-center">
+                                           <div className="uppercase font-black text-emerald-900">Valor do Arremate</div>
+                                           <div className="text-xl font-black text-emerald-600">{formatBRL(lot.current_price)}</div>
+                                        </div>
+                                        {viewingEventDetails?.commission_rate > 0 && (
+                                          <div className="flex justify-between items-center border-t border-emerald-100 pt-3">
+                                            <div className="uppercase font-bold text-emerald-800 text-xs">Comissão do Leiloeiro ({viewingEventDetails.commission_rate}%)</div>
+                                            <div className="text-lg font-bold text-emerald-700">
+                                              {formatBRL(lot.current_price * (viewingEventDetails.commission_rate / 100))}
+                                            </div>
+                                          </div>
+                                        )}
+                                        <div className="flex justify-between items-center border-t-2 border-emerald-200 pt-3">
+                                           <div className="uppercase font-black text-emerald-900">Total Geral</div>
+                                           <div className="text-3xl font-black text-emerald-600">
+                                             {formatBRL(lot.current_price + (lot.current_price * ((viewingEventDetails?.commission_rate || 0) / 100)))}
+                                           </div>
+                                        </div>
+                                      </div>
 
-                                     <div className="pt-10">
-                                       <p className="text-xs leading-relaxed text-gray-500 italic">
-                                         Este documento serve como registro administrativo do arremate. 
-                                         O arremate foi realizado em {new Date(lot.updated_at).toLocaleString('pt-BR')}.
-                                       </p>
-                                     </div>
+                                      <div className="pt-10 space-y-4">
+                                        <p className="text-xs leading-relaxed text-gray-500 italic">
+                                          Este documento serve como registro administrativo do arremate. 
+                                          O arremate foi realizado em {new Date(lot.updated_at).toLocaleString('pt-BR')}.
+                                        </p>
+                                        <p className="text-[10px] text-gray-400 border-t pt-2">
+                                          * O site atua apenas como intermediador, facilitando a conexão entre comprador e vendedor. 
+                                          Toda a responsabilidade sobre o animal e a transação financeira direta é das partes envolvidas.
+                                        </p>
+                                      </div>
 
                                      <div className="flex justify-between items-end pt-20">
                                         <div className="w-48 border-t border-black text-center pt-2 text-[10px] uppercase font-bold">Premium Agro</div>
