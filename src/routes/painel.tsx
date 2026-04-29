@@ -90,8 +90,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
     MapPin, Globe, Loader2, Send
  } from "lucide-react";
- import { useEffect, useState, useRef } from "react";
+  import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+  import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -149,6 +150,16 @@ export const Route = createFileRoute("/painel")({
         });
       }
 
+      const [rtStatus, setRtStatus] = useState<string>("INITIAL");
+
+      useRealtimeFallback({
+        status: rtStatus,
+        onUpdate: fetchDashboardData,
+        label: "Painel do Usuário",
+        pollInterval: 60000,
+        initialPollInterval: 30000
+      });
+
       // Add real-time listeners for the dashboard
       const lotsChannel = supabase
         .channel('dashboard-lots-realtime')
@@ -160,7 +171,9 @@ export const Route = createFileRoute("/painel")({
         }, () => {
           fetchDashboardData();
         })
-        .subscribe();
+        .subscribe((newStatus) => {
+          setRtStatus(newStatus);
+        });
 
       const bidsChannel = supabase
         .channel('dashboard-bids-realtime')
