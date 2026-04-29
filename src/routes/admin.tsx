@@ -16,8 +16,8 @@
  import { LiveAuctionControl } from "@/components/admin/LiveAuctionControl";
  import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings, 
-   LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag, 
-   ClipboardList, ShoppingCart, ShieldCheck, Newspaper 
+   LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
+   ClipboardList, ShoppingCart, ShieldCheck, Newspaper, Info
  } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
@@ -258,6 +258,12 @@
                     <CardDescription>Gerencie o conteúdo principal do seu leilão.</CardDescription>
                   </CardHeader>
                    <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                       <Button variant="outline" className="w-full border-gold/30" onClick={() => setActiveTab("posts")}>
+                         <Newspaper className="mr-2 h-4 w-4 text-gold" /> Criar Artigos
+                       </Button>
+                       <Button variant="outline" className="w-full border-gold/30" onClick={() => setActiveTab("settings")}>
+                         <Info className="mr-2 h-4 w-4 text-gold" /> Gerenciar Pág. Sobre
+                       </Button>
                       <Button className="w-full bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => setActiveTab("events")}>
                         <Calendar className="mr-2 h-4 w-4" /> Gerenciar Eventos
                       </Button>
