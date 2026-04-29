@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { ptBR } from "date-fns/locale";
 import { validateLiveLink, formatBRL } from "@/utils/format";
 import { generateSlug } from "@/utils/slug";
+import { SerpPreview } from "./SerpPreview";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const [events, setEvents] = useState<any[]>([]);
@@ -665,6 +666,15 @@ import { generateSlug } from "@/utils/slug";
                       value={formData.seo_description} 
                       onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
                       placeholder="Meta descrição para o Google"
+                    />
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <SerpPreview 
+                      title={formData.seo_title || formData.name}
+                      description={formData.seo_description || formData.description}
+                      slug={formData.slug}
+                      basePath="/eventos"
                     />
                   </div>
                 </TabsContent>
