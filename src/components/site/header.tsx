@@ -1,4 +1,6 @@
-  import { useSiteSettings } from "@/hooks/useSiteSettings";
+   import { useSiteSettings } from "@/hooks/useSiteSettings";
+   import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
+   import { useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
  import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
 import { useState } from "react";
@@ -16,9 +18,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-  export function Header() {
+   export function Header() {
+     const router = useRouter();
     const { theme, toggle } = useTheme();
     const { siteInfo, homepage, aboutPage } = useSiteSettings();
+ 
+     const { delaySeconds, isPolling } = useHomeRealtime(() => {
+       router.invalidate();
+     });
+ 
   const { user, profile, signOut } = useAuth();
   const [open, setOpen] = useState(false);
  
