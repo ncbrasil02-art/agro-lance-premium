@@ -106,77 +106,78 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
           </DialogDescription>
         </DialogHeader>
         
-         <div className="space-y-4 py-4">
-           <div className="grid gap-2">
-             <div className="flex justify-between items-center mb-1">
-               <Label htmlFor="offer_amount" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Valor Total da Proposta</Label>
-               <span className="text-[10px] text-white/40 italic">Ref: {item && formatBRL(item.price)}</span>
-             </div>
-             <div className="relative">
-               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
-               <Input 
-                 id="offer_amount" 
-                 type="number"
-                 placeholder="0,00" 
-                 value={amount}
-                 onChange={(e) => setAmount(e.target.value)}
-                 className="h-12 pl-10 bg-white/5 border-white/10 text-xl font-bold text-white focus:ring-gold"
-               />
-             </div>
-             
-             <div className="flex gap-2 mt-1">
-               {[0, 0.05, 0.10].map((percent) => {
-                 const quickVal = item ? Math.round(item.price * (1 + percent)) : 0;
-                 return (
-                   <Button 
-                     key={percent}
-                     variant="outline" 
-                     size="sm" 
-                     className="flex-1 h-8 text-[10px] font-bold border-white/10 bg-white/5 hover:bg-gold hover:text-emerald-deep"
-                     onClick={() => setAmount(quickVal.toString())}
-                   >
-                     {percent === 0 ? "Valor Atual" : `+${percent * 100}%`}
-                   </Button>
-                 );
-               })}
-           </div>
+        <div className="space-y-6 py-4">
+          <div className="grid gap-2">
+            <div className="flex justify-between items-center mb-1">
+              <Label htmlFor="offer_amount" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Valor Total da Proposta</Label>
+              <span className="text-[10px] text-white/40 italic">Ref: {item && formatBRL(item.price)}</span>
+            </div>
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
+              <Input 
+                id="offer_amount" 
+                type="number"
+                placeholder="0,00" 
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="h-12 pl-10 bg-white/5 border-white/10 text-xl font-bold text-white focus:ring-gold"
+              />
+            </div>
+            
+            <div className="flex gap-2 mt-1">
+              {[0, 0.05, 0.10].map((percent) => {
+                const quickVal = item ? Math.round(item.price * (1 + percent)) : 0;
+                return (
+                  <Button 
+                    key={percent}
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 h-8 text-[10px] font-bold border-white/10 bg-white/5 hover:bg-gold hover:text-emerald-deep"
+                    onClick={() => setAmount(quickVal.toString())}
+                  >
+                    {percent === 0 ? "Valor Atual" : `+${percent * 100}%`}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
 
-           <div className="grid gap-2">
-             <Label className="text-[10px] font-black uppercase tracking-widest text-gold/60">Forma de Pagamento / Parcelas</Label>
-             <div className="grid grid-cols-3 gap-2">
-               {[
-                 { label: "À Vista", value: "1" },
-                 { label: "15x", value: "15" },
-                 { label: "30x", value: "30" }
-               ].map((opt) => (
-                 <Button
-                   key={opt.value}
-                   variant={installments === opt.value ? "default" : "outline"}
-                   className={`h-10 text-xs font-bold ${installments === opt.value ? "bg-gold text-emerald-deep" : "border-white/10 bg-white/5 text-white"}`}
-                   onClick={() => setInstallments(opt.value)}
-                 >
-                   {opt.label}
-                 </Button>
-               ))}
-             </div>
-             {amount && parseFloat(amount) > 0 && installments !== "1" && (
-               <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                 <Calendar className="h-3 w-3" /> {installments}x de {formatBRL(parseFloat(amount) / parseInt(installments))}
-               </p>
-             )}
-           </div>
-           
-           <div className="grid gap-2">
-             <Label htmlFor="offer_message" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Observações (Opcional)</Label>
-             <Textarea 
-               id="offer_message"
-               className="flex min-h-[80px] bg-white/5 border-white/10 text-white placeholder:text-white/20 text-sm"
-               placeholder="Ex: Frete por minha conta, permuta em outros animais..."
-               value={message}
-               onChange={(e) => setMessage(e.target.value)}
-             />
-           </div>
-         </div>
+          <div className="grid gap-2">
+            <Label className="text-[10px] font-black uppercase tracking-widest text-gold/60">Forma de Pagamento / Parcelas</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "À Vista", value: "1" },
+                { label: "15x", value: "15" },
+                { label: "30x", value: "30" }
+              ].map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant={installments === opt.value ? "default" : "outline"}
+                  className={`h-10 text-xs font-bold ${installments === opt.value ? "bg-gold text-emerald-deep" : "border-white/10 bg-white/5 text-white"}`}
+                  onClick={() => setInstallments(opt.value)}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+            {amount && parseFloat(amount) > 0 && installments !== "1" && (
+              <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                <Calendar className="h-3 w-3" /> {installments}x de {formatBRL(parseFloat(amount) / parseInt(installments))}
+              </p>
+            )}
+          </div>
+          
+          <div className="grid gap-2">
+            <Label htmlFor="offer_message" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Observações (Opcional)</Label>
+            <Textarea 
+              id="offer_message"
+              className="flex min-h-[80px] bg-white/5 border-white/10 text-white placeholder:text-white/20 text-sm"
+              placeholder="Ex: Frete por minha conta, permuta em outros animais..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </div>
+        </div>
         
         <DialogFooter className="sm:justify-between items-center gap-4">
           <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-white/60 hover:text-white hover:bg-white/5">
