@@ -41,8 +41,35 @@ import { generateSlug, validateSlug } from "@/utils/slug";
    const [categories, setCategories] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
+   const [isAiFixing, setIsAiFixing] = useState(false);
    const [searchQuery, setSearchQuery] = useState("");
  
+   const handleAutoFix = async () => {
+     if (!formData.title) {
+       toast.error("Preencha ao menos o título para usar a IA");
+       return;
+     }
+     setIsAiFixing(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('seo-fixer', {
+         body: { type: 'Notícia', title: formData.title, content: formData.content || formData.excerpt }
+       });
+       if (error) throw error;
+       setFormData({
+         ...formData,
+         seo_title: data.seo_title,
+         seo_description: data.seo_description,
+         og_title: data.og_title,
+         og_description: data.og_description
+       });
+       toast.success("SEO otimizado com IA!");
+     } catch (error: any) {
+       toast.error("Erro ao otimizar: " + error.message);
+     } finally {
+       setIsAiFixing(false);
+     }
+   };
+
    const fetchData = async () => {
      setIsLoading(true);
      try {
