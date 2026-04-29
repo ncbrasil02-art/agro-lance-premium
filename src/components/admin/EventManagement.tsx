@@ -200,11 +200,11 @@ import { generateSlug } from "@/utils/slug";
          seller_id: "none",
          seller_name: "",
           regulation: "",
-                 viewers: 0,
-                 slug: "",
-                 seo_title: "",
-                 seo_description: ""
-             });
+          viewers: 0,
+          slug: "",
+          seo_title: "",
+          seo_description: ""
+        });
 
      const resetForm = () => {
        setEditingEvent(null);
