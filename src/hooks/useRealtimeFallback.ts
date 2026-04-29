@@ -46,11 +46,12 @@
      const isInitial = status === 'INITIAL' || status === 'JOINING';
      const baseInterval = isInitial ? initialPollInterval : pollInterval;
      
-     // Exponential backoff
-     const intervalTime = Math.min(
-       baseInterval * Math.pow(backoffFactor, retryCount), 
-       maxInterval 
-     );
+      // Exponential backoff with jitter (±10%)
+      const jitter = 0.9 + Math.random() * 0.2;
+      const intervalTime = Math.min(
+        baseInterval * Math.pow(backoffFactor, retryCount) * jitter, 
+        maxInterval 
+      );
  
      logger.warn(`Realtime [${label}] status: ${status}. Polling fallback em ${Math.round(intervalTime/1000)}s (Tentativa: ${retryCount})`);
      
