@@ -5,6 +5,9 @@ interface SEOProps {
   type?: 'website' | 'article' | 'product';
   seoSettings?: any;
   canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
 }
 
 export function generateMetaTags({
@@ -14,6 +17,9 @@ export function generateMetaTags({
   type = 'website',
   seoSettings,
   canonical,
+  ogTitle,
+  ogDescription,
+  ogImage,
 }: SEOProps) {
   const seoSuffix = seoSettings?.global_title_suffix || " | Premium Agro Leilões";
   const defaultDesc = seoSettings?.global_description || "A plataforma brasileira de leilões agropecuários com tecnologia de ponta.";
@@ -23,14 +29,18 @@ export function generateMetaTags({
   const finalDesc = description || defaultDesc;
   const finalImage = image || "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp";
 
+  const finalOgTitle = ogTitle || finalTitle;
+  const finalOgDesc = ogDescription || finalDesc;
+  const finalOgImage = ogImage || finalImage;
+
   const meta = [
     { title: finalTitle },
     { name: "description", content: finalDesc },
     
     // Open Graph
-    { property: "og:title", content: finalTitle },
-    { property: "og:description", content: finalDesc },
-    { property: "og:image", content: finalImage },
+     { property: "og:title", content: finalOgTitle },
+     { property: "og:description", content: finalOgDesc },
+     { property: "og:image", content: finalOgImage },
     { property: "og:type", content: type },
     { property: "og:url", content: canonical ? `${siteUrl}${canonical}` : siteUrl },
     { property: "og:site_name", content: "Premium Agro Leilões" },
@@ -38,9 +48,9 @@ export function generateMetaTags({
     
     // Twitter
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: finalTitle },
-    { name: "twitter:description", content: finalDesc },
-    { name: "twitter:image", content: finalImage },
+     { name: "twitter:title", content: finalOgTitle },
+     { name: "twitter:description", content: finalOgDesc },
+     { name: "twitter:image", content: finalOgImage },
   ];
 
   if (seoSettings?.twitter_handle) {
