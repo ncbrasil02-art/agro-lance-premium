@@ -459,14 +459,55 @@ import { generateSlug } from "@/utils/slug";
                </DialogDescription>
              </DialogHeader>
                <Tabs defaultValue="geral" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 mb-4">
-                    <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
-                    <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
-                     <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
-                     <TabsTrigger value="saude" className="text-xs">Saúde do Animal</TabsTrigger>
-                     <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
-                    <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
-                  </TabsList>
+                   <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4">
+                     <TabsTrigger value="geral" className="text-xs">Geral</TabsTrigger>
+                     <TabsTrigger value="registros" className="text-xs">Registros</TabsTrigger>
+                      <TabsTrigger value="genealogia" className="text-xs">Genealogia</TabsTrigger>
+                      <TabsTrigger value="saude" className="text-xs">Saúde</TabsTrigger>
+                      <TabsTrigger value="midia" className="text-xs">Mídia</TabsTrigger>
+                     <TabsTrigger value="venda" className="text-xs">Venda</TabsTrigger>
+                     <TabsTrigger value="seo" className="text-xs">SEO</TabsTrigger>
+                   </TabsList>
+                  <TabsContent value="seo" className="space-y-4 pt-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="slug">Slug (URL amigável)</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          id="slug"
+                          value={formData.slug} 
+                          onChange={(e) => setFormData({ ...formData, slug: e.target.value })} 
+                          placeholder="exemplo-de-link-seo"
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setFormData({ ...formData, slug: generateSlug(formData.name) })}
+                          type="button"
+                        >
+                          Gerar da Nome
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                      <Input 
+                        id="seo_title"
+                        value={formData.seo_title} 
+                        onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })} 
+                        placeholder="Título para buscadores"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="seo_description">SEO Description</Label>
+                      <textarea 
+                        id="seo_description"
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        value={formData.seo_description} 
+                        onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })} 
+                        placeholder="Meta descrição para o Google"
+                      />
+                    </div>
+                  </TabsContent>
 
                   <TabsContent value="venda" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                    <div className="flex items-center space-x-2 border p-4 rounded-md bg-muted/20">
