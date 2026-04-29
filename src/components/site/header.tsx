@@ -18,10 +18,25 @@ import {
 } from "@/components/ui/dropdown-menu";
  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
- import { RefreshCw, Zap, ZapOff } from "lucide-react";
+   import { RefreshCw, Zap, ZapOff, WifiOff } from "lucide-react";
 
-   export function Header() {
-     const router = useRouter();
+    export function Header() {
+      const router = useRouter();
+      const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+ 
+      useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+ 
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+ 
+        return () => {
+          window.removeEventListener('online', handleOnline);
+          window.removeEventListener('offline', handleOffline);
+        };
+      }, []);
+ 
     const { theme, toggle } = useTheme();
     const { siteInfo, homepage, aboutPage } = useSiteSettings();
  
@@ -78,14 +93,16 @@ import {
            <TooltipProvider>
              <Tooltip>
                <TooltipTrigger asChild>
-                 <div className="hidden lg:flex items-center gap-2 cursor-help px-3 py-1.5 rounded-full bg-secondary/50 border border-border/40 transition-smooth hover:bg-secondary">
-                   {isPolling ? (
+                 <div className={`hidden lg:flex items-center gap-2 cursor-help px-3 py-1.5 rounded-full bg-secondary/50 border border-border/40 transition-smooth hover:bg-secondary ${!isOnline ? 'border-destructive/40' : ''}`}>
+                   {!isOnline ? (
+                     <WifiOff className="h-3.5 w-3.5 text-destructive animate-pulse" />
+                   ) : isPolling ? (
                      <ZapOff className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
                    ) : (
                      <Zap className="h-3.5 w-3.5 text-emerald-500" />
                    )}
-                   <span className={`text-[10px] font-bold uppercase tracking-wider ${isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
-                     {isPolling ? 'Polling' : 'Realtime'}
+                   <span className={`text-[10px] font-bold uppercase tracking-wider ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
+                     {!isOnline ? 'Offline' : isPolling ? 'Polling' : 'Realtime'}
                    </span>
                    {delaySeconds > 0 && (
                      <span className="text-[10px] font-medium text-muted-foreground border-l border-border/60 pl-2">
@@ -97,13 +114,15 @@ import {
                <TooltipContent side="bottom" className="text-xs max-w-xs">
                  <div className="space-y-1.5">
                    <p className="font-bold flex items-center gap-1.5">
-                     {isPolling ? <RefreshCw className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
+                     {!isOnline ? <WifiOff className="h-3 w-3" /> : isPolling ? <RefreshCw className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
                      Status da Conexão
                    </p>
                    <p className="text-muted-foreground">
-                     {isPolling 
-                       ? "Sincronizando via polling automático devido a instabilidade no WebSocket." 
-                       : "Conectado via WebSocket. Recebendo atualizações instantâneas."}
+                     {!isOnline 
+                       ? "Você está desconectado da internet. Algumas atualizações podem falhar."
+                       : isPolling 
+                         ? "Sincronizando via polling automático devido a instabilidade no WebSocket." 
+                         : "Conectado via WebSocket. Recebendo atualizações instantâneas."}
                    </p>
                    {delaySeconds > 0 && (
                      <p className="pt-1 border-t border-border/40 text-[10px]">
