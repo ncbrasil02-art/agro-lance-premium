@@ -432,11 +432,13 @@ export const Route = createFileRoute("/painel")({
                            </td>
                            <td className="px-4 py-4">
                              <Badge variant={
-                               offer.status === 'approved' ? 'default' : 
-                               offer.status === 'rejected' ? 'destructive' : 'secondary'
+                               offer.status === 'approved' ? 'default' :
+                               offer.status === 'rejected' ? 'destructive' :
+                               offer.status === 'under_review' ? 'outline' : 'secondary'
                              } className="text-[10px]">
-                               {offer.status === 'pending' ? 'Pendente' : 
-                                offer.status === 'approved' ? 'Aprovada' : 'Rejeitada'}
+                               {offer.status === 'pending' ? 'Pendente' :
+                                offer.status === 'approved' ? 'Aprovada' :
+                                offer.status === 'under_review' ? 'Em Análise' : 'Rejeitada'}
                              </Badge>
                            </td>
                            <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px] truncate" title={offer.description}>

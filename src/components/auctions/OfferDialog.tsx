@@ -56,7 +56,26 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
         offerData.animal_id = item.id;
       }
 
-      const { error } = await supabase.from("offers").insert(offerData);
+       const { data: newOffer, error } = await supabase.from("offers").insert(offerData).select().single();
+       if (!error && newOffer) {
+         // Notify admin
+         const { data: adminProfiles } = await supabase
+           .from("profiles")
+           .select("id")
+           .eq("role", "admin");
+
+         if (adminProfiles && adminProfiles.length > 0) {
+           const adminNotifications = adminProfiles.map(admin => ({
+             user_id: admin.id,
+             title: "Nova Proposta Recebida",
+             message: `Uma nova proposta de ${formatBRL(offerAmount)} foi feita por ${user.email?.split('@')[0]} para ${item.name}.`,
+             link: "/admin"
+           }));
+
+           await supabase.from("notifications").insert(adminNotifications);
+         }
+       }
+
 
       if (error) throw error;
 
