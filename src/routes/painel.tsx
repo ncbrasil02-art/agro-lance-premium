@@ -115,7 +115,8 @@ export const Route = createFileRoute("/painel")({
     const { user, profile, refreshProfile } = useAuth();
     const [activeTab, setActiveTab] = useState("arremates");
     const [myLots, setMyLots] = useState<any[]>([]);
-    const [myBids, setMyBids] = useState<any[]>([]);
+     const [myBids, setMyBids] = useState<any[]>([]);
+     const [myOffers, setMyOffers] = useState<any[]>([]);
      const [myFavorites, setMyFavorites] = useState<any[]>([]);
      const [messages, setMessages] = useState<any[]>([]);
      const [siteInfo, setSiteInfo] = useState<any>(null);
@@ -160,7 +161,15 @@ export const Route = createFileRoute("/painel")({
            .order("created_at", { ascending: false })
            .limit(10);
          
-          setMyBids(userBids || []);
+           setMyBids(userBids || []);
+
+          const { data: userOffers } = await supabase
+            .from("offers")
+            .select("*, animal:animals(name, breed, photos)")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false });
+          
+          setMyOffers(userOffers || []);
 
           const { data: settingsData } = await supabase
             .from("site_settings")
@@ -368,6 +377,81 @@ export const Route = createFileRoute("/painel")({
            <TabsTrigger value="lances" className="gap-2">
              <Clock className="h-4 w-4" /> Meus Lances
            </TabsTrigger>
+           <TabsTrigger value="ofertas" className="gap-2">
+             <TrendingUp className="h-4 w-4" /> Minhas Ofertas
+           </TabsTrigger>
+         <TabsContent value="ofertas" className="space-y-6">
+           <Card>
+             <CardHeader>
+               <CardTitle>Suas Propostas de Compra</CardTitle>
+               <CardDescription>Acompanhe o status das ofertas que você fez em lotes e venda direta.</CardDescription>
+             </CardHeader>
+             <CardContent>
+               {myOffers.length === 0 ? (
+                 <div className="flex flex-col items-center justify-center py-12 text-center">
+                   <TrendingUp className="h-12 w-12 text-muted-foreground/20 mb-4" />
+                   <p className="text-muted-foreground">Você ainda não fez nenhuma proposta.</p>
+                   <Link to="/compra-direta" className="mt-4">
+                     <Button variant="outline">Ver Venda Direta</Button>
+                   </Link>
+                 </div>
+               ) : (
+                 <div className="relative overflow-x-auto">
+                   <table className="w-full text-sm text-left">
+                     <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
+                       <tr>
+                         <th className="px-4 py-3">Data</th>
+                         <th className="px-4 py-3">Animal</th>
+                         <th className="px-4 py-3">Valor</th>
+                         <th className="px-4 py-3">Status</th>
+                         <th className="px-4 py-3">Mensagem</th>
+                       </tr>
+                     </thead>
+                     <tbody className="divide-y border-b">
+                       {myOffers.map((offer) => (
+                         <tr key={offer.id} className="hover:bg-muted/5 transition-colors">
+                           <td className="px-4 py-4 whitespace-nowrap text-xs">
+                             {new Date(offer.created_at).toLocaleDateString("pt-BR")}
+                           </td>
+                           <td className="px-4 py-4">
+                             <div className="flex items-center gap-2">
+                               {offer.animal?.photos?.[0] && (
+                                 <OptimizedImage 
+                                   src={offer.animal.photos[0]} 
+                                   alt="" 
+                                   width={40}
+                                   aspectRatio="square"
+                                   className="h-8 w-8 rounded" 
+                                 />
+                               )}
+                               <span className="font-medium">{offer.animal?.name}</span>
+                             </div>
+                           </td>
+                           <td className="px-4 py-4 font-bold text-emerald-600">
+                             {formatBRL(offer.amount)}
+                           </td>
+                           <td className="px-4 py-4">
+                             <Badge variant={
+                               offer.status === 'approved' ? 'default' : 
+                               offer.status === 'rejected' ? 'destructive' : 'secondary'
+                             } className="text-[10px]">
+                               {offer.status === 'pending' ? 'Pendente' : 
+                                offer.status === 'approved' ? 'Aprovada' : 'Rejeitada'}
+                             </Badge>
+                           </td>
+                           <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px] truncate" title={offer.description}>
+                             {offer.description || "-"}
+                           </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                 </div>
+               )}
+             </CardContent>
+           </Card>
+         </TabsContent>
+
           <TabsTrigger value="favoritos" className="gap-2">
             <Heart className="h-4 w-4" /> Meus Favoritos
           </TabsTrigger>
