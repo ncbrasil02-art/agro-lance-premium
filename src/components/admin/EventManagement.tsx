@@ -1251,7 +1251,7 @@ import { SocialPreview } from "./SocialPreview";
                          <TableHead>Lote</TableHead>
                          <TableHead>Evento</TableHead>
                          <TableHead>Animal</TableHead>
-                         <TableHead>Valor</TableHead>
+                          <TableHead>Valor / Comissão</TableHead>
                          <TableHead className="text-right">Ação</TableHead>
                        </TableRow>
                      </TableHeader>
@@ -1261,7 +1261,16 @@ import { SocialPreview } from "./SocialPreview";
                            <TableCell className="font-bold">#{lot.lot_number}</TableCell>
                            <TableCell className="text-xs">{lot.event?.name}</TableCell>
                            <TableCell className="font-medium uppercase">{lot.animal?.name}</TableCell>
-                           <TableCell className="font-bold text-emerald-deep">{formatBRL(lot.current_price)}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-emerald-deep">{formatBRL(lot.current_price)}</span>
+                                {lot.event?.commission_rate > 0 && (
+                                  <span className="text-[10px] text-amber-600 font-medium">
+                                    + {formatBRL(lot.current_price * (lot.event.commission_rate / 100))} ({lot.event.commission_rate}%)
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
                            <TableCell className="text-right">
                              <Button size="sm" onClick={() => setSelectedLotForWinner(lot)}>
                                <UserPlus className="mr-2 h-4 w-4" /> Atribuir Ganhador
@@ -1342,21 +1351,26 @@ import { SocialPreview } from "./SocialPreview";
                                <span className="text-xs text-muted-foreground italic">Sem arrematante</span>
                              )}
                            </TableCell>
-                           <TableCell>
-                             <div className="flex flex-col">
-                               <span className="font-black text-emerald-deep">
-                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
-                               </span>
-                               <Button 
-                                 variant="ghost" 
-                                 size="sm" 
-                                 className="h-6 px-0 text-[10px] text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
-                                 onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}
-                               >
-                                 <ListOrdered className="h-3 w-3" /> Ver {lot.bids_count || 0} lances
-                               </Button>
-                             </div>
-                           </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-black text-emerald-deep">
+                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lot.current_price || 0)}
+                                </span>
+                                {viewingEventDetails?.commission_rate > 0 && (
+                                  <span className="text-[10px] text-amber-600 font-bold">
+                                    + {formatBRL(lot.current_price * (viewingEventDetails.commission_rate / 100))}
+                                  </span>
+                                )}
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-6 px-0 text-[10px] text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
+                                  onClick={() => { setSelectedLotForBids(lot); fetchLotBids(lot.id); }}
+                                >
+                                  <ListOrdered className="h-3 w-3" /> Ver {lot.bids_count || 0} lances
+                                </Button>
+                              </div>
+                            </TableCell>
                            <TableCell className="text-right">
                              <div className="flex justify-end gap-1">
                                <TooltipProvider>
