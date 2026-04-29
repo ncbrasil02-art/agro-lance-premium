@@ -47,6 +47,21 @@ import { SocialPreview } from "./SocialPreview";
    const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
    const [showBalanceReport, setShowBalanceReport] = useState(false);
 
+    const logAuditAction = async (action: string, entityId: string, details: any) => {
+      try {
+        const { profile } = await supabase.auth.getUser();
+        await supabase.from("audit_logs").insert({
+          user_id: profile?.id,
+          action: action,
+          entity_type: "event",
+          entity_id: entityId,
+          new_data: details
+        });
+      } catch (e) {
+        console.error("Erro ao registrar auditoria:", e);
+      }
+    };
+
    const handleAutoFix = async () => {
      if (!formData.name) {
        toast.error("Preencha ao menos o nome para usar a IA");
@@ -1211,7 +1226,8 @@ import { SocialPreview } from "./SocialPreview";
                                       onClick={() => {
                                         setViewingEventDetails(event);
                                         fetchEventLots(event.id);
-                                        setShowBalanceReport(true);
+                                         setShowBalanceReport(true);
+                                         logAuditAction("VIEW_FINANCIAL_BALANCE", event.id, { event_name: event.name });
                                       }}
                                     >
                                       <BarChart3 className="h-4 w-4" />
@@ -1382,7 +1398,10 @@ import { SocialPreview } from "./SocialPreview";
                            <div className="text-sm font-bold text-emerald-deep uppercase tracking-wider">Lotes e Arrematantes</div>
                            <Button 
                              className="bg-emerald-deep text-gold gap-2 font-bold"
-                             onClick={() => setShowBalanceReport(true)}
+                             onClick={() => {
+                               setShowBalanceReport(true);
+                               logAuditAction("VIEW_FINANCIAL_BALANCE", viewingEventDetails.id, { event_name: viewingEventDetails.name });
+                             }}
                            >
                              <BarChart3 className="h-4 w-4" /> Gerar Balanço Completo
                            </Button>
