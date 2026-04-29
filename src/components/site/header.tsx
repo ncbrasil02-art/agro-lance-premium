@@ -3,7 +3,7 @@
    import { useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
  import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
-import { useState } from "react";
+ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
 import { useAuth } from "../auth/auth-provider";
