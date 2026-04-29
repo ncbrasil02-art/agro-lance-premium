@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2 } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -44,7 +44,8 @@ import { SocialPreview } from "./SocialPreview";
   const [selectedLotForWinner, setSelectedLotForWinner] = useState<any>(null);
   const [searchWinnerQuery, setSearchWinnerQuery] = useState("");
   const [isAssigningWinner, setIsAssigningWinner] = useState(false);
-  const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+   const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+   const [showBalanceReport, setShowBalanceReport] = useState(false);
 
    const handleAutoFix = async () => {
      if (!formData.name) {
@@ -172,7 +173,7 @@ import { SocialPreview } from "./SocialPreview";
             .from("lots")
             .select(`
               *,
-              animal:animals(name, internal_code),
+               animal:animals(name, internal_code, seller:sellers(name)),
               winner:profiles!lots_winner_id_fkey(id, full_name, phone, cpf)
             `)
             .eq("event_id", eventId)
@@ -1178,10 +1179,29 @@ import { SocialPreview } from "./SocialPreview";
                                      <Eye className="h-4 w-4" />
                                    </Button>
                                  </TooltipTrigger>
-                                 <TooltipContent>Ver detalhes e arrematantes</TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                             <TooltipProvider>
+                                  <TooltipContent>Ver detalhes e arrematantes</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="text-amber-600"
+                                      onClick={() => {
+                                        setViewingEventDetails(event);
+                                        fetchEventLots(event.id);
+                                        setShowBalanceReport(true);
+                                      }}
+                                    >
+                                      <BarChart3 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Gerar Balanço Financeiro</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
                                <Tooltip>
                                  <TooltipTrigger asChild>
                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
@@ -1337,9 +1357,19 @@ import { SocialPreview } from "./SocialPreview";
                               <div className="text-2xl font-black text-white">{formatBRL(totalGeneral)}</div>
                             </CardContent>
                           </Card>
-                        </div>
-                        
-                        <div className="border rounded-xl overflow-hidden bg-card">
+                         </div>
+
+                         <div className="flex justify-between items-center mb-4">
+                           <div className="text-sm font-bold text-emerald-deep uppercase tracking-wider">Lotes e Arrematantes</div>
+                           <Button 
+                             className="bg-emerald-deep text-gold gap-2 font-bold"
+                             onClick={() => setShowBalanceReport(true)}
+                           >
+                             <BarChart3 className="h-4 w-4" /> Gerar Balanço Completo
+                           </Button>
+                         </div>
+                         
+                         <div className="border rounded-xl overflow-hidden bg-card">
                    <Table>
                      <TableHeader className="bg-muted/50">
                        <TableRow>
@@ -1651,7 +1681,111 @@ import { SocialPreview } from "./SocialPreview";
                </div>
              </div>
            </DialogContent>
-         </Dialog>
-       </div>
-     );
-   }
+          </Dialog>
+
+          <Dialog open={showBalanceReport} onOpenChange={setShowBalanceReport}>
+            <DialogContent className="max-w-[95vw] sm:max-w-5xl max-h-[90vh] overflow-y-auto bg-white p-0 text-black">
+              <div className="p-8 space-y-8 print:p-0">
+                <div className="text-center border-b-2 border-emerald-900 pb-6 mb-8 flex justify-between items-end">
+                  <div className="text-left">
+                    <h1 className="text-3xl font-black uppercase text-emerald-900 leading-none">Balanço Financeiro</h1>
+                    <p className="text-sm text-gray-500 uppercase font-bold mt-2">Evento: {viewingEventDetails?.name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400 font-bold uppercase">{new Date().toLocaleDateString('pt-BR')}</p>
+                    <p className="text-[10px] text-emerald-600 font-black tracking-widest">PREMIUM AGRO LEILÕES</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                    <div className="flex items-center gap-3 mb-2">
+                      <TrendingUp className="h-5 w-5 text-emerald-600" />
+                      <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">Total Martelo</span>
+                    </div>
+                    <div className="text-2xl font-black text-emerald-900">
+                      {formatBRL(eventLots.reduce((acc, lot) => acc + (lot.current_price || 0), 0))}
+                    </div>
+                  </div>
+                  <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100">
+                    <div className="flex items-center gap-3 mb-2">
+                      <DollarSign className="h-5 w-5 text-amber-600" />
+                      <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider">Comissão ({viewingEventDetails?.commission_rate}%)</span>
+                    </div>
+                    <div className="text-2xl font-black text-amber-900">
+                      {formatBRL(eventLots.reduce((acc, lot) => acc + ((lot.current_price || 0) * ((viewingEventDetails?.commission_rate || 0) / 100)), 0))}
+                    </div>
+                  </div>
+                  <div className="p-6 bg-emerald-900 rounded-2xl border border-emerald-800 shadow-xl shadow-emerald-900/20">
+                    <div className="flex items-center gap-3 mb-2">
+                      <BarChart3 className="h-5 w-5 text-gold" />
+                      <span className="text-[10px] font-black uppercase text-emerald-100 tracking-wider">Balanço Geral</span>
+                    </div>
+                    <div className="text-2xl font-black text-white">
+                      {formatBRL(eventLots.reduce((acc, lot) => acc + (lot.current_price || 0) + ((lot.current_price || 0) * ((viewingEventDetails?.commission_rate || 0) / 100)), 0))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-emerald-900 border-b-2 border-emerald-900/10 pb-2">Detalhamento por Lote</h3>
+                  <div className="border rounded-xl overflow-hidden">
+                    <Table>
+                      <TableHeader className="bg-emerald-900 text-white">
+                        <TableRow className="hover:bg-emerald-900">
+                          <TableHead className="text-white font-bold w-[60px]">Lote</TableHead>
+                          <TableHead className="text-white font-bold">Animal / Vendedor</TableHead>
+                          <TableHead className="text-white font-bold">Arrematante</TableHead>
+                          <TableHead className="text-white font-bold text-right">Martelo</TableHead>
+                          <TableHead className="text-white font-bold text-right">Comissão</TableHead>
+                          <TableHead className="text-white font-bold text-right">Total</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {eventLots.filter(l => l.status === 'sold' || l.current_price > 0).map((lot) => {
+                          const hammer = lot.current_price || 0;
+                          const commission = hammer * ((viewingEventDetails?.commission_rate || 0) / 100);
+                          return (
+                            <TableRow key={lot.id} className="border-b">
+                              <TableCell className="font-black text-emerald-900">#{lot.lot_number}</TableCell>
+                              <TableCell>
+                                <div className="font-bold uppercase text-xs">{lot.animal?.name}</div>
+                                <div className="text-[9px] text-gray-500 font-bold uppercase">{lot.animal?.seller?.name || "Premium Agro"}</div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="font-medium text-xs">{lot.winner?.full_name || "Auditório"}</div>
+                                <div className="text-[9px] text-gray-400">CPF: {lot.winner?.cpf || "---"}</div>
+                              </TableCell>
+                              <TableCell className="text-right font-medium">{formatBRL(hammer)}</TableCell>
+                              <TableCell className="text-right text-amber-600 font-bold">{formatBRL(commission)}</TableCell>
+                              <TableCell className="text-right font-black text-emerald-900">{formatBRL(hammer + commission)}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+
+                <div className="pt-10 space-y-4">
+                  <p className="text-[10px] leading-relaxed text-gray-400 italic">
+                    Este relatório é gerado automaticamente pelo sistema de leilões. Todas as informações financeiras baseiam-se nos arremates registrados.
+                    O site atua como intermediador e os valores de comissão referem-se à prestação de serviço de leiloaria.
+                  </p>
+                  <div className="flex justify-between items-end pt-20">
+                    <div className="w-64 border-t border-black text-center pt-2 text-[10px] uppercase font-bold text-gray-900">Responsável Financeiro</div>
+                    <div className="w-64 border-t border-black text-center pt-2 text-[10px] uppercase font-bold text-gray-900">Diretoria Premium Agro</div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center pt-8 print:hidden">
+                  <Button className="bg-emerald-900 text-white gap-2 px-10 h-12" onClick={() => window.print()}>
+                    <Printer className="h-5 w-5" /> Imprimir Balanço do Evento
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      );
+    }
