@@ -200,10 +200,11 @@ import { generateSlug } from "@/utils/slug";
          seller_id: "none",
          seller_name: "",
           regulation: "",
-          viewers: 0,
-          seo_title: "",
-          seo_description: ""
-      });
+                 viewers: 0,
+                 slug: "",
+                 seo_title: "",
+                 seo_description: ""
+             });
 
      const resetForm = () => {
        setEditingEvent(null);
@@ -250,6 +251,7 @@ import { generateSlug } from "@/utils/slug";
            seller_name: event.seller_name || "",
             regulation: event.regulation || "",
             viewers: event.viewers || 0,
+            slug: event.slug || "",
             seo_title: event.seo_title || "",
             seo_description: event.seo_description || ""
         });
@@ -409,8 +411,13 @@ import { generateSlug } from "@/utils/slug";
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
         } else {
-          const baseSlug = generateSlug(formData.name);
-          const slug = `${baseSlug}-${Math.floor(Math.random() * 1000000)}`;
+          let slug = formData.slug?.trim();
+          if (!slug) {
+            const baseSlug = generateSlug(formData.name);
+            slug = `${baseSlug}-${Math.floor(Math.random() * 1000000)}`;
+          } else {
+            slug = generateSlug(slug);
+          }
           
           const { error } = await supabase.from("events").insert({
             name: formData.name,
