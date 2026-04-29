@@ -16,6 +16,7 @@ import { ThemeProvider } from "@/components/site/theme-provider";
 import { SiteShell } from "@/components/site/site-shell";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { generateMetaTags } from "@/utils/seo";
 
 function NotFoundComponent() {
   return (
@@ -65,26 +66,19 @@ function NotFoundComponent() {
      }
    },
    head: ({ loaderData }) => {
-     const seo = loaderData?.seoSettings;
-     const title = seo?.global_title_suffix ? `Premium Agro Leilões ${seo.global_title_suffix}` : "Premium Agro Leilões — Plataforma premium de leilões agropecuários";
-     const description = seo?.global_description || "A plataforma brasileira de leilões de cavalos, bovinos e embriões com transmissão ao vivo, lances em tempo real e curadoria premium.";
+     const seoSettings = loaderData?.seoSettings;
+     const tags = generateMetaTags({ seoSettings });
      
      return {
        meta: [
          { charSet: "utf-8" },
          { name: "viewport", content: "width=device-width, initial-scale=1" },
-         { title: title },
-         { name: "description", content: description },
-         { property: "og:title", content: title },
-         { property: "og:description", content: description },
-         { property: "og:type", content: "website" },
-         { name: "twitter:card", content: "summary_large_image" },
-         { name: "twitter:title", content: title },
-         { name: "twitter:description", content: description },
-         { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp" },
-         { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp" },
+         ...tags.meta
        ],
-       links: [{ rel: "stylesheet", href: appCss }],
+       links: [
+         { rel: "stylesheet", href: appCss },
+         ...tags.links
+       ],
      };
    },
   shellComponent: RootShell,

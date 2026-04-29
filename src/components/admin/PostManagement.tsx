@@ -12,6 +12,8 @@
  import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SerpPreview } from "./SerpPreview";
+import { SeoAnalysis } from "./SeoAnalysis";
+import { SocialPreview } from "./SocialPreview";
 import { generateSlug, validateSlug } from "@/utils/slug";
  import { toast } from "sonner";
  
@@ -334,13 +336,27 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                       />
                     </div>
 
-                    <div className="pt-4 border-t">
-                      <SerpPreview 
-                        title={formData.seo_title || formData.title}
-                        description={formData.seo_description || formData.excerpt}
-                        slug={formData.slug}
-                        basePath="/noticias"
-                      />
+                    <div className="pt-4 border-t grid md:grid-cols-2 gap-6">
+                      <div className="space-y-6">
+                        <SeoAnalysis 
+                          title={formData.seo_title || formData.title}
+                          description={formData.seo_description || formData.excerpt}
+                          content={formData.content}
+                        />
+                        <SerpPreview 
+                          title={formData.seo_title || formData.title}
+                          description={formData.seo_description || formData.excerpt}
+                          slug={formData.slug}
+                          basePath="/noticias"
+                        />
+                      </div>
+                      <div className="space-y-6">
+                        <SocialPreview 
+                          title={formData.seo_title || formData.title}
+                          description={formData.seo_description || formData.excerpt}
+                          image={formData.featured_image}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
                   <TabsContent value="preview" className="pt-4">
