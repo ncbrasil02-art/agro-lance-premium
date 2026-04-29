@@ -27,7 +27,7 @@ export function generateMetaTags({
 
   const finalTitle = title ? `${title}${seoSuffix}` : "Premium Agro Leilões";
   const finalDesc = description || defaultDesc;
-  const finalImage = image || "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp";
+  const finalImage = image || seoSettings?.og_default_image || "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp";
 
   const finalOgTitle = ogTitle || finalTitle;
   const finalOgDesc = ogDescription || finalDesc;
