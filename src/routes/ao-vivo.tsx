@@ -677,7 +677,6 @@ export const Route = createFileRoute("/ao-vivo")({
              }
           }
           setLastSyncAt(new Date());
-          setPollingRetryCount(0); // Reset retry count on success
         }
       } catch (err) {
         console.error("Erro ao sincronizar dados:", err);
