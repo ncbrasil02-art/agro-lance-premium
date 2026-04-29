@@ -134,8 +134,11 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
                 type="number"
                 placeholder="0,00" 
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="h-12 pl-10 bg-white/5 border-white/10 text-xl font-bold text-white focus:ring-gold"
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (amountError) setAmountError(false);
+                }}
+                className={`h-12 pl-10 bg-white/5 border-white/10 text-xl font-bold text-white focus:ring-gold ${amountError ? 'border-red-500 ring-1 ring-red-500' : ''}`}
               />
             </div>
             
