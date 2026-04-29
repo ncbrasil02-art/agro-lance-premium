@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
  import { Loader2, Search, AlertCircle, AlertTriangle, Info, CheckCircle2, ShieldCheck, Globe, ArrowRight, RefreshCw, History, Calendar, Play, Wand2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -14,6 +15,7 @@ export function BulkSeoAudit() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFixing, setIsFixing] = useState<string | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
+  const [activeAudit, setActiveAudit] = useState<any>(null);
   const [results, setResults] = useState<any[]>([]);
   const [auditHistory, setAuditHistory] = useState<any[]>([]);
   const [summary, setSummary] = useState({
@@ -113,13 +115,43 @@ export function BulkSeoAudit() {
     }
   };
 
+  useEffect(() => {
+    let interval: any;
+    if (isAuditing && activeAudit?.id) {
+      interval = setInterval(async () => {
+        const { data } = await supabase
+          .from('seo_audits')
+          .select('*')
+          .eq('id', activeAudit.id)
+          .single();
+        
+        if (data) {
+          setActiveAudit(data);
+          if (data.status === 'completed' || data.status === 'failed') {
+            setIsAuditing(false);
+            fetchHistory();
+            toast.success("Auditoria do servidor concluída!");
+          }
+        }
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [isAuditing, activeAudit?.id]);
+
   const triggerServerAudit = async () => {
     setIsAuditing(true);
     try {
       const { data, error } = await supabase.functions.invoke('seo-audit');
       if (error) throw error;
-      toast.success("Auditoria agendada executada com sucesso!");
-      fetchHistory();
+      
+      const { data: auditData } = await supabase
+        .from('seo_audits')
+        .select('*')
+        .eq('id', data.auditId)
+        .single();
+      
+      setActiveAudit(auditData);
+      toast.info("Auditoria iniciada no servidor...");
     } catch (error: any) {
       toast.error("Erro ao disparar auditoria: " + error.message);
     } finally {
