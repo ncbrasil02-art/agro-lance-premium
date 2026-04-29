@@ -739,6 +739,16 @@ import { SocialPreview } from "./SocialPreview";
                     />
                   </div>
                 </TabsContent>
+                <TabsContent value="rich" className="space-y-4 pt-4">
+                  <RichResultsPreview 
+                    type="event"
+                    title={formData.og_title || formData.seo_title || formData.name}
+                    data={{
+                      startDate: formData.start_date,
+                      location: formData.location || "Arena Digital"
+                    }}
+                  />
+                </TabsContent>
 
                 <TabsContent value="basico" className="space-y-4 animate-in fade-in slide-in-from-left-2">
                   <div className="grid gap-2">
