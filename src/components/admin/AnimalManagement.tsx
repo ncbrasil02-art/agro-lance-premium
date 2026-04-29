@@ -5,7 +5,7 @@
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign, Filter, ShieldCheck } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Check, ShoppingCart, DollarSign, Filter, ShieldCheck, Wand2 } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Checkbox } from "@/components/ui/checkbox";
@@ -39,7 +39,34 @@ import { RichResultsPreview } from "./RichResultsPreview";
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
   const [customHealthItem, setCustomHealthItem] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
+  const [isAiFixing, setIsAiFixing] = useState(false);
   
+   const handleAutoFix = async () => {
+     if (!formData.name) {
+       toast.error("Preencha ao menos o nome para usar a IA");
+       return;
+     }
+     setIsAiFixing(true);
+     try {
+       const { data: aiFix, error: aiError } = await supabase.functions.invoke('seo-fixer', {
+         body: { type: 'Animal', title: formData.name, content: formData.description || formData.breed }
+       });
+       if (aiError) throw aiError;
+       setFormData({
+         ...formData,
+         seo_title: aiFix.seo_title,
+         seo_description: aiFix.seo_description,
+         og_title: aiFix.og_title,
+         og_description: aiFix.og_description
+       });
+       toast.success("SEO otimizado com IA!");
+     } catch (error: any) {
+       toast.error("Erro ao otimizar: " + error.message);
+     } finally {
+       setIsAiFixing(false);
+     }
+   };
+
       const [formData, setFormData] = useState<any>({
          seller_id: "",
          category_id: "",
@@ -504,7 +531,20 @@ import { RichResultsPreview } from "./RichResultsPreview";
                       </div>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-7 text-[10px] uppercase font-bold text-emerald-600 gap-1"
+                          onClick={handleAutoFix}
+                          disabled={isAiFixing}
+                          type="button"
+                        >
+                          {isAiFixing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                          Auto-completar com IA
+                        </Button>
+                      </div>
                       <Input 
                         id="seo_title"
                         value={formData.seo_title} 

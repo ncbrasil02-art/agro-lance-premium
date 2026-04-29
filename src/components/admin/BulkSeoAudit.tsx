@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { analyzeSEO } from "@/utils/seo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, AlertCircle, AlertTriangle, Info, CheckCircle2, ShieldCheck, Globe, ArrowRight, RefreshCw, History, Calendar, Play } from "lucide-react";
+ import { Loader2, Search, AlertCircle, AlertTriangle, Info, CheckCircle2, ShieldCheck, Globe, ArrowRight, RefreshCw, History, Calendar, Play, Wand2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { ptBR } from "date-fns/locale";
 
 export function BulkSeoAudit() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isFixing, setIsFixing] = useState<string | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const [auditHistory, setAuditHistory] = useState<any[]>([]);
@@ -44,17 +45,17 @@ export function BulkSeoAudit() {
       
       animals.data?.forEach(a => {
         const issues = analyzeSEO(a.seo_title || a.name, a.seo_description || "", "", a.photos?.[0], a.og_title || undefined, a.og_description || undefined);
-        allItems.push({ id: a.id, name: a.name, type: 'Animal', issues });
+        allItems.push({ id: a.id, name: a.name, type: 'Animal', issues, rawContent: a.seo_description });
       });
 
       posts.data?.forEach(p => {
         const issues = analyzeSEO(p.seo_title || p.title, p.seo_description || "", p.content || "", p.featured_image || undefined, p.og_title || undefined, p.og_description || undefined);
-        allItems.push({ id: p.id, name: p.title, type: 'Notícia', issues });
+        allItems.push({ id: p.id, name: p.title, type: 'Notícia', issues, rawContent: p.content });
       });
 
       events.data?.forEach(e => {
         const issues = analyzeSEO(e.seo_title || e.name, e.seo_description || "", "", e.banner_url || undefined, e.og_title || undefined, e.og_description || undefined);
-        allItems.push({ id: e.id, name: e.name, type: 'Evento', issues });
+        allItems.push({ id: e.id, name: e.name, type: 'Evento', issues, rawContent: e.seo_description });
       });
 
       setResults(allItems);
@@ -73,6 +74,42 @@ export function BulkSeoAudit() {
       toast.error("Erro na auditoria: " + error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const autoFixItem = async (item: any) => {
+    setIsFixing(item.id);
+    try {
+      const { data: aiFix, error: aiError } = await supabase.functions.invoke('seo-fixer', {
+        body: { 
+          type: item.type, 
+          title: item.name, 
+          content: item.rawContent || item.name 
+        }
+      });
+
+      if (aiError) throw aiError;
+
+      const table = item.type === 'Animal' ? 'animals' : item.type === 'Notícia' ? 'posts' : 'events';
+      
+      const { error: updateError } = await supabase
+        .from(table)
+        .update({
+          seo_title: aiFix.seo_title,
+          seo_description: aiFix.seo_description,
+          og_title: aiFix.og_title,
+          og_description: aiFix.og_description
+        })
+        .eq('id', item.id);
+
+      if (updateError) throw updateError;
+
+      toast.success(`${item.type} otimizado com sucesso!`);
+      runAudit();
+    } catch (error: any) {
+      toast.error("Erro ao otimizar: " + error.message);
+    } finally {
+      setIsFixing(null);
     }
   };
 
@@ -185,9 +222,23 @@ export function BulkSeoAudit() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase gap-1 text-muted-foreground hover:text-gold">
-                              Ver <ArrowRight className="h-3 w-3" />
-                            </Button>
+                           <div className="flex justify-end gap-2">
+                             {item.issues.length > 0 && (
+                               <Button 
+                                 variant="outline" 
+                                 size="sm" 
+                                 className="h-8 text-[10px] font-bold uppercase gap-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                                 onClick={() => autoFixItem(item)}
+                                 disabled={isFixing === item.id}
+                                >
+                                 {isFixing === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                                 Auto-corrigir
+                               </Button>
+                             )}
+                             <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase gap-1 text-muted-foreground hover:text-gold">
+                               Ver <ArrowRight className="h-3 w-3" />
+                             </Button>
+                           </div>
                           </TableCell>
                         </TableRow>
                       ))

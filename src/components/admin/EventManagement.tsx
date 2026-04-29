@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer } from "lucide-react";
+ import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2 } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -28,6 +28,7 @@ import { SocialPreview } from "./SocialPreview";
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isAiFixing, setIsAiFixing] = useState(false);
    const [statusFilter, setStatusFilter] = useState("all");
    const [pendingWinnerLots, setPendingWinnerLots] = useState<any[]>([]);
    const [isPendingLoading, setIsPendingLoading] = useState(false);
@@ -44,6 +45,32 @@ import { SocialPreview } from "./SocialPreview";
   const [searchWinnerQuery, setSearchWinnerQuery] = useState("");
   const [isAssigningWinner, setIsAssigningWinner] = useState(false);
   const [filteredProfiles, setFilteredProfiles] = useState<any[]>([]);
+
+   const handleAutoFix = async () => {
+     if (!formData.name) {
+       toast.error("Preencha ao menos o nome para usar a IA");
+       return;
+     }
+     setIsAiFixing(true);
+     try {
+       const { data: aiFix, error: aiError } = await supabase.functions.invoke('seo-fixer', {
+         body: { type: 'Evento', title: formData.name, content: formData.description }
+       });
+       if (aiError) throw aiError;
+       setFormData({
+         ...formData,
+         seo_title: aiFix.seo_title,
+         seo_description: aiFix.seo_description,
+         og_title: aiFix.og_title,
+         og_description: aiFix.og_description
+       });
+       toast.success("SEO otimizado com IA!");
+     } catch (error: any) {
+       toast.error("Erro ao otimizar: " + error.message);
+     } finally {
+       setIsAiFixing(false);
+     }
+   };
 
   const fetchLotBids = async (lotId: string) => {
     setIsBidsLoading(true);
@@ -664,7 +691,20 @@ import { SocialPreview } from "./SocialPreview";
                     </div>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-[10px] uppercase font-bold text-emerald-600 gap-1"
+                        onClick={handleAutoFix}
+                        disabled={isAiFixing}
+                        type="button"
+                      >
+                        {isAiFixing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                        Auto-completar com IA
+                      </Button>
+                    </div>
                     <Input 
                       id="seo_title"
                       value={formData.seo_title} 

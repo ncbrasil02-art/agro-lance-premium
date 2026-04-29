@@ -41,8 +41,35 @@ import { generateSlug, validateSlug } from "@/utils/slug";
    const [categories, setCategories] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
+   const [isAiFixing, setIsAiFixing] = useState(false);
    const [searchQuery, setSearchQuery] = useState("");
  
+   const handleAutoFix = async () => {
+     if (!formData.title) {
+       toast.error("Preencha ao menos o título para usar a IA");
+       return;
+     }
+     setIsAiFixing(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('seo-fixer', {
+         body: { type: 'Notícia', title: formData.title, content: formData.content || formData.excerpt }
+       });
+       if (error) throw error;
+       setFormData({
+         ...formData,
+         seo_title: data.seo_title,
+         seo_description: data.seo_description,
+         og_title: data.og_title,
+         og_description: data.og_description
+       });
+       toast.success("SEO otimizado com IA!");
+     } catch (error: any) {
+       toast.error("Erro ao otimizar: " + error.message);
+     } finally {
+       setIsAiFixing(false);
+     }
+   };
+
    const fetchData = async () => {
      setIsLoading(true);
      try {
@@ -330,7 +357,20 @@ import { generateSlug, validateSlug } from "@/utils/slug";
                       </div>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                       <div className="flex items-center justify-between">
+                         <Label htmlFor="seo_title">SEO Title (Título da Aba)</Label>
+                         <Button 
+                           variant="ghost" 
+                           size="sm" 
+                           className="h-7 text-[10px] uppercase font-bold text-emerald-600 gap-1"
+                           onClick={handleAutoFix}
+                           disabled={isAiFixing}
+                           type="button"
+                         >
+                           {isAiFixing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                           Auto-completar com IA
+                         </Button>
+                       </div>
                       <Input 
                         id="seo_title"
                         value={formData.seo_title} 

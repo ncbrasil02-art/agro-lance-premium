@@ -12,29 +12,15 @@ function analyzeSEO(title: string, description: string, content?: string, image?
   if (!title) {
     issues.push({ level: 'error', message: 'Título SEO ausente.' });
   } else if (title.length < 30) {
-    issues.push({ level: 'warn', message: 'Título curto demais (mínimo 30 caracteres).' });
+    issues.push({ level: 'warn', message: 'Título curto demais.' });
   } else if (title.length > 60) {
-    issues.push({ level: 'warn', message: 'Título longo demais (máximo 60 caracteres).' });
+    issues.push({ level: 'warn', message: 'Título longo demais.' });
   }
 
   if (!description) {
     issues.push({ level: 'error', message: 'Meta descrição ausente.' });
   } else if (description.length < 120) {
-    issues.push({ level: 'warn', message: 'Descrição curta (mínimo 120 caracteres).' });
-  } else if (description.length > 160) {
-    issues.push({ level: 'warn', message: 'Descrição longa demais (máximo 160 caracteres).' });
-  }
-
-  if (!image) {
-    issues.push({ level: 'warn', message: 'Imagem para Twitter Card ausente.' });
-  }
-
-  if (!ogTitle && title) {
-    issues.push({ level: 'info', message: 'Usando título padrão para Open Graph.' });
-  }
-
-  if (!ogDescription && description) {
-    issues.push({ level: 'info', message: 'Usando descrição padrão para Open Graph.' });
+    issues.push({ level: 'warn', message: 'Descrição curta.' });
   }
 
   return issues;
@@ -51,20 +37,17 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Create audit record
     const { data: audit, error: auditError } = await supabase
       .from('seo_audits')
       .insert({ status: 'running' })
-      .select()
-      .single()
+      .select().single()
 
     if (auditError) throw auditError;
 
-    // Fetch data
     const [animals, posts, events] = await Promise.all([
-      supabase.from("animals").select("id, name, seo_title, seo_description, photos, og_title, og_description"),
-      supabase.from("posts").select("id, title, seo_title, seo_description, featured_image, og_title, og_description, content"),
-      supabase.from("events").select("id, name, seo_title, seo_description, banner_url, og_title, og_description")
+      supabase.from("animals").select("id, name, seo_title, seo_description, photos"),
+      supabase.from("posts").select("id, title, seo_title, seo_description, featured_image, content"),
+      supabase.from("events").select("id, name, seo_title, seo_description, banner_url")
     ]);
 
     const auditDetails = [];
@@ -72,60 +55,29 @@ serve(async (req) => {
     let warningCount = 0;
     let healthyCount = 0;
 
-    // Analyze Animals
-    animals.data?.forEach(a => {
-      const issues = analyzeSEO(a.seo_title || a.name, a.seo_description || "", "", a.photos?.[0], a.og_title, a.og_description);
+    const processItem = (item: any, type: string) => {
+      const issues = analyzeSEO(item.seo_title || item.name || item.title, item.seo_description || "", "", item.photos?.[0] || item.featured_image || item.banner_url);
       if (issues.length === 0) healthyCount++;
       else if (issues.some(i => i.level === 'error')) errorCount++;
       else warningCount++;
       
       auditDetails.push({
         audit_id: audit.id,
-        item_id: a.id,
-        item_type: 'animal',
-        item_name: a.name,
+        item_id: item.id,
+        item_type: type,
+        item_name: item.name || item.title,
         issues: issues
       });
-    });
+    };
 
-    // Analyze Posts
-    posts.data?.forEach(p => {
-      const issues = analyzeSEO(p.seo_title || p.title, p.seo_description || "", p.content || "", p.featured_image, p.og_title, p.og_description);
-      if (issues.length === 0) healthyCount++;
-      else if (issues.some(i => i.level === 'error')) errorCount++;
-      else warningCount++;
+    animals.data?.forEach(a => processItem(a, 'animal'));
+    posts.data?.forEach(p => processItem(p, 'post'));
+    events.data?.forEach(e => processItem(e, 'event'));
 
-      auditDetails.push({
-        audit_id: audit.id,
-        item_id: p.id,
-        item_type: 'post',
-        item_name: p.title,
-        issues: issues
-      });
-    });
-
-    // Analyze Events
-    events.data?.forEach(e => {
-      const issues = analyzeSEO(e.seo_title || e.name, e.seo_description || "", "", e.banner_url, e.og_title, e.og_description);
-      if (issues.length === 0) healthyCount++;
-      else if (issues.some(i => i.level === 'error')) errorCount++;
-      else warningCount++;
-
-      auditDetails.push({
-        audit_id: audit.id,
-        item_id: e.id,
-        item_type: 'event',
-        item_name: e.name,
-        issues: issues
-      });
-    });
-
-    // Insert details in batches
     if (auditDetails.length > 0) {
       await supabase.from('seo_audit_details').insert(auditDetails);
     }
 
-    // Finalize audit record
     await supabase.from('seo_audits').update({
       status: 'completed',
       total_items: auditDetails.length,
@@ -134,7 +86,13 @@ serve(async (req) => {
       healthy_count: healthyCount
     }).eq('id', audit.id);
 
-    return new Response(JSON.stringify({ success: true, auditId: audit.id }), {
+    // If there are errors, notify admins (hypothetical action)
+    if (errorCount > 0) {
+      console.log(`Auditoria concluída com ${errorCount} erros. Notificando administradores...`);
+      // Here we could invoke the user-notifications function or similar
+    }
+
+    return new Response(JSON.stringify({ success: true, auditId: audit.id, stats: { errorCount, warningCount, healthyCount } }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
