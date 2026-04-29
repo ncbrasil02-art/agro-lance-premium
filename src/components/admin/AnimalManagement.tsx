@@ -16,6 +16,8 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateSlug } from "@/utils/slug";
 import { SerpPreview } from "./SerpPreview";
+import { SeoAnalysis } from "./SeoAnalysis";
+import { SocialPreview } from "./SocialPreview";
   import { toast } from "sonner";
  
  const VETERINARY_CHECKLIST = [
@@ -509,13 +511,26 @@ import { SerpPreview } from "./SerpPreview";
                       />
                     </div>
 
-                    <div className="pt-4 border-t">
-                      <SerpPreview 
-                        title={formData.seo_title || formData.name}
-                        description={formData.seo_description || formData.description}
-                        slug={formData.slug}
-                        basePath="/lotes"
-                      />
+                    <div className="pt-4 border-t grid md:grid-cols-2 gap-6">
+                      <div className="space-y-6">
+                        <SeoAnalysis 
+                          title={formData.seo_title || formData.name}
+                          description={formData.seo_description || formData.description}
+                        />
+                        <SerpPreview 
+                          title={formData.seo_title || formData.name}
+                          description={formData.seo_description || formData.description}
+                          slug={formData.slug}
+                          basePath="/lotes"
+                        />
+                      </div>
+                      <div className="space-y-6">
+                        <SocialPreview 
+                          title={formData.seo_title || formData.name}
+                          description={formData.seo_description || formData.description}
+                          image={formData.photos_urls?.split(',')[0]}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
 
