@@ -100,7 +100,8 @@
   function AdminLayout() {
      const [isMounted, setIsMounted] = useState(false);
      const { profile, isLoading: authLoading, signOut } = useAuth();
-     const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+      const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+      const [settingsTab, setSettingsTab] = useState("geral");
      const [selectedEventId, setSelectedEventId] = useState<string>("all");
      const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [stats, setStats] = useState({
@@ -261,7 +262,14 @@
                        <Button variant="outline" className="w-full border-gold/30" onClick={() => setActiveTab("posts")}>
                          <Newspaper className="mr-2 h-4 w-4 text-gold" /> Criar Artigos
                        </Button>
-                       <Button variant="outline" className="w-full border-gold/30" onClick={() => setActiveTab("settings")}>
+                       <Button 
+                         variant="outline" 
+                         className="w-full border-gold/30" 
+                         onClick={() => {
+                           setSettingsTab("content");
+                           setActiveTab("settings");
+                         }}
+                       >
                          <Info className="mr-2 h-4 w-4 text-gold" /> Gerenciar Pág. Sobre
                        </Button>
                       <Button className="w-full bg-gold hover:bg-gold/90 text-emerald-deep" onClick={() => setActiveTab("events")}>
@@ -320,7 +328,7 @@
              {activeTab === "security" && <BidSecurityAudit />}
              {activeTab === "rls_test" && <RLSSecurityTests />}
              {activeTab === "logs" && <SystemLogs />}
-              {activeTab === "settings" && <SiteSettings />}
+               {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
        </main>
      </div>
    );
