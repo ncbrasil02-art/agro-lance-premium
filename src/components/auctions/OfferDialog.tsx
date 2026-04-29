@@ -106,8 +106,7 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
-          <div className="grid gap-2">
+         <div className="space-y-4 py-4">
            <div className="grid gap-2">
              <div className="flex justify-between items-center mb-1">
                <Label htmlFor="offer_amount" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Valor Total da Proposta</Label>
@@ -140,7 +139,6 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
                    </Button>
                  );
                })}
-             </div>
            </div>
 
            <div className="grid gap-2">
