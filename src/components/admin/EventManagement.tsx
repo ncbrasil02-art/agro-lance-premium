@@ -199,9 +199,11 @@ import { generateSlug } from "@/utils/slug";
         auctioneer_name: "",
          seller_id: "none",
          seller_name: "",
-         regulation: "",
-         viewers: 0
-     });
+          regulation: "",
+          viewers: 0,
+          seo_title: "",
+          seo_description: ""
+      });
 
      const resetForm = () => {
        setEditingEvent(null);
@@ -244,9 +246,11 @@ import { generateSlug } from "@/utils/slug";
          auctioneer_name: event.auctioneer_name || "",
            seller_id: event.seller_id || "none",
            seller_name: event.seller_name || "",
-           regulation: event.regulation || "",
-           viewers: event.viewers || 0
-       });
+            regulation: event.regulation || "",
+            viewers: event.viewers || 0,
+            seo_title: event.seo_title || "",
+            seo_description: event.seo_description || ""
+        });
        setIsDialogOpen(true);
      };
  
@@ -394,9 +398,11 @@ import { generateSlug } from "@/utils/slug";
                auctioneer_name: formData.auctioneer_name,
                 seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
                  seller_name: formData.seller_name,
-                 regulation: formData.regulation,
-                 viewers: formData.viewers
-             })
+                  regulation: formData.regulation,
+                  viewers: formData.viewers,
+                  seo_title: formData.seo_title,
+                  seo_description: formData.seo_description
+              })
              .eq("id", editingEvent.id);
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
@@ -420,10 +426,12 @@ import { generateSlug } from "@/utils/slug";
             auctioneer_name: formData.auctioneer_name,
             seller_id: formData.seller_id === "none" ? null : (formData.seller_id || null),
              seller_name: formData.seller_name,
-             slug: slug,
-             regulation: formData.regulation,
-             viewers: formData.viewers
-          });
+              slug: slug,
+              regulation: formData.regulation,
+              viewers: formData.viewers,
+              seo_title: formData.seo_title,
+              seo_description: formData.seo_description
+           });
           if (error) throw error;
           toast.success("Evento criado com sucesso");
         }
