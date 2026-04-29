@@ -471,7 +471,7 @@ import { SocialPreview } from "./SocialPreview";
                </DialogDescription>
              </DialogHeader>
                <Tabs defaultValue="geral" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-4">
+                     <TabsList className="grid w-full grid-cols-5 md:grid-cols-9 mb-4">
                       <TabsTrigger value="geral" className="text-[10px] md:text-xs">Geral</TabsTrigger>
                       <TabsTrigger value="registros" className="text-[10px] md:text-xs">Registros</TabsTrigger>
                        <TabsTrigger value="genealogia" className="text-[10px] md:text-xs">Genealogia</TabsTrigger>
@@ -480,6 +480,7 @@ import { SocialPreview } from "./SocialPreview";
                       <TabsTrigger value="venda" className="text-[10px] md:text-xs">Venda</TabsTrigger>
                       <TabsTrigger value="seo" className="text-[10px] md:text-xs">SEO</TabsTrigger>
                       <TabsTrigger value="social" className="text-[10px] md:text-xs">Social</TabsTrigger>
+                      <TabsTrigger value="rich" className="text-[10px] md:text-xs">Rich Results</TabsTrigger>
                     </TabsList>
                   <TabsContent value="seo" className="space-y-4 pt-4">
                     <div className="grid gap-2">
@@ -538,6 +539,18 @@ import { SocialPreview } from "./SocialPreview";
                          />
                        </div>
                      </div>
+                  </TabsContent>
+                  <TabsContent value="rich" className="space-y-4 pt-4">
+                    <RichResultsPreview 
+                      type="product"
+                      title={formData.og_title || formData.seo_title || formData.name}
+                      data={{
+                        price: Number(formData.sale_price) || 0,
+                        currency: "BRL",
+                        availability: formData.sale_status === 'available' ? "Em estoque" : "Vendido",
+                        reviews: 8
+                      }}
+                    />
                   </TabsContent>
                   <TabsContent value="social" className="space-y-4 pt-4">
                     <div className="grid gap-4">
