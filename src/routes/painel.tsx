@@ -702,7 +702,7 @@ export const Route = createFileRoute("/painel")({
   );
 }
 
-function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
+ function LotPurchaseCard({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
   return (
     <Card className="overflow-hidden border-2 hover:border-gold/30 transition-all shadow-md">
       <div className="grid md:grid-cols-[240px_1fr] lg:grid-cols-[300px_1fr]">
@@ -758,24 +758,27 @@ function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
           <Separator className="mb-6" />
 
           <div className="flex flex-wrap gap-3 mt-auto">
-            <DocumentButton 
-              title="Termo de Arrematação" 
-              lot={lot} 
-              profile={profile}
-              type="termo"
-            />
-            <DocumentButton 
-              title="Nota de Venda" 
-              lot={lot} 
-              profile={profile}
-              type="nota"
-            />
-            <DocumentButton 
-              title="Contrato de Compra" 
-              lot={lot} 
-              profile={profile}
-              type="contrato"
-            />
+             <DocumentButton 
+               title="Termo de Arrematação" 
+               lot={lot} 
+               profile={profile}
+               siteInfo={siteInfo}
+               type="termo"
+             />
+             <DocumentButton 
+               title="Nota de Venda" 
+               lot={lot} 
+               profile={profile}
+               siteInfo={siteInfo}
+               type="nota"
+             />
+             <DocumentButton 
+               title="Contrato de Compra" 
+               lot={lot} 
+               profile={profile}
+               siteInfo={siteInfo}
+               type="contrato"
+             />
             <PaymentDialog lot={lot} profile={profile} />
           </div>
         </div>
@@ -784,7 +787,7 @@ function LotPurchaseCard({ lot, profile }: { lot: any, profile: any }) {
   );
 }
 
-function DocumentButton({ title, lot, profile, type }: { title: string, lot: any, profile: any, type: string }) {
+ function DocumentButton({ title, lot, profile, siteInfo, type }: { title: string, lot: any, profile: any, siteInfo: any, type: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
