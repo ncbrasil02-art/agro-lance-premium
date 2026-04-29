@@ -28,6 +28,7 @@ import { toast } from "sonner";
  import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OfferDialog } from "@/components/auctions/OfferDialog";
 import {
   Dialog,
   DialogContent,
@@ -321,8 +322,6 @@ function LotDetail() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
-  const [isOfferLoading, setIsOfferLoading] = useState(false);
-  const [offerData, setOfferData] = useState({ amount: "", description: "" });
 
    const [rtStatus, setRtStatus] = useState<string>("INITIAL");
  
@@ -441,29 +440,6 @@ function LotDetail() {
     }
   };
 
-  const handleSendOffer = async () => {
-    if (!user) { toast.error("Faça login para enviar uma proposta."); return; }
-    if (!offerData.amount) { toast.error("Informe o valor da proposta."); return; }
-    
-    setIsOfferLoading(true);
-    try {
-      const { error } = await supabase.from("offers").insert({
-        lot_id: lot.id,
-        user_id: user.id,
-        amount: parseFloat(offerData.amount),
-        description: offerData.description
-      });
-
-      if (error) throw error;
-      toast.success("Proposta enviada com sucesso! O vendedor entrará em contato.");
-      setIsOfferDialogOpen(false);
-      setOfferData({ amount: "", description: "" });
-    } catch (e: any) {
-      toast.error("Erro ao enviar proposta: " + e.message);
-    } finally {
-      setIsOfferLoading(false);
-    }
-  };
 
   const toggleFavorite = async () => {
     if (!user) { toast.error("Faça login."); return; }
