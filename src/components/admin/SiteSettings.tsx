@@ -8,7 +8,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
-import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star } from "lucide-react";
+import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe } from "lucide-react";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -33,6 +33,18 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
  
   export function SiteSettings() {
     const [isLoading, setIsLoading] = useState(true);
+    const [seoSettings, setSeoSettings] = useState({
+      global_title_suffix: " | Premium Agro Leilões",
+      global_description: "A melhor plataforma de leilões agropecuários do Brasil.",
+      home_title: "Home",
+      home_description: "",
+      about_title: "Sobre",
+      about_description: "",
+      news_title: "Notícias",
+      news_description: "",
+      google_analytics_id: "",
+      facebook_pixel_id: ""
+    });
      const [aboutPage, setAboutPage] = useState({
        enabled: true,
        title: "Sobre",
@@ -112,17 +124,19 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
  
         const info = data.find(i => i.key === "site_info")?.value;
         const themeData = data.find(i => i.key === "theme")?.value;
-         const homeData = data.find(i => i.key === "homepage_sections")?.value;
-         const aboutData = data.find(i => i.key === "about_page")?.value;
-         const textsData = data.find(i => i.key === "custom_texts")?.value;
-        const palettes = data.find(i => i.key === "saved_palettes")?.value;
-
-        if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
-        if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
-         if (homeData) setHomepage((prev: any) => ({ ...prev, ...(homeData as any) }));
-         if (aboutData) setAboutPage((prev: any) => ({ ...prev, ...(aboutData as any) }));
-         if (textsData) setCustomTexts((prev: any) => ({ ...prev, ...(textsData as any) }));
-        if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
+          const homeData = data.find(i => i.key === "homepage_sections")?.value;
+          const aboutData = data.find(i => i.key === "about_page")?.value;
+          const textsData = data.find(i => i.key === "custom_texts")?.value;
+          const seoData = data.find(i => i.key === "seo_settings")?.value;
+         const palettes = data.find(i => i.key === "saved_palettes")?.value;
+ 
+         if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
+         if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
+          if (homeData) setHomepage((prev: any) => ({ ...prev, ...(homeData as any) }));
+          if (aboutData) setAboutPage((prev: any) => ({ ...prev, ...(aboutData as any) }));
+          if (textsData) setCustomTexts((prev: any) => ({ ...prev, ...(textsData as any) }));
+          if (seoData) setSeoSettings((prev: any) => ({ ...prev, ...(seoData as any) }));
+         if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
 
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
@@ -275,6 +289,9 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
           </TabsTrigger>
           <TabsTrigger value="content" className="gap-2">
             <FileText className="h-4 w-4" /> Conteúdo
+          </TabsTrigger>
+          <TabsTrigger value="seo" className="gap-2">
+            <Globe className="h-4 w-4" /> SEO
           </TabsTrigger>
         </TabsList>
 
