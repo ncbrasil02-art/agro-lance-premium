@@ -410,9 +410,14 @@ export const Route = createFileRoute("/painel")({
                      <tbody className="divide-y border-b">
                        {myOffers.map((offer) => (
                          <tr key={offer.id} className="hover:bg-muted/5 transition-colors">
-                           <td className="px-4 py-4 whitespace-nowrap text-xs">
-                             {new Date(offer.created_at).toLocaleDateString("pt-BR")}
-                           </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div className="text-xs font-medium">{new Date(offer.created_at).toLocaleDateString("pt-BR")}</div>
+                              {offer.updated_at && offer.updated_at !== offer.created_at && (
+                                <div className="text-[9px] text-muted-foreground flex items-center gap-1 mt-1">
+                                  <Clock className="h-2 w-2" /> {new Date(offer.updated_at).toLocaleDateString("pt-BR")}
+                                </div>
+                              )}
+                            </td>
                            <td className="px-4 py-4">
                              <div className="flex items-center gap-2">
                                {offer.animal?.photos?.[0] && (
