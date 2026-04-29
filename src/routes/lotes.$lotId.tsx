@@ -388,7 +388,6 @@ function LotDetail() {
 
     return () => {
       supabase.removeChannel(lotChannel);
-      clearInterval(pollInterval);
     };
   }, [lot.id, user]);
 
