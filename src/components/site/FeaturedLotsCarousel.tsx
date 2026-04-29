@@ -23,18 +23,20 @@
 
    return (
      <section className="container mx-auto px-4 py-16 relative">
-       <div className="mb-10 flex items-end justify-between">
+       <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
          <div>
-           <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full bg-gold/10 border border-gold/20 text-gold text-[10px] font-bold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/30 text-gold text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
              <Star className="h-3 w-3 fill-gold" />
-             Seleção de Elite
+              Oportunidades de Leilão
            </div>
-           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-             Lotes em <span className="text-gradient-gold uppercase italic">Destaque</span>
+            <h2 className="text-4xl font-black text-foreground uppercase italic tracking-tighter md:text-5xl">
+              Lotes em <span className="text-gradient-gold">Destaque</span>
            </h2>
-           <p className="mt-2 text-muted-foreground">Animais e embriões com genética superior e potencial de mercado.</p>
+            <p className="mt-3 text-muted-foreground max-w-xl text-lg font-medium">Animais e embriões de linhagem superior com alto potencial genético para o seu plantel.</p>
          </div>
-         <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <Link to="/lotes" className="mr-4 text-xs font-black uppercase italic tracking-widest text-gold hover:underline">Ver tudo</Link>
+            <div className="flex gap-2">
            <Button 
              variant="outline" 
              size="icon" 
