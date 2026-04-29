@@ -566,6 +566,8 @@ export type Database = {
           regulation: string | null
           seller_id: string | null
           seller_name: string | null
+          seo_description: string | null
+          seo_title: string | null
           show_countdown: boolean | null
           slug: string | null
           start_date: string
@@ -598,6 +600,8 @@ export type Database = {
           regulation?: string | null
           seller_id?: string | null
           seller_name?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           show_countdown?: boolean | null
           slug?: string | null
           start_date: string
@@ -630,6 +634,8 @@ export type Database = {
           regulation?: string | null
           seller_id?: string | null
           seller_name?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           show_countdown?: boolean | null
           slug?: string | null
           start_date?: string
