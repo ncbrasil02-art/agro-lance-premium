@@ -85,9 +85,24 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
     };
   }, [eventId, onUpdate, retryCount]);
 
-  return { status };
-}
-
+   // Fallback Polling if WebSocket is not connected for specific event
+   useEffect(() => {
+     if (status === 'SUBSCRIBED') return;
+ 
+     const intervalTime = status === 'INITIAL' ? 15000 : 45000;
+     logger.warn(`Realtime do evento não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
+     
+     const pollInterval = setInterval(() => {
+       logger.info(`Executando polling de fallback para Evento ${eventId}...`);
+       onUpdate();
+     }, intervalTime);
+ 
+     return () => clearInterval(pollInterval);
+   }, [status, onUpdate, eventId]);
+ 
+   return { status };
+ }
+ 
  export function useHomeRealtime(onUpdate: () => void) {
    const [status, setStatus] = useState<ChannelStatus>('INITIAL');
    const [retryCount, setRetryCount] = useState(0);
@@ -132,23 +147,6 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
      return () => clearInterval(pollInterval);
    }, [status, onUpdate]);
  
-   // Fallback Polling if WebSocket is not connected for specific event
-   useEffect(() => {
-     if (status === 'SUBSCRIBED') return;
- 
-     const intervalTime = status === 'INITIAL' ? 15000 : 45000;
-     logger.warn(`Realtime do evento não conectado (${status}), iniciando polling de fallback (${intervalTime}ms)`);
-     
-     const pollInterval = setInterval(() => {
-       logger.info(`Executando polling de fallback para Evento ${eventId}...`);
-       onUpdate();
-     }, intervalTime);
- 
-     return () => clearInterval(pollInterval);
-   }, [status, onUpdate, eventId]);
- 
-   return { status };
- }
  
  export function useRealtimeLots(onUpdate: () => void) {
    const { status } = useHomeRealtime(onUpdate);
