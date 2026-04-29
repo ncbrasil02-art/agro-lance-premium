@@ -186,7 +186,12 @@ export function OfferDialog({ isOpen, onOpenChange, item }: OfferDialogProps) {
           </div>
           
           <div className="grid gap-2">
-            <Label htmlFor="offer_message" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Observações (Opcional)</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="offer_message" className="text-[10px] font-black uppercase tracking-widest text-gold/60">Observações (Opcional)</Label>
+              <span className={`text-[9px] ${message.length > 500 ? 'text-red-500' : 'text-white/40'}`}>
+                {message.length}/500
+              </span>
+            </div>
             <Textarea 
               id="offer_message"
               className="flex min-h-[80px] bg-white/5 border-white/10 text-white placeholder:text-white/20 text-sm"
