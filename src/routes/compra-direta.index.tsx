@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { generateMetaTags } from "@/utils/seo";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useState, useMemo } from "react";
@@ -14,12 +15,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 
  export const Route = createFileRoute("/compra-direta/")({
-   head: () => ({
-     meta: [
-       { title: "Catálogo de Venda — Premium Agro Leilões" },
-       { name: "description", content: "Venda direta de animais selecionados. Escolha seu animal e faça sua reserva." },
-     ],
-   }),
+   head: ({ matches }) => {
+     const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
+     const seoSettings = rootData?.seoSettings;
+     return generateMetaTags({
+       title: "Compra Direta",
+       description: "Venda direta de animais selecionados. Escolha seu animal e faça sua reserva.",
+       seoSettings,
+       canonical: "/compra-direta"
+     });
+   },
   loader: async () => {
     const { data: animals, error: animalsError } = await supabase
       .from("animals")
