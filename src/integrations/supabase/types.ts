@@ -937,6 +937,7 @@ export type Database = {
       offers: {
         Row: {
           amount: number | null
+          animal_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -947,6 +948,7 @@ export type Database = {
         }
         Insert: {
           amount?: number | null
+          animal_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -957,6 +959,7 @@ export type Database = {
         }
         Update: {
           amount?: number | null
+          animal_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -966,6 +969,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "offers_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "offers_lot_id_fkey"
             columns: ["lot_id"]

@@ -891,9 +891,18 @@ export const Route = createFileRoute("/painel")({
 
           {type === 'nota' && (
             <div className="space-y-8">
-              <div className="text-center mb-10">
-                <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">Nota de Venda</h1>
-                <p className="text-gray-400 text-xs font-bold tracking-widest">COMPROVANTE DE TRANSAÇÃO AGROPECUÁRIA</p>
+              <div className="flex justify-between items-center mb-10 border-b pb-6">
+                <div className="text-left">
+                  <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">Nota de Venda</h1>
+                  <p className="text-gray-400 text-xs font-bold tracking-widest">COMPROVANTE DE TRANSAÇÃO AGROPECUÁRIA</p>
+                </div>
+                <div className="h-16 w-16 bg-emerald-deep/5 rounded-xl p-2 flex items-center justify-center">
+                  <img 
+                    src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
+                    alt="Logo" 
+                    className="h-full object-contain"
+                  />
+                </div>
               </div>
 
               <div className="border rounded-xl overflow-hidden shadow-sm">
