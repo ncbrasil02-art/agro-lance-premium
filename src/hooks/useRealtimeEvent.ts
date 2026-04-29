@@ -27,7 +27,6 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
          (payload) => {
            logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
            onUpdate();
-           fallback?.onManualUpdate?.();
          }
       )
       .on(
@@ -41,7 +40,6 @@ export function useRealtimeEvent(eventId: string, onUpdate: () => void) {
          (payload) => {
            logger.info('Mudança detectada nos dados do evento', { eventId, payload });
            onUpdate();
-           fallback?.onManualUpdate?.();
          }
       )
       .subscribe((newStatus) => {
