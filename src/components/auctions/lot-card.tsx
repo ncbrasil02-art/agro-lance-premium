@@ -1,3 +1,25 @@
+      {lot.acceptsOffers && (dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento' || dynamicStatus === 'pre_lance') && (
+        <div className="absolute top-[42px] right-3 z-20">
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            animate={animations.badge_blink ? { scale: [1, 1.05, 1] } : {}}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Button 
+              size="sm"
+              className={`bg-gold text-emerald-deep font-black gap-1 rounded-full shadow-gold h-7 text-[9px] px-3 border border-emerald-deep/20 ${animations.badge_glow ? 'shadow-[0_0_15px_rgba(212,175,55,0.4)]' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsOfferOpen(true);
+              }}
+            >
+              <MessageSquare className="h-3 w-3" />
+              FAZER UMA OFERTA
+            </Button>
+          </motion.div>
+        </div>
+      )}
 import { Link } from "@tanstack/react-router";
  import { Eye, Gavel, Info, ChevronRight, MessageSquare } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
