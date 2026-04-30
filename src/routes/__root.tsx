@@ -64,7 +64,7 @@ function NotFoundComponent() {
         return { siteInfo: info, theme, homepage, seoSettings, animations };
      } catch (error) {
        console.error("Error loading root settings:", error);
-       return { siteInfo: null, theme: null, homepage: null };
+       return { siteInfo: null, theme: null, homepage: null, animations: null, seoSettings: null };
      }
    },
    head: ({ loaderData }) => {
