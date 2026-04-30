@@ -44,6 +44,7 @@ function NotFoundComponent() {
      siteInfo: any;
      theme: any;
      homepage: any;
+     animations: any;
      seoSettings: any;
    }>()({
    loader: async () => {
@@ -58,8 +59,9 @@ function NotFoundComponent() {
         const theme = data.find((i: any) => i.key === "theme")?.value as any;
         const homepage = data.find((i: any) => i.key === "homepage_sections")?.value as any;
         const seoSettings = data.find((i: any) => i.key === "seo_settings")?.value as any;
+        const animations = data.find((i: any) => i.key === "animations")?.value as any;
         
-        return { siteInfo: info, theme, homepage, seoSettings };
+        return { siteInfo: info, theme, homepage, seoSettings, animations };
      } catch (error) {
        console.error("Error loading root settings:", error);
        return { siteInfo: null, theme: null, homepage: null };
