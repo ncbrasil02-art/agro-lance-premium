@@ -1,4 +1,4 @@
-   import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert, XCircle } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert, XCircle, Zap, ZapOff, WifiOff } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
   import { supabase } from "@/integrations/supabase/client";
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema } from "@/lib/schemas";
@@ -723,7 +724,7 @@ export const Route = createFileRoute("/ao-vivo")({
       refreshAllData();
     }, [liveEvent?.id]);
 
-    useRealtimeFallback({
+    const { delaySeconds, isPolling } = useRealtimeFallback({
       status: realtimeStatus,
       onUpdate: handleRefresh,
       label: "Leilão ao Vivo",
@@ -947,7 +948,33 @@ export const Route = createFileRoute("/ao-vivo")({
              <p className="text-xs text-gold/60 font-bold uppercase tracking-wider">Leiloeiro: {liveEvent.auctioneer_name || "A definir"} · {liveEvent.promoter_company || "A definir"}</p>
            </div>
         </div>
-         <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-all cursor-help ${isOffline ? 'bg-destructive/10 border-destructive/30 text-destructive' : isPolling ? 'bg-amber-500/10 border-amber-500/30 text-amber-600' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600'}`}>
+                    {isOffline ? (
+                      <WifiOff className="h-3.5 w-3.5 animate-pulse" />
+                    ) : isPolling ? (
+                      <ZapOff className="h-3.5 w-3.5 animate-pulse" />
+                    ) : (
+                      <Zap className="h-3.5 w-3.5" />
+                    )}
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
+                      {isOffline ? 'Offline' : isPolling ? 'Polling' : 'Realtime'}
+                    </span>
+                    {delaySeconds > 0 && <span className="text-[9px] opacity-70 border-l border-current pl-2 ml-1">{delaySeconds}s</span>}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs text-xs">
+                  <p className="font-bold mb-1">Status da Transmissão</p>
+                  <p className="text-muted-foreground">
+                    {isOffline ? "Sem conexão com a internet." : isPolling ? "WebSocket instável. Usando redundância de polling para garantir que você não perca nenhum lance." : "Conectado ao servidor Elite. Recebendo lances instantaneamente."}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-muted-foreground">
               <Users className="h-4 w-4 text-gold" /> 
               <span className="font-bold">{(liveEvent.viewers || 0).toLocaleString("pt-BR")}</span> assistindo
