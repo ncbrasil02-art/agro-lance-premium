@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { generateMetaTags } from "@/utils/seo";
 import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, ZapOff, WifiOff, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, XCircle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
