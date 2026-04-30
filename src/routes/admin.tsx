@@ -19,9 +19,9 @@
   import { ContractManagement } from "@/components/admin/ContractManagement";
   import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
-   LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
-   ClipboardList, ShoppingCart, ShieldCheck, Newspaper, Info,
-   MessageSquare
+    LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
+    ClipboardList, ShoppingCart, ShieldCheck, Newspaper, Info,
+    MessageSquare, FileText
  } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
