@@ -98,7 +98,9 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
           show_upcoming_events: true, 
           show_featured_lots: true,
           show_animated_slides: true,
-          order: ["upcoming_events", "featured_lots", "sale_menu", "articles"],
+          order: templateId === 'model2' ? ["featured_lots", "upcoming_events", "articles", "sale_menu"] : 
+                 templateId === 'model3' ? ["upcoming_events", "articles", "featured_lots", "sale_menu"] : 
+                 ["upcoming_events", "featured_lots", "sale_menu", "articles"],
           template_id: 'model1'
         };
     const [now, setNow] = useState(Date.now());
