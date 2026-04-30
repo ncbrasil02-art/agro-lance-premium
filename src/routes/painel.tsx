@@ -90,7 +90,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
      ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
      Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
-    MapPin, Globe, Loader2, Send, BellRing
+    MapPin, Globe, Loader2, Send, BellRing, Search
  } from "lucide-react";
    import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,6 +109,7 @@ import { Separator } from "@/components/ui/separator";
  import { Input } from "@/components/ui/input";
  import { Label } from "@/components/ui/label";
  import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/painel")({
   component: UserDashboard,
