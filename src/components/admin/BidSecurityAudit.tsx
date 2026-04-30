@@ -42,8 +42,9 @@ export function BidSecurityAudit() {
     fetchBids();
 
     // Realtime subscription for new bids - optimize to avoid full re-fetches
+    const uniqueId = `bid-security-audit-${Math.random().toString(36).slice(2, 9)}`;
     const channel = supabase
-      .channel("bid-security-audit")
+      .channel(uniqueId)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "bids" },
