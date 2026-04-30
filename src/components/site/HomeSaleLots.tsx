@@ -69,7 +69,7 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
               
               <CardContent className="p-6 flex-1 flex flex-col relative">
                 {animal.accepts_offers && (
-                  <div className="absolute -top-10 right-6">
+                  <div className="absolute -top-10 left-6">
                     <Button 
                       size="sm"
                       className="bg-emerald-bright text-white font-bold gap-1.5 rounded-full shadow-lg hover:scale-105 transition-transform h-9 px-4 border border-white/20"
@@ -80,7 +80,7 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
                       }}
                     >
                       <MessageSquare className="h-3.5 w-3.5" />
-                      Oferta
+                      Fazer uma oferta
                     </Button>
                   </div>
                 )}
