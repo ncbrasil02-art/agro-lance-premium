@@ -1352,7 +1352,9 @@ export const Route = createFileRoute("/painel")({
             width={400}
           />
           <div className="absolute top-3 left-3">
-            <Badge className="bg-emerald-600 text-white border-none shadow-lg">Lote Arrematado</Badge>
+            <Badge className="bg-emerald-600 text-white border-none shadow-lg">
+              {lot.is_direct_sale ? "Venda Direta" : "Lote Arrematado"}
+            </Badge>
           </div>
         </div>
         
@@ -1360,16 +1362,22 @@ export const Route = createFileRoute("/painel")({
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold uppercase text-gold tracking-widest">Lote #{lot.lot_number}</span>
+                <span className="text-xs font-bold uppercase text-gold tracking-widest">
+                  {lot.is_direct_sale ? "Venda Direta" : `Lote #${lot.lot_number}`}
+                </span>
                 <Separator orientation="vertical" className="h-3 bg-gold/30" />
-                <span className="text-xs font-bold uppercase text-muted-foreground">{lot.event?.name}</span>
+                <span className="text-xs font-bold uppercase text-muted-foreground">
+                  {lot.is_direct_sale ? "Compra Animal" : lot.event?.name}
+                </span>
               </div>
               <h3 className="text-2xl font-black text-emerald-deep tracking-tighter uppercase italic">{lot.animal?.name}</h3>
               <p className="text-sm text-muted-foreground">{lot.animal?.breed} · {lot.animal?.species}</p>
             </div>
             
             <div className="text-right bg-emerald-deep/5 p-3 rounded-xl border border-emerald-deep/10">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-1">Valor do Arremate</p>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-1">
+                {lot.is_direct_sale ? "Valor da Compra" : "Valor do Arremate"}
+              </p>
               <p className="text-2xl font-black text-emerald-deep tabular-nums">{formatBRL(lot.current_price)}</p>
             </div>
           </div>
@@ -1409,11 +1417,11 @@ export const Route = createFileRoute("/painel")({
                  disabled={isAccepting}
                >
                  {isAccepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                 ACEITAR TERMOS E CONDIÇÕES
+                 {lot.is_direct_sale ? "ACEITAR TERMOS DE COMPRA" : "ACEITAR TERMOS DE ARREMATAÇÃO"}
                </Button>
              )}
              <DocumentButton 
-               title="Termo de Arrematação" 
+               title={lot.is_direct_sale ? "Termo de Compra" : "Termo de Arrematação"} 
                lot={lot} 
                profile={profile}
                siteInfo={siteInfo}
