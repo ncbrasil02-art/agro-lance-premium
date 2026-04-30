@@ -643,6 +643,7 @@ export const Route = createFileRoute("/painel")({
                       <SelectItem value="read">Lidas</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
                 {notifications.some(n => !n.is_read) && (
                 <Button 
                   variant="ghost" 
