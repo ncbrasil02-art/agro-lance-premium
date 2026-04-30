@@ -1,3 +1,5 @@
+ import { useState, useEffect, ReactNode } from "react";
+ import { motion, AnimatePresence } from "framer-motion";
  import { Link } from "@tanstack/react-router";
  import { ArrowRight, Calendar, Radio, Sparkles, Bell, Trophy, Users, TrendingUp } from "lucide-react";
  import { Button } from "@/components/ui/button";
@@ -7,41 +9,108 @@
  import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
  import { Badge } from "@/components/ui/badge";
  
- interface HeroProps {
-   siteInfo: any;
-   nextEvent: any;
-   customTexts: any;
-   stats: any;
- }
+  interface HeroProps {
+    siteInfo: any;
+    nextEvent: any;
+    customTexts: any;
+    stats: any;
+    homepageSettings?: any;
+  }
+
+  const HeroBackground = ({ backgrounds, opacity, blur }: { backgrounds: string[], opacity: number, blur: number }) => {
+    const [index, setIndex] = useState(0);
+    const images = (backgrounds && backgrounds.length > 0) ? backgrounds : ["https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"];
+
+    useEffect(() => {
+      if (images.length <= 1) return;
+      const interval = setInterval(() => setIndex(prev => (prev + 1) % images.length), 5000);
+      return () => clearInterval(interval);
+    }, [images.length]);
+
+    return (
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={images[index]}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: opacity / 100, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0"
+            style={{ filter: `blur(${blur}px)` }}
+          >
+            <OptimizedImage 
+              src={images[index]} 
+              alt="Hero Background" 
+              width={1920} 
+              className="h-full w-full object-cover" 
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  };
+
+  const HeroPhrase = ({ phrases, defaultTitle, className }: { phrases: string[], defaultTitle: ReactNode, className?: string }) => {
+    const [index, setIndex] = useState(0);
+    const items = (phrases && phrases.length > 0) ? phrases : [];
+
+    useEffect(() => {
+      if (items.length <= 1) return;
+      const interval = setInterval(() => setIndex(prev => (prev + 1) % items.length), 6000);
+      return () => clearInterval(interval);
+    }, [items.length]);
+
+    if (items.length === 0) return <>{defaultTitle}</>;
+
+    return (
+      <div className={className}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            {items[index]}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  };
  
- export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats }: HeroProps) => (
-   <section className="relative overflow-hidden min-h-[85vh] flex items-center">
-     <div className="absolute inset-0">
-       <OptimizedImage 
-         src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
-         alt="Elite" 
-         width={1920} 
-         className="h-full w-full object-cover opacity-50" 
-       />
-       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-     </div>
+  export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => (
+    <section className="relative overflow-hidden min-h-[85vh] flex items-center">
+      <HeroBackground 
+        backgrounds={homepageSettings?.hero_backgrounds} 
+        opacity={homepageSettings?.hero_bg_opacity ?? 50} 
+        blur={homepageSettings?.hero_bg_blur ?? 0} 
+      />
+      <div className="absolute inset-0 z-1 bg-gradient-to-r from-background via-background/80 to-transparent" />
+      <div className="absolute inset-0 z-1 bg-gradient-to-t from-background via-transparent to-transparent" />
  
-     <div className="container relative mx-auto px-4 py-20">
+      <div className="container relative z-10 mx-auto px-4 py-20">
        <div className="max-w-3xl">
          <Badge variant="outline" className="mb-6 bg-gold/10 text-gold border-gold/20 px-4 py-1.5 uppercase tracking-widest text-[10px] font-black animate-pulse">
            <Sparkles className="h-3 w-3 mr-2" />
            A nova era dos leilões de elite
          </Badge>
          
-         <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic mb-6">
-           {customTexts?.hero_title || (
-             <>
-               <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.[0]}</span><br />
-               {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
-             </>
-           )}
-         </h1>
+          <HeroPhrase 
+            phrases={customTexts?.hero_phrases} 
+            className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic mb-6"
+            defaultTitle={
+              <h1>
+                {customTexts?.hero_title || (
+                  <>
+                    <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.[0]}</span><br />
+                    {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
+                  </>
+                )}
+              </h1>
+            } 
+          />
          
          <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
            {customTexts?.hero_subtitle || "Curadoria genética de excelência e tecnologia de ponta para o agronegócio global."}
@@ -84,11 +153,19 @@
    </section>
  );
  
- export const ModernHero = ({ siteInfo, nextEvent, customTexts }: HeroProps) => (
+  export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => (
    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-     <div className="absolute inset-0 opacity-10">
-       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--gold)_1px,transparent_1px)] bg-[size:40px_40px]" />
-     </div>
+      {homepageSettings?.hero_backgrounds?.length > 0 ? (
+        <HeroBackground 
+          backgrounds={homepageSettings?.hero_backgrounds} 
+          opacity={homepageSettings?.hero_bg_opacity ?? 10} 
+          blur={homepageSettings?.hero_bg_blur ?? 0} 
+        />
+      ) : (
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--gold)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        </div>
+      )}
      
      <div className="container relative mx-auto px-4 text-center">
        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-emerald-deep text-[10px] font-bold uppercase tracking-widest mb-8">
@@ -96,14 +173,20 @@
          Plataforma de Investimento Genético
        </div>
  
-       <h1 className="text-5xl md:text-9xl font-black tracking-tighter uppercase mb-8 leading-[0.9]">
-         {customTexts?.hero_title || (
-           <>
-             REVOLUCIONANDO O <br />
-             <span className="text-gradient-gold">AGRONEGÓCIO</span>
-           </>
-         )}
-       </h1>
+        <HeroPhrase 
+          phrases={customTexts?.hero_phrases} 
+          className="text-5xl md:text-9xl font-black tracking-tighter uppercase mb-8 leading-[0.9]"
+          defaultTitle={
+            <h1>
+              {customTexts?.hero_title || (
+                <>
+                  REVOLUCIONANDO O <br />
+                  <span className="text-gradient-gold">AGRONEGÓCIO</span>
+                </>
+              )}
+            </h1>
+          }
+        />
  
        <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-12 font-medium">
          {customTexts?.hero_subtitle || "A mais avançada experiência de leilões digitais com lances em tempo real e segurança inabalável."}
@@ -146,7 +229,7 @@
    </section>
  );
  
- export const TraditionalHero = ({ siteInfo, nextEvent, customTexts }: HeroProps) => (
+  export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => (
    <section className="relative min-h-screen grid lg:grid-cols-2">
      <div className="relative flex items-center p-8 md:p-20 bg-emerald-deep text-white overflow-hidden">
        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-3xl -mr-32 -mt-32" />
@@ -159,14 +242,20 @@
            className="h-16 object-contain mb-12 invert brightness-0"
          />
          
-         <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
-           {customTexts?.hero_title || (
-             <>
-               TRADIÇÃO <br />
-               <span className="text-gold">E RESULTADO</span>
-             </>
-           )}
-         </h1>
+          <HeroPhrase 
+            phrases={customTexts?.hero_phrases} 
+            className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] mb-8"
+            defaultTitle={
+              <h1>
+                {customTexts?.hero_title || (
+                  <>
+                    TRADIÇÃO <br />
+                    <span className="text-gold">E RESULTADO</span>
+                  </>
+                )}
+              </h1>
+            }
+          />
          
          <p className="text-xl text-emerald-bright/80 max-w-md mb-12 leading-relaxed font-medium">
            {customTexts?.hero_subtitle || "Unindo o campo à tecnologia com a confiança de quem entende de genética animal."}
@@ -183,14 +272,22 @@
        </div>
      </div>
      
-     <div className="relative min-h-[400px] lg:min-h-full">
-       <OptimizedImage 
-         src="https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80" 
-         alt="Farm" 
-         width={1200} 
-         className="h-full w-full object-cover" 
-       />
-       <div className="absolute inset-0 bg-emerald-deep/20" />
+      <div className="relative min-h-[400px] lg:min-h-full overflow-hidden">
+        {homepageSettings?.hero_backgrounds?.length > 0 ? (
+          <HeroBackground 
+            backgrounds={homepageSettings?.hero_backgrounds} 
+            opacity={homepageSettings?.hero_bg_opacity ?? 100} 
+            blur={homepageSettings?.hero_bg_blur ?? 0} 
+          />
+        ) : (
+          <OptimizedImage 
+            src="https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80" 
+            alt="Farm" 
+            width={1200} 
+            className="h-full w-full object-cover" 
+          />
+        )}
+        <div className="absolute inset-0 z-1 bg-emerald-deep/20" />
        
        {nextEvent && (
          <div className="absolute bottom-10 left-10 right-10 bg-white/95 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border-l-8 border-gold">

@@ -36,12 +36,16 @@
    show_animated_slides: boolean;
    order: string[];
   template_id?: 'model1' | 'model2' | 'model3';
+  hero_backgrounds?: string[];
+  hero_bg_opacity?: number;
+  hero_bg_blur?: number;
  }
  
   export interface CustomTexts {
     hero_title: string;
     hero_subtitle: string;
     footer_text: string;
+  hero_phrases?: string[];
   }
  
     export function useSiteSettings(initialData?: { 
