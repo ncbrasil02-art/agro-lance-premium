@@ -117,7 +117,8 @@ export const Route = createFileRoute("/painel")({
     const [myLots, setMyLots] = useState<any[]>([]);
      const [myBids, setMyBids] = useState<any[]>([]);
      const [myOffers, setMyOffers] = useState<any[]>([]);
-     const [myFavorites, setMyFavorites] = useState<any[]>([]);
+      const [myFavorites, setMyFavorites] = useState<any[]>([]);
+      const [myContracts, setMyContracts] = useState<any[]>([]);
      const [messages, setMessages] = useState<any[]>([]);
      const [siteInfo, setSiteInfo] = useState<any>(null);
      const [isLoading, setIsLoading] = useState(true);
@@ -184,7 +185,21 @@ export const Route = createFileRoute("/painel")({
             .select("*, lot:lots!followed_lots_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(*), event:events!lots_event_id_fkey(*))")
             .eq("user_id", user.id);
          
-         setMyFavorites(followedData || []);
+           setMyFavorites(followedData || []);
+
+           const { data: contractsData } = await supabase
+             .from("contracts")
+             .select(`
+               *,
+               transaction:transactions!inner(
+                 id, buyer_id, final_price,
+                 lot:lots!inner(lot_number, animal:animals(name, breed, photos))
+               )
+             `)
+             .eq("transaction.buyer_id", user.id)
+             .order("created_at", { ascending: false });
+           
+           setMyContracts(contractsData || []);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         toast.error("Erro ao carregar dados do painel");
