@@ -1407,6 +1407,17 @@ export const Route = createFileRoute("/painel")({
             </div>
           </div>
 
+          {lot.is_direct_sale && lot.negotiated_terms && (
+            <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-100">
+              <p className="text-[10px] font-bold uppercase text-amber-700 mb-2 flex items-center gap-1">
+                <Info className="h-3 w-3" /> Condições Combinadas
+              </p>
+              <p className="text-sm text-amber-900 font-medium leading-relaxed italic">
+                "{lot.negotiated_terms}"
+              </p>
+            </div>
+          )}
+
           <Separator className="mb-6" />
 
           <div className="flex flex-wrap gap-3 mt-auto">
