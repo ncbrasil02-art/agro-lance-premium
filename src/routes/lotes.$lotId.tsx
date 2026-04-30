@@ -647,8 +647,20 @@ function LotDetail() {
                <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
                 <div className="relative">
                   <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                    <Expand className="h-12 w-12 text-white/50" />
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <div className="bg-emerald-deep/80 backdrop-blur-md p-4 rounded-full border border-gold/40 shadow-gold">
+                      <Expand className="h-8 w-8 text-gold" />
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <Button 
+                      size="sm" 
+                      className="bg-emerald-deep/90 text-gold hover:bg-emerald-bright hover:text-white transition-all shadow-gold font-bold border border-gold/40 backdrop-blur-md"
+                      onClick={() => setActivePhoto(activePhoto)} // Just to trigger something if needed, but it's mainly for contrast/UI
+                    >
+                      <Expand className="mr-2 h-4 w-4" /> VER GALERIA
+                    </Button>
                   </div>
                   
                   {/* Next/Prev overlays on image */}

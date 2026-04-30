@@ -19,7 +19,7 @@ import { logger } from "@/utils/logger";
   "": { label: "PENDENTE", cls: "bg-muted text-muted-foreground border-border" },
 };
 
-   export function StatusBadge({ status, className, urgent }: { status: string | null | undefined; className?: string; urgent?: boolean }) {
+    export function StatusBadge({ status, className, urgent, animations }: { status: string | null | undefined; className?: string; urgent?: boolean, animations?: any }) {
     const safeStatus = (status || "").toLowerCase();
 
     if (status && !map[safeStatus]) {
@@ -31,6 +31,9 @@ import { logger } from "@/utils/logger";
       cls: "bg-muted text-muted-foreground border-border" 
     };
 
+    const shouldBlink = animations?.badge_blink && (safeStatus === 'live' || safeStatus === 'recebendo_lances' || urgent);
+    const hasGlow = animations?.badge_glow;
+
     return (
       <span 
         role="status"
@@ -38,6 +41,8 @@ import { logger } from "@/utils/logger";
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider",
           s.cls,
+          shouldBlink && "animate-blink-fast",
+          hasGlow && "shadow-[0_0_15px_rgba(212,175,55,0.4)]",
           className
         )}
       >

@@ -28,10 +28,11 @@ import {
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema } from "@/lib/schemas";
   import { z } from "zod";
-  import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
  import { toast } from "sonner";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
  import { useAuth } from "@/components/auth/auth-provider";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/ao-vivo")({
   head: () => ({
@@ -175,6 +176,14 @@ export const Route = createFileRoute("/ao-vivo")({
 
   function LivePage() {
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
+    const rootContext = Route.useRouteContext() as any;
+    const animations = useMemo(() => rootContext.animations || {
+      badge_blink: true,
+      badge_glow: true,
+      bid_button_pulse: true,
+      animal_name_entry: "slide-up"
+    }, [rootContext.animations]);
+
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -1097,9 +1106,17 @@ export const Route = createFileRoute("/ao-vivo")({
                 <div className="absolute bottom-4 left-4 flex gap-2">
                    <Dialog>
                      <DialogTrigger asChild>
-                       <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm hover:bg-gold hover:text-white transition-all shadow-lg font-bold">
-                         <Expand className="mr-2 h-3.5 w-3.5" /> VER GALERIA
-                       </Button>
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Button 
+                            size="sm" 
+                            className="bg-emerald-deep text-gold hover:bg-emerald-bright hover:text-white transition-all shadow-gold font-bold border border-gold/40 backdrop-blur-md"
+                          >
+                            <Expand className="mr-2 h-3.5 w-3.5" /> VER GALERIA
+                          </Button>
+                        </motion.div>
                      </DialogTrigger>
                      <DialogContent className="max-w-4xl bg-emerald-deep border-gold/20">
                        <DialogHeader>
@@ -1133,7 +1150,20 @@ export const Route = createFileRoute("/ao-vivo")({
                         <span className="text-[10px] text-muted-foreground font-mono">Registro: {liveLot.animal.registration_number}</span>
                       )}
                     </div>
-                    <h2 className="text-2xl font-black text-emerald-deep tracking-tighter leading-none">{liveLot.animal?.name}</h2>
+                    <motion.h2 
+                      key={liveLot.animal?.id}
+                      initial={
+                        animations.animal_name_entry === 'slide-up' ? { y: 20, opacity: 0 } :
+                        animations.animal_name_entry === 'fade' ? { opacity: 0 } :
+                        animations.animal_name_entry === 'scale' ? { scale: 0.8, opacity: 0 } :
+                        {}
+                      }
+                      animate={{ y: 0, opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="text-2xl font-black text-emerald-deep tracking-tighter leading-none"
+                    >
+                      {liveLot.animal?.name}
+                    </motion.h2>
                     <p className="text-sm text-muted-foreground font-medium">{liveLot.animal?.breed} · {liveLot.animal?.species}</p>
                   </div>
                   {liveLot.end_date && (
@@ -1183,23 +1213,40 @@ export const Route = createFileRoute("/ao-vivo")({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] gap-2">
-                    <Button
-                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
-                      disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
-                      onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
+                  <div className="flex gap-2 items-center">
+                    <motion.div
+                      className="flex-1"
+                      animate={animations.bid_button_pulse && !(isBidding || liveLot.status === 'sold' || liveLot.status === 'passed') ? {
+                        scale: [1, 1.02, 1],
+                        boxShadow: [
+                          "0 0 0 rgba(212,175,55,0)",
+                          "0 0 15px rgba(212,175,55,0.4)",
+                          "0 0 0 rgba(212,175,55,0)"
+                        ]
+                      } : {}}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
                     >
-                      {isBidding ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
-                        <Ban className="mr-2 h-4 w-4" />
-                      ) : (
-                        <Gavel className="mr-2 h-4 w-4" />
-                      )}
-                      {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
-                       liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
-                       `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
-                    </Button>
+                      <Button
+                        className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
+                        disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
+                        onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
+                      >
+                        {isBidding ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
+                          <Ban className="mr-2 h-4 w-4" />
+                        ) : (
+                          <Gavel className="mr-2 h-4 w-4" />
+                        )}
+                        {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
+                         liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
+                         `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
+                      </Button>
+                    </motion.div>
 
                     <div className="flex gap-2">
                       <Button 
