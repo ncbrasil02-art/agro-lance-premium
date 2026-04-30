@@ -1097,8 +1097,12 @@ export type Database = {
           phone: string | null
           pref_followed_lot_update: boolean | null
           pref_new_event_email: boolean | null
+          pref_new_event_sms: boolean | null
+          pref_new_event_whatsapp: boolean | null
           pref_outbid_email: boolean | null
           pref_outbid_push: boolean | null
+          pref_outbid_sms: boolean | null
+          pref_outbid_whatsapp: boolean | null
           risk_level: string | null
           risk_score: number | null
           role: string
@@ -1124,8 +1128,12 @@ export type Database = {
           phone?: string | null
           pref_followed_lot_update?: boolean | null
           pref_new_event_email?: boolean | null
+          pref_new_event_sms?: boolean | null
+          pref_new_event_whatsapp?: boolean | null
           pref_outbid_email?: boolean | null
           pref_outbid_push?: boolean | null
+          pref_outbid_sms?: boolean | null
+          pref_outbid_whatsapp?: boolean | null
           risk_level?: string | null
           risk_score?: number | null
           role?: string
@@ -1151,8 +1159,12 @@ export type Database = {
           phone?: string | null
           pref_followed_lot_update?: boolean | null
           pref_new_event_email?: boolean | null
+          pref_new_event_sms?: boolean | null
+          pref_new_event_whatsapp?: boolean | null
           pref_outbid_email?: boolean | null
           pref_outbid_push?: boolean | null
+          pref_outbid_sms?: boolean | null
+          pref_outbid_whatsapp?: boolean | null
           risk_level?: string | null
           risk_score?: number | null
           role?: string
