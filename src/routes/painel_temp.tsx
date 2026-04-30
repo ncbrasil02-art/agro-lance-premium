@@ -109,7 +109,7 @@ import { Separator } from "@/components/ui/separator";
  import { Label } from "@/components/ui/label";
  import { Textarea } from "@/components/ui/textarea";
 
-export const Route = createFileRoute("/painel")({
+export const Route = createFileRoute("/painel_temp")({
   component: UserDashboard,
 });
 
