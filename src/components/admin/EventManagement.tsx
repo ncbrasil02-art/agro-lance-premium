@@ -1483,7 +1483,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                                         id={`replace-banner-${event.id}`} 
                                         onChange={async (e) => {
                                           const file = e.target.files?.[0];
-                                          if (!file) return;
+                                          if (!file || !validateImage(file)) return;
                                           const tid = toast.loading("Substituindo banner...");
                                           const fileExt = file.name.split('.').pop();
                                           const fileName = `${event.id}_${Math.random()}.${fileExt}`;
@@ -1561,7 +1561,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                                                 id={`replace-animal-${lot.animal?.id}`} 
                                                 onChange={async (e) => {
                                                   const file = e.target.files?.[0];
-                                                  if (!file) return;
+                                                  if (!file || !validateImage(file)) return;
                                                   const tid = toast.loading("Atualizando foto...");
                                                   const fileExt = file.name.split('.').pop();
                                                   const fileName = `${lot.animal?.id}_${Math.random()}.${fileExt}`;
