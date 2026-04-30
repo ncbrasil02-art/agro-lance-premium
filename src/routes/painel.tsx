@@ -254,10 +254,23 @@ export const Route = createFileRoute("/painel")({
          })
          .subscribe();
  
-       return () => {
-         supabase.removeChannel(lotsChannel);
-         supabase.removeChannel(bidsChannel);
-       };
+        const offersChannel = supabase
+          .channel('dashboard-offers-realtime')
+          .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'offers',
+            filter: `user_id=eq.${user.id}` 
+          }, () => {
+            fetchDashboardData();
+          })
+          .subscribe();
+
+        return () => {
+          supabase.removeChannel(lotsChannel);
+          supabase.removeChannel(bidsChannel);
+          supabase.removeChannel(offersChannel);
+        };
      }, [user, profile, fetchDashboardData, fetchMessages]);
  
 
