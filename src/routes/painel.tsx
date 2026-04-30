@@ -121,7 +121,8 @@ export const Route = createFileRoute("/painel")({
      const [myOffers, setMyOffers] = useState<any[]>([]);
       const [myFavorites, setMyFavorites] = useState<any[]>([]);
       const [myContracts, setMyContracts] = useState<any[]>([]);
-     const [messages, setMessages] = useState<any[]>([]);
+      const [messages, setMessages] = useState<any[]>([]);
+      const [notifications, setNotifications] = useState<any[]>([]);
      const [siteInfo, setSiteInfo] = useState<any>(null);
      const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -219,6 +220,16 @@ export const Route = createFileRoute("/painel")({
         .order("created_at", { ascending: false });
       setMessages(data || []);
     }, [user?.id]);
+
+    const fetchNotifications = useCallback(async () => {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setNotifications(data || []);
+    }, [user?.id]);
  
      useRealtimeFallback({
        status: rtStatus,
@@ -230,8 +241,9 @@ export const Route = createFileRoute("/painel")({
  
      useEffect(() => {
        if (!user) return;
-       fetchDashboardData();
-       fetchMessages();
+      fetchDashboardData();
+      fetchMessages();
+      fetchNotifications();
        
        if (profile) {
          setFormData({
@@ -270,6 +282,18 @@ export const Route = createFileRoute("/painel")({
            fetchDashboardData();
          })
          .subscribe();
+
+       const notificationsChannel = supabase
+         .channel('dashboard-notifications-realtime')
+         .on('postgres_changes', { 
+           event: '*', 
+           schema: 'public', 
+           table: 'notifications',
+           filter: `user_id=eq.${user.id}` 
+         }, () => {
+           fetchNotifications();
+         })
+         .subscribe();
  
         const offersChannel = supabase
           .channel('dashboard-offers-realtime')
@@ -283,11 +307,12 @@ export const Route = createFileRoute("/painel")({
           })
           .subscribe();
 
-        return () => {
-          supabase.removeChannel(lotsChannel);
-          supabase.removeChannel(bidsChannel);
-          supabase.removeChannel(offersChannel);
-        };
+         return () => {
+           supabase.removeChannel(lotsChannel);
+           supabase.removeChannel(bidsChannel);
+           supabase.removeChannel(offersChannel);
+           supabase.removeChannel(notificationsChannel);
+         };
      }, [user, profile, fetchDashboardData, fetchMessages]);
  
 
