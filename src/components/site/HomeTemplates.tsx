@@ -97,14 +97,20 @@
            A nova era dos leilões de elite
          </Badge>
          
-         <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic mb-6">
-           {customTexts?.hero_title || (
-             <>
-               <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.[0]}</span><br />
-               {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
-             </>
-           )}
-         </h1>
+          <HeroPhrase 
+            phrases={customTexts?.hero_phrases} 
+            className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic mb-6"
+            defaultTitle={
+              <h1>
+                {customTexts?.hero_title || (
+                  <>
+                    <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.[0]}</span><br />
+                    {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
+                  </>
+                )}
+              </h1>
+            } 
+          />
          
          <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
            {customTexts?.hero_subtitle || "Curadoria genética de excelência e tecnologia de ponta para o agronegócio global."}
