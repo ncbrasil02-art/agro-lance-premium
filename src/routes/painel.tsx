@@ -639,13 +639,32 @@ export const Route = createFileRoute("/painel")({
                             </a>
                           </Button>
                         )}
-                        {contract.status === 'pending' ? (
-                          <Button size="sm" className="bg-gold text-emerald-deep font-bold">
-                            <Pencil className="h-4 w-4 mr-2" /> Assinar Agora
-                          </Button>
-                        ) : (
+                        {contract.status === 'signed' ? (
                           <Button size="sm" variant="ghost" disabled className="text-emerald-600 font-bold">
                             <BadgeCheck className="h-4 w-4 mr-2" /> Assinado em {contract.signed_at && new Date(contract.signed_at).toLocaleDateString('pt-BR')}
+                          </Button>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            className="bg-gold text-emerald-deep font-bold hover:bg-gold-bright"
+                            onClick={async () => {
+                              try {
+                                const { error } = await supabase
+                                  .from('contracts')
+                                  .update({ 
+                                    status: 'signed', 
+                                    signed_at: new Date().toISOString() 
+                                  })
+                                  .eq('id', contract.id);
+                                if (error) throw error;
+                                toast.success("Contrato assinado com sucesso!");
+                                fetchDashboardData();
+                              } catch (err: any) {
+                                toast.error("Erro ao assinar contrato: " + err.message);
+                              }
+                            }}
+                          >
+                            <Pencil className="h-4 w-4 mr-2" /> Assinar Agora
                           </Button>
                         )}
                       </div>
