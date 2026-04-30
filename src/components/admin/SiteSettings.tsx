@@ -76,6 +76,14 @@
    const [isUploading, setIsUploading] = useState(false);
     const [baseColor, setBaseColor] = useState("#D4AF37");
     const [savedPalettes, setSavedPalettes] = useState<any[]>([]);
+    const [animations, setAnimations] = useState({
+      badge_blink: true,
+      badge_glow: true,
+      bid_button_pulse: true,
+      animal_name_entry: "slide-up",
+      card_hover_tilt: true,
+      enable_confetti: true
+    });
  
    const [siteInfo, setSiteInfo] = useState({
      name: "",
@@ -140,6 +148,7 @@
           const textsData = data.find(i => i.key === "custom_texts")?.value;
           const seoData = data.find(i => i.key === "seo_settings")?.value;
          const palettes = data.find(i => i.key === "saved_palettes")?.value;
+         const animData = data.find(i => i.key === "animations")?.value;
  
          if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
          if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
@@ -148,6 +157,7 @@
           if (textsData) setCustomTexts((prev: any) => ({ ...prev, ...(textsData as any) }));
           if (seoData) setSeoSettings((prev: any) => ({ ...prev, ...(seoData as any) }));
          if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
+         if (animData) setAnimations((prev: any) => ({ ...prev, ...(animData as any) }));
 
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
