@@ -584,6 +584,7 @@ export type Database = {
           og_title: string | null
           photos: string[] | null
           promoter_company: string | null
+          promoter_logo_url: string | null
           regulation: string | null
           seller_id: string | null
           seller_name: string | null
@@ -621,6 +622,7 @@ export type Database = {
           og_title?: string | null
           photos?: string[] | null
           promoter_company?: string | null
+          promoter_logo_url?: string | null
           regulation?: string | null
           seller_id?: string | null
           seller_name?: string | null
@@ -658,6 +660,7 @@ export type Database = {
           og_title?: string | null
           photos?: string[] | null
           promoter_company?: string | null
+          promoter_logo_url?: string | null
           regulation?: string | null
           seller_id?: string | null
           seller_name?: string | null
@@ -1159,6 +1162,7 @@ export type Database = {
           email: string | null
           id: string
           location: string | null
+          logo_url: string | null
           name: string
           phone: string | null
           slug: string | null
@@ -1170,6 +1174,7 @@ export type Database = {
           email?: string | null
           id?: string
           location?: string | null
+          logo_url?: string | null
           name: string
           phone?: string | null
           slug?: string | null
@@ -1181,6 +1186,7 @@ export type Database = {
           email?: string | null
           id?: string
           location?: string | null
+          logo_url?: string | null
           name?: string
           phone?: string | null
           slug?: string | null
