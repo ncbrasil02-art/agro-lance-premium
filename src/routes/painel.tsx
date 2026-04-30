@@ -1498,7 +1498,9 @@ export const Route = createFileRoute("/painel")({
           {type === 'termo' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="text-center mb-10">
-                <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">Termo de Arrematação</h1>
+                <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">
+                  {isDirectSale ? "Termo de Compra e Venda" : "Termo de Arrematação"}
+                </h1>
                 <div className="h-1 w-20 bg-gold mx-auto" />
               </div>
               
@@ -1512,17 +1514,22 @@ export const Route = createFileRoute("/painel")({
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">Dados do Leilão</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">
+                    {isDirectSale ? "Dados da Transação" : "Dados do Leilão"}
+                  </h3>
                   <div className="space-y-2 text-sm">
-                    <p><span className="text-gray-500">Evento:</span> <span className="font-bold">{lot.event?.name}</span></p>
-                    <p><span className="text-gray-500">Data:</span> <span className="font-bold">{new Date(lot.updated_at).toLocaleDateString("pt-BR")}</span></p>
-                    <p><span className="text-gray-500">Lote:</span> <span className="font-bold">#{lot.lot_number}</span></p>
+                    {!isDirectSale && <p><span className="text-gray-500">Evento:</span> <span className="font-bold">{lot.event?.name}</span></p>}
+                    <p><span className="text-gray-500">Data:</span> <span className="font-bold">{new Date(lot.updated_at || lot.created_at).toLocaleDateString("pt-BR")}</span></p>
+                    {!isDirectSale && <p><span className="text-gray-500">Lote:</span> <span className="font-bold">#{lot.lot_number}</span></p>}
+                    {isDirectSale && <p><span className="text-gray-500">Modalidade:</span> <span className="font-bold">Venda Direta</span></p>}
                   </div>
                 </div>
               </div>
 
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 mt-8">
-                <h3 className="text-xs font-black uppercase tracking-widest text-emerald-deep border-b border-emerald-deep/10 pb-2 mb-4">Especificações do Lote</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-emerald-deep border-b border-emerald-deep/10 pb-2 mb-4">
+                  {isDirectSale ? "Especificações do Animal" : "Especificações do Lote"}
+                </h3>
                 <div className="grid grid-cols-3 gap-6 text-sm">
                   <div>
                     <p className="text-gray-500 text-[10px] uppercase font-bold">Animal</p>
@@ -1533,7 +1540,9 @@ export const Route = createFileRoute("/painel")({
                     <p className="font-bold">{lot.animal?.breed} / {lot.animal?.species}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-[10px] uppercase font-bold">Valor do Arremate</p>
+                    <p className="text-gray-500 text-[10px] uppercase font-bold">
+                      {isDirectSale ? "Valor da Compra" : "Valor do Arremate"}
+                    </p>
                     <p className="font-black text-xl text-emerald-600">{formatBRL(lot.current_price)}</p>
                   </div>
                 </div>
@@ -1541,9 +1550,10 @@ export const Route = createFileRoute("/painel")({
 
               <div className="pt-10">
                 <p className="text-sm leading-relaxed text-gray-600 italic">
-                  "Confirmo para os devidos fins de direito o arremate do lote acima descrito pelo valor indicado, 
-                  estando ciente das normas e regulamentos do leilão {lot.event?.name}. O arrematante declara-se 
-                  responsável pelo pagamento integral do valor arrematado somado às comissões aplicáveis."
+                  {isDirectSale 
+                    ? `Confirmo a compra do animal acima descrito pelo valor indicado, estando ciente das condições negociadas. O comprador declara-se responsável pelo pagamento integral do valor acordado.`
+                    : `Confirmo para os devidos fins de direito o arremate do lote acima descrito pelo valor indicado, estando ciente das normas e regulamentos do leilão ${lot.event?.name}. O arrematante declara-se responsável pelo pagamento integral do valor arrematado somado às comissões aplicáveis.`
+                  }
                 </p>
               </div>
 
