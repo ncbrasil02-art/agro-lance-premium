@@ -1,3 +1,4 @@
+ import { validateImage, validateDocument } from "@/utils/upload-validation";
  function PaymentDialog({ lot, profile }: { lot: any, profile: any }) {
    const installments = 30; // default
    const installmentValue = lot.current_price / installments;
@@ -350,11 +351,14 @@ export const Route = createFileRoute("/painel")({
      }
    };
 
-   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'document') => {
-     const file = e.target.files?.[0];
-     if (!file || !user?.id) return;
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'document') => {
+      const file = e.target.files?.[0];
+      if (!file || !user?.id) return;
 
-     setIsUploading(true);
+      const isValid = type === 'avatar' ? validateImage(file) : validateDocument(file);
+      if (!isValid) return;
+
+      setIsUploading(true);
      try {
        const fileExt = file.name.split('.').pop();
        const filePath = `${user.id}/${Math.random()}.${fileExt}`;
