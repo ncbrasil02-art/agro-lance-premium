@@ -1137,14 +1137,14 @@ import { ImageCropper } from "./ImageCropper";
                    {formData.photos_urls && (
                      <div className="grid grid-cols-4 gap-2 mb-2">
                         {formData.photos_urls.split(",").map((url: string, i: number) => (
-                          <div key={i} className="relative aspect-square group">
-                            <OptimizedImage 
-                              src={url.trim()} 
-                              alt="" 
-                              width={200}
-                              aspectRatio="square"
-                              className="h-full w-full rounded-md border" 
-                            />
+                           <div key={i} className="relative aspect-[4/3] group">
+                             <OptimizedImage 
+                               src={url.trim()} 
+                               alt="" 
+                               width={200}
+                               aspectRatio="landscape"
+                               className="h-full w-full rounded-md border" 
+                             />
                             <button 
                              type="button"
                              onClick={() => {
@@ -1298,12 +1298,12 @@ import { ImageCropper } from "./ImageCropper";
                         >
                          <TableCell>
                            {animal.photos && animal.photos.length > 0 ? (
-                             <OptimizedImage 
+                            <OptimizedImage 
                                src={animal.photos[0]} 
                                alt={animal.name} 
-                               width={80}
-                               aspectRatio="square"
-                               className="h-10 w-10 rounded-md border"
+                               width={120}
+                               aspectRatio="landscape"
+                               className="h-10 w-14 rounded-md border"
                              />
                            ) : (
                             <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-[10px] text-muted-foreground border border-dashed">

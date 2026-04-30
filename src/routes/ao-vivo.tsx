@@ -1101,14 +1101,15 @@ export const Route = createFileRoute("/ao-vivo")({
           <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500 order-3">
             <div className="grid md:grid-cols-[1fr_1.2fr]">
                {/* Lado Esquerdo: Foto Grande */}
-               <div className="relative aspect-square md:aspect-auto h-full group">
-                 <OptimizedImage 
-                   src={liveLot.animal?.photos?.[activePhotoIndex] || ""} 
-                   alt={liveLot.animal?.name || "Animal"} 
-                   width={1000}
-                   category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
-                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                 />
+                <div className="relative aspect-[4/3] h-full group">
+                  <OptimizedImage 
+                    src={liveLot.animal?.photos?.[activePhotoIndex] || ""} 
+                    alt={liveLot.animal?.name || "Animal"} 
+                    width={1000}
+                    aspectRatio="landscape"
+                    category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                  />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
 
                 {/* Carimbo de VENDIDO/FINALIZADO sobre a foto */}
