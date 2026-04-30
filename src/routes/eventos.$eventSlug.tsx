@@ -31,17 +31,28 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
          eventData = data;
        }
  
-       if (!eventData) throw notFound();
- 
-       const { data: lots, error: lotsError } = await supabase
-         .from("lots")
-         .select("*, animal:animals(*, seller:sellers(name)), winner:profiles(full_name)")
-         .eq("event_id", eventData.id)
-         .order("lot_number", { ascending: true });
- 
-       if (lotsError) console.error("Erro ao buscar lotes:", lotsError);
- 
-       const event = { ...eventData, lots: lots || [] };
+        if (!eventData) throw notFound();
+
+        // Fetch seller logo if seller_id is present
+        let sellerData = null;
+        if (eventData.seller_id) {
+          const { data: sData } = await supabase
+            .from("sellers")
+            .select("logo_url, name")
+            .eq("id", eventData.seller_id)
+            .maybeSingle();
+          sellerData = sData;
+        }
+  
+        const { data: lots, error: lotsError } = await supabase
+          .from("lots")
+          .select("*, animal:animals(*, seller:sellers(name, logo_url)), winner:profiles(full_name)")
+          .eq("event_id", eventData.id)
+          .order("lot_number", { ascending: true });
+  
+        if (lotsError) console.error("Erro ao buscar lotes:", lotsError);
+  
+        const event = { ...eventData, lots: lots || [], seller: sellerData };
        const result = eventSchema.safeParse(event);
        return { event: result.success ? result.data : (event as any) };
       } catch (err: any) {
