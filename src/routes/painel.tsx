@@ -144,7 +144,11 @@ export const Route = createFileRoute("/painel")({
       nationality: "Brasileira",
       pref_outbid_email: true,
       pref_outbid_push: true,
+      pref_outbid_whatsapp: true,
+      pref_outbid_sms: false,
       pref_new_event_email: true,
+      pref_new_event_whatsapp: true,
+      pref_new_event_sms: false,
       pref_followed_lot_update: true,
     });
 
@@ -293,7 +297,11 @@ export const Route = createFileRoute("/painel")({
             nationality: profile.nationality || "Brasileira",
             pref_outbid_email: profile.pref_outbid_email !== false,
             pref_outbid_push: profile.pref_outbid_push !== false,
+            pref_outbid_whatsapp: profile.pref_outbid_whatsapp !== false,
+            pref_outbid_sms: !!profile.pref_outbid_sms,
             pref_new_event_email: profile.pref_new_event_email !== false,
+            pref_new_event_whatsapp: profile.pref_new_event_whatsapp !== false,
+            pref_new_event_sms: !!profile.pref_new_event_sms,
             pref_followed_lot_update: profile.pref_followed_lot_update !== false,
           });
        }
@@ -375,7 +383,11 @@ export const Route = createFileRoute("/painel")({
             nationality: formData.nationality,
             pref_outbid_email: formData.pref_outbid_email,
             pref_outbid_push: formData.pref_outbid_push,
+            pref_outbid_whatsapp: formData.pref_outbid_whatsapp,
+            pref_outbid_sms: formData.pref_outbid_sms,
             pref_new_event_email: formData.pref_new_event_email,
+            pref_new_event_whatsapp: formData.pref_new_event_whatsapp,
+            pref_new_event_sms: formData.pref_new_event_sms,
             pref_followed_lot_update: formData.pref_followed_lot_update,
           })
           .eq("id", user.id);
