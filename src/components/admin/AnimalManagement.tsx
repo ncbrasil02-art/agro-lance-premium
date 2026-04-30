@@ -1,3 +1,4 @@
+ import { validateImage, validateDocument } from "@/utils/upload-validation";
  import { Upload } from "lucide-react";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
@@ -1134,28 +1135,33 @@ import { RichResultsPreview } from "./RichResultsPreview";
                         accept="image/*" 
                         className="hidden" 
                         id="photo-upload" 
-                        onChange={async (e) => {
-                          const files = e.target.files;
-                          if (!files) return;
-                          const toastId = toast.loading("Enviando fotos...");
-                          const uploadedUrls = [];
-                          for (let i = 0; i < files.length; i++) {
-                            const file = files[i];
-                            const fileExt = file.name.split('.').pop();
-                            const fileName = `${Math.random()}.${fileExt}`;
-                            const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
-                            if (error) {
-                              toast.error(`Erro no upload: ${error.message}`);
-                              continue;
-                            }
-                            const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
-                            uploadedUrls.push(publicUrl);
-                          }
-                           const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-                          setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
-                          toast.dismiss(toastId);
-                          toast.success(`${uploadedUrls.length} fotos enviadas!`);
-                        }}
+                         onChange={async (e) => {
+                           const files = e.target.files;
+                           if (!files || files.length === 0) return;
+                           
+                           const validFiles = Array.from(files).filter(validateImage);
+                           if (validFiles.length === 0) return;
+
+                           const toastId = toast.loading("Enviando fotos...");
+                           const uploadedUrls = [];
+                           for (const file of validFiles) {
+                             const fileExt = file.name.split('.').pop();
+                             const fileName = `${Math.random()}.${fileExt}`;
+                             const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+                             if (error) {
+                               toast.error(`Erro no upload: ${error.message}`);
+                               continue;
+                             }
+                             const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+                             uploadedUrls.push(publicUrl);
+                           }
+                            const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+                           setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
+                           toast.dismiss(toastId);
+                           if (uploadedUrls.length > 0) {
+                             toast.success(`${uploadedUrls.length} fotos enviadas!`);
+                           }
+                         }}
                       />
                       <Button 
                         type="button" 
@@ -1186,22 +1192,22 @@ import { RichResultsPreview } from "./RichResultsPreview";
                        accept=".pdf,image/*" 
                        className="hidden" 
                        id="doc-upload" 
-                       onChange={async (e) => {
-                         const file = e.target.files?.[0];
-                         if (!file) return;
-                         const toastId = toast.loading("Enviando documento...");
-                         const fileExt = file.name.split('.').pop();
-                         const fileName = `${Math.random()}.${fileExt}`;
-                         const { data, error } = await supabase.storage.from('documents').upload(fileName, file);
-                         if (error) {
-                           toast.error(`Erro no upload: ${error.message}`);
-                         } else {
-                           const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(data.path);
-                           setFormData({ ...formData, pedigree_url: publicUrl });
-                           toast.success("Documento enviado!");
-                         }
-                         toast.dismiss(toastId);
-                       }}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !validateDocument(file)) return;
+                          const toastId = toast.loading("Enviando documento...");
+                          const fileExt = file.name.split('.').pop();
+                          const fileName = `${Math.random()}.${fileExt}`;
+                          const { data, error } = await supabase.storage.from('documents').upload(fileName, file);
+                          if (error) {
+                            toast.error(`Erro no upload: ${error.message}`);
+                          } else {
+                            const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(data.path);
+                            setFormData({ ...formData, pedigree_url: publicUrl });
+                            toast.success("Documento enviado!");
+                          }
+                          toast.dismiss(toastId);
+                        }}
                      />
                      <Button 
                        type="button" 
