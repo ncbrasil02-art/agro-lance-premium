@@ -60,6 +60,21 @@ export function OfferManagement() {
 
   useEffect(() => {
     fetchOffers();
+
+    const channel = supabase
+      .channel('admin-offers-realtime')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'offers' 
+      }, () => {
+        fetchOffers();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
    const handleUpdateStatus = async (offer: any, status: 'approved' | 'rejected' | 'under_review') => {
@@ -251,7 +266,7 @@ export function OfferManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {offer.status === 'pending' && (
+                        {(offer.status === 'pending' || offer.status === 'under_review') && (
                           <div className="flex justify-end gap-2">
                             <Button 
                               size="sm" 
