@@ -90,10 +90,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
      ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
      Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
-    MapPin, Globe, Loader2, Send
+    MapPin, Globe, Loader2, Send, BellRing
  } from "lucide-react";
    import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -135,6 +136,9 @@ export const Route = createFileRoute("/painel")({
       address: "",
       cep: "",
       nationality: "Brasileira",
+      pref_outbid_email: true,
+      pref_outbid_push: true,
+      pref_new_event_email: true,
     });
 
      const fileInputRef = useRef<HTMLInputElement>(null);
@@ -246,14 +250,17 @@ export const Route = createFileRoute("/painel")({
       fetchNotifications();
        
        if (profile) {
-         setFormData({
-           full_name: profile.full_name || "",
-           cpf: profile.cpf || "",
-           phone: profile.phone || "",
-           address: profile.address || "",
-           cep: profile.cep || "",
-           nationality: profile.nationality || "Brasileira",
-         });
+          setFormData({
+            full_name: profile.full_name || "",
+            cpf: profile.cpf || "",
+            phone: profile.phone || "",
+            address: profile.address || "",
+            cep: profile.cep || "",
+            nationality: profile.nationality || "Brasileira",
+            pref_outbid_email: profile.pref_outbid_email !== false,
+            pref_outbid_push: profile.pref_outbid_push !== false,
+            pref_new_event_email: profile.pref_new_event_email !== false,
+          });
        }
  
        // Add real-time listeners for the dashboard
@@ -322,17 +329,20 @@ export const Route = createFileRoute("/painel")({
      
      setIsSaving(true);
      try {
-       const { error } = await supabase
-         .from("profiles")
-         .update({
-           full_name: formData.full_name,
-           cpf: formData.cpf,
-           phone: formData.phone,
-           address: formData.address,
-           cep: formData.cep,
-           nationality: formData.nationality,
-         })
-         .eq("id", user.id);
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            full_name: formData.full_name,
+            cpf: formData.cpf,
+            phone: formData.phone,
+            address: formData.address,
+            cep: formData.cep,
+            nationality: formData.nationality,
+            pref_outbid_email: formData.pref_outbid_email,
+            pref_outbid_push: formData.pref_outbid_push,
+            pref_new_event_email: formData.pref_new_event_email,
+          })
+          .eq("id", user.id);
 
        if (error) throw error;
        
