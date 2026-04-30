@@ -1267,11 +1267,12 @@ import { LotCard } from "../auctions/lot-card";
                         ))}
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t flex justify-end">
+                     </div>
+                   </div>
+                 </div>
+               </div>
+ 
+               <div className="pt-6 border-t flex justify-end">
                 <Button 
                   className="bg-gold text-emerald-deep font-black hover:bg-gold/90 shadow-gold"
                   disabled={isSaving}
