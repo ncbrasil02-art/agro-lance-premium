@@ -1383,6 +1383,16 @@ export const Route = createFileRoute("/painel")({
           <Separator className="mb-6" />
 
           <div className="flex flex-wrap gap-3 mt-auto">
+             {!lot.accepted_at && (
+               <Button 
+                 className="bg-gold hover:bg-gold-bright text-emerald-deep font-bold gap-2"
+                 onClick={handleAcceptTerms}
+                 disabled={isAccepting}
+               >
+                 {isAccepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                 ACEITAR TERMOS E CONDIÇÕES
+               </Button>
+             )}
              <DocumentButton 
                title="Termo de Arrematação" 
                lot={lot} 
