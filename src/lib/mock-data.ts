@@ -40,6 +40,17 @@ export interface Lot {
   viewers: number;
   endsAt?: string;
   status?: any;
+  photos?: string[];
+  youtube_url?: string;
+  registration_number?: string;
+  vaccination_records?: any;
+  father?: string;
+  mother?: string;
+  sex?: string;
+  color?: string;
+  birthDate?: string;
+  seller?: string;
+  location?: string;
 }
 
 export const events: AuctionEvent[] = [
@@ -124,6 +135,13 @@ export const lots: Lot[] = [
     viewers: 312,
     endsAt: new Date(Date.now() + 1000 * 60 * 12).toISOString(),
     status: "live",
+    photos: [horse1, horse2, horse3],
+    father: "Zorro do Cerrado",
+    mother: "Dama da Noite",
+    sex: "M",
+    seller: "Haras São Bento",
+    registration_number: "ABC-123456",
+    birthDate: "2020-05-15"
   },
   {
     id: "lot-2",
@@ -139,6 +157,11 @@ export const lots: Lot[] = [
     viewers: 198,
     endsAt: new Date(Date.now() + 1000 * 60 * 35).toISOString(),
     status: "open",
+    youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    photos: [horse2, horse1],
+    sex: "F",
+    seller: "Fazenda Estrela",
+    location: "Uberaba - MG"
   },
   {
     id: "lot-3",
