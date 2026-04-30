@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { generateMetaTags } from "@/utils/seo";
- import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, XCircle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
+import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, ZapOff, WifiOff, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, XCircle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { LotDetailSkeleton } from "@/components/ui/page-skeleton";
 import { ErrorFallback } from "@/components/ui/error-fallback";
@@ -313,6 +313,7 @@ function LotDetail() {
   const { user, profile } = useAuth();
    const [lot, setLot] = useState(initialLot);
    const [viewIncremented, setViewIncremented] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [recentBids, setRecentBids] = useState<any[]>(initialBids);
   const [isBidding, setIsBidding] = useState(false);
   const [showConfirmBid, setShowConfirmBid] = useState(false);
@@ -340,7 +341,7 @@ function LotDetail() {
      if (latestBids) setRecentBids(latestBids);
    }, [lot.id]);
  
-   useRealtimeFallback({
+    const { delaySeconds, isPolling } = useRealtimeFallback({
      status: rtStatus,
      onUpdate: fetchLatestData,
      label: `Detalhe Lote ${lot.lot_number}`,
@@ -348,6 +349,17 @@ function LotDetail() {
      initialPollInterval: 15000
    });
  
+    useEffect(() => {
+      const handleOnline = () => setIsOffline(false);
+      const handleOffline = () => setIsOffline(true);
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }, []);
+
    // Real-time synchronization
    useEffect(() => {
      const lotId = lot.id;
