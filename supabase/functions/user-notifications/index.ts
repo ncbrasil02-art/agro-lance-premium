@@ -1,3 +1,4 @@
+  import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
   const sendWhatsApp = async (phone: string, message: string) => {
     const url = Deno.env.get('WHATSAPP_API_URL')
     const key = Deno.env.get('WHATSAPP_API_KEY')
@@ -24,7 +25,6 @@
     console.log('SMS would be sent to', phone, ':', message)
   }
 
- import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
  import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
  
  const corsHeaders = {
@@ -58,8 +58,9 @@
      // Permissions check: only admins can send notifications (except for certain types if allowed)
       if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
        throw new Error('Forbidden')
+       }
      }
- 
+
      const adminClient = createClient(
        Deno.env.get('SUPABASE_URL') ?? '',
        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
