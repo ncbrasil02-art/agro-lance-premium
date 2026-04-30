@@ -402,6 +402,7 @@ export type Database = {
           buyer_phone: string | null
           created_at: string | null
           id: string
+          negotiated_terms: string | null
           shipping_details: Json | null
           status: string | null
           total_price: number
@@ -415,6 +416,7 @@ export type Database = {
           buyer_phone?: string | null
           created_at?: string | null
           id?: string
+          negotiated_terms?: string | null
           shipping_details?: Json | null
           status?: string | null
           total_price: number
@@ -428,6 +430,7 @@ export type Database = {
           buyer_phone?: string | null
           created_at?: string | null
           id?: string
+          negotiated_terms?: string | null
           shipping_details?: Json | null
           status?: string | null
           total_price?: number
@@ -945,6 +948,7 @@ export type Database = {
           description: string | null
           id: string
           lot_id: string | null
+          negotiated_terms: string | null
           status: string | null
           updated_at: string
           user_id: string | null
@@ -956,6 +960,7 @@ export type Database = {
           description?: string | null
           id?: string
           lot_id?: string | null
+          negotiated_terms?: string | null
           status?: string | null
           updated_at?: string
           user_id?: string | null
@@ -967,6 +972,7 @@ export type Database = {
           description?: string | null
           id?: string
           lot_id?: string | null
+          negotiated_terms?: string | null
           status?: string | null
           updated_at?: string
           user_id?: string | null
