@@ -1213,43 +1213,40 @@ export const Route = createFileRoute("/ao-vivo")({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] gap-2">
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <motion.div
-                        className="w-full"
-                        animate={animations.bid_button_pulse && !(isBidding || liveLot.status === 'sold' || liveLot.status === 'passed') ? {
-                          scale: [1, 1.02, 1],
-                          boxShadow: [
-                            "0 0 0 rgba(212,175,55,0)",
-                            "0 0 15px rgba(212,175,55,0.4)",
-                            "0 0 0 rgba(212,175,55,0)"
-                          ]
-                        } : {}}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
+                  <div className="flex gap-2 items-center">
+                    <motion.div
+                      className="flex-1"
+                      animate={animations.bid_button_pulse && !(isBidding || liveLot.status === 'sold' || liveLot.status === 'passed') ? {
+                        scale: [1, 1.02, 1],
+                        boxShadow: [
+                          "0 0 0 rgba(212,175,55,0)",
+                          "0 0 15px rgba(212,175,55,0.4)",
+                          "0 0 0 rgba(212,175,55,0)"
+                        ]
+                      } : {}}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <Button
+                        className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
+                        disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
+                        onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
                       >
-                        <Button
-                          className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
-                          disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
-                          onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
-                        >
-                          {isBidding ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
-                            <Ban className="mr-2 h-4 w-4" />
-                          ) : (
-                            <Gavel className="mr-2 h-4 w-4" />
-                          )}
-                          {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
-                           liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
-                           `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
-                        </Button>
-                      </motion.div>
-                    </div>
+                        {isBidding ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
+                          <Ban className="mr-2 h-4 w-4" />
+                        ) : (
+                          <Gavel className="mr-2 h-4 w-4" />
+                        )}
+                        {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
+                         liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
+                         `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
+                      </Button>
+                    </motion.div>
 
                     <div className="flex gap-2">
                       <Button 
