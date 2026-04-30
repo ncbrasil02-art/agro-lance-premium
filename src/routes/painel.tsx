@@ -352,52 +352,63 @@ export const Route = createFileRoute("/painel")({
    };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'document') => {
-      const file = e.target.files?.[0];
-      if (!file || !user?.id) return;
+      const files = e.target.files;
+      if (!files || files.length === 0 || !user?.id) return;
 
-      const isValid = type === 'avatar' ? validateImage(file) : validateDocument(file);
-      if (!isValid) return;
+      const validFiles = Array.from(files).filter(type === 'avatar' ? validateImage : validateDocument);
+      if (validFiles.length === 0) return;
 
       setIsUploading(true);
-     try {
-       const fileExt = file.name.split('.').pop();
-       const filePath = `${user.id}/${Math.random()}.${fileExt}`;
-       const bucket = type === 'avatar' ? 'avatars' : 'documents';
+      try {
+        const uploadedUrls: string[] = [];
+        const bucket = type === 'avatar' ? 'avatars' : 'documents';
 
-       const { error: uploadError } = await supabase.storage
-         .from(bucket)
-         .upload(filePath, file);
+        for (const file of validFiles) {
+          const fileExt = file.name.split('.').pop();
+          const filePath = `${user.id}/${Math.random()}.${fileExt}`;
 
-       if (uploadError) throw uploadError;
+          const { error: uploadError } = await supabase.storage
+            .from(bucket)
+            .upload(filePath, file);
 
-       const { data: { publicUrl } } = supabase.storage
-         .from(bucket)
-         .getPublicUrl(filePath);
+          if (uploadError) {
+            toast.error(`Erro no upload de ${file.name}: ${uploadError.message}`);
+            continue;
+          }
 
-       if (type === 'avatar') {
-         const { error: updateError } = await supabase
-           .from("profiles")
-           .update({ avatar_url: publicUrl })
-           .eq("id", user.id);
-         if (updateError) throw updateError;
-         toast.success("Foto de perfil atualizada!");
-       } else {
-         const newDocs = [...(profile?.document_urls || []), publicUrl];
-         const { error: updateError } = await supabase
-           .from("profiles")
-           .update({ document_urls: newDocs })
-           .eq("id", user.id);
-         if (updateError) throw updateError;
-         toast.success("Documento enviado com sucesso!");
-       }
-       
-       refreshProfile();
-     } catch (error: any) {
-       toast.error("Erro no upload: " + error.message);
-     } finally {
-       setIsUploading(false);
-     }
-   };
+          const { data: { publicUrl } } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(filePath);
+          
+          uploadedUrls.push(publicUrl);
+        }
+
+        if (uploadedUrls.length === 0) return;
+
+        if (type === 'avatar') {
+          const { error: updateError } = await supabase
+            .from("profiles")
+            .update({ avatar_url: uploadedUrls[0] })
+            .eq("id", user.id);
+          if (updateError) throw updateError;
+          toast.success("Foto de perfil atualizada!");
+        } else {
+          const newDocs = [...(profile?.document_urls || []), ...uploadedUrls];
+          const { error: updateError } = await supabase
+            .from("profiles")
+            .update({ document_urls: newDocs })
+            .eq("id", user.id);
+          if (updateError) throw updateError;
+          toast.success(`${uploadedUrls.length} documento(s) enviado(s) com sucesso!`);
+        }
+        
+        refreshProfile();
+      } catch (error: any) {
+        toast.error("Erro no processo de upload: " + error.message);
+      } finally {
+        setIsUploading(false);
+      }
+    };
 
 
   if (!user) {
