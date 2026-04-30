@@ -1348,7 +1348,10 @@ export const Route = createFileRoute("/painel")({
   );
 }
 
- function DocumentButton({ title, lot, profile, siteInfo, type }: { title: string, lot: any, profile: any, siteInfo: any, type: string }) {
+  function DocumentButton({ title, lot, profile, siteInfo, type }: { title: string, lot: any, profile: any, siteInfo: any, type: string }) {
+    const isDirectSale = lot.is_direct_sale || !lot.lot_number;
+    const finalNegotiatedTerms = lot.negotiated_terms || lot.description || "As condições de pagamento seguem o regulamento padrão da plataforma.";
+
   return (
     <Dialog>
       <DialogTrigger asChild>
