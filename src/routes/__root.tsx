@@ -75,10 +75,13 @@ function NotFoundComponent() {
          { name: "viewport", content: "width=device-width, initial-scale=1" },
          ...tags.meta
        ],
-       links: [
-         { rel: "stylesheet", href: appCss },
-         ...tags.links
-       ],
+        links: [
+          { rel: "stylesheet", href: appCss },
+          { rel: "preconnect", href: "https://fonts.googleapis.com" },
+          { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+          { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" },
+          ...tags.links
+        ],
      };
    },
   shellComponent: RootShell,

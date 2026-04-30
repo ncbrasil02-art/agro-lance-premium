@@ -31,17 +31,28 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
          eventData = data;
        }
  
-       if (!eventData) throw notFound();
- 
-       const { data: lots, error: lotsError } = await supabase
-         .from("lots")
-         .select("*, animal:animals(*, seller:sellers(name)), winner:profiles(full_name)")
-         .eq("event_id", eventData.id)
-         .order("lot_number", { ascending: true });
- 
-       if (lotsError) console.error("Erro ao buscar lotes:", lotsError);
- 
-       const event = { ...eventData, lots: lots || [] };
+        if (!eventData) throw notFound();
+
+        // Fetch seller logo if seller_id is present
+        let sellerData = null;
+        if (eventData.seller_id) {
+          const { data: sData } = await supabase
+            .from("sellers")
+            .select("logo_url, name")
+            .eq("id", eventData.seller_id)
+            .maybeSingle();
+          sellerData = sData;
+        }
+  
+        const { data: lots, error: lotsError } = await supabase
+          .from("lots")
+          .select("*, animal:animals(*, seller:sellers(name, logo_url)), winner:profiles(full_name)")
+          .eq("event_id", eventData.id)
+          .order("lot_number", { ascending: true });
+  
+        if (lotsError) console.error("Erro ao buscar lotes:", lotsError);
+  
+        const event = { ...eventData, lots: lots || [], seller: sellerData };
        const result = eventSchema.safeParse(event);
        return { event: result.success ? result.data : (event as any) };
       } catch (err: any) {
@@ -206,6 +217,38 @@ function EventDetail() {
                     {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium selecionados cuidadosamente por nossa curadoria genética."}
                   </p>
                 </div>
+              </div>
+
+              {/* Marcas e Assinaturas */}
+              <div className="flex flex-wrap items-center gap-8 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                {event.seller?.logo_url && (
+                  <div className="flex flex-col gap-2 group cursor-default">
+                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Vendedor</span>
+                    <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
+                      <img src={event.seller.logo_url} alt={event.seller.name} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                    </div>
+                  </div>
+                )}
+
+                {event.promoter_logo_url && (
+                  <div className="flex flex-col gap-2 group cursor-default">
+                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Promotora</span>
+                    <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
+                      <img src={event.promoter_logo_url} alt={event.promoter_company} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                    </div>
+                  </div>
+                )}
+
+                {event.auctioneer_name && (
+                  <div className="flex flex-col gap-2 group cursor-default">
+                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Leiloeiro</span>
+                    <div className="h-16 flex items-center px-4">
+                      <div className="text-xl md:text-2xl font-signature text-foreground opacity-40 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter">
+                        {event.auctioneer_name}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-12">

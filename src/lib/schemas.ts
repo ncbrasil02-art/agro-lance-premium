@@ -35,8 +35,9 @@
     photos: z.array(z.string()).nullable().optional().default([]),
     seller_id: z.string().uuid().nullable().optional(),
     seller_name: z.string().nullable().optional(),
-    allows_pre_bidding: z.boolean().nullable().optional().default(true),
-  }).passthrough();
+     allows_pre_bidding: z.boolean().nullable().optional().default(true),
+     promoter_logo_url: z.string().nullable().optional(),
+   }).passthrough();
  
  export const animalSchema = z.object({
    id: z.string().uuid(),
