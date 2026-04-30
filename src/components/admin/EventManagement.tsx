@@ -452,13 +452,16 @@ import { useAuth } from "@/components/auth/auth-provider";
      };
 
     // Real-time updates for the events list and current details
-     useRealtimeLots(() => {
-       fetchEvents();
-       fetchPendingWinnerLots();
-       if (viewingEventDetails) {
-         fetchEventLots(viewingEventDetails.id);
-       }
-     });
+      useRealtimeLots(() => {
+        fetchEvents();
+        fetchPendingWinnerLots();
+        if (viewingEventDetails) {
+          fetchEventLots(viewingEventDetails.id);
+        }
+        if (expandedEventId) {
+          fetchExpandedData(expandedEventId);
+        }
+      });
 
       const [rtStatus, setRtStatus] = useState<string>("INITIAL");
 
