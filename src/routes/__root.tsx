@@ -43,10 +43,11 @@ function NotFoundComponent() {
     export const Route = createRootRouteWithContext<{
      siteInfo: any;
      theme: any;
-     homepage: any;
-     animations: any;
-     seoSettings: any;
-   }>()({
+      homepage: any;
+      animations: any;
+      seoSettings: any;
+      lot_card_settings: any;
+    }>()({
    loader: async () => {
      try {
        const { data, error } = await supabase
@@ -58,14 +59,15 @@ function NotFoundComponent() {
         const info = data.find((i: any) => i.key === "site_info")?.value as any;
         const theme = data.find((i: any) => i.key === "theme")?.value as any;
         const homepage = data.find((i: any) => i.key === "homepage_sections")?.value as any;
-        const seoSettings = data.find((i: any) => i.key === "seo_settings")?.value as any;
-        const animations = data.find((i: any) => i.key === "animations")?.value as any;
-        
-        return { siteInfo: info, theme, homepage, seoSettings, animations };
-     } catch (error) {
-       console.error("Error loading root settings:", error);
-       return { siteInfo: null, theme: null, homepage: null, animations: null, seoSettings: null };
-     }
+         const seoSettings = data.find((i: any) => i.key === "seo_settings")?.value as any;
+         const animations = data.find((i: any) => i.key === "animations")?.value as any;
+         const lot_card_settings = data.find((i: any) => i.key === "lot_card_settings")?.value as any;
+         
+         return { siteInfo: info, theme, homepage, seoSettings, animations, lot_card_settings };
+      } catch (error) {
+        console.error("Error loading root settings:", error);
+        return { siteInfo: null, theme: null, homepage: null, animations: null, seoSettings: null, lot_card_settings: null };
+      }
    },
    head: ({ loaderData }) => {
      const seoSettings = loaderData?.seoSettings;
