@@ -1367,15 +1367,21 @@ export const Route = createFileRoute("/painel")({
         </DialogHeader>
         
         <div className="p-12 text-gray-800 bg-white" id="printable-area">
-          <div className="flex justify-between items-start mb-12">
-            <div className="flex items-center gap-3">
-               <div className="bg-emerald-deep p-2 rounded-lg">
-                 <Gavel className="h-8 w-8 text-gold" />
+          <div className="flex justify-between items-start mb-12 border-b pb-8">
+            <div className="flex items-center gap-4">
+               <div className="h-24 w-24 flex items-center justify-center">
+                 {siteInfo?.logo_url ? (
+                   <img src={siteInfo.logo_url} alt="Logo" className="max-h-full max-w-full object-contain" />
+                 ) : (
+                   <div className="bg-emerald-deep p-4 rounded-xl">
+                    <Gavel className="h-12 w-12 text-gold" />
+                   </div>
+                 )}
                </div>
                 <div>
-                  <h2 className="text-2xl font-black text-emerald-deep leading-none uppercase tracking-tighter italic">{siteInfo?.name || "Premium Agro"}</h2>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{siteInfo?.description || "Leilões Agropecuários de Elite"}</p>
-                  {siteInfo?.cnpj && <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">CNPJ: {siteInfo.cnpj}</p>}
+                  <h2 className="text-3xl font-black text-emerald-deep leading-none uppercase tracking-tighter italic">{siteInfo?.name || "Premium Agro"}</h2>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{siteInfo?.description || "Leilões Agropecuários de Elite"}</p>
+                  {siteInfo?.cnpj && <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">CNPJ: {siteInfo.cnpj}</p>}
                 </div>
             </div>
             <div className="text-right">
@@ -1457,9 +1463,9 @@ export const Route = createFileRoute("/painel")({
                   <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">Nota de Venda</h1>
                   <p className="text-gray-400 text-xs font-bold tracking-widest">COMPROVANTE DE TRANSAÇÃO AGROPECUÁRIA</p>
                 </div>
-                <div className="h-16 w-16 bg-emerald-deep/5 rounded-xl p-2 flex items-center justify-center">
+                <div className="h-24 w-24 bg-emerald-deep/5 rounded-xl p-2 flex items-center justify-center">
                   <img 
-                    src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
+                    src={siteInfo?.logo_url || "https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png"} 
                     alt="Logo" 
                     className="h-full object-contain"
                   />
