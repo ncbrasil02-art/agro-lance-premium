@@ -312,11 +312,12 @@ import { useAuth } from "@/components/auth/auth-provider";
           viewers: 0,
           slug: "",
           seo_title: "",
-          seo_description: "",
-          og_title: "",
-          og_description: "",
-          og_image_url: ""
-        });
+           seo_description: "",
+           og_title: "",
+           og_description: "",
+           og_image_url: "",
+           promoter_logo_url: ""
+         });
 
      const resetForm = () => {
        setEditingEvent(null);
@@ -341,11 +342,12 @@ import { useAuth } from "@/components/auth/auth-provider";
           viewers: 0,
           slug: "",
           seo_title: "",
-          seo_description: "",
-          og_title: "",
-          og_description: "",
-          og_image_url: ""
-        });
+           seo_description: "",
+           og_title: "",
+           og_description: "",
+           og_image_url: "",
+           promoter_logo_url: ""
+         });
      };
 
      const handleEdit = (event: any) => {
@@ -373,9 +375,10 @@ import { useAuth } from "@/components/auth/auth-provider";
             seo_title: event.seo_title || "",
           seo_description: event.seo_description || "",
           og_title: event.og_title || "",
-          og_description: event.og_description || "",
-          og_image_url: event.og_image_url || ""
-        });
+           og_description: event.og_description || "",
+           og_image_url: event.og_image_url || "",
+           promoter_logo_url: event.promoter_logo_url || ""
+         });
        setIsDialogOpen(true);
      };
  
@@ -534,9 +537,10 @@ import { useAuth } from "@/components/auth/auth-provider";
                   commission_rate: formData.commission_rate,
                   regulation: formData.regulation,
                   viewers: formData.viewers,
-                  seo_title: formData.seo_title,
-                  seo_description: formData.seo_description
-              })
+                   seo_title: formData.seo_title,
+                   seo_description: formData.seo_description,
+                   promoter_logo_url: formData.promoter_logo_url
+               })
              .eq("id", editingEvent.id);
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
@@ -569,9 +573,10 @@ import { useAuth } from "@/components/auth/auth-provider";
               slug: slug,
               regulation: formData.regulation,
               viewers: formData.viewers,
-              seo_title: formData.seo_title,
-              seo_description: formData.seo_description
-           });
+               seo_title: formData.seo_title,
+               seo_description: formData.seo_description,
+               promoter_logo_url: formData.promoter_logo_url
+            });
           if (error) throw error;
           toast.success("Evento criado com sucesso");
         }
@@ -1104,11 +1109,50 @@ import { useAuth } from "@/components/auth/auth-provider";
                       <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
                     )}
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="transmission">Link da Transmissão (YouTube/Vimeo)</Label>
-                    <Input value={formData.transmission_link} onChange={(e) => setFormData({ ...formData, transmission_link: e.target.value })} placeholder="https://..." />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="grid gap-2">
+                       <Label>Logo da Promotora</Label>
+                       <div className="flex gap-2">
+                          {formData.promoter_logo_url && (
+                            <img src={formData.promoter_logo_url} alt="" className="h-10 w-10 rounded object-contain border bg-white" />
+                          )}
+                          <Input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            id="promoter-logo-upload" 
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const tid = toast.loading("Enviando logo...");
+                              const fileExt = file.name.split('.').pop();
+                              const fileName = `promoter_${Math.random()}.${fileExt}`;
+                              const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
+                              if (error) toast.error("Erro: " + error.message);
+                              else {
+                                const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
+                                setFormData({ ...formData, promoter_logo_url: publicUrl });
+                                toast.success("Logo enviado!");
+                              }
+                              toast.dismiss(tid);
+                            }}
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="flex-1 border-dashed"
+                            onClick={() => document.getElementById('promoter-logo-upload')?.click()}
+                          >
+                            {formData.promoter_logo_url ? "Trocar Logo" : "Upload Logo"}
+                          </Button>
+                       </div>
+                     </div>
+                     <div className="grid gap-2">
+                       <Label htmlFor="transmission">Link da Transmissão (YouTube/Vimeo)</Label>
+                       <Input value={formData.transmission_link} onChange={(e) => setFormData({ ...formData, transmission_link: e.target.value })} placeholder="https://..." />
+                     </div>
+                   </div>
+                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="promoter">Empresa Promotora</Label>
                       <Input value={formData.promoter_company} onChange={(e) => setFormData({ ...formData, promoter_company: e.target.value })} placeholder="Fazenda / Empresa" />
