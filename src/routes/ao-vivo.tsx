@@ -1106,9 +1106,17 @@ export const Route = createFileRoute("/ao-vivo")({
                 <div className="absolute bottom-4 left-4 flex gap-2">
                    <Dialog>
                      <DialogTrigger asChild>
-                       <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm hover:bg-gold hover:text-white transition-all shadow-lg font-bold">
-                         <Expand className="mr-2 h-3.5 w-3.5" /> VER GALERIA
-                       </Button>
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Button 
+                            size="sm" 
+                            className="bg-emerald-deep text-gold hover:bg-emerald-bright hover:text-white transition-all shadow-gold font-bold border border-gold/40 backdrop-blur-md"
+                          >
+                            <Expand className="mr-2 h-3.5 w-3.5" /> VER GALERIA
+                          </Button>
+                        </motion.div>
                      </DialogTrigger>
                      <DialogContent className="max-w-4xl bg-emerald-deep border-gold/20">
                        <DialogHeader>
