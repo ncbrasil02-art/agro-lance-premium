@@ -901,6 +901,49 @@ export const Route = createFileRoute("/painel")({
                   />
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                    <BellRing className="h-4 w-4 text-gold" /> Preferências de Alerta
+                  </CardTitle>
+                  <CardDescription>Escolha como deseja ser notificado.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Lance Superado (E-mail)</Label>
+                      <p className="text-[10px] text-muted-foreground">Receba um e-mail imediato quando alguém cobrir seu lance.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_outbid_email} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_outbid_email: checked})}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Lance Superado (Painel)</Label>
+                      <p className="text-[10px] text-muted-foreground">Alertas visuais e histórico no seu painel de usuário.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_outbid_push} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_outbid_push: checked})}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Novos Eventos</Label>
+                      <p className="text-[10px] text-muted-foreground">Fique por dentro dos novos leilões e oportunidades.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_new_event_email} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_new_event_email: checked})}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="lg:col-span-2">
