@@ -220,7 +220,11 @@ export const Route = createFileRoute("/painel")({
             current_price: ds.total_price,
             lot_number: null // Direct sales don't have lot numbers
           }))
-        ].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+        ].sort((a, b) => {
+          const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+          const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+          return dateB - dateA;
+        });
 
         setMyLots(combinedPurchases);
  
