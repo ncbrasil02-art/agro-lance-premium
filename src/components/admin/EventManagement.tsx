@@ -1154,9 +1154,11 @@ import { useAuth } from "@/components/auth/auth-provider";
                      </TableCell>
                    </TableRow>
                  ) : (
-                    filteredEvents.map((event) => (
+                    filteredEvents.map((event) => {
+                      const data = expandedData[event.id];
+                      return (
                       <React.Fragment key={event.id}>
-                      <TableRow className={expandedEventId === event.id ? "bg-muted/50" : ""}>
+                      <TableRow className={expandedEventId === event.id ? "bg-muted/30 border-b-0" : ""}>
                         <TableCell>
                           <Button 
                             variant="ghost" 
@@ -1340,8 +1342,128 @@ import { useAuth } from "@/components/auth/auth-provider";
                             )}
                         </div>
                       </TableCell>
-                     </TableRow>
-                   ))
+                      </TableRow>
+                      {expandedEventId === event.id && (
+                        <TableRow className="bg-muted/30 border-t-0 hover:bg-muted/30">
+                          <TableCell colSpan={6} className="p-0">
+                            <div className="p-6 pt-0 animate-in slide-in-from-top-2 duration-300">
+                              <div className="grid md:grid-cols-3 gap-6">
+                                {/* Media Section */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gold mb-1">
+                                    <ImageIcon className="h-3 w-3" /> Mídia do Evento
+                                  </div>
+                                  <div className="relative group aspect-video rounded-xl overflow-hidden border bg-background flex items-center justify-center">
+                                    {event.banner_url ? (
+                                      <img src={event.banner_url} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                      <div className="text-muted-foreground text-[10px]">Sem banner cadastrado</div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                      <Input 
+                                        type="file" 
+                                        className="hidden" 
+                                        id={`replace-banner-${event.id}`} 
+                                        onChange={async (e) => {
+                                          const file = e.target.files?.[0];
+                                          if (!file) return;
+                                          const tid = toast.loading("Substituindo banner...");
+                                          const fileExt = file.name.split('.').pop();
+                                          const fileName = `${event.id}_${Math.random()}.${fileExt}`;
+                                          const { data: uploadData, error } = await supabase.storage.from('banners').upload(fileName, file);
+                                          if (error) toast.error("Erro: " + error.message);
+                                          else {
+                                            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(uploadData.path);
+                                            await supabase.from('events').update({ banner_url: publicUrl }).eq('id', event.id);
+                                            toast.success("Banner atualizado!");
+                                            fetchEvents();
+                                          }
+                                          toast.dismiss(tid);
+                                        }}
+                                      />
+                                      <Button size="sm" variant="secondary" className="h-7 text-[10px]" onClick={() => document.getElementById(`replace-banner-${event.id}`)?.click()}>
+                                        Substituir Foto
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="text-[10px] text-muted-foreground italic">
+                                    * Banner visível na listagem principal do site.
+                                  </div>
+                                </div>
+
+                                {/* Bids Section */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-500 mb-1">
+                                    <History className="h-3 w-3" /> Últimos 2 Lances
+                                  </div>
+                                  {isExpandedLoading ? (
+                                    <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                                  ) : data?.bids && data.bids.length > 0 ? (
+                                    <div className="space-y-2">
+                                      {data.bids.map((bid: any) => (
+                                        <div key={bid.id} className="flex items-center justify-between p-3 rounded-lg bg-background border text-xs">
+                                          <div>
+                                            <p className="font-bold text-emerald-600">{formatBRL(bid.amount)}</p>
+                                            <p className="text-[10px] text-muted-foreground">{bid.profiles?.full_name}</p>
+                                          </div>
+                                          <div className="text-right">
+                                            <p className="font-medium">Lote {bid.lots?.lot_number}</p>
+                                            <p className="text-[9px] text-muted-foreground">{format(new Date(bid.created_at), "HH:mm:ss")}</p>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div className="p-4 rounded-lg bg-background border border-dashed text-center text-[10px] text-muted-foreground">
+                                      Nenhum lance recebido neste evento.
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Animals Section */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-blue-500 mb-1">
+                                    <Users className="h-3 w-3" /> Animais no Evento ({data?.lots?.length || 0})
+                                  </div>
+                                  <div className="max-h-[160px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                                    {isExpandedLoading ? (
+                                      <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                                    ) : data?.lots && data.lots.length > 0 ? (
+                                      data.lots.map((lot: any) => (
+                                        <div key={lot.id} className="flex items-center gap-3 p-2 rounded-lg bg-background border hover:border-gold/30 transition-colors">
+                                          <div className="h-10 w-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                                            {lot.animal?.photos?.[0] ? (
+                                              <img src={lot.animal.photos[0]} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                              <div className="w-full h-full flex items-center justify-center"><ImageIcon className="h-4 w-4 text-muted-foreground/30" /></div>
+                                            )}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold truncate">{lot.animal?.name}</p>
+                                            <p className="text-[9px] text-muted-foreground">Lote {lot.lot_number} • {lot.animal?.breed}</p>
+                                          </div>
+                                          <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
+                                            <a href={`/admin?tab=lots&search=${lot.lot_number}`} title="Ir para lote">
+                                              <ChevronRight className="h-3 w-3" />
+                                            </a>
+                                          </Button>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="p-4 rounded-lg bg-background border border-dashed text-center text-[10px] text-muted-foreground">
+                                        Nenhum animal vinculado.
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      </React.Fragment>
+                    );
+                  })
                  )}
                </TableBody>
              </Table>
