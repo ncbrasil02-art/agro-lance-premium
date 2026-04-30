@@ -163,16 +163,7 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
           const seoData = data.find(i => i.key === "seo_settings")?.value;
          const palettes = data.find(i => i.key === "saved_palettes")?.value;
           const animData = data.find(i => i.key === "animations")?.value;
-          const lotCardData = data.find(i => i.key === "lot_card_settings")?.value;
-        <TabsContent value="lots" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-gold" /> Configuração do Card do Lote
-              </CardTitle>
-              <CardDescription>Personalize como as informações dos animais aparecem nos cards</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+           const lotCardData = data.find(i => i.key === "lot_card_settings")?.value;
               <div className="space-y-4">
                 <Label className="text-base font-bold">Modo de Exibição de Mídia</Label>
                 <div className="flex gap-4">
