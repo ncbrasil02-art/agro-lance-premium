@@ -96,9 +96,13 @@
            from: 'Elite Leilões <contato@premiumagro.com.br>',
            to: [email],
            subject: 'Seu cadastro foi aprovado! 🚀',
-           html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Olá! Seu cadastro foi aprovado.</h2><p>Você já pode participar dos leilões.</p></div>`,
-         }),
-       })
+            html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Olá! Seu cadastro foi aprovado.</h2><p>Você já pode participar dos leilões.</p></div>`,
+          }),
+        })
+        
+        if (phone) {
+          await sendWhatsApp(phone, `🚀 *Elite Leilões: Seu cadastro foi aprovado!*\n\nOlá! Seu cadastro foi aprovado com sucesso. Você já pode participar de todos os nossos leilões e realizar lances.\n\nBoas compras!`)
+        }
      } else if ((type === 'offer_received' || type === 'direct_sale_request') && resendKey) {
        const { amount, itemName, bidderName } = data;
        const { data: admins } = await adminClient.from('profiles').select('id').eq('role', 'admin');
