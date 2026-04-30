@@ -101,16 +101,18 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
           template_id: 'model1'
         };
         
-        const templateId = (baseSettings as any)?.template_id || 'model1';
+   const baseTemplateId = (baseSettings as any)?.template_id || 'model1';
+   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
+   const templateId = previewTemplate || baseTemplateId;
         
-        const activeSections = {
-          ...baseSettings,
-          order: (baseSettings as any).order || (
-            templateId === 'model2' ? ["featured_lots", "upcoming_events", "articles", "sale_menu"] : 
-            templateId === 'model3' ? ["upcoming_events", "articles", "featured_lots", "sale_menu"] : 
-            ["upcoming_events", "featured_lots", "sale_menu", "articles"]
-          )
-        };
+   const activeSections = {
+     ...baseSettings,
+     order: (baseSettings as any).order || (
+       templateId === 'model2' ? ["featured_lots", "upcoming_events", "articles", "sale_menu"] : 
+       templateId === 'model3' ? ["upcoming_events", "articles", "featured_lots", "sale_menu"] : 
+       ["upcoming_events", "featured_lots", "sale_menu", "articles"]
+     )
+   };
     const [now, setNow] = useState(Date.now());
 
       useEffect(() => {
@@ -216,7 +218,29 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
    };
 
   return (
-    <>
+    <div className="relative">
+      {/* Temporary Preview Switcher for the client to test models */}
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 scale-75 md:scale-100 origin-bottom-right">
+        <div className="bg-black/80 backdrop-blur-xl border border-gold/30 p-2 rounded-2xl shadow-2xl flex gap-2">
+          {['model1', 'model2', 'model3'].map((m) => (
+            <Button 
+              key={m}
+              size="sm" 
+              variant={templateId === m ? "default" : "outline"}
+              className={cn(
+                "rounded-xl font-black uppercase text-[10px] h-10 px-4 transition-all",
+                templateId === m ? "bg-gold text-emerald-deep scale-105" : "border-gold/20 text-gold hover:bg-gold/10"
+              )}
+              onClick={() => setPreviewTemplate(m)}
+            >
+              {m === 'model1' ? 'Elite' : m === 'model2' ? 'Modern' : 'Agro'}
+            </Button>
+          ))}
+        </div>
+        <div className="text-[9px] text-center font-bold text-gold/60 uppercase tracking-widest bg-black/40 py-1 rounded-full backdrop-blur-sm">
+          Seletor de Layouts
+        </div>
+      </div>
       {/* ANNOUNCEMENT BANNER */}
       {announcement && (announcement as any).active && (
         <div className="bg-gold py-2.5 px-4 text-emerald-deep border-b border-gold-bright/30">
