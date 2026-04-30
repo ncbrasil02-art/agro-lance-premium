@@ -763,9 +763,26 @@ export const Route = createFileRoute("/ao-vivo")({
 
         if (error) throw error;
 
-        const result = data as { success: boolean; message: string };
+        const result = data as { success: boolean; message: string; previous_bidder_id?: string };
         if (result.success) {
           toast.success(result.message);
+
+          // Enviar notificação por e-mail se houver um licitante anterior superado
+          if (result.previous_bidder_id && user && result.previous_bidder_id !== user.id) {
+            supabase.functions.invoke('user-notifications', {
+              body: {
+                userId: result.previous_bidder_id,
+                type: 'outbid',
+                lotId: liveLot?.id,
+                data: {
+                  amount: amount,
+                  lotNumber: liveLot?.lot_number,
+                  animalName: liveLot?.animal?.name
+                }
+              }
+            }).catch(err => console.error("Erro ao enviar e-mail de outbid:", err));
+          }
+
           // Fetch latest lot data immediately after a successful bid
           if (liveEvent?.active_lot_id) {
             const { data: latestLot } = await supabase
