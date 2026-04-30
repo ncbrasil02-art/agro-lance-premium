@@ -3,6 +3,7 @@
  import { ChevronLeft, ChevronRight, Calendar, MapPin, Users } from "lucide-react"
  import { Button } from "@/components/ui/button"
  import { EventCard } from "@/components/auctions/event-card"
+import { cn } from "@/lib/utils"
 
   export function EventCarousel({ events, title, subtitle, variant = 'model1' }: { events: any[], title: string, subtitle: string, variant?: string }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
