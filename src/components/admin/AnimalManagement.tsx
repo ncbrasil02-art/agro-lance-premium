@@ -1464,7 +1464,8 @@ import { RichResultsPreview } from "./RichResultsPreview";
           <ImageCropper
             image={croppingImage.url}
             aspect={4 / 3}
-            onCropComplete={handleCropComplete}
+           onCropComplete={handleCropComplete}
+           onApplyToAll={uploadQueue.length > 0 ? handleApplyToAll : undefined}
             onCancel={() => {
              setCroppingImage(null);
              if (uploadQueue.length > 0) {
