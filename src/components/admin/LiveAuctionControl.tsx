@@ -732,13 +732,46 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                        >
                          <RefreshCw className={`mr-2 h-4 w-4 ${isActionLoading ? 'animate-spin' : ''}`} /> Atualizar Usuários
                        </Button>
-                       <Button 
-                         variant="destructive" 
-                         onClick={finalizeEvent}
-                         disabled={isActionLoading}
-                       >
-                         <Square className="mr-2 h-4 w-4" /> Encerrar Evento
-                       </Button>
+                        <div className="flex flex-col gap-2 w-full">
+                          <Button 
+                            variant="destructive" 
+                            onClick={finalizeEvent}
+                            disabled={isActionLoading}
+                            className="w-full"
+                          >
+                            <Square className="mr-2 h-4 w-4" /> Encerrar Evento
+                          </Button>
+
+                          <div className="mt-4 p-4 border-2 border-dashed border-gold/20 rounded-xl bg-gold/5">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-gold mb-3 flex items-center gap-2">
+                              <RefreshCw className="h-3 w-3" /> Teste de Recarregamento
+                            </h4>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="flex-1 text-[10px] font-bold h-8"
+                                onClick={() => {
+                                  window.location.reload();
+                                }}
+                              >
+                                RECARREGAR ADMIN
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="flex-1 text-[10px] font-bold border-gold text-gold h-8"
+                                onClick={updateLiveView}
+                                disabled={isActionLoading}
+                              >
+                                FORÇAR GERAL
+                              </Button>
+                            </div>
+                            <p className="text-[9px] text-muted-foreground mt-2 leading-tight">
+                              "FORÇAR GERAL" dispara um sinal para que todos os usuários conectados atualizem seus dados instantaneamente.
+                            </p>
+                          </div>
+                        </div>
                      </div>
                   </div>
                 )}

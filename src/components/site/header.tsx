@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
    import { RefreshCw, Zap, ZapOff, WifiOff } from "lucide-react";
 
     export function Header() {
@@ -126,10 +127,21 @@ import {
                          : "Conectado via WebSocket. Recebendo atualizações instantâneas."}
                    </p>
                    {delaySeconds > 0 && (
-                     <p className="pt-1 border-t border-border/40 text-[10px]">
+                      <p className="pt-1 border-t border-border/40 text-[10px] mb-2">
                        Última atualização: {delaySeconds} segundos atrás
                      </p>
                    )}
+                   <Button 
+                     variant="outline" 
+                     size="sm" 
+                     className="w-full h-7 text-[10px] font-bold"
+                     onClick={() => {
+                       router.invalidate();
+                       toast.success("Sincronizando dados...");
+                     }}
+                   >
+                     <RefreshCw className="mr-1.5 h-3 w-3" /> RECARREGAR DADOS
+                   </Button>
                  </div>
                </TooltipContent>
              </Tooltip>

@@ -963,7 +963,18 @@ export const Route = createFileRoute("/ao-vivo")({
                     <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
                       {isOffline ? 'Offline' : isPolling ? 'Polling' : 'Realtime'}
                     </span>
-                    {delaySeconds > 0 && <span className="text-[9px] opacity-70 border-l border-current pl-2 ml-1">{delaySeconds}s</span>}
+                    {delaySeconds > 0 && <span className="text-[9px] opacity-70 border-l border-current pl-2 ml-1 pr-1">{delaySeconds}s</span>}
+                    <div 
+                      className="h-5 w-5 rounded-full hover:bg-current/10 flex items-center justify-center transition-colors ml-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        refreshAllData();
+                        toast.success("Dados sincronizados com sucesso!");
+                      }}
+                      title="Recarregar dados manualmente"
+                    >
+                      <RefreshCw className="h-2.5 w-2.5" />
+                    </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs text-xs">
