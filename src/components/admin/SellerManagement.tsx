@@ -1,3 +1,4 @@
+ import { validateImage } from "@/utils/upload-validation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -254,21 +255,21 @@ export function SellerManagement() {
                        accept="image/*" 
                        className="hidden" 
                        id="seller-logo-upload" 
-                       onChange={async (e) => {
-                         const file = e.target.files?.[0];
-                         if (!file) return;
-                         const tid = toast.loading("Enviando logo...");
-                         const fileExt = file.name.split('.').pop();
-                         const fileName = `seller_${Math.random()}.${fileExt}`;
-                         const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
-                         if (error) toast.error("Erro: " + error.message);
-                         else {
-                           const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
-                           setFormData({ ...formData, logo_url: publicUrl });
-                           toast.success("Logo enviado!");
-                         }
-                         toast.dismiss(tid);
-                       }}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !validateImage(file)) return;
+                          const tid = toast.loading("Enviando logo...");
+                          const fileExt = file.name.split('.').pop();
+                          const fileName = `seller_${Math.random()}.${fileExt}`;
+                          const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
+                          if (error) toast.error("Erro: " + error.message);
+                          else {
+                            const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
+                            setFormData({ ...formData, logo_url: publicUrl });
+                            toast.success("Logo enviado!");
+                          }
+                          toast.dismiss(tid);
+                        }}
                      />
                      <Button 
                        type="button" 
