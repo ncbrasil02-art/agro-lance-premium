@@ -680,6 +680,82 @@
                    <ColorPicker label="Status: ENCERRADO" value={theme.closed_color} onChange={v => setTheme({...theme, closed_color: v})} />
                  </div>
                </section>
+
+               <section className="space-y-4 pt-8 border-t">
+                 <h3 className="text-lg font-black uppercase tracking-tight flex items-center gap-2 text-gold">
+                   <Zap className="h-5 w-5" /> Animações e Efeitos Visuais
+                 </h3>
+                 <div className="grid sm:grid-cols-2 gap-6">
+                   <div className="space-y-4 border rounded-xl p-4 bg-muted/5">
+                     <h4 className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Componentes</h4>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <Label>Blinks em Badges</Label>
+                         <p className="text-[10px] text-muted-foreground">Faz com que os balões informativos sobre as fotos pisquem.</p>
+                       </div>
+                       <Switch 
+                         checked={animations.badge_blink} 
+                         onCheckedChange={v => setAnimations({...animations, badge_blink: v})} 
+                       />
+                     </div>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <Label>Brilho (Glow) em Badges</Label>
+                         <p className="text-[10px] text-muted-foreground">Adiciona um efeito de luz neon ao redor dos balões.</p>
+                       </div>
+                       <Switch 
+                         checked={animations.badge_glow} 
+                         onCheckedChange={v => setAnimations({...animations, badge_glow: v})} 
+                       />
+                     </div>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <Label>Pulsação no Botão de Lance</Label>
+                         <p className="text-[10px] text-muted-foreground">O botão "Dar Lance" pulsa levemente para atrair atenção.</p>
+                       </div>
+                       <Switch 
+                         checked={animations.bid_button_pulse} 
+                         onCheckedChange={v => setAnimations({...animations, bid_button_pulse: v})} 
+                       />
+                     </div>
+                   </div>
+
+                   <div className="space-y-4 border rounded-xl p-4 bg-muted/5">
+                     <h4 className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Transições</h4>
+                     <div className="space-y-2">
+                       <Label>Efeito de Entrada do Nome do Animal</Label>
+                       <select 
+                         className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors"
+                         value={animations.animal_name_entry}
+                         onChange={e => setAnimations({...animations, animal_name_entry: e.target.value})}
+                       >
+                         <option value="none">Nenhum</option>
+                         <option value="slide-up">Deslizar para Cima</option>
+                         <option value="fade">Fade In</option>
+                         <option value="scale">Aumentar Escala</option>
+                       </select>
+                     </div>
+                     <div className="flex items-center justify-between pt-2">
+                       <div className="space-y-0.5">
+                         <Label>Tilt no Hover dos Cards</Label>
+                         <p className="text-[10px] text-muted-foreground">Inclinação leve dos cards ao passar o mouse.</p>
+                       </div>
+                       <Switch 
+                         checked={animations.card_hover_tilt} 
+                         onCheckedChange={v => setAnimations({...animations, card_hover_tilt: v})} 
+                       />
+                     </div>
+                   </div>
+                 </div>
+                 <Button 
+                    className="w-full bg-gold text-emerald-deep font-bold mt-2" 
+                    onClick={() => handleSave("animations", animations)}
+                    disabled={isSaving}
+                  >
+                    {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    Salvar Preferências de Animação
+                  </Button>
+               </section>
              </div>
  
              <div className="p-6 rounded-xl border bg-muted/10 space-y-4">
