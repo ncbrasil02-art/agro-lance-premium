@@ -621,9 +621,29 @@ export const Route = createFileRoute("/painel")({
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle>Notificações do Sistema</CardTitle>
-                <CardDescription>Avisos importantes sobre seus lances e conta.</CardDescription>
-              </div>
-              {notifications.some(n => !n.is_read) && (
+                  <CardDescription>Avisos importantes sobre seus lances e conta.</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-48 hidden md:block">
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input 
+                      placeholder="Filtrar avisos..." 
+                      className="pl-8 h-8 text-xs" 
+                      value={notifSearchTerm}
+                      onChange={(e) => setNotifSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <Select value={notifStatusFilter} onValueChange={setNotifStatusFilter}>
+                    <SelectTrigger className="h-8 text-xs w-32">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="unread">Não lidas</SelectItem>
+                      <SelectItem value="read">Lidas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                {notifications.some(n => !n.is_read) && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -639,15 +659,15 @@ export const Route = createFileRoute("/painel")({
                 </Button>
               )}
             </CardHeader>
-            <CardContent>
-              {notifications.length === 0 ? (
+              <CardContent>
+                {filteredNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <ShieldCheck className="h-12 w-12 text-muted-foreground/20 mb-4" />
                   <p className="text-muted-foreground">Nenhuma notificação por enquanto.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {notifications.map((n) => (
+                  <div className="space-y-4">
+                    {filteredNotifications.map((n) => (
                     <div 
                       key={n.id} 
                       className={`p-4 rounded-2xl border transition-all ${n.is_read ? 'bg-background border-border opacity-70' : 'bg-gold/5 border-gold/20 shadow-sm'}`}
