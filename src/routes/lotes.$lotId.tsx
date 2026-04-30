@@ -654,7 +654,7 @@ function LotDetail() {
                   <TooltipTrigger asChild>
                     <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all cursor-help ${isOffline ? 'bg-destructive/10 border-destructive/30 text-destructive' : isPolling ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'}`}>
                       {isOffline ? <WifiOff className="h-3 w-3 animate-pulse" /> : isPolling ? <ZapOff className="h-3 w-3 animate-pulse" /> : <Zap className="h-3 w-3" />}
-                      <span className="text-[9px] font-black uppercase tracking-widest hidden xs:inline">
+                      <span className="text-[9px] font-black uppercase tracking-widest hidden sm:inline">
                         {isOffline ? 'Off' : isPolling ? 'Sync' : 'Live'}
                       </span>
                       {delaySeconds > 0 && <span className="text-[8px] opacity-70 ml-1">{delaySeconds}s</span>}
