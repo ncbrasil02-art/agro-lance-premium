@@ -11,6 +11,7 @@
    aspect?: number;
    onCropComplete: (croppedImage: Blob) => void;
    onCancel: () => void;
+   onApplyToAll?: (pixelCrop: { x: number; y: number; width: number; height: number }) => void;
  }
  
  const createImage = (url: string): Promise<HTMLImageElement> =>
@@ -66,7 +67,7 @@
      });
  }
  
- export function ImageCropper({ image, aspect = 4 / 3, onCropComplete, onCancel }: ImageCropperProps) {
+   export function ImageCropper({ image, aspect = 4 / 3, onCropComplete, onCancel, onApplyToAll }: ImageCropperProps) {
    const [crop, setCrop] = useState({ x: 0, y: 0 });
    const [zoom, setZoom] = useState(1);
    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
@@ -150,7 +151,18 @@
            </div>
          <DialogFooter>
            <Button variant="outline" onClick={onCancel}>Cancelar</Button>
-           <Button onClick={handleCrop}>Finalizar e Subir</Button>
+           {onApplyToAll && (
+             <Button 
+               variant="secondary" 
+               onClick={() => onApplyToAll(croppedAreaPixels)}
+               className="bg-emerald-600 text-white hover:bg-emerald-700 border-none"
+             >
+               Aplicar a todas
+             </Button>
+           )}
+           <Button onClick={handleCrop} className="bg-gold text-emerald-deep hover:bg-gold/90 border-none">
+             Finalizar e Subir
+           </Button>
          </DialogFooter>
        </DialogContent>
      </Dialog>
