@@ -1193,10 +1193,43 @@ import { LotCard } from "../auctions/lot-card";
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <Label className="text-base font-bold">Efeitos e Animações</Label>
-                  
-                  <div className="space-y-4">
+                 <div className="space-y-8">
+                   <div className="space-y-4">
+                     <Label className="text-base font-bold">Pré-visualização do Card</Label>
+                     <div className="p-4 bg-muted/5 rounded-3xl border border-dashed border-gold/20 flex justify-center">
+                       <div className="w-full max-w-[320px] pointer-events-none scale-90 sm:scale-100 origin-top">
+                         <LotCard 
+                           lot={{
+                             id: "preview-1",
+                             number: 1,
+                             name: "Animal de Exemplo",
+                             breed: "Raça Premium",
+                             category: "Equino",
+                             cover: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
+                             currentBid: 50000,
+                             minIncrement: 1000,
+                             bidsCount: 12,
+                             viewers: 154,
+                             status: "open",
+                             father: "Pai de Elite",
+                             mother: "Matriz de Ouro",
+                             sex: "M",
+                             registration_number: "ABC-123",
+                             seller: "Haras Exemplo",
+                             location: "São Paulo - SP",
+                             photos: ["https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"]
+                           } as any}
+                           settings={lotCardSettings}
+                         />
+                       </div>
+                     </div>
+                     <p className="text-[10px] text-center text-muted-foreground uppercase italic">Esta é uma prévia de como o card aparecerá para os usuários</p>
+                   </div>
+ 
+                   <div className="space-y-4 border-t pt-6">
+                     <Label className="text-base font-bold">Efeitos e Animações</Label>
+                     
+                     <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-muted/10 rounded-2xl border">
                       <div className="space-y-1">
                         <span className="text-sm font-bold uppercase">Piscar Badges</span>
