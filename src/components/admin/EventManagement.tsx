@@ -65,7 +65,8 @@ import { useAuth } from "@/components/auth/auth-provider";
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [isAiFixing, setIsAiFixing] = useState(false);
-   const [statusFilter, setStatusFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [sortOrder, setSortOrder] = useState("start_desc");
    const [pendingWinnerLots, setPendingWinnerLots] = useState<any[]>([]);
    const [isPendingLoading, setIsPendingLoading] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -583,22 +584,38 @@ import { useAuth } from "@/components/auth/auth-provider";
      }
    };
  
-    const filteredEvents = events.filter(event => {
-      const matchesSearch = event.name?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      if (statusFilter === "all") return matchesSearch;
-      if (statusFilter === "live") return matchesSearch && event.status === "live";
-      if (statusFilter === "finished") return matchesSearch && event.status === "finished";
-      if (statusFilter === "loteamento") return matchesSearch && event.status === "em_loteamento";
-      if (statusFilter === "recebendo_lances") return matchesSearch && event.status === "recebendo_lances";
-       if (statusFilter === "condicional") return matchesSearch && event.status === "em_condicional";
-       if (statusFilter === "adiado") return matchesSearch && event.status === "evento_adiado";
-       if (statusFilter === "incondicional") return matchesSearch && event.status === "incondicional";
-      if (statusFilter === "pre-bidding") return matchesSearch && event.status === "scheduled" && event.allows_pre_bidding;
-      if (statusFilter === "scheduled") return matchesSearch && event.status === "scheduled" && !event.allows_pre_bidding;
-      
-      return matchesSearch;
-    });
+    const filteredEvents = events
+      .filter(event => {
+        const matchesSearch = event.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        if (statusFilter === "all") return matchesSearch;
+        if (statusFilter === "live") return matchesSearch && event.status === "live";
+        if (statusFilter === "finished") return matchesSearch && event.status === "finished";
+        if (statusFilter === "loteamento") return matchesSearch && event.status === "em_loteamento";
+        if (statusFilter === "recebendo_lances") return matchesSearch && event.status === "recebendo_lances";
+        if (statusFilter === "condicional") return matchesSearch && event.status === "em_condicional";
+        if (statusFilter === "adiado") return matchesSearch && event.status === "evento_adiado";
+        if (statusFilter === "incondicional") return matchesSearch && event.status === "incondicional";
+        if (statusFilter === "pre-bidding") return matchesSearch && event.status === "scheduled" && event.allows_pre_bidding;
+        if (statusFilter === "scheduled") return matchesSearch && event.status === "scheduled" && !event.allows_pre_bidding;
+        
+        return matchesSearch;
+      })
+      .sort((a, b) => {
+        if (sortOrder === "priority") {
+          const statusPriority: Record<string, number> = { 'live': 1, 'scheduled': 2, 'finished': 3 };
+          const pA = statusPriority[a.status as string] || 99;
+          const pB = statusPriority[b.status as string] || 99;
+          if (pA !== pB) return pA - pB;
+          return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        }
+        if (sortOrder === "start_desc") return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        if (sortOrder === "start_asc") return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        if (sortOrder === "created_desc") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        if (sortOrder === "created_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        if (sortOrder === "name_asc") return (a.name || "").localeCompare(b.name || "");
+        return 0;
+      });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este evento? Todos os lotes associados também serão afetados.")) return;
@@ -1129,8 +1146,41 @@ import { useAuth } from "@/components/auth/auth-provider";
 
            <TabsContent value="eventos">
              <Card>
-               <CardHeader>
+               <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4">
                  <CardTitle>Eventos de Leilão</CardTitle>
+                 <div className="flex flex-wrap gap-2">
+                    <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-md border">
+                      <Filter className="h-3 w-3 ml-1 text-muted-foreground" />
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[140px] text-xs">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos Status</SelectItem>
+                          <SelectItem value="live">Ao Vivo</SelectItem>
+                          <SelectItem value="scheduled">Aceita Pré-lance</SelectItem>
+                          <SelectItem value="finished">Finalizados</SelectItem>
+                          <SelectItem value="loteamento">Em Loteamento</SelectItem>
+                          <SelectItem value="recebendo_lances">Recebendo Lances</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-md border">
+                      <Select value={sortOrder} onValueChange={setSortOrder}>
+                        <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[140px] text-xs">
+                          <SelectValue placeholder="Ordenar por" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="priority">Prioridade (Status)</SelectItem>
+                          <SelectItem value="start_desc">Início (Recente)</SelectItem>
+                          <SelectItem value="start_asc">Início (Antigo)</SelectItem>
+                          <SelectItem value="created_desc">Criação (Recente)</SelectItem>
+                          <SelectItem value="created_asc">Criação (Antigo)</SelectItem>
+                          <SelectItem value="name_asc">Nome (A-Z)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                 </div>
                </CardHeader>
                <CardContent>
            {isLoading ? (

@@ -391,6 +391,8 @@ import { RichResultsPreview } from "./RichResultsPreview";
    const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
+    const [categoryFilter, setCategoryFilter] = useState("all");
+    const [sortOrder, setSortOrder] = useState("created_desc");
  
     const fetchAnimals = async () => {
       setIsLoading(true);
@@ -421,15 +423,27 @@ import { RichResultsPreview } from "./RichResultsPreview";
       fetchSellers();
     }, []);
  
-   const filteredAnimals = animals.filter(animal => {
-     const matchesSearch = animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase());
-     
-     if (statusFilter === "all") return matchesSearch;
-     if (statusFilter === "direct_sale") return matchesSearch && animal.is_direct_sale;
-     if (statusFilter === "auction_only") return matchesSearch && !animal.is_direct_sale;
-     return matchesSearch && animal.sale_status === statusFilter;
-   });
+    const filteredAnimals = animals
+      .filter(animal => {
+        const matchesSearch = animal.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                             animal.registration_number?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const matchesCategory = categoryFilter === "all" || animal.category_id === categoryFilter;
+
+        let matchesStatus = true;
+        if (statusFilter === "direct_sale") matchesStatus = animal.is_direct_sale;
+        else if (statusFilter === "auction_only") matchesStatus = !animal.is_direct_sale;
+        else if (statusFilter !== "all") matchesStatus = animal.sale_status === statusFilter;
+
+        return matchesSearch && matchesCategory && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (sortOrder === "created_desc") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        if (sortOrder === "created_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        if (sortOrder === "name_asc") return (a.name || "").localeCompare(b.name || "");
+        if (sortOrder === "name_desc") return (b.name || "").localeCompare(a.name || "");
+        return 0;
+      });
  
    const handleDelete = async (id: string) => {
      if (!confirm("Tem certeza que deseja excluir este animal?")) return;
@@ -452,23 +466,51 @@ import { RichResultsPreview } from "./RichResultsPreview";
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Atualizar Lista"}
             </Button>
           </div>
-          <div className="flex flex-1 items-center gap-4 max-w-2xl">
-            <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-md border">
-              <Filter className="h-3 w-3 ml-2 text-muted-foreground" />
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[150px] text-xs">
-                  <SelectValue placeholder="Filtrar por" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os Animais</SelectItem>
-                  <SelectItem value="direct_sale">Venda Direta</SelectItem>
-                  <SelectItem value="auction_only">Apenas Leilão</SelectItem>
-                  <SelectItem value="available">Status: Disponível</SelectItem>
-                  <SelectItem value="reserved">Status: Reservado</SelectItem>
-                  <SelectItem value="sold">Status: Vendido</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+           <div className="flex flex-1 flex-wrap items-center gap-2 max-w-4xl">
+             <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-md border">
+               <Filter className="h-3 w-3 ml-1 text-muted-foreground" />
+               <Select value={statusFilter} onValueChange={setStatusFilter}>
+                 <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[130px] text-xs">
+                   <SelectValue placeholder="Status" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="all">Todos Status</SelectItem>
+                   <SelectItem value="direct_sale">Venda Direta</SelectItem>
+                   <SelectItem value="auction_only">Apenas Leilão</SelectItem>
+                   <SelectItem value="available">Disponível</SelectItem>
+                   <SelectItem value="reserved">Reservado</SelectItem>
+                   <SelectItem value="sold">Vendido</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+
+             <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-md border">
+               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                 <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[130px] text-xs">
+                   <SelectValue placeholder="Categoria" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="all">Todas Categorias</SelectItem>
+                   {categories.map(cat => (
+                     <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                   ))}
+                 </SelectContent>
+               </Select>
+             </div>
+
+             <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-md border">
+               <Select value={sortOrder} onValueChange={setSortOrder}>
+                 <SelectTrigger className="h-8 border-none bg-transparent focus:ring-0 w-[130px] text-xs">
+                   <SelectValue placeholder="Ordenar por" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="created_desc">Mais Recentes</SelectItem>
+                   <SelectItem value="created_asc">Mais Antigos</SelectItem>
+                   <SelectItem value="name_asc">Nome (A-Z)</SelectItem>
+                   <SelectItem value="name_desc">Nome (Z-A)</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
             <div className="relative flex-1">
            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
            <Input
