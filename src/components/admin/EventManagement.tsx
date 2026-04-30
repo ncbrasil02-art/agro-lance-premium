@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign, ShieldCheck } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign, ShieldCheck, ChevronDown, ChevronRight, Image as ImageIcon, History } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -26,7 +26,41 @@ import { useAuth } from "@/components/auth/auth-provider";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const { profile: adminProfile } = useAuth();
-    const [events, setEvents] = useState<any[]>([]);
+     const [events, setEvents] = useState<any[]>([]);
+     const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
+     const [expandedData, setExpandedData] = useState<any>({});
+     const [isExpandedLoading, setIsExpandedLoading] = useState(false);
+     const fetchExpandedData = async (eventId: string) => {
+       setIsExpandedLoading(true);
+       try {
+         const [bidsRes, animalsRes] = await Promise.all([
+           supabase
+             .from("bids")
+             .select("*, profiles(full_name), lots!inner(lot_number, animal:animals(name), event_id)")
+             .eq("lots.event_id", eventId)
+             .order("created_at", { ascending: false })
+             .limit(2),
+           supabase
+             .from("lots")
+             .select("*, animal:animals(id, name, photos, breed)")
+             .eq("event_id", eventId)
+             .order("lot_number", { ascending: true })
+         ]);
+
+         setExpandedData((prev: any) => ({
+           ...prev,
+           [eventId]: {
+             bids: bidsRes.data || [],
+             lots: animalsRes.data || []
+           }
+         }));
+       } catch (error: any) {
+         console.error("Erro ao carregar dados expandidos:", error);
+       } finally {
+         setIsExpandedLoading(false);
+       }
+     };
+
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
