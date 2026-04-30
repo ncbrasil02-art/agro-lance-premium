@@ -414,7 +414,7 @@ export const Route = createFileRoute("/painel")({
       </header>
 
       <Tabs defaultValue="arremates" className="space-y-6">
-        <TabsList className="bg-muted/50 p-1">
+        <TabsList className="bg-muted/50 p-1 flex-wrap h-auto justify-start md:justify-center gap-1">
           <TabsTrigger value="arremates" className="gap-2">
             <Gavel className="h-4 w-4" /> Meus Arremates
           </TabsTrigger>

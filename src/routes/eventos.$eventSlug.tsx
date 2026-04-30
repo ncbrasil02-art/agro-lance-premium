@@ -384,7 +384,7 @@ function EventDetail() {
         </div>
 
         {eventLots.length > 0 ? (
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
             {eventLots.map((l: any) => (
               <LotCard 
                 key={l.id} 
