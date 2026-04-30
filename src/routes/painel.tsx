@@ -836,9 +836,33 @@ export const Route = createFileRoute("/painel")({
 
         <TabsContent value="lances">
           <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Lances</CardTitle>
-              <CardDescription>Seus lances recentes em todos os leilões.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div>
+                <CardTitle>Histórico de Lances</CardTitle>
+                <CardDescription>Seus lances recentes em todos os leilões.</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative w-48 hidden md:block">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input 
+                    placeholder="Buscar animal..." 
+                    className="pl-8 h-8 text-xs" 
+                    value={bidsSearchTerm}
+                    onChange={(e) => setBidsSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Select value={bidsStatusFilter} onValueChange={setBidsStatusFilter}>
+                  <SelectTrigger className="h-8 text-xs w-40">
+                    <SelectValue placeholder="Filtrar status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os lances</SelectItem>
+                    <SelectItem value="winner">Lotes arrematados</SelectItem>
+                    <SelectItem value="leading">Lances vencedores</SelectItem>
+                    <SelectItem value="outbid">Lances superados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="relative overflow-x-auto">
@@ -852,8 +876,15 @@ export const Route = createFileRoute("/painel")({
                     </tr>
                   </thead>
                   <tbody className="divide-y border-b">
-                    {myBids.map((bid) => (
-                      <tr key={bid.id} className="hover:bg-muted/10 transition-colors">
+                    {filteredBids.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-10 text-center text-muted-foreground">
+                          Nenhum lance encontrado com os filtros selecionados.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredBids.map((bid) => (
+                        <tr key={bid.id} className="hover:bg-muted/10 transition-colors">
                         <td className="px-4 py-4 whitespace-nowrap">
                           {new Date(bid.created_at).toLocaleString("pt-BR")}
                         </td>
