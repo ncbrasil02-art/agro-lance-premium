@@ -801,8 +801,8 @@ export const Route = createFileRoute("/painel")({
                               </Button>
                         )}
                       </td>
-                    </tr>
-                  ))}
+                   </tr>
+                 )))}
                     </tbody>
                   </table>
                 </div>
