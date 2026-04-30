@@ -84,9 +84,10 @@
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
  import {
-    User, Gavel, FileText, Receipt, CreditCard, Clock, Camera,
-    ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
-    ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
+     User, Gavel, FileText, Receipt, CreditCard, Clock, Camera,
+     ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
+     ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
+     Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
     MapPin, Globe, Loader2, Send
  } from "lucide-react";
