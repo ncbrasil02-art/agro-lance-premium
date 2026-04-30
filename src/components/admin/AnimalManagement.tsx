@@ -382,6 +382,36 @@ import { ImageCropper } from "./ImageCropper";
     const [animals, setAnimals] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
 
+    const handleCropComplete = async (croppedBlob: Blob) => {
+      if (!croppingImage) return;
+      const toastId = toast.loading("Enviando foto recortada...");
+      try {
+        const fileExt = croppingImage.name.split('.').pop() || 'jpg';
+        const fileName = `${Math.random()}.${fileExt}`;
+        const file = new File([croppedBlob], fileName, { type: 'image/jpeg' });
+        const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+        const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+        setFormData({ ...formData, photos_urls: [...currentUrls, publicUrl].join(", ") });
+        toast.success("Foto enviada com sucesso!");
+      } catch (error: any) {
+        toast.error(`Erro no upload: ${error.message}`);
+      } finally {
+        toast.dismiss(toastId);
+        setCroppingImage(null);
+        if (uploadQueue.length > 0) {
+          const nextFile = uploadQueue[0];
+          setUploadQueue(prev => prev.slice(1));
+          const reader = new FileReader();
+          reader.onload = () => {
+            setCroppingImage({ url: reader.result as string, name: nextFile.name });
+          };
+          reader.readAsDataURL(nextFile);
+        }
+      }
+    };
+
     const fetchCategories = async () => {
       const { data } = await supabase.from("categories").select("id, name").order("name");
       if (data) setCategories(data);
