@@ -46,8 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Real-time profile updates
-  useEffect(() => {
+   // Real-time updates for profile and notifications
+   useEffect(() => {
     if (!user?.id) return;
 
     const channel = supabase
@@ -77,10 +77,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id]);
+     const notificationsChannel = supabase
+       .channel(`notifications-${user.id}`)
+       .on(
+         "postgres_changes",
+         {
+           event: "INSERT",
+           schema: "public",
+           table: "notifications",
+           filter: `user_id=eq.${user.id}`
+         },
+         (payload) => {
+           console.log("New notification received in real-time:", payload.new);
+           import("sonner").then(({ toast }) => {
+             toast(payload.new.title, {
+               description: payload.new.message,
+               duration: 6000,
+             });
+           });
+         }
+       )
+       .subscribe();
+
+     return () => {
+       supabase.removeChannel(channel);
+       supabase.removeChannel(notificationsChannel);
+     };
+   }, [user?.id]);
 
   const fetchProfile = async (userId: string) => {
     try {
