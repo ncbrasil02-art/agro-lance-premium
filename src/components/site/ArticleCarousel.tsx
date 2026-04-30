@@ -18,7 +18,7 @@
    category?: { name: string | null } | null
  }
 
- export function ArticleCarousel({ articles }: { articles: Article[] }) {
+  export function ArticleCarousel({ articles, variant = 'model1' }: { articles: Article[], variant?: string }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
      align: "start",
      loop: true,
@@ -34,15 +34,28 @@
 
    if (!articles || articles.length === 0) return null
 
-   return (
-     <section className="bg-emerald-deep/20 py-16 border-t border-gold/10 overflow-hidden">
+    const isModern = variant === 'model2';
+    const isTraditional = variant === 'model3';
+
+    return (
+      <section className={cn(
+        "py-16 overflow-hidden",
+        variant === 'model1' ? "bg-emerald-deep/20 border-t border-gold/10" : 
+        isModern ? "bg-background" : "bg-muted/30"
+      )}>
        <div className="container mx-auto px-4">
          <div className="mb-10 flex items-center justify-between">
            <div>
-             <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-white">
-               Blog & <span className="text-gradient-gold uppercase italic">Notícias</span>
+              <h2 className={cn(
+                "text-3xl font-bold tracking-tight md:text-4xl",
+                variant === 'model1' ? "text-white" : "text-foreground"
+              )}>
+                {isModern ? "O que há de novo no " : "Blog & "} 
+                <span className="text-gradient-gold uppercase italic">{isModern ? "Mercado" : "Notícias"}</span>
              </h2>
-             <p className="mt-2 text-muted-foreground">Fique por dentro das principais novidades do mercado agropecuário.</p>
+              <p className="mt-2 text-muted-foreground">
+                {isModern ? "Informação estratégica para investidores de elite." : "Fique por dentro das principais novidades do mercado agropecuário."}
+              </p>
            </div>
            <div className="flex gap-2">
              <Button 
