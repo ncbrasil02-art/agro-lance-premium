@@ -405,6 +405,6 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
