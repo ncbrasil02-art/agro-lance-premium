@@ -1,13 +1,13 @@
   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
- import { useState, useEffect, useCallback } from "react";
+  import React, { useState, useEffect, useCallback, Fragment } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
- import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign, ShieldCheck } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, Calendar as CalendarIcon, PlusCircle, Filter, Send, Play, Info, HelpCircle, Eye, MessageSquare, FileText, Trash, Users, Gavel, UserPlus, ListOrdered, Check, AlertCircle, Printer, Wand2, BarChart3, TrendingUp, DollarSign, ShieldCheck, ChevronDown, ChevronRight, Image as ImageIcon, History } from "lucide-react";
   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
  import { Label } from "@/components/ui/label";
@@ -26,7 +26,41 @@ import { useAuth } from "@/components/auth/auth-provider";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const { profile: adminProfile } = useAuth();
-    const [events, setEvents] = useState<any[]>([]);
+     const [events, setEvents] = useState<any[]>([]);
+     const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
+     const [expandedData, setExpandedData] = useState<any>({});
+     const [isExpandedLoading, setIsExpandedLoading] = useState(false);
+     const fetchExpandedData = async (eventId: string) => {
+       setIsExpandedLoading(true);
+       try {
+         const [bidsRes, animalsRes] = await Promise.all([
+           supabase
+             .from("bids")
+             .select("*, profiles(full_name), lots!inner(lot_number, animal:animals(name), event_id)")
+             .eq("lots.event_id", eventId)
+             .order("created_at", { ascending: false })
+             .limit(2),
+           supabase
+             .from("lots")
+             .select("*, animal:animals(id, name, photos, breed)")
+             .eq("event_id", eventId)
+             .order("lot_number", { ascending: true })
+         ]);
+
+         setExpandedData((prev: any) => ({
+           ...prev,
+           [eventId]: {
+             bids: bidsRes.data || [],
+             lots: animalsRes.data || []
+           }
+         }));
+       } catch (error: any) {
+         console.error("Erro ao carregar dados expandidos:", error);
+       } finally {
+         setIsExpandedLoading(false);
+       }
+     };
+
     const [sellers, setSellers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -418,13 +452,16 @@ import { useAuth } from "@/components/auth/auth-provider";
      };
 
     // Real-time updates for the events list and current details
-     useRealtimeLots(() => {
-       fetchEvents();
-       fetchPendingWinnerLots();
-       if (viewingEventDetails) {
-         fetchEventLots(viewingEventDetails.id);
-       }
-     });
+      useRealtimeLots(() => {
+        fetchEvents();
+        fetchPendingWinnerLots();
+        if (viewingEventDetails) {
+          fetchEventLots(viewingEventDetails.id);
+        }
+        if (expandedEventId) {
+          fetchExpandedData(expandedEventId);
+        }
+      });
 
       const [rtStatus, setRtStatus] = useState<string>("INITIAL");
 
@@ -1103,8 +1140,9 @@ import { useAuth } from "@/components/auth/auth-provider";
            ) : (
              <Table>
                <TableHeader>
-                 <TableRow>
-                   <TableHead>Evento</TableHead>
+                  <TableRow>
+                    <TableHead className="w-[40px]"></TableHead>
+                    <TableHead>Evento</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Local/Promotor/Vendedor</TableHead>
                    <TableHead>Status</TableHead>
@@ -1119,12 +1157,53 @@ import { useAuth } from "@/components/auth/auth-provider";
                      </TableCell>
                    </TableRow>
                  ) : (
-                   filteredEvents.map((event) => (
-                     <TableRow key={event.id}>
-                       <TableCell className="font-medium">
-                         <div>{event.name}</div>
-                          <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Ao Vivo'}</div>
-                       </TableCell>
+                    filteredEvents.map((event) => {
+                      const data = expandedData[event.id];
+                      return (
+                      <Fragment key={event.id}>
+                      <TableRow className={expandedEventId === event.id ? "bg-muted/30 border-b-0" : ""}>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => {
+                              if (expandedEventId === event.id) {
+                                setExpandedEventId(null);
+                              } else {
+                                setExpandedEventId(event.id);
+                                if (!expandedData[event.id]) {
+                                  fetchExpandedData(event.id);
+                                }
+                              }
+                            }}
+                          >
+                            {expandedEventId === event.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            {event.name}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-5 w-5 text-gold hover:text-gold hover:bg-gold/10"
+                              onClick={() => {
+                                if (expandedEventId === event.id) {
+                                  setExpandedEventId(null);
+                                } else {
+                                  setExpandedEventId(event.id);
+                                  if (!expandedData[event.id]) {
+                                    fetchExpandedData(event.id);
+                                  }
+                                }
+                              }}
+                            >
+                              <PlusCircle className="h-3 w-3" />
+                            </Button>
+                          </div>
+                           <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Ao Vivo'}</div>
+                        </TableCell>
                        <TableCell>
                          <div className="flex items-center gap-1">
                            <CalendarIcon className="h-3 w-3" />
@@ -1285,8 +1364,159 @@ import { useAuth } from "@/components/auth/auth-provider";
                             )}
                         </div>
                       </TableCell>
-                     </TableRow>
-                   ))
+                      </TableRow>
+                      {expandedEventId === event.id && (
+                        <TableRow className="bg-muted/30 border-t-0 hover:bg-muted/30">
+                          <TableCell colSpan={6} className="p-0">
+                            <div className="p-6 pt-0 animate-in slide-in-from-top-2 duration-300">
+                              <div className="grid md:grid-cols-3 gap-6">
+                                {/* Media Section */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gold mb-1">
+                                    <ImageIcon className="h-3 w-3" /> Mídia do Evento
+                                  </div>
+                                  <div className="relative group aspect-video rounded-xl overflow-hidden border bg-background flex items-center justify-center">
+                                    {event.banner_url ? (
+                                      <img src={event.banner_url} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                      <div className="text-muted-foreground text-[10px]">Sem banner cadastrado</div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                      <Input 
+                                        type="file" 
+                                        className="hidden" 
+                                        id={`replace-banner-${event.id}`} 
+                                        onChange={async (e) => {
+                                          const file = e.target.files?.[0];
+                                          if (!file) return;
+                                          const tid = toast.loading("Substituindo banner...");
+                                          const fileExt = file.name.split('.').pop();
+                                          const fileName = `${event.id}_${Math.random()}.${fileExt}`;
+                                          const { data: uploadData, error } = await supabase.storage.from('banners').upload(fileName, file);
+                                          if (error) toast.error("Erro: " + error.message);
+                                          else {
+                                            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(uploadData.path);
+                                            await supabase.from('events').update({ banner_url: publicUrl }).eq('id', event.id);
+                                            toast.success("Banner atualizado!");
+                                            fetchEvents();
+                                          }
+                                          toast.dismiss(tid);
+                                        }}
+                                      />
+                                      <Button size="sm" variant="secondary" className="h-7 text-[10px]" onClick={() => document.getElementById(`replace-banner-${event.id}`)?.click()}>
+                                        Substituir Foto
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="text-[10px] text-muted-foreground italic">
+                                    * Banner visível na listagem principal do site.
+                                  </div>
+                                </div>
+
+                                {/* Bids Section */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-500 mb-1">
+                                    <History className="h-3 w-3" /> Últimos 2 Lances
+                                  </div>
+                                  {isExpandedLoading ? (
+                                    <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                                  ) : data?.bids && data.bids.length > 0 ? (
+                                    <div className="space-y-2">
+                                      {data.bids.map((bid: any) => (
+                                        <div key={bid.id} className="flex items-center justify-between p-3 rounded-lg bg-background border text-xs">
+                                          <div>
+                                            <p className="font-bold text-emerald-600">{formatBRL(bid.amount)}</p>
+                                            <p className="text-[10px] text-muted-foreground">{bid.profiles?.full_name}</p>
+                                          </div>
+                                          <div className="text-right">
+                                            <p className="font-medium">Lote {bid.lots?.lot_number}</p>
+                                            <p className="text-[9px] text-muted-foreground">{format(new Date(bid.created_at), "HH:mm:ss")}</p>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div className="p-4 rounded-lg bg-background border border-dashed text-center text-[10px] text-muted-foreground">
+                                      Nenhum lance recebido neste evento.
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Animals Section */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-blue-500 mb-1">
+                                    <Users className="h-3 w-3" /> Animais no Evento ({data?.lots?.length || 0})
+                                  </div>
+                                  <div className="max-h-[160px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                                    {isExpandedLoading ? (
+                                      <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                                    ) : data?.lots && data.lots.length > 0 ? (
+                                      data.lots.map((lot: any) => (
+                                        <div key={lot.id} className="flex items-center gap-3 p-2 rounded-lg bg-background border hover:border-gold/30 transition-colors">
+                                          <div className="relative group h-10 w-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                                            {lot.animal?.photos?.[0] ? (
+                                              <img src={lot.animal.photos[0]} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                              <div className="w-full h-full flex items-center justify-center"><ImageIcon className="h-4 w-4 text-muted-foreground/30" /></div>
+                                            )}
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                              <Input 
+                                                type="file" 
+                                                className="hidden" 
+                                                id={`replace-animal-${lot.animal?.id}`} 
+                                                onChange={async (e) => {
+                                                  const file = e.target.files?.[0];
+                                                  if (!file) return;
+                                                  const tid = toast.loading("Atualizando foto...");
+                                                  const fileExt = file.name.split('.').pop();
+                                                  const fileName = `${lot.animal?.id}_${Math.random()}.${fileExt}`;
+                                                  const { data: uploadData, error } = await supabase.storage.from('animals').upload(fileName, file);
+                                                  if (error) toast.error("Erro: " + error.message);
+                                                  else {
+                                                    const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(uploadData.path);
+                                                    await supabase.from('animals').update({ photos: [publicUrl] }).eq('id', lot.animal?.id);
+                                                    toast.success("Foto atualizada!");
+                                                    fetchExpandedData(event.id);
+                                                  }
+                                                  toast.dismiss(tid);
+                                                }}
+                                              />
+                                              <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="h-6 w-6 text-white" 
+                                                onClick={() => document.getElementById(`replace-animal-${lot.animal?.id}`)?.click()}
+                                              >
+                                                <Pencil className="h-3 w-3" />
+                                              </Button>
+                                            </div>
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold truncate">{lot.animal?.name}</p>
+                                            <p className="text-[9px] text-muted-foreground">Lote {lot.lot_number} • {lot.animal?.breed}</p>
+                                          </div>
+                                          <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
+                                            <a href={`/admin?tab=lots&search=${lot.lot_number}`} title="Ir para lote">
+                                              <ChevronRight className="h-3 w-3" />
+                                            </a>
+                                          </Button>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="p-4 rounded-lg bg-background border border-dashed text-center text-[10px] text-muted-foreground">
+                                        Nenhum animal vinculado.
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      </Fragment>
+                    );
+                  })
                  )}
                </TableBody>
              </Table>
