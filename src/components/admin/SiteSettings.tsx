@@ -1100,6 +1100,158 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
         <TabsContent value="audit">
           <BulkSeoAudit />
         </TabsContent>
+
+        <TabsContent value="lots" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-gold" /> Configuração do Card do Lote
+              </CardTitle>
+              <CardDescription>Personalize como as informações dos animais aparecem nos cards</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <Label className="text-base font-bold">Modo de Exibição de Mídia</Label>
+                <div className="flex gap-4">
+                  <Button 
+                    variant={lotCardSettings.media_mode === 'gallery' ? 'default' : 'outline'}
+                    onClick={() => setLotCardSettings({...lotCardSettings, media_mode: 'gallery'})}
+                    className="flex-1"
+                  >
+                    Galeria de Fotos
+                  </Button>
+                  <Button 
+                    variant={lotCardSettings.media_mode === 'video' ? 'default' : 'outline'}
+                    onClick={() => setLotCardSettings({...lotCardSettings, media_mode: 'video'})}
+                    className="flex-1"
+                  >
+                    Vídeo do Animal
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground italic">
+                  {lotCardSettings.media_mode === 'gallery' 
+                    ? "Mostra um carrossel com as fotos do animal no card." 
+                    : "Tenta exibir o vídeo do YouTube se disponível, caso contrário volta para a foto principal."}
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 border-t pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-bold">Campos de Informação</Label>
+                    <span className="text-xs text-muted-foreground uppercase font-black">Exibir / Reordenar</span>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    {lotCardSettings.displayed_fields.map((field, idx) => (
+                      <div key={field.key} className="flex items-center gap-3 p-3 bg-muted/20 border rounded-xl group">
+                        <div className="flex flex-col gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 p-0 hover:bg-gold/10 hover:text-gold"
+                            onClick={() => {
+                              if (idx === 0) return;
+                              const newFields = [...lotCardSettings.displayed_fields];
+                              [newFields[idx-1], newFields[idx]] = [newFields[idx], newFields[idx-1]];
+                              setLotCardSettings({...lotCardSettings, displayed_fields: newFields});
+                            }}
+                          >
+                            <ArrowUp className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 p-0 hover:bg-gold/10 hover:text-gold"
+                            onClick={() => {
+                              if (idx === lotCardSettings.displayed_fields.length - 1) return;
+                              const newFields = [...lotCardSettings.displayed_fields];
+                              [newFields[idx+1], newFields[idx]] = [newFields[idx], newFields[idx+1]];
+                              setLotCardSettings({...lotCardSettings, displayed_fields: newFields});
+                            }}
+                          >
+                            <ArrowDown className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        
+                        <div className="flex-1">
+                          <span className="text-sm font-bold uppercase tracking-tight">{field.label}</span>
+                        </div>
+
+                        <Switch 
+                          checked={field.enabled} 
+                          onCheckedChange={(checked) => {
+                            const newFields = [...lotCardSettings.displayed_fields];
+                            newFields[idx] = { ...newFields[idx], enabled: checked };
+                            setLotCardSettings({...lotCardSettings, displayed_fields: newFields});
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <Label className="text-base font-bold">Efeitos e Animações</Label>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-muted/10 rounded-2xl border">
+                      <div className="space-y-1">
+                        <span className="text-sm font-bold uppercase">Piscar Badges</span>
+                        <p className="text-[10px] text-muted-foreground uppercase">Efeito de pulso em 'AO VIVO' e 'URGENTE'</p>
+                      </div>
+                      <Switch 
+                        checked={animations.badge_blink} 
+                        onCheckedChange={v => setAnimations({...animations, badge_blink: v})} 
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-muted/10 rounded-2xl border">
+                      <div className="space-y-1">
+                        <span className="text-sm font-bold uppercase">Brilho (Glow)</span>
+                        <p className="text-[10px] text-muted-foreground uppercase">Efeito neon nos cards e badges</p>
+                      </div>
+                      <Switch 
+                        checked={animations.badge_glow} 
+                        onCheckedChange={v => setAnimations({...animations, badge_glow: v})} 
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-xs font-bold uppercase text-muted-foreground">Efeito de Entrada do Nome</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['none', 'fade', 'slide-up'].map((effect) => (
+                          <Button
+                            key={effect}
+                            variant={animations.animal_name_entry === effect ? 'default' : 'outline'}
+                            className="text-[10px] font-black uppercase"
+                            onClick={() => setAnimations({...animations, animal_name_entry: effect})}
+                          >
+                            {effect === 'slide-up' ? 'Deslizar' : effect === 'fade' ? 'Fade' : 'Nenhum'}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t flex justify-end">
+                <Button 
+                  className="bg-gold text-emerald-deep font-black hover:bg-gold/90 shadow-gold"
+                  disabled={isSaving}
+                  onClick={() => {
+                    handleSave("lot_card_settings", lotCardSettings);
+                    handleSave("animations", animations);
+                  }}
+                >
+                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                  SALVAR TUDO
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     );
   }
