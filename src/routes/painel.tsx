@@ -129,6 +129,11 @@ export const Route = createFileRoute("/painel")({
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     
+    const [bidsSearchTerm, setBidsSearchTerm] = useState("");
+    const [bidsStatusFilter, setBidsStatusFilter] = useState("all");
+    const [notifSearchTerm, setNotifSearchTerm] = useState("");
+    const [notifStatusFilter, setNotifStatusFilter] = useState("all");
+
     const [formData, setFormData] = useState({
       full_name: "",
       cpf: "",
@@ -146,6 +151,33 @@ export const Route = createFileRoute("/painel")({
      const docInputRef = useRef<HTMLInputElement>(null);
      const [rtStatus, setRtStatus] = useState<string>("INITIAL");
  
+    const filteredBids = useMemo(() => {
+      return myBids.filter(bid => {
+        const matchesSearch = (bid.lot?.animal?.name || "").toLowerCase().includes(bidsSearchTerm.toLowerCase());
+        const isWinner = bid.lot?.winner_id === user?.id && bid.lot?.status === 'sold';
+        const isLeading = bid.amount >= (bid.lot?.current_price || 0) && !isWinner;
+        const isOutbid = bid.amount < (bid.lot?.current_price || 0);
+
+        let matchesStatus = true;
+        if (bidsStatusFilter === 'winner') matchesStatus = isWinner;
+        if (bidsStatusFilter === 'leading') matchesStatus = isLeading;
+        if (bidsStatusFilter === 'outbid') matchesStatus = isOutbid;
+
+        return matchesSearch && matchesStatus;
+      });
+    }, [myBids, bidsSearchTerm, bidsStatusFilter, user?.id]);
+
+    const filteredNotifications = useMemo(() => {
+      return notifications.filter(n => {
+        const matchesSearch = (n.title + n.message).toLowerCase().includes(notifSearchTerm.toLowerCase());
+        let matchesStatus = true;
+        if (notifStatusFilter === 'unread') matchesStatus = !n.is_read;
+        if (notifStatusFilter === 'read') matchesStatus = n.is_read;
+
+        return matchesSearch && matchesStatus;
+      });
+    }, [notifications, notifSearchTerm, notifStatusFilter]);
+
     const fetchDashboardData = useCallback(async () => {
       setIsLoading(true);
       if (!user?.id) return;
