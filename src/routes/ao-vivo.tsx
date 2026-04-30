@@ -1,4 +1,4 @@
-   import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert, XCircle } from "lucide-react";
+import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert, XCircle, Zap, ZapOff, WifiOff } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -723,7 +723,7 @@ export const Route = createFileRoute("/ao-vivo")({
       refreshAllData();
     }, [liveEvent?.id]);
 
-    useRealtimeFallback({
+    const { delaySeconds, isPolling } = useRealtimeFallback({
       status: realtimeStatus,
       onUpdate: handleRefresh,
       label: "Leilão ao Vivo",
