@@ -1297,7 +1297,31 @@ export const Route = createFileRoute("/painel")({
   );
 }
 
- function LotPurchaseCard({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
+  function LotPurchaseCard({ lot, profile, siteInfo, onUpdate }: { lot: any, profile: any, siteInfo: any, onUpdate?: () => void }) {
+    const [isAccepting, setIsAccepting] = useState(false);
+
+    const handleAcceptTerms = async () => {
+      setIsAccepting(true);
+      try {
+        const table = lot.is_direct_sale ? 'direct_sales' : 'lots';
+        const { error } = await supabase
+          .from(table)
+          .update({
+            accepted_at: new Date().toISOString(),
+            accepted_ip: 'Auto-registrado via Painel' // We don't have easy access to client IP here without a function, but we can put a placeholder
+          })
+          .eq('id', lot.id);
+
+        if (error) throw error;
+        toast.success("Termos aceitos com sucesso!");
+        if (onUpdate) onUpdate();
+      } catch (error: any) {
+        toast.error("Erro ao aceitar termos: " + error.message);
+      } finally {
+        setIsAccepting(false);
+      }
+    };
+
   return (
     <Card className="overflow-hidden border-2 hover:border-gold/30 transition-all shadow-md">
       <div className="grid md:grid-cols-[240px_1fr] lg:grid-cols-[300px_1fr]">
@@ -1344,9 +1368,15 @@ export const Route = createFileRoute("/painel")({
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Status de Pagamento</p>
               <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px]">Aguardando Confirmação</Badge>
             </div>
-            <div className="space-y-1 text-right">
-               <p className="text-[10px] font-bold uppercase text-muted-foreground">Ações</p>
-               <Button size="sm" variant="outline" className="h-7 text-[10px] font-bold">Solicitar Ajuda</Button>
+            <div className="space-y-1">
+               <p className="text-[10px] font-bold uppercase text-muted-foreground">Aceite de Termos</p>
+               {lot.accepted_at ? (
+                 <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px] gap-1">
+                   <ShieldCheck className="h-3 w-3" /> Aceito em {new Date(lot.accepted_at).toLocaleDateString('pt-BR')}
+                 </Badge>
+               ) : (
+                 <Badge variant="destructive" className="text-[10px] animate-pulse">Pendente</Badge>
+               )}
             </div>
           </div>
 
