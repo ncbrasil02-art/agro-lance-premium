@@ -1,3 +1,4 @@
+ import { validateImage } from "@/utils/upload-validation";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
@@ -171,11 +172,11 @@
      }
    };
  
-   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-     const file = e.target.files?.[0];
-     if (!file) return;
- 
-     setIsUploading(true);
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !validateImage(file)) return;
+  
+      setIsUploading(true);
      try {
        const fileExt = file.name.split('.').pop();
        const fileName = `logo-${Math.random()}.${fileExt}`;
