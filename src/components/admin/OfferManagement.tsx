@@ -218,15 +218,15 @@ export function OfferManagement() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {offer.animal?.photos?.[0] ? (
-                            <OptimizedImage 
-                              src={offer.animal.photos[0]} 
-                              alt="" 
-                              width={64}
-                              aspectRatio="square"
-                              className="h-8 w-8 rounded" 
-                            />
-                          ) : (
+                           {offer.animal?.photos?.[0] ? (
+                             <OptimizedImage 
+                               src={offer.animal.photos[0]} 
+                               alt="" 
+                               width={96}
+                               aspectRatio="landscape"
+                               className="h-8 w-11 rounded" 
+                             />
+                           ) : (
                             <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
                               <Package className="h-4 w-4 text-muted-foreground" />
                             </div>
