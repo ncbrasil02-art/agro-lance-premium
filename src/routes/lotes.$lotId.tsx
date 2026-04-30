@@ -446,7 +446,7 @@ function LotDetail() {
         toast.success(result.message || "Lance efetuado!");
 
         // Enviar notificação por e-mail se houver um licitante anterior superado
-        if (result.previous_bidder_id && result.previous_bidder_id !== user.id) {
+        if (result.previous_bidder_id && user && result.previous_bidder_id !== user.id) {
           supabase.functions.invoke('user-notifications', {
             body: {
               userId: result.previous_bidder_id,
