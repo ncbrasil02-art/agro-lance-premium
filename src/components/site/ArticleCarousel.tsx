@@ -84,7 +84,8 @@
                   <div className={cn(
                     "group h-full flex flex-col overflow-hidden transition-all",
                     variant === 'model1' ? "rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:border-gold/30 hover:bg-white/10" :
-                    isModern ? "rounded-none border-b border-border bg-transparent hover:bg-muted/50" :
+                    isModern ? "rounded-none border-b border-border bg-transparent hover:bg-muted/50 shadow-none" :
+                    isTraditional ? "rounded-none border-l-4 border-gold bg-emerald-deep shadow-2xl" :
                     "rounded-3xl border border-border bg-card shadow-sm hover:shadow-xl"
                   )}>
                    <div className="relative aspect-[16/9] overflow-hidden">
@@ -100,10 +101,7 @@
                      )}
                    </div>
                    
-                    <div className={cn(
-                      "flex flex-1 flex-col p-6",
-                      isModern && "px-0"
-                    )}>
+                    <div className={cn("flex flex-1 flex-col p-6", isModern && "px-0", isTraditional && "text-white")}>
                      <div className="mb-3 flex items-center gap-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                        <div className="flex items-center gap-1">
                          <Calendar className="h-3 w-3 text-gold" />
