@@ -138,6 +138,7 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
         { key: "seller", label: "Vendedor", enabled: true },
         { key: "birth_date", label: "Data de Nasc.", enabled: false },
         { key: "registration_number", label: "Registro", enabled: false },
+        { key: "vaccination_records", label: "Vacinação", enabled: false },
         { key: "location", label: "Localização", enabled: false }
       ]
     });

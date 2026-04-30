@@ -71,7 +71,7 @@ import {
            const [lotsRes, eventsRes, animalsRes, profilesRes] = await Promise.all([
              supabase
                .from("lots")
-                .select("*, event:events!event_id(name, end_date, commission_rate), animal:animals(name, internal_code)")
+                .select("*, event:events!event_id(name, end_date, commission_rate), animal:animals(*)")
                .order("is_featured", { ascending: false })
                .order("lot_number", { ascending: true }),
              supabase
