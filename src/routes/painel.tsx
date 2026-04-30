@@ -190,7 +190,7 @@ export const Route = createFileRoute("/painel")({
         const { data: wonLots, error: wonError } = await supabase
           .from("lots")
           .select(`
-            id, lot_number, status, current_price, winner_id, updated_at,
+            id, lot_number, status, current_price, winner_id, updated_at, accepted_at, accepted_ip,
             animal:animals!lots_animal_id_fkey(id, name, breed, species, photos, internal_code),
             event:events!lots_event_id_fkey(id, name)
           `)
@@ -203,7 +203,7 @@ export const Route = createFileRoute("/painel")({
         const { data: directSales, error: dsError } = await supabase
           .from("direct_sales")
           .select(`
-            id, total_price, status, created_at, updated_at, negotiated_terms,
+            id, total_price, status, created_at, updated_at, negotiated_terms, accepted_at, accepted_ip,
             animal:animals(id, name, breed, species, photos, internal_code)
           `)
           .eq("buyer_id", user.id)
@@ -639,13 +639,32 @@ export const Route = createFileRoute("/painel")({
                             </a>
                           </Button>
                         )}
-                        {contract.status === 'pending' ? (
-                          <Button size="sm" className="bg-gold text-emerald-deep font-bold">
-                            <Pencil className="h-4 w-4 mr-2" /> Assinar Agora
-                          </Button>
-                        ) : (
+                        {contract.status === 'signed' ? (
                           <Button size="sm" variant="ghost" disabled className="text-emerald-600 font-bold">
                             <BadgeCheck className="h-4 w-4 mr-2" /> Assinado em {contract.signed_at && new Date(contract.signed_at).toLocaleDateString('pt-BR')}
+                          </Button>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            className="bg-gold text-emerald-deep font-bold hover:bg-gold-bright"
+                            onClick={async () => {
+                              try {
+                                const { error } = await supabase
+                                  .from('contracts')
+                                  .update({ 
+                                    status: 'signed', 
+                                    signed_at: new Date().toISOString() 
+                                  })
+                                  .eq('id', contract.id);
+                                if (error) throw error;
+                                toast.success("Contrato assinado com sucesso!");
+                                fetchDashboardData();
+                              } catch (err: any) {
+                                toast.error("Erro ao assinar contrato: " + err.message);
+                              }
+                            }}
+                          >
+                            <Pencil className="h-4 w-4 mr-2" /> Assinar Agora
                           </Button>
                         )}
                       </div>
@@ -874,7 +893,7 @@ export const Route = createFileRoute("/painel")({
           ) : (
             <div className="grid gap-6">
                {myLots.map((lot) => (
-                 <LotPurchaseCard key={lot.id} lot={lot} profile={profile} siteInfo={siteInfo} />
+                  <LotPurchaseCard key={lot.id} lot={lot} profile={profile} siteInfo={siteInfo} onUpdate={fetchDashboardData} />
                ))}
             </div>
           )}
@@ -1297,7 +1316,31 @@ export const Route = createFileRoute("/painel")({
   );
 }
 
- function LotPurchaseCard({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
+  function LotPurchaseCard({ lot, profile, siteInfo, onUpdate }: { lot: any, profile: any, siteInfo: any, onUpdate?: () => void }) {
+    const [isAccepting, setIsAccepting] = useState(false);
+
+    const handleAcceptTerms = async () => {
+      setIsAccepting(true);
+      try {
+        const table = lot.is_direct_sale ? 'direct_sales' : 'lots';
+        const { error } = await supabase
+          .from(table)
+          .update({
+            accepted_at: new Date().toISOString(),
+            accepted_ip: 'Auto-registrado via Painel' // We don't have easy access to client IP here without a function, but we can put a placeholder
+          })
+          .eq('id', lot.id);
+
+        if (error) throw error;
+        toast.success("Termos aceitos com sucesso!");
+        if (onUpdate) onUpdate();
+      } catch (error: any) {
+        toast.error("Erro ao aceitar termos: " + error.message);
+      } finally {
+        setIsAccepting(false);
+      }
+    };
+
   return (
     <Card className="overflow-hidden border-2 hover:border-gold/30 transition-all shadow-md">
       <div className="grid md:grid-cols-[240px_1fr] lg:grid-cols-[300px_1fr]">
@@ -1309,7 +1352,9 @@ export const Route = createFileRoute("/painel")({
             width={400}
           />
           <div className="absolute top-3 left-3">
-            <Badge className="bg-emerald-600 text-white border-none shadow-lg">Lote Arrematado</Badge>
+            <Badge className="bg-emerald-600 text-white border-none shadow-lg">
+              {lot.is_direct_sale ? "Venda Direta" : "Lote Arrematado"}
+            </Badge>
           </div>
         </div>
         
@@ -1317,16 +1362,22 @@ export const Route = createFileRoute("/painel")({
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold uppercase text-gold tracking-widest">Lote #{lot.lot_number}</span>
+                <span className="text-xs font-bold uppercase text-gold tracking-widest">
+                  {lot.is_direct_sale ? "Venda Direta" : `Lote #${lot.lot_number}`}
+                </span>
                 <Separator orientation="vertical" className="h-3 bg-gold/30" />
-                <span className="text-xs font-bold uppercase text-muted-foreground">{lot.event?.name}</span>
+                <span className="text-xs font-bold uppercase text-muted-foreground">
+                  {lot.is_direct_sale ? "Compra Animal" : lot.event?.name}
+                </span>
               </div>
               <h3 className="text-2xl font-black text-emerald-deep tracking-tighter uppercase italic">{lot.animal?.name}</h3>
               <p className="text-sm text-muted-foreground">{lot.animal?.breed} · {lot.animal?.species}</p>
             </div>
             
             <div className="text-right bg-emerald-deep/5 p-3 rounded-xl border border-emerald-deep/10">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-1">Valor do Arremate</p>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-1">
+                {lot.is_direct_sale ? "Valor da Compra" : "Valor do Arremate"}
+              </p>
               <p className="text-2xl font-black text-emerald-deep tabular-nums">{formatBRL(lot.current_price)}</p>
             </div>
           </div>
@@ -1344,17 +1395,44 @@ export const Route = createFileRoute("/painel")({
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Status de Pagamento</p>
               <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px]">Aguardando Confirmação</Badge>
             </div>
-            <div className="space-y-1 text-right">
-               <p className="text-[10px] font-bold uppercase text-muted-foreground">Ações</p>
-               <Button size="sm" variant="outline" className="h-7 text-[10px] font-bold">Solicitar Ajuda</Button>
+            <div className="space-y-1">
+               <p className="text-[10px] font-bold uppercase text-muted-foreground">Aceite de Termos</p>
+               {lot.accepted_at ? (
+                 <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px] gap-1">
+                   <ShieldCheck className="h-3 w-3" /> Aceito em {new Date(lot.accepted_at).toLocaleDateString('pt-BR')}
+                 </Badge>
+               ) : (
+                 <Badge variant="destructive" className="text-[10px] animate-pulse">Pendente</Badge>
+               )}
             </div>
           </div>
+
+          {lot.is_direct_sale && lot.negotiated_terms && (
+            <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-100">
+              <p className="text-[10px] font-bold uppercase text-amber-700 mb-2 flex items-center gap-1">
+                <Info className="h-3 w-3" /> Condições Combinadas
+              </p>
+              <p className="text-sm text-amber-900 font-medium leading-relaxed italic">
+                "{lot.negotiated_terms}"
+              </p>
+            </div>
+          )}
 
           <Separator className="mb-6" />
 
           <div className="flex flex-wrap gap-3 mt-auto">
+             {!lot.accepted_at && (
+               <Button 
+                 className="bg-gold hover:bg-gold-bright text-emerald-deep font-bold gap-2"
+                 onClick={handleAcceptTerms}
+                 disabled={isAccepting}
+               >
+                 {isAccepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                 {lot.is_direct_sale ? "ACEITAR TERMOS DE COMPRA" : "ACEITAR TERMOS DE ARREMATAÇÃO"}
+               </Button>
+             )}
              <DocumentButton 
-               title="Termo de Arrematação" 
+               title={lot.is_direct_sale ? "Termo de Compra" : "Termo de Arrematação"} 
                lot={lot} 
                profile={profile}
                siteInfo={siteInfo}
@@ -1431,7 +1509,9 @@ export const Route = createFileRoute("/painel")({
           {type === 'termo' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="text-center mb-10">
-                <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">Termo de Arrematação</h1>
+                <h1 className="text-3xl font-black uppercase tracking-tight text-emerald-deep mb-2">
+                  {isDirectSale ? "Termo de Compra e Venda" : "Termo de Arrematação"}
+                </h1>
                 <div className="h-1 w-20 bg-gold mx-auto" />
               </div>
               
@@ -1445,17 +1525,22 @@ export const Route = createFileRoute("/painel")({
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">Dados do Leilão</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-gold border-b pb-1">
+                    {isDirectSale ? "Dados da Transação" : "Dados do Leilão"}
+                  </h3>
                   <div className="space-y-2 text-sm">
-                    <p><span className="text-gray-500">Evento:</span> <span className="font-bold">{lot.event?.name}</span></p>
-                    <p><span className="text-gray-500">Data:</span> <span className="font-bold">{new Date(lot.updated_at).toLocaleDateString("pt-BR")}</span></p>
-                    <p><span className="text-gray-500">Lote:</span> <span className="font-bold">#{lot.lot_number}</span></p>
+                    {!isDirectSale && <p><span className="text-gray-500">Evento:</span> <span className="font-bold">{lot.event?.name}</span></p>}
+                    <p><span className="text-gray-500">Data:</span> <span className="font-bold">{new Date(lot.updated_at || lot.created_at).toLocaleDateString("pt-BR")}</span></p>
+                    {!isDirectSale && <p><span className="text-gray-500">Lote:</span> <span className="font-bold">#{lot.lot_number}</span></p>}
+                    {isDirectSale && <p><span className="text-gray-500">Modalidade:</span> <span className="font-bold">Venda Direta</span></p>}
                   </div>
                 </div>
               </div>
 
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 mt-8">
-                <h3 className="text-xs font-black uppercase tracking-widest text-emerald-deep border-b border-emerald-deep/10 pb-2 mb-4">Especificações do Lote</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-emerald-deep border-b border-emerald-deep/10 pb-2 mb-4">
+                  {isDirectSale ? "Especificações do Animal" : "Especificações do Lote"}
+                </h3>
                 <div className="grid grid-cols-3 gap-6 text-sm">
                   <div>
                     <p className="text-gray-500 text-[10px] uppercase font-bold">Animal</p>
@@ -1466,7 +1551,9 @@ export const Route = createFileRoute("/painel")({
                     <p className="font-bold">{lot.animal?.breed} / {lot.animal?.species}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-[10px] uppercase font-bold">Valor do Arremate</p>
+                    <p className="text-gray-500 text-[10px] uppercase font-bold">
+                      {isDirectSale ? "Valor da Compra" : "Valor do Arremate"}
+                    </p>
                     <p className="font-black text-xl text-emerald-600">{formatBRL(lot.current_price)}</p>
                   </div>
                 </div>
@@ -1474,9 +1561,10 @@ export const Route = createFileRoute("/painel")({
 
               <div className="pt-10">
                 <p className="text-sm leading-relaxed text-gray-600 italic">
-                  "Confirmo para os devidos fins de direito o arremate do lote acima descrito pelo valor indicado, 
-                  estando ciente das normas e regulamentos do leilão {lot.event?.name}. O arrematante declara-se 
-                  responsável pelo pagamento integral do valor arrematado somado às comissões aplicáveis."
+                  {isDirectSale 
+                    ? `Confirmo a compra do animal acima descrito pelo valor indicado, estando ciente das condições negociadas. O comprador declara-se responsável pelo pagamento integral do valor acordado.`
+                    : `Confirmo para os devidos fins de direito o arremate do lote acima descrito pelo valor indicado, estando ciente das normas e regulamentos do leilão ${lot.event?.name}. O arrematante declara-se responsável pelo pagamento integral do valor arrematado somado às comissões aplicáveis.`
+                  }
                 </p>
               </div>
 
@@ -1487,7 +1575,16 @@ export const Route = createFileRoute("/painel")({
                   </div>
                  <div className="w-64 border-t border-gray-400 text-center pt-2">
                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{profile?.full_name}</p>
-                   <p className="text-[10px] text-gray-400">Arrematante</p>
+                   {lot.accepted_at ? (
+                     <div className="space-y-1">
+                       <p className="text-[10px] text-emerald-600 font-bold flex items-center justify-center gap-1">
+                         <ShieldCheck className="h-3 w-3" /> ACEITE DIGITAL EM {new Date(lot.accepted_at).toLocaleDateString('pt-BR')}
+                       </p>
+                       <p className="text-[8px] text-gray-400 uppercase">Auditado: {lot.accepted_ip || 'REGISTRO DE PAINEL'}</p>
+                     </div>
+                   ) : (
+                     <p className="text-[10px] text-gray-400">Arrematante</p>
+                   )}
                  </div>
               </div>
             </div>
@@ -1563,7 +1660,9 @@ export const Route = createFileRoute("/painel")({
 
           {type === 'contrato' && (
             <div className="space-y-6 text-sm leading-relaxed text-justify text-gray-700 font-serif">
-               <h1 className="text-xl font-bold text-center uppercase mb-8 underline">Instrumento Particular de Compra e Venda de Semovente</h1>
+                <h1 className="text-xl font-bold text-center uppercase mb-8 underline">
+                  {isDirectSale ? "Contrato de Compra e Venda de Animal (Direta)" : "Instrumento Particular de Compra e Venda de Semovente (Leilão)"}
+                </h1>
                
                <p>
                  Pelo presente instrumento particular, as partes abaixo identificadas têm entre si, justo e contratado, a compra e venda do animal descrito, mediante as cláusulas e condições seguintes:
@@ -1578,11 +1677,11 @@ export const Route = createFileRoute("/painel")({
                </p>
 
                <p>
-                 <strong>CLÁUSULA PRIMEIRA - DO OBJETO:</strong> O objeto do presente contrato é a venda e compra do animal denominado <strong>{lot.animal?.name?.toUpperCase()}</strong>, da raça <strong>{lot.animal?.breed?.toUpperCase()}</strong>, Lote nº <strong>{lot.lot_number}</strong> arrematado no leilão <strong>{lot.event?.name?.toUpperCase()}</strong>.
+                 <strong>CLÁUSULA PRIMEIRA - DO OBJETO:</strong> O objeto do presente contrato é a venda e compra do animal denominado <strong>{lot.animal?.name?.toUpperCase()}</strong>, da raça <strong>{lot.animal?.breed?.toUpperCase()}</strong>, {isDirectSale ? "adquirido via venda direta" : `Lote nº ${lot.lot_number} arrematado no leilão ${lot.event?.name?.toUpperCase()}`}.
                </p>
 
                <p>
-                 <strong>CLÁUSULA SEGUNDA - DO PREÇO E CONDIÇÕES:</strong> O COMPRADOR pagará ao VENDEDOR a quantia total de <strong>{formatBRL(lot.current_price)}</strong>, à vista ou conforme condições parceladas pactuadas no pregão.
+                 <strong>CLÁUSULA SEGUNDA - DO PREÇO E CONDIÇÕES:</strong> O COMPRADOR pagará ao VENDEDOR a quantia total de <strong>{formatBRL(lot.current_price)}</strong>, {isDirectSale ? "conforme condições negociadas entre as partes" : "à vista ou conforme condições parceladas pactuadas no pregão"}.
                </p>
 
                <p>

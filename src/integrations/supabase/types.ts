@@ -395,6 +395,8 @@ export type Database = {
       }
       direct_sales: {
         Row: {
+          accepted_at: string | null
+          accepted_ip: string | null
           animal_id: string
           buyer_email: string | null
           buyer_id: string | null
@@ -409,6 +411,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
           animal_id: string
           buyer_email?: string | null
           buyer_id?: string | null
@@ -423,6 +427,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
           animal_id?: string
           buyer_email?: string | null
           buyer_id?: string | null
@@ -747,6 +753,8 @@ export type Database = {
       }
       lots: {
         Row: {
+          accepted_at: string | null
+          accepted_ip: string | null
           allows_pre_bidding: boolean | null
           animal_id: string | null
           bid_increment: number
@@ -775,6 +783,8 @@ export type Database = {
           winner_link_reason: string | null
         }
         Insert: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
           allows_pre_bidding?: boolean | null
           animal_id?: string | null
           bid_increment?: number
@@ -803,6 +813,8 @@ export type Database = {
           winner_link_reason?: string | null
         }
         Update: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
           allows_pre_bidding?: boolean | null
           animal_id?: string | null
           bid_increment?: number
