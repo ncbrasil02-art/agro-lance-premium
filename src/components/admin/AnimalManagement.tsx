@@ -21,7 +21,7 @@ import { SeoAnalysis } from "./SeoAnalysis";
 import { SocialPreview } from "./SocialPreview";
 import { RichResultsPreview } from "./RichResultsPreview";
   import { toast } from "sonner";
-import { ImageCropper } from "./ImageCropper";
+ import { ImageCropper, getCroppedImg } from "./ImageCropper";
  
  const VETERINARY_CHECKLIST = [
    { id: "prognata", label: "Prognata?" },
@@ -382,35 +382,104 @@ import { ImageCropper } from "./ImageCropper";
     const [animals, setAnimals] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
 
-    const handleCropComplete = async (croppedBlob: Blob) => {
-      if (!croppingImage) return;
-      const toastId = toast.loading("Enviando foto recortada...");
-      try {
-        const fileExt = croppingImage.name.split('.').pop() || 'jpg';
-        const fileName = `${Math.random()}.${fileExt}`;
-        const file = new File([croppedBlob], fileName, { type: 'image/jpeg' });
-        const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
-        if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
-        const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-        setFormData({ ...formData, photos_urls: [...currentUrls, publicUrl].join(", ") });
-        toast.success("Foto enviada com sucesso!");
-      } catch (error: any) {
-        toast.error(`Erro no upload: ${error.message}`);
-      } finally {
-        toast.dismiss(toastId);
-        setCroppingImage(null);
-        if (uploadQueue.length > 0) {
-          const nextFile = uploadQueue[0];
-          setUploadQueue(prev => prev.slice(1));
-          const reader = new FileReader();
-          reader.onload = () => {
-            setCroppingImage({ url: reader.result as string, name: nextFile.name });
-          };
-          reader.readAsDataURL(nextFile);
-        }
-      }
-    };
+     const handleCropComplete = async (croppedBlob: Blob) => {
+       if (!croppingImage) return;
+       const toastId = toast.loading("Enviando foto recortada...");
+       try {
+         const fileExt = croppingImage.name.split('.').pop() || 'jpg';
+         const fileName = `${Math.random()}.${fileExt}`;
+         const file = new File([croppedBlob], fileName, { type: 'image/webp' });
+         const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+         if (error) throw error;
+         const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+         const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+         setFormData({ ...formData, photos_urls: [...currentUrls, publicUrl].join(", ") });
+         toast.success("Foto enviada com sucesso!");
+       } catch (error: any) {
+         toast.error(`Erro no upload: ${error.message}`);
+       } finally {
+         toast.dismiss(toastId);
+         setCroppingImage(null);
+         if (uploadQueue.length > 0) {
+           const nextFile = uploadQueue[0];
+           setUploadQueue(prev => prev.slice(1));
+           const reader = new FileReader();
+           reader.onload = () => {
+             setCroppingImage({ url: reader.result as string, name: nextFile.name });
+           };
+           reader.readAsDataURL(nextFile);
+         }
+       }
+     };
+ 
+     const handleApplyToAll = async (pixelCrop: { x: number, y: number, width: number, height: number }) => {
+       if (!croppingImage) return;
+       
+       const toastId = toast.loading("Processando todas as fotos...");
+       try {
+         // 1. Process current image
+         const currentBlob = await getCroppedImg(croppingImage.url, pixelCrop);
+         const currentExt = croppingImage.name.split('.').pop() || 'jpg';
+         const currentName = `${Math.random()}.${currentExt}`;
+         const currentFile = new File([currentBlob], currentName, { type: 'image/webp' });
+         const { data: currentData, error: currentError } = await supabase.storage.from('animals').upload(currentName, currentFile);
+         if (currentError) throw currentError;
+         const { data: { publicUrl: currentUrl } } = supabase.storage.from('animals').getPublicUrl(currentData.path);
+         
+         let allUrls = [currentUrl];
+         
+         // 2. Process all remaining in queue
+         for (const file of uploadQueue) {
+           toast.loading(`Processando: ${file.name}...`, { id: toastId });
+           const reader = new FileReader();
+           const fileUrl = await new Promise<string>((resolve) => {
+             reader.onload = () => resolve(reader.result as string);
+             reader.readAsDataURL(file);
+           });
+ 
+           const img = new Image();
+           await new Promise((resolve) => {
+             img.onload = resolve;
+             img.src = fileUrl;
+           });
+ 
+           const imgW = img.width;
+           const imgH = img.height;
+           let cropW, cropH, cropX, cropY;
+ 
+           if (imgW / imgH > 4 / 3) {
+             cropH = imgH;
+             cropW = imgH * (4 / 3);
+             cropX = (imgW - cropW) / 2;
+             cropY = 0;
+           } else {
+             cropW = imgW;
+             cropH = imgW * (3 / 4);
+             cropX = 0;
+             cropY = (imgH - cropH) / 2;
+           }
+ 
+           const blob = await getCroppedImg(fileUrl, { x: cropX, y: cropY, width: cropW, height: cropH });
+           const ext = file.name.split('.').pop() || 'jpg';
+           const name = `${Math.random()}.${ext}`;
+           const uploadFile = new File([blob], name, { type: 'image/webp' });
+           const { data, error } = await supabase.storage.from('animals').upload(name, uploadFile);
+           if (error) throw error;
+           const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+           allUrls.push(publicUrl);
+         }
+ 
+         const existingUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+         setFormData({ ...formData, photos_urls: [...existingUrls, ...allUrls].join(", ") });
+         setUploadQueue([]);
+         setCroppingImage(null);
+         toast.success("Todas as fotos foram processadas com sucesso!", { id: toastId });
+       } catch (error: any) {
+         toast.error(`Erro no processamento em massa: ${error.message}`, { id: toastId });
+       } finally {
+         toast.dismiss(toastId);
+       }
+     };
 
     const fetchCategories = async () => {
       const { data } = await supabase.from("categories").select("id, name").order("name");
@@ -1137,14 +1206,14 @@ import { ImageCropper } from "./ImageCropper";
                    {formData.photos_urls && (
                      <div className="grid grid-cols-4 gap-2 mb-2">
                         {formData.photos_urls.split(",").map((url: string, i: number) => (
-                          <div key={i} className="relative aspect-square group">
-                            <OptimizedImage 
-                              src={url.trim()} 
-                              alt="" 
-                              width={200}
-                              aspectRatio="square"
-                              className="h-full w-full rounded-md border" 
-                            />
+                           <div key={i} className="relative aspect-[4/3] group">
+                             <OptimizedImage 
+                               src={url.trim()} 
+                               alt="" 
+                               width={200}
+                               aspectRatio="landscape"
+                               className="h-full w-full rounded-md border" 
+                             />
                             <button 
                              type="button"
                              onClick={() => {
@@ -1298,12 +1367,12 @@ import { ImageCropper } from "./ImageCropper";
                         >
                          <TableCell>
                            {animal.photos && animal.photos.length > 0 ? (
-                             <OptimizedImage 
+                            <OptimizedImage 
                                src={animal.photos[0]} 
                                alt={animal.name} 
-                               width={80}
-                               aspectRatio="square"
-                               className="h-10 w-10 rounded-md border"
+                               width={120}
+                               aspectRatio="landscape"
+                               className="h-10 w-14 rounded-md border"
                              />
                            ) : (
                             <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-[10px] text-muted-foreground border border-dashed">
@@ -1395,7 +1464,8 @@ import { ImageCropper } from "./ImageCropper";
           <ImageCropper
             image={croppingImage.url}
             aspect={4 / 3}
-            onCropComplete={handleCropComplete}
+           onCropComplete={handleCropComplete}
+           onApplyToAll={uploadQueue.length > 0 ? handleApplyToAll : undefined}
             onCancel={() => {
              setCroppingImage(null);
              if (uploadQueue.length > 0) {
