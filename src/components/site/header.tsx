@@ -2,7 +2,7 @@
    import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
    import { useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
- import { Gavel, Moon, Sun, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
+  import { Gavel, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
  import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
@@ -38,7 +38,7 @@ import {
         };
       }, []);
  
-    const { theme, toggle } = useTheme();
+     const { theme } = useTheme();
     const { siteInfo, homepage, aboutPage } = useSiteSettings();
  
      const { delaySeconds, isPolling } = useHomeRealtime(() => {
@@ -135,13 +135,10 @@ import {
              </Tooltip>
            </TooltipProvider>
  
-           <div className="flex items-center gap-1.5 md:gap-2">
-          {user && <NotificationBell userId={user.id} />}
-          <Button variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </Button>
-
-          {user ? (
+            <div className="flex items-center gap-1.5 md:gap-2">
+           {user && <NotificationBell userId={user.id} />}
+ 
+           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
