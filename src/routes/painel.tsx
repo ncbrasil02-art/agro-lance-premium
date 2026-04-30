@@ -90,7 +90,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
      ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
      Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
-    MapPin, Globe, Loader2, Send, BellRing
+    MapPin, Globe, Loader2, Send, BellRing, Search
  } from "lucide-react";
    import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,6 +109,7 @@ import { Separator } from "@/components/ui/separator";
  import { Input } from "@/components/ui/input";
  import { Label } from "@/components/ui/label";
  import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/painel")({
   component: UserDashboard,
@@ -129,6 +130,11 @@ export const Route = createFileRoute("/painel")({
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     
+    const [bidsSearchTerm, setBidsSearchTerm] = useState("");
+    const [bidsStatusFilter, setBidsStatusFilter] = useState("all");
+    const [notifSearchTerm, setNotifSearchTerm] = useState("");
+    const [notifStatusFilter, setNotifStatusFilter] = useState("all");
+
     const [formData, setFormData] = useState({
       full_name: "",
       cpf: "",
@@ -146,6 +152,33 @@ export const Route = createFileRoute("/painel")({
      const docInputRef = useRef<HTMLInputElement>(null);
      const [rtStatus, setRtStatus] = useState<string>("INITIAL");
  
+    const filteredBids = useMemo(() => {
+      return myBids.filter(bid => {
+        const matchesSearch = (bid.lot?.animal?.name || "").toLowerCase().includes(bidsSearchTerm.toLowerCase());
+        const isWinner = bid.lot?.winner_id === user?.id && bid.lot?.status === 'sold';
+        const isLeading = bid.amount >= (bid.lot?.current_price || 0) && !isWinner;
+        const isOutbid = bid.amount < (bid.lot?.current_price || 0);
+
+        let matchesStatus = true;
+        if (bidsStatusFilter === 'winner') matchesStatus = isWinner;
+        if (bidsStatusFilter === 'leading') matchesStatus = isLeading;
+        if (bidsStatusFilter === 'outbid') matchesStatus = isOutbid;
+
+        return matchesSearch && matchesStatus;
+      });
+    }, [myBids, bidsSearchTerm, bidsStatusFilter, user?.id]);
+
+    const filteredNotifications = useMemo(() => {
+      return notifications.filter(n => {
+        const matchesSearch = (n.title + n.message).toLowerCase().includes(notifSearchTerm.toLowerCase());
+        let matchesStatus = true;
+        if (notifStatusFilter === 'unread') matchesStatus = !n.is_read;
+        if (notifStatusFilter === 'read') matchesStatus = n.is_read;
+
+        return matchesSearch && matchesStatus;
+      });
+    }, [notifications, notifSearchTerm, notifStatusFilter]);
+
     const fetchDashboardData = useCallback(async () => {
       setIsLoading(true);
       if (!user?.id) return;
@@ -589,9 +622,30 @@ export const Route = createFileRoute("/painel")({
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle>Notificações do Sistema</CardTitle>
-                <CardDescription>Avisos importantes sobre seus lances e conta.</CardDescription>
-              </div>
-              {notifications.some(n => !n.is_read) && (
+                  <CardDescription>Avisos importantes sobre seus lances e conta.</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-48 hidden md:block">
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input 
+                      placeholder="Filtrar avisos..." 
+                      className="pl-8 h-8 text-xs" 
+                      value={notifSearchTerm}
+                      onChange={(e) => setNotifSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <Select value={notifStatusFilter} onValueChange={setNotifStatusFilter}>
+                    <SelectTrigger className="h-8 text-xs w-32">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="unread">Não lidas</SelectItem>
+                      <SelectItem value="read">Lidas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {notifications.some(n => !n.is_read) && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -607,15 +661,15 @@ export const Route = createFileRoute("/painel")({
                 </Button>
               )}
             </CardHeader>
-            <CardContent>
-              {notifications.length === 0 ? (
+              <CardContent>
+                {filteredNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <ShieldCheck className="h-12 w-12 text-muted-foreground/20 mb-4" />
                   <p className="text-muted-foreground">Nenhuma notificação por enquanto.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {notifications.map((n) => (
+                  <div className="space-y-4">
+                    {filteredNotifications.map((n) => (
                     <div 
                       key={n.id} 
                       className={`p-4 rounded-2xl border transition-all ${n.is_read ? 'bg-background border-border opacity-70' : 'bg-gold/5 border-gold/20 shadow-sm'}`}
@@ -745,10 +799,11 @@ export const Route = createFileRoute("/painel")({
                               >
                                 Solicitar Revisão
                               </Button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
                     </tbody>
                   </table>
                 </div>
@@ -782,9 +837,33 @@ export const Route = createFileRoute("/painel")({
 
         <TabsContent value="lances">
           <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Lances</CardTitle>
-              <CardDescription>Seus lances recentes em todos os leilões.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div>
+                <CardTitle>Histórico de Lances</CardTitle>
+                <CardDescription>Seus lances recentes em todos os leilões.</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative w-48 hidden md:block">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input 
+                    placeholder="Buscar animal..." 
+                    className="pl-8 h-8 text-xs" 
+                    value={bidsSearchTerm}
+                    onChange={(e) => setBidsSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Select value={bidsStatusFilter} onValueChange={setBidsStatusFilter}>
+                  <SelectTrigger className="h-8 text-xs w-40">
+                    <SelectValue placeholder="Filtrar status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os lances</SelectItem>
+                    <SelectItem value="winner">Lotes arrematados</SelectItem>
+                    <SelectItem value="leading">Lances vencedores</SelectItem>
+                    <SelectItem value="outbid">Lances superados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="relative overflow-x-auto">
@@ -798,8 +877,15 @@ export const Route = createFileRoute("/painel")({
                     </tr>
                   </thead>
                   <tbody className="divide-y border-b">
-                    {myBids.map((bid) => (
-                      <tr key={bid.id} className="hover:bg-muted/10 transition-colors">
+                    {filteredBids.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-10 text-center text-muted-foreground">
+                          Nenhum lance encontrado com os filtros selecionados.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredBids.map((bid) => (
+                        <tr key={bid.id} className="hover:bg-muted/10 transition-colors">
                         <td className="px-4 py-4 whitespace-nowrap">
                           {new Date(bid.created_at).toLocaleString("pt-BR")}
                         </td>
