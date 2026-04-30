@@ -60,9 +60,9 @@ export function OfferManagement() {
 
   useEffect(() => {
     fetchOffers();
-
+    const uniqueId = `admin-offers-realtime-${Math.random().toString(36).slice(2, 9)}`;
     const channel = supabase
-      .channel('admin-offers-realtime')
+      .channel(uniqueId)
       .on('postgres_changes', { 
         event: '*', 
         schema: 'public', 
