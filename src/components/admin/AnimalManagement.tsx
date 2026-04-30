@@ -21,6 +21,7 @@ import { SeoAnalysis } from "./SeoAnalysis";
 import { SocialPreview } from "./SocialPreview";
 import { RichResultsPreview } from "./RichResultsPreview";
   import { toast } from "sonner";
+import { ImageCropper } from "./ImageCropper";
  
  const VETERINARY_CHECKLIST = [
    { id: "prognata", label: "Prognata?" },
