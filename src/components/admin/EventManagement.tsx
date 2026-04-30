@@ -1,3 +1,4 @@
+ import { validateImage } from "@/utils/upload-validation";
   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
@@ -1080,7 +1081,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                         id="banner-upload" 
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
-                          if (!file) return;
+                          if (!file || !validateImage(file)) return;
                           const toastId = toast.loading("Enviando banner...");
                           const fileExt = file.name.split('.').pop();
                           const fileName = `${Math.random()}.${fileExt}`;
@@ -1123,7 +1124,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                             id="promoter-logo-upload" 
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
-                              if (!file) return;
+                              if (!file || !validateImage(file)) return;
                               const tid = toast.loading("Enviando logo...");
                               const fileExt = file.name.split('.').pop();
                               const fileName = `promoter_${Math.random()}.${fileExt}`;
