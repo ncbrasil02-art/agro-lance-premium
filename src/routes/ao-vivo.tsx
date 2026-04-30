@@ -572,14 +572,28 @@ export const Route = createFileRoute("/ao-vivo")({
                    };
                  });
                  
-                 // Notify user if it's a new bid
-                 if (payload.eventType === "INSERT") {
-                    toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
-                      description: newBid.bidder_name || "Licitante",
-                      icon: <Gavel className="h-4 w-4 text-gold" />,
-                      duration: 3000
+                  // Notify user if it's a new bid
+                  if (payload.eventType === "INSERT") {
+                    setBids(prevBids => {
+                      // Check if outbidding current user
+                      const isOutbiddingMe = user && prevBids.length > 0 && prevBids[0].user_id === user.id && newBid.user_id !== user.id;
+
+                      if (isOutbiddingMe) {
+                        toast.error("VOCÊ FOI SUPERADO!", {
+                          description: `Seu lance no lote #${liveLot?.lot_number} foi superado por ${formatBRL(newBid.amount)}.`,
+                          icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
+                          duration: 6000
+                        });
+                      } else {
+                        toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
+                          description: newBid.bidder_name || "Licitante",
+                          icon: <Gavel className="h-4 w-4 text-gold" />,
+                          duration: 3000
+                        });
+                      }
+                      return prevBids;
                     });
-                 }
+                  }
                } else if (payload.eventType === "DELETE") {
                 const updatedBid = payload.new;
                 setBids((prev: any[]) => 
