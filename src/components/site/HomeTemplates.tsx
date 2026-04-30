@@ -1,3 +1,5 @@
+ import { useState, useEffect, ReactNode } from "react";
+ import { motion, AnimatePresence } from "framer-motion";
  import { Link } from "@tanstack/react-router";
  import { ArrowRight, Calendar, Radio, Sparkles, Bell, Trophy, Users, TrendingUp } from "lucide-react";
  import { Button } from "@/components/ui/button";
