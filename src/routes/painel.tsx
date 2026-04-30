@@ -190,7 +190,7 @@ export const Route = createFileRoute("/painel")({
         const { data: wonLots, error: wonError } = await supabase
           .from("lots")
           .select(`
-            id, lot_number, status, current_price, winner_id, updated_at,
+            id, lot_number, status, current_price, winner_id, updated_at, accepted_at, accepted_ip,
             animal:animals!lots_animal_id_fkey(id, name, breed, species, photos, internal_code),
             event:events!lots_event_id_fkey(id, name)
           `)
@@ -203,7 +203,7 @@ export const Route = createFileRoute("/painel")({
         const { data: directSales, error: dsError } = await supabase
           .from("direct_sales")
           .select(`
-            id, total_price, status, created_at, updated_at, negotiated_terms,
+            id, total_price, status, created_at, updated_at, negotiated_terms, accepted_at, accepted_ip,
             animal:animals(id, name, breed, species, photos, internal_code)
           `)
           .eq("buyer_id", user.id)
