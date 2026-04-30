@@ -14,8 +14,9 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
 
     logger.info(`Configurando canal em tempo real para o evento: ${eventId} (Tentativa: ${retryCount})`);
     
+    const uniqueId = `event-updates-${eventId}-${Math.random().toString(36).substring(2, 9)}`;
     const channel = supabase
-      .channel(`event-updates-${eventId}`)
+      .channel(uniqueId)
       .on(
         'postgres_changes',
         {
