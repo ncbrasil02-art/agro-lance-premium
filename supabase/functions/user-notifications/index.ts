@@ -86,8 +86,9 @@
      if (!resendKey) {
        console.warn('RESEND_API_KEY not found. Email not sent.')
        return new Response(JSON.stringify({ success: true, message: 'Key missing' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+       }
      }
- 
+
      if (type === 'user_approved' && email) {
        await fetch('https://api.resend.com/emails', {
          method: 'POST',
