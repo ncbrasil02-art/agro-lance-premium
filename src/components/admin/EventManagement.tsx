@@ -471,8 +471,9 @@ import { useAuth } from "@/components/auth/auth-provider";
       const [rtStatus, setRtStatus] = useState<string>("INITIAL");
 
       useEffect(() => {
+        const uniqueId = `admin-events-realtime-${Math.random().toString(36).slice(2, 9)}`;
         const channel = supabase
-          .channel('admin-events-realtime')
+          .channel(uniqueId)
           .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
             fetchEvents();
           })
