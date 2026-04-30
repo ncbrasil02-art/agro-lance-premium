@@ -353,8 +353,9 @@ function LotDetail() {
      const lotId = lot.id;
      let lastBidId = initialBids[0]?.id;
  
-     const lotChannel = supabase
-       .channel(`lot-dt-${lotId}`)
+      const uniqueId = `lot-dt-${lotId}-${Math.random().toString(36).slice(2, 9)}`;
+      const lotChannel = supabase
+        .channel(uniqueId)
        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${lotId}` }, (p) => {
          setLot((prev: any) => ({ ...prev, ...p.new }));
        })

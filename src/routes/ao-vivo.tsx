@@ -374,8 +374,9 @@ export const Route = createFileRoute("/ao-vivo")({
 
     useEffect(() => {
       // Listen for updates to ANY event that could become live if we don't have one
+      const uniqueGlobalId = `global-events-status-${Math.random().toString(36).slice(2, 9)}`;
       const globalChannel = supabase
-        .channel("global-events-status")
+        .channel(uniqueGlobalId)
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "events" },
@@ -480,8 +481,9 @@ export const Route = createFileRoute("/ao-vivo")({
       // Specific channel for the active lot to catch price and bid count updates
       let lotChannel: any = null;
       if (liveEvent?.active_lot_id) {
+        const lotUniqueId = `lot-updates-${liveEvent.active_lot_id}-${Math.random().toString(36).slice(2, 9)}`;
         lotChannel = supabase
-          .channel(`lot-updates-${liveEvent.active_lot_id}`)
+          .channel(lotUniqueId)
           .on(
             "postgres_changes",
             { 
@@ -529,8 +531,9 @@ export const Route = createFileRoute("/ao-vivo")({
       let bidsChannel: any = null;
       if (liveEvent?.active_lot_id) {
         console.log("Subscribing to bids for lot:", liveEvent.active_lot_id);
+        const bidsUniqueId = `live-bids-${liveEvent.active_lot_id}-${Math.random().toString(36).slice(2, 9)}`;
         bidsChannel = supabase
-          .channel(`live-bids-${liveEvent.active_lot_id}`)
+          .channel(bidsUniqueId)
           .on(
             "postgres_changes",
             { 
@@ -630,8 +633,9 @@ export const Route = createFileRoute("/ao-vivo")({
       }
 
       // Real-time profiles subscription to update names in the history
+      const profilesUniqueId = `live-profiles-sync-${Math.random().toString(36).slice(2, 9)}`;
       const profilesChannel = supabase
-        .channel("live-profiles-sync")
+        .channel(profilesUniqueId)
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "profiles" },

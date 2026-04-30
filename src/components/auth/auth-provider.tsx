@@ -50,8 +50,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    useEffect(() => {
     if (!user?.id) return;
 
+    const uniqueChannelId = `profile-updates-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
     const channel = supabase
-      .channel(`profile-updates-${user.id}`)
+      .channel(uniqueChannelId)
       .on(
         "postgres_changes",
         { 
@@ -77,8 +78,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       )
       .subscribe();
 
+     const notificationsUniqueId = `notifications-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
      const notificationsChannel = supabase
-       .channel(`notifications-${user.id}`)
+       .channel(notificationsUniqueId)
        .on(
          "postgres_changes",
          {

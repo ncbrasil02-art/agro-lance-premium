@@ -335,8 +335,9 @@ export const Route = createFileRoute("/painel")({
        }
  
        // Add real-time listeners for the dashboard
+       const lotsUniqueId = `dashboard-lots-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
        const lotsChannel = supabase
-         .channel('dashboard-lots-realtime')
+         .channel(lotsUniqueId)
          .on('postgres_changes', { 
            event: '*', 
            schema: 'public', 
@@ -349,8 +350,9 @@ export const Route = createFileRoute("/painel")({
            setRtStatus(newStatus);
          });
  
+       const bidsUniqueId = `dashboard-bids-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
        const bidsChannel = supabase
-         .channel('dashboard-bids-realtime')
+         .channel(bidsUniqueId)
          .on('postgres_changes', { 
            event: '*', 
            schema: 'public', 
@@ -361,8 +363,9 @@ export const Route = createFileRoute("/painel")({
          })
          .subscribe();
 
+       const notificationsUniqueId = `dashboard-notifications-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
        const notificationsChannel = supabase
-         .channel('dashboard-notifications-realtime')
+         .channel(notificationsUniqueId)
          .on('postgres_changes', { 
            event: '*', 
            schema: 'public', 
@@ -373,8 +376,9 @@ export const Route = createFileRoute("/painel")({
          })
          .subscribe();
  
-        const offersChannel = supabase
-          .channel('dashboard-offers-realtime')
+         const offersUniqueId = `dashboard-offers-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
+         const offersChannel = supabase
+           .channel(offersUniqueId)
           .on('postgres_changes', { 
             event: '*', 
             schema: 'public', 
