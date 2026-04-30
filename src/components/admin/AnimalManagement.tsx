@@ -21,6 +21,7 @@ import { SeoAnalysis } from "./SeoAnalysis";
 import { SocialPreview } from "./SocialPreview";
 import { RichResultsPreview } from "./RichResultsPreview";
   import { toast } from "sonner";
+import { ImageCropper } from "./ImageCropper";
  
  const VETERINARY_CHECKLIST = [
    { id: "prognata", label: "Prognata?" },
@@ -38,6 +39,8 @@ import { RichResultsPreview } from "./RichResultsPreview";
  export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
+  const [croppingImage, setCroppingImage] = useState<{ url: string, name: string } | null>(null);
+  const [uploadQueue, setUploadQueue] = useState<File[]>([]);
   const [customHealthItem, setCustomHealthItem] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [isAiFixing, setIsAiFixing] = useState(false);
@@ -378,6 +381,36 @@ import { RichResultsPreview } from "./RichResultsPreview";
     };
     const [animals, setAnimals] = useState<any[]>([]);
     const [sellers, setSellers] = useState<any[]>([]);
+
+    const handleCropComplete = async (croppedBlob: Blob) => {
+      if (!croppingImage) return;
+      const toastId = toast.loading("Enviando foto recortada...");
+      try {
+        const fileExt = croppingImage.name.split('.').pop() || 'jpg';
+        const fileName = `${Math.random()}.${fileExt}`;
+        const file = new File([croppedBlob], fileName, { type: 'image/jpeg' });
+        const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
+        const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+        setFormData({ ...formData, photos_urls: [...currentUrls, publicUrl].join(", ") });
+        toast.success("Foto enviada com sucesso!");
+      } catch (error: any) {
+        toast.error(`Erro no upload: ${error.message}`);
+      } finally {
+        toast.dismiss(toastId);
+        setCroppingImage(null);
+        if (uploadQueue.length > 0) {
+          const nextFile = uploadQueue[0];
+          setUploadQueue(prev => prev.slice(1));
+          const reader = new FileReader();
+          reader.onload = () => {
+            setCroppingImage({ url: reader.result as string, name: nextFile.name });
+          };
+          reader.readAsDataURL(nextFile);
+        }
+      }
+    };
 
     const fetchCategories = async () => {
       const { data } = await supabase.from("categories").select("id, name").order("name");
@@ -1141,26 +1174,14 @@ import { RichResultsPreview } from "./RichResultsPreview";
                            
                            const validFiles = Array.from(files).filter(validateImage);
                            if (validFiles.length === 0) return;
-
-                           const toastId = toast.loading("Enviando fotos...");
-                           const uploadedUrls = [];
-                           for (const file of validFiles) {
-                             const fileExt = file.name.split('.').pop();
-                             const fileName = `${Math.random()}.${fileExt}`;
-                             const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
-                             if (error) {
-                               toast.error(`Erro no upload: ${error.message}`);
-                               continue;
-                             }
-                             const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
-                             uploadedUrls.push(publicUrl);
-                           }
-                            const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-                           setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
-                           toast.dismiss(toastId);
-                           if (uploadedUrls.length > 0) {
-                             toast.success(`${uploadedUrls.length} fotos enviadas!`);
-                           }
+                           const firstFile = validFiles[0];
+                           const remainingFiles = validFiles.slice(1);
+                           setUploadQueue(remainingFiles);
+                           const reader = new FileReader();
+                           reader.onload = () => {
+                             setCroppingImage({ url: reader.result as string, name: firstFile.name });
+                           };
+                           reader.readAsDataURL(firstFile);
                          }}
                       />
                       <Button 
@@ -1369,6 +1390,25 @@ import { RichResultsPreview } from "./RichResultsPreview";
            )}
          </CardContent>
        </Card>
+
+       {croppingImage && (
+         <ImageCropper
+           image={croppingImage.url}
+           onCropComplete={handleCropComplete}
+           onCancel={() => {
+             setCroppingImage(null);
+             if (uploadQueue.length > 0) {
+               const nextFile = uploadQueue[0];
+               setUploadQueue(prev => prev.slice(1));
+               const reader = new FileReader();
+               reader.onload = () => {
+                 setCroppingImage({ url: reader.result as string, name: nextFile.name });
+               };
+               reader.readAsDataURL(nextFile);
+             }
+           }}
+         />
+       )}
      </div>
    );
  }
