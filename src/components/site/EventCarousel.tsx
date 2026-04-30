@@ -27,8 +27,7 @@
         "py-16",
         variant === 'model3' ? "bg-emerald-deep text-white" : "container mx-auto px-4"
       )}>
-        {variant === 'model3' && <div className="container mx-auto px-4">}
-       <div className="mb-10 flex items-center justify-between">
+        <div className={cn("mb-10 flex items-center justify-between", variant === 'model3' && "container mx-auto px-4")}>
          <div>
             <h2 className={cn(
               "text-3xl font-bold tracking-tight md:text-4xl",
@@ -61,7 +60,7 @@
          )}
        </div>
 
-       <div className="overflow-hidden" ref={emblaRef}>
+        <div className={cn("overflow-hidden", variant === 'model3' && "container mx-auto px-4")} ref={emblaRef}>
          <div className="flex -ml-6">
            {events.map((event) => (
              <div key={event.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] pl-6">
