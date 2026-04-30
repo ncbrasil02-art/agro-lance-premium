@@ -874,7 +874,7 @@ export const Route = createFileRoute("/painel")({
           ) : (
             <div className="grid gap-6">
                {myLots.map((lot) => (
-                 <LotPurchaseCard key={lot.id} lot={lot} profile={profile} siteInfo={siteInfo} />
+                  <LotPurchaseCard key={lot.id} lot={lot} profile={profile} siteInfo={siteInfo} onUpdate={fetchDashboardData} />
                ))}
             </div>
           )}
