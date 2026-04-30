@@ -90,10 +90,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
      ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
      Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
-    MapPin, Globe, Loader2, Send
+    MapPin, Globe, Loader2, Send, BellRing
  } from "lucide-react";
    import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -135,6 +136,10 @@ export const Route = createFileRoute("/painel")({
       address: "",
       cep: "",
       nationality: "Brasileira",
+      pref_outbid_email: true,
+      pref_outbid_push: true,
+      pref_new_event_email: true,
+      pref_followed_lot_update: true,
     });
 
      const fileInputRef = useRef<HTMLInputElement>(null);
@@ -246,14 +251,18 @@ export const Route = createFileRoute("/painel")({
       fetchNotifications();
        
        if (profile) {
-         setFormData({
-           full_name: profile.full_name || "",
-           cpf: profile.cpf || "",
-           phone: profile.phone || "",
-           address: profile.address || "",
-           cep: profile.cep || "",
-           nationality: profile.nationality || "Brasileira",
-         });
+          setFormData({
+            full_name: profile.full_name || "",
+            cpf: profile.cpf || "",
+            phone: profile.phone || "",
+            address: profile.address || "",
+            cep: profile.cep || "",
+            nationality: profile.nationality || "Brasileira",
+            pref_outbid_email: profile.pref_outbid_email !== false,
+            pref_outbid_push: profile.pref_outbid_push !== false,
+            pref_new_event_email: profile.pref_new_event_email !== false,
+            pref_followed_lot_update: profile.pref_followed_lot_update !== false,
+          });
        }
  
        // Add real-time listeners for the dashboard
@@ -322,17 +331,21 @@ export const Route = createFileRoute("/painel")({
      
      setIsSaving(true);
      try {
-       const { error } = await supabase
-         .from("profiles")
-         .update({
-           full_name: formData.full_name,
-           cpf: formData.cpf,
-           phone: formData.phone,
-           address: formData.address,
-           cep: formData.cep,
-           nationality: formData.nationality,
-         })
-         .eq("id", user.id);
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            full_name: formData.full_name,
+            cpf: formData.cpf,
+            phone: formData.phone,
+            address: formData.address,
+            cep: formData.cep,
+            nationality: formData.nationality,
+            pref_outbid_email: formData.pref_outbid_email,
+            pref_outbid_push: formData.pref_outbid_push,
+            pref_new_event_email: formData.pref_new_event_email,
+            pref_followed_lot_update: formData.pref_followed_lot_update,
+          })
+          .eq("id", user.id);
 
        if (error) throw error;
        
@@ -889,6 +902,60 @@ export const Route = createFileRoute("/painel")({
                     multiple
                     onChange={(e) => handleFileUpload(e, 'document')}
                   />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                    <BellRing className="h-4 w-4 text-gold" /> Preferências de Alerta
+                  </CardTitle>
+                  <CardDescription>Escolha como deseja ser notificado.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Lance Superado (E-mail)</Label>
+                      <p className="text-[10px] text-muted-foreground">Receba um e-mail imediato quando alguém cobrir seu lance.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_outbid_email} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_outbid_email: checked})}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Lance Superado (Painel)</Label>
+                      <p className="text-[10px] text-muted-foreground">Alertas visuais e histórico no seu painel de usuário.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_outbid_push} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_outbid_push: checked})}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Lotes Seguidos</Label>
+                      <p className="text-[10px] text-muted-foreground">Alertas sobre mudanças de preço ou status nos animais que você segue.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_followed_lot_update} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_followed_lot_update: checked})}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Novos Eventos</Label>
+                      <p className="text-[10px] text-muted-foreground">Fique por dentro dos novos leilões e oportunidades.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_new_event_email} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_new_event_email: checked})}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </div>

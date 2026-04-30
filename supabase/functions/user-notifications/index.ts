@@ -96,6 +96,19 @@
           }),
         });
       } else if (type === 'outbid' && email && resendKey) {
+        // Check user preferences
+        if (userId) {
+          const { data: prefData } = await adminClient
+            .from('profiles')
+            .select('pref_outbid_email')
+            .eq('id', userId)
+            .single();
+          
+          if (prefData && prefData.pref_outbid_email === false) {
+            return new Response(JSON.stringify({ success: true, message: 'Email skipped due to user preferences' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+          }
+        }
+
         const { amount, lotNumber, animalName } = data;
         await fetch('https://api.resend.com/emails', {
           method: 'POST',

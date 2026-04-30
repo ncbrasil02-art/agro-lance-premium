@@ -1095,6 +1095,10 @@ export type Database = {
           is_blocked: boolean | null
           nationality: string | null
           phone: string | null
+          pref_followed_lot_update: boolean | null
+          pref_new_event_email: boolean | null
+          pref_outbid_email: boolean | null
+          pref_outbid_push: boolean | null
           risk_level: string | null
           risk_score: number | null
           role: string
@@ -1118,6 +1122,10 @@ export type Database = {
           is_blocked?: boolean | null
           nationality?: string | null
           phone?: string | null
+          pref_followed_lot_update?: boolean | null
+          pref_new_event_email?: boolean | null
+          pref_outbid_email?: boolean | null
+          pref_outbid_push?: boolean | null
           risk_level?: string | null
           risk_score?: number | null
           role?: string
@@ -1141,6 +1149,10 @@ export type Database = {
           is_blocked?: boolean | null
           nationality?: string | null
           phone?: string | null
+          pref_followed_lot_update?: boolean | null
+          pref_new_event_email?: boolean | null
+          pref_outbid_email?: boolean | null
+          pref_outbid_push?: boolean | null
           risk_level?: string | null
           risk_score?: number | null
           role?: string

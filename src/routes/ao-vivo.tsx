@@ -572,14 +572,28 @@ export const Route = createFileRoute("/ao-vivo")({
                    };
                  });
                  
-                 // Notify user if it's a new bid
-                 if (payload.eventType === "INSERT") {
-                    toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
-                      description: newBid.bidder_name || "Licitante",
-                      icon: <Gavel className="h-4 w-4 text-gold" />,
-                      duration: 3000
+                  // Notify user if it's a new bid
+                  if (payload.eventType === "INSERT") {
+                    setBids(prevBids => {
+                      // Check if outbidding current user
+                      const isOutbiddingMe = user && prevBids.length > 0 && prevBids[0].user_id === user.id && newBid.user_id !== user.id;
+
+                      if (isOutbiddingMe) {
+                        toast.error("VOCÊ FOI SUPERADO!", {
+                          description: `Seu lance no lote #${liveLot?.lot_number} foi superado por ${formatBRL(newBid.amount)}.`,
+                          icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
+                          duration: 6000
+                        });
+                      } else {
+                        toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
+                          description: newBid.bidder_name || "Licitante",
+                          icon: <Gavel className="h-4 w-4 text-gold" />,
+                          duration: 3000
+                        });
+                      }
+                      return prevBids;
                     });
-                 }
+                  }
                } else if (payload.eventType === "DELETE") {
                 const updatedBid = payload.new;
                 setBids((prev: any[]) => 
@@ -749,9 +763,26 @@ export const Route = createFileRoute("/ao-vivo")({
 
         if (error) throw error;
 
-        const result = data as { success: boolean; message: string };
+        const result = data as { success: boolean; message: string; previous_bidder_id?: string };
         if (result.success) {
           toast.success(result.message);
+
+          // Enviar notificação por e-mail se houver um licitante anterior superado
+          if (result.previous_bidder_id && user && result.previous_bidder_id !== user.id) {
+            supabase.functions.invoke('user-notifications', {
+              body: {
+                userId: result.previous_bidder_id,
+                type: 'outbid',
+                lotId: liveLot?.id,
+                data: {
+                  amount: amount,
+                  lotNumber: liveLot?.lot_number,
+                  animalName: liveLot?.animal?.name
+                }
+              }
+            }).catch(err => console.error("Erro ao enviar e-mail de outbid:", err));
+          }
+
           // Fetch latest lot data immediately after a successful bid
           if (liveEvent?.active_lot_id) {
             const { data: latestLot } = await supabase
