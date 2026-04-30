@@ -102,7 +102,7 @@ import {
                    ) : (
                      <Zap className="h-3.5 w-3.5 text-emerald-500" />
                    )}
-                    <span className={`text-[10px] font-bold uppercase tracking-wider hidden xs:inline ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider hidden sm:inline ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
                      {!isOnline ? 'Offline' : isPolling ? 'Polling' : 'Realtime'}
                    </span>
                    {delaySeconds > 0 && (
