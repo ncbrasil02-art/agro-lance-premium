@@ -11,6 +11,7 @@
  import { toast } from "sonner";
 import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap } from "lucide-react";
  import { BulkSeoAudit } from "./BulkSeoAudit";
+import { LotCard } from "../auctions/lot-card";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
