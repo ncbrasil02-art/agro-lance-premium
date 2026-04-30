@@ -938,27 +938,49 @@ import { RichResultsPreview } from "./RichResultsPreview";
                    <Label className="text-base font-bold">Saúde do Animal</Label>
                    <div className="grid grid-cols-1 gap-2 border rounded-md p-4 bg-muted/30">
                      {[...VETERINARY_CHECKLIST, ...Object.keys(formData.veterinary_history || {}).filter(k => k !== 'other_info' && k !== 'health_photo_url' && !VETERINARY_CHECKLIST.find(i => i.id === k)).map(k => ({ id: k, label: k }))].map((item) => (
-                       <div key={item.id} className="flex items-center justify-between py-2 border-b last:border-0 border-white/5">
-                         <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
-                           {item.label}
-                         </Label>
-                         <ToggleGroup 
-                           type="single" 
-                           value={formData.veterinary_history?.[item.id] === true ? "sim" : formData.veterinary_history?.[item.id] === false ? "nao" : ""}
-                           onValueChange={(val) => {
-                             setFormData({
-                               ...formData,
-                               veterinary_history: {
-                                 ...formData.veterinary_history,
-                                 [item.id]: val === "sim"
-                               }
-                             });
-                           }}
-                         >
-                           <ToggleGroupItem value="sim" className="h-8 text-xs data-[state=on]:bg-emerald-500 data-[state=on]:text-white">Sim</ToggleGroupItem>
-                           <ToggleGroupItem value="nao" className="h-8 text-xs data-[state=on]:bg-red-500 data-[state=on]:text-white">Não</ToggleGroupItem>
-                         </ToggleGroup>
-                       </div>
+                          <div key={item.id} className="flex items-center justify-between py-2 border-b last:border-0 border-white/5">
+                            <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
+                              {item.label}
+                            </Label>
+                            <ToggleGroup 
+                              type="single" 
+                              value={formData.veterinary_history?.[item.id] === true ? "sim" : formData.veterinary_history?.[item.id] === false ? "nao" : ""}
+                              onValueChange={(val) => {
+                                const newHistory = { ...formData.veterinary_history };
+                                if (!val) {
+                                  delete newHistory[item.id];
+                                } else {
+                                  newHistory[item.id] = val === "sim";
+                                }
+                                setFormData({
+                                  ...formData,
+                                  veterinary_history: newHistory
+                                });
+                              }}
+                            >
+                              <ToggleGroupItem value="sim" className="h-8 text-xs data-[state=on]:bg-emerald-500 data-[state=on]:text-white">Sim</ToggleGroupItem>
+                              <ToggleGroupItem value="nao" className="h-8 text-xs data-[state=on]:bg-red-500 data-[state=on]:text-white">Não</ToggleGroupItem>
+                            </ToggleGroup>
+                          </div>
+                    <div className="flex justify-end">
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[10px] text-muted-foreground hover:text-emerald-500"
+                        onClick={() => {
+                          const newHistory = { ...formData.veterinary_history };
+                          VETERINARY_CHECKLIST.forEach(item => {
+                            if (newHistory[item.id] === undefined) {
+                              newHistory[item.id] = false;
+                            }
+                          });
+                          setFormData({ ...formData, veterinary_history: newHistory });
+                        }}
+                      >
+                        Preencher "Não" nos vazios
+                      </Button>
+                    </div>
                      ))}
                    </div>
 
