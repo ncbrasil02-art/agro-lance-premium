@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Building2, User } from "lucide-react";
+  import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Building2, User, Upload, Image as ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
@@ -15,13 +15,14 @@ import { toast } from "sonner";
 export function SellerManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSeller, setEditingSeller] = useState<any>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    type: "pessoa",
-    email: "",
-    phone: "",
-    location: ""
-  });
+   const [formData, setFormData] = useState({
+     name: "",
+     type: "pessoa",
+     email: "",
+     phone: "",
+     location: "",
+     logo_url: ""
+   });
   const [sellers, setSellers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,24 +50,26 @@ export function SellerManagement() {
 
   const resetForm = () => {
     setEditingSeller(null);
-    setFormData({
-      name: "",
-      type: "pessoa",
-      email: "",
-      phone: "",
-      location: ""
-    });
+     setFormData({
+       name: "",
+       type: "pessoa",
+       email: "",
+       phone: "",
+       location: "",
+       logo_url: ""
+     });
   };
 
   const handleEdit = (seller: any) => {
     setEditingSeller(seller);
-    setFormData({
-      name: seller.name || "",
-      type: seller.type || "pessoa",
-      email: seller.email || "",
-      phone: seller.phone || "",
-      location: seller.location || ""
-    });
+     setFormData({
+       name: seller.name || "",
+       type: seller.type || "pessoa",
+       email: seller.email || "",
+       phone: seller.phone || "",
+       location: seller.location || "",
+       logo_url: seller.logo_url || ""
+     });
     setIsDialogOpen(true);
   };
 
@@ -206,7 +209,8 @@ export function SellerManagement() {
                   <TableRow>
                     <TableHead>Tipo</TableHead>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Local</TableHead>
+                     <TableHead>Logo</TableHead>
+                     <TableHead>Local</TableHead>
                     <TableHead>Contato</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -226,7 +230,59 @@ export function SellerManagement() {
                             </div>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium">{seller.name}</TableCell>
+                         <TableCell>
+                           {seller.logo_url ? (
+                             <img src={seller.logo_url} alt="" className="h-10 w-10 rounded object-contain border bg-white" />
+                           ) : (
+                             <div className="h-10 w-10 rounded bg-muted flex items-center justify-center"><ImageIcon className="h-4 w-4 text-muted-foreground/30" /></div>
+                           )}
+                         </TableCell>
+                         <TableCell className="font-medium">{seller.name}</TableCell>
+               <div className="grid gap-2">
+                 <Label>Logotipo do Vendedor</Label>
+                 <div className="flex items-center gap-4">
+                   {formData.logo_url ? (
+                     <img src={formData.logo_url} alt="Logo" className="h-16 w-16 rounded object-contain border bg-white" />
+                   ) : (
+                     <div className="h-16 w-16 rounded bg-muted border border-dashed flex items-center justify-center">
+                       <ImageIcon className="h-6 w-6 text-muted-foreground/20" />
+                     </div>
+                   )}
+                   <div className="flex-1">
+                     <Input 
+                       type="file" 
+                       accept="image/*" 
+                       className="hidden" 
+                       id="seller-logo-upload" 
+                       onChange={async (e) => {
+                         const file = e.target.files?.[0];
+                         if (!file) return;
+                         const tid = toast.loading("Enviando logo...");
+                         const fileExt = file.name.split('.').pop();
+                         const fileName = `seller_${Math.random()}.${fileExt}`;
+                         const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
+                         if (error) toast.error("Erro: " + error.message);
+                         else {
+                           const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
+                           setFormData({ ...formData, logo_url: publicUrl });
+                           toast.success("Logo enviado!");
+                         }
+                         toast.dismiss(tid);
+                       }}
+                     />
+                     <Button 
+                       type="button" 
+                       variant="outline" 
+                       size="sm" 
+                       className="w-full h-10 border-dashed"
+                       onClick={() => document.getElementById('seller-logo-upload')?.click()}
+                     >
+                       <Upload className="mr-2 h-4 w-4" /> 
+                       {formData.logo_url ? "Trocar Logotipo" : "Upload Logotipo"}
+                     </Button>
+                   </div>
+                 </div>
+               </div>
                         <TableCell>{seller.location || "--"}</TableCell>
                         <TableCell>
                           <div className="text-xs">
