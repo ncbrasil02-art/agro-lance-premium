@@ -239,27 +239,38 @@ export function LotCard({ lot, settings: propSettings }: {
             </motion.h3>
           </div>
 
-          <div className="grid grid-cols-1 gap-y-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3">
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Pai:</span>
-              <span className="text-foreground font-semibold truncate ml-2">{lot.father || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Mãe:</span>
-              <span className="text-foreground font-semibold truncate ml-2">{lot.mother || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Sexo:</span>
-              <span className="text-foreground font-semibold uppercase">{lot.sex === 'M' ? 'Macho' : lot.sex === 'F' ? 'Fêmea' : lot.sex || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Raça:</span>
-              <span className="text-foreground font-semibold">{lot.breed || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center pt-1 mt-1 border-t border-border/30">
-              <span className="font-medium uppercase">Vendedor:</span>
-              <span className="text-emerald-deep font-bold truncate ml-2">{lot.seller || "--"}</span>
-            </div>
+          <div className="grid grid-cols-1 gap-y-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3 min-h-[140px]">
+            {settings.displayed_fields
+              .filter((f: any) => f.enabled)
+              .map((field: any, idx: number) => {
+                let value: any = lot[field.key as keyof typeof lot];
+                
+                // Formatting logic
+                if (field.key === 'sex') {
+                  value = value === 'M' ? 'Macho' : value === 'F' ? 'Fêmea' : value;
+                } else if (field.key === 'birth_date' && value) {
+                  value = new Date(value).toLocaleDateString('pt-BR');
+                } else if (field.key === 'vaccination_records' && value) {
+                  value = Array.isArray(value) ? `${value.length} vacinas` : "Sim";
+                } else if (field.key === 'registration_number') {
+                  value = value || lot.registration_number || "--";
+                }
+
+                const isLast = idx === settings.displayed_fields.filter((f: any) => f.enabled).length - 1;
+                const isSeller = field.key === 'seller';
+
+                return (
+                  <div 
+                    key={field.key} 
+                    className={`flex justify-between items-center ${isLast ? 'pt-1 mt-1 border-t border-border/30' : ''}`}
+                  >
+                    <span className="font-medium uppercase">{field.label}:</span>
+                    <span className={`font-semibold truncate ml-2 ${isSeller ? 'text-emerald-deep' : 'text-foreground'}`}>
+                      {value || "--"}
+                    </span>
+                  </div>
+                );
+              })}
           </div>
 
           <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-3">
