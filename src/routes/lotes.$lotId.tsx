@@ -772,20 +772,39 @@ function LotDetail() {
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                          <div className="space-y-4">
                            <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Checklist de Saúde</p>
-                           <div className="grid grid-cols-1 gap-2">
-                             {[
-                               { id: "prognata", label: "Prognata" },
-                               { id: "aerofagico", label: "Aerofágico" },
-                               { id: "criptorquidico", label: "Criptorquídico" },
-                               { id: "cirurgia_neurectomia", label: "Cirurgia de neurectomia" },
-                               { id: "laminite", label: "Laminite" },
-                               { id: "cirurgia_colica", label: "Cirurgia de Cólica" },
-                               { id: "dpco", label: "DPCO" },
-                               { id: "cirurgia_grave", label: "Cirurgia Grave" },
-                               { id: "cicatrizes", label: "Cicatrizes" },
-                               { id: "hypp", label: "HYPP" },
-                             ].map(item => {
-                               const val = lot.animal?.veterinary_history?.[item.id];
+                            <div className="grid grid-cols-1 gap-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                              {(() => {
+                                const staticItems = [
+                                  { id: "prognata", label: "Prognata" },
+                                  { id: "aerofagico", label: "Aerofágico" },
+                                  { id: "criptorquidico", label: "Criptorquídico" },
+                                  { id: "cirurgia_neurectomia", label: "Cirurgia de neurectomia" },
+                                  { id: "laminite", label: "Laminite" },
+                                  { id: "cirurgia_colica", label: "Cirurgia de Cólica" },
+                                  { id: "dpco", label: "DPCO" },
+                                  { id: "cirurgia_grave", label: "Cirurgia Grave" },
+                                  { id: "cicatrizes", label: "Cicatrizes" },
+                                  { id: "hypp", label: "HYPP" },
+                                ];
+                                
+                                const history = lot.animal?.veterinary_history || {};
+                                const customKeys = Object.keys(history).filter(k => 
+                                  k !== 'other_info' && 
+                                  k !== 'health_photo_url' && 
+                                  !staticItems.find(i => i.id === k)
+                                );
+                                
+                                const allItems = [
+                                  ...staticItems,
+                                  ...customKeys.map(k => ({ id: k, label: k }))
+                                ];
+
+                                return allItems.map(item => {
+                                  const val = history[item.id];
+                                  // We only show items if they have a value (true/false) OR if it's one of the static items
+                                  const shouldShow = val !== undefined || staticItems.find(i => i.id === item.id);
+                                  if (!shouldShow) return null;
+
                                return (
                                  <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
                                    <span className="text-xs text-white/80">{item.label}</span>
@@ -798,12 +817,12 @@ function LotDetail() {
                                            </div>
                                          </div>
                                        ) : val === false ? (
-                                         <div className="flex items-center gap-2">
-                                           <span className="text-xs font-black uppercase text-red-400 bg-red-400/10 px-2 py-0.5 rounded border border-red-400/20">NÃO</span>
-                                           <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
-                                             <AlertTriangle className="h-4 w-4 text-red-400" />
-                                           </div>
-                                         </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs font-black uppercase text-red-400 bg-red-400/10 px-2 py-0.5 rounded border border-red-400/20">NÃO</span>
+                                            <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/40">
+                                              <XCircle className="h-4 w-4 text-red-400" />
+                                            </div>
+                                          </div>
                                        ) : (
                                          <div className="flex items-center gap-2">
                                            <span className="text-xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded border border-white/10">PENDENTE</span>
@@ -814,8 +833,9 @@ function LotDetail() {
                                        )}
                                    </div>
                                  </div>
-                               );
-                             })}
+                                  );
+                                });
+                              })()}
                            </div>
                          </div>
                          
