@@ -1182,9 +1182,28 @@ import { useAuth } from "@/components/auth/auth-provider";
                           </Button>
                         </TableCell>
                         <TableCell className="font-medium">
-                         <div>{event.name}</div>
-                          <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Ao Vivo'}</div>
-                       </TableCell>
+                          <div className="flex items-center gap-2">
+                            {event.name}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-5 w-5 text-gold hover:text-gold hover:bg-gold/10"
+                              onClick={() => {
+                                if (expandedEventId === event.id) {
+                                  setExpandedEventId(null);
+                                } else {
+                                  setExpandedEventId(event.id);
+                                  if (!expandedData[event.id]) {
+                                    fetchExpandedData(event.id);
+                                  }
+                                }
+                              }}
+                            >
+                              <PlusCircle className="h-3 w-3" />
+                            </Button>
+                          </div>
+                           <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Ao Vivo'}</div>
+                        </TableCell>
                        <TableCell>
                          <div className="flex items-center gap-1">
                            <CalendarIcon className="h-3 w-3" />
