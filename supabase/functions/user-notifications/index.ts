@@ -108,7 +108,95 @@ const corsHeaders = {
         if (!res.ok) {
           const errorData = await res.json()
           console.error('Error sending email via Resend:', errorData)
-     } else if (type === 'offer_received' && resendKey) {
+     } else if ((type === 'offer_received' || type === 'direct_sale_request') && resendKey) {
+       // Notify admins about new offer or purchase request
+       const { amount, itemName, bidderName } = data;
+       const subject = type === 'offer_received' ? 'Nova Proposta Recebida! 💰' : 'Novo Interesse de Compra! 🛒';
+       const title = type === 'offer_received' ? 'Nova Proposta Recebida' : 'Novo Interesse de Compra';
+       const actionLink = type === 'offer_received' ? 'https://agro-ncbrasil.lovable.app/admin' : 'https://agro-ncbrasil.lovable.app/admin';
+       
+       // Get all admin emails
+       const { data: admins } = await adminClient
+         .from('profiles')
+         .select('id')
+         .eq('role', 'admin');
+ 
+       if (admins && admins.length > 0) {
+         for (const admin of admins) {
+           const { data: { user: adminUser } } = await adminClient.auth.admin.getUserById(admin.id);
+           if (adminUser?.email) {
+             await fetch('https://api.resend.com/emails', {
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${resendKey}`,
+               },
+               body: JSON.stringify({
+                 from: 'Elite Leilões <contato@premiumagro.com.br>',
+                 to: [adminUser.email],
+                 subject: subject,
+                 html: `
+                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+                     <div style="background-color: #064e3b; padding: 30px; text-align: center;">
+                       <h1 style="color: #fbbf24; margin: 0; font-size: 24px; letter-spacing: 2px;">ELITE LEILÕES</h1>
+                     </div>
+                     <div style="padding: 30px; color: #374151; line-height: 1.6;">
+                       <h2 style="color: #064e3b;">${title}</h2>
+                       <p>Um novo interesse foi enviado para o item <strong>${itemName}</strong>.</p>
+                       <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                         <p style="margin: 0; font-size: 14px; color: #6b7280;">Interessado:</p>
+                         <p style="margin: 5px 0 15px 0; font-weight: bold; font-size: 18px;">${bidderName}</p>
+                         <p style="margin: 0; font-size: 14px; color: #6b7280;">Valor:</p>
+                         <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 24px; color: #059669;">R$ ${amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                       </div>
+                       <div style="margin: 40px 0; text-align: center;">
+                         <a href="${actionLink}" style="background-color: #fbbf24; color: #064e3b; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">GERENCIAR PEDIDOS</a>
+                       </div>
+                     </div>
+                   </div>
+                 `,
+               }),
+             });
+           }
+         }
+       }
+     } else if (type === 'direct_sale_status_update' && email && resendKey) {
+       // Notify buyer about status update
+       const { amount, itemName, status } = data;
+       const statusLabel = status === 'confirmed' ? 'CONFIRMADA' : 'CANCELADA';
+       const statusColor = status === 'confirmed' ? '#059669' : '#dc2626';
+ 
+       await fetch('https://api.resend.com/emails', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${resendKey}`,
+         },
+         body: JSON.stringify({
+           from: 'Elite Leilões <contato@premiumagro.com.br>',
+           to: [email],
+           subject: `Sua solicitação de compra foi ${statusLabel.toLowerCase()}!`,
+           html: `
+             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+               <div style="background-color: #064e3b; padding: 30px; text-align: center;">
+                 <h1 style="color: #fbbf24; margin: 0; font-size: 24px; letter-spacing: 2px;">ELITE LEILÕES</h1>
+               </div>
+               <div style="padding: 30px; color: #374151; line-height: 1.6;">
+                 <h2 style="color: #064e3b;">Status da sua Compra</h2>
+                 <p>O status da sua solicitação para <strong>${itemName}</strong> foi atualizado.</p>
+                 <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                   <p style="margin: 0; font-size: 14px; color: #6b7280;">Novo Status:</p>
+                   <p style="margin: 10px 0; font-weight: bold; font-size: 24px; color: ${statusColor}; text-transform: uppercase;">${statusLabel}</p>
+                   <p style="margin: 0; font-size: 14px; color: #6b7280;">Valor: R$ ${amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
+                 <p>Nossa equipe entrará em contato em breve para os próximos passos.</p>
+                 <p>Equipe Elite Leilões</p>
+               </div>
+             </div>
+           `,
+         }),
+       });
+     }
        // Notify admins about new offer
        const { amount, itemName, bidderName } = data;
        
