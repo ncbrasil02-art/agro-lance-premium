@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestCarouselRouteImport } from './routes/test-carousel'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as LotesRouteImport } from './routes/lotes'
@@ -26,6 +27,11 @@ import { Route as NoticiasSlugRouteImport } from './routes/noticias.$slug'
 import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
 
+const TestCarouselRoute = TestCarouselRouteImport.update({
+  id: '/test-carousel',
+  path: '/test-carousel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/lotes': typeof LotesRouteWithChildren
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
+  '/test-carousel': typeof TestCarouselRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
+  '/test-carousel': typeof TestCarouselRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/lotes': typeof LotesRouteWithChildren
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
+  '/test-carousel': typeof TestCarouselRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/lotes'
     | '/painel'
     | '/sobre'
+    | '/test-carousel'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/painel'
     | '/sobre'
+    | '/test-carousel'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/lotes'
     | '/painel'
     | '/sobre'
+    | '/test-carousel'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   LotesRoute: typeof LotesRouteWithChildren
   PainelRoute: typeof PainelRoute
   SobreRoute: typeof SobreRoute
+  TestCarouselRoute: typeof TestCarouselRoute
   NoticiasSlugRoute: typeof NoticiasSlugRoute
   CompraDiretaIndexRoute: typeof CompraDiretaIndexRoute
   NoticiasIndexRoute: typeof NoticiasIndexRoute
@@ -232,6 +245,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test-carousel': {
+      id: '/test-carousel'
+      path: '/test-carousel'
+      fullPath: '/test-carousel'
+      preLoaderRoute: typeof TestCarouselRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sobre': {
       id: '/sobre'
       path: '/sobre'
@@ -382,6 +402,7 @@ const rootRouteChildren: RootRouteChildren = {
   LotesRoute: LotesRouteWithChildren,
   PainelRoute: PainelRoute,
   SobreRoute: SobreRoute,
+  TestCarouselRoute: TestCarouselRoute,
   NoticiasSlugRoute: NoticiasSlugRoute,
   CompraDiretaIndexRoute: CompraDiretaIndexRoute,
   NoticiasIndexRoute: NoticiasIndexRoute,
@@ -389,3 +410,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
