@@ -64,8 +64,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null));
 
       // Real-time profiles subscription to keep the dropdown and data fresh
+      const profilesUniqueId = `admin-profiles-sync-${Math.random().toString(36).slice(2, 9)}`;
       const profilesChannel = supabase
-        .channel("admin-profiles-sync")
+        .channel(profilesUniqueId)
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "profiles" },
@@ -92,8 +93,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
   useEffect(() => {
     if (!selectedEventId) return;
 
+    const eventUniqueId = `admin-event-updates-${selectedEventId}-${Math.random().toString(36).slice(2, 9)}`;
     const eventChannel = supabase
-      .channel(`admin-event-updates-${selectedEventId}`)
+      .channel(eventUniqueId)
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${selectedEventId}` },
@@ -138,8 +140,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       };
       fetchInitialBids();
 
+      const lotUniqueId = `admin-lot-realtime-${activeLot.id}-${Math.random().toString(36).slice(2, 9)}`;
       const lotChannel = supabase
-        .channel(`admin-lot-realtime-${activeLot.id}`)
+        .channel(lotUniqueId)
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "lots", filter: `id=eq.${activeLot.id}` },
