@@ -252,9 +252,13 @@
     width: 100%;
   }
 
-  h1, h2, h3, h4 {
-    letter-spacing: -0.02em;
-  }
+   h1, h2, h3, h4 {
+     letter-spacing: -0.02em;
+   }
+
+   .font-signature {
+     font-family: 'Dancing Script', 'Cedarville Cursive', 'Cursive', cursive;
+   }
 }
 
 @layer utilities {
