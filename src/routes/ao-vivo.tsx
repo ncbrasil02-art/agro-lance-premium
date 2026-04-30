@@ -1,4 +1,4 @@
-  import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert } from "lucide-react";
+   import { MessageSquare, Phone, Info, FileText, Syringe, TreePine, Expand, ChevronLeft, ChevronRight, Eye, Radio, Users, Gavel, Volume2, Loader2, AlertTriangle, BadgeCheck, Ban, RefreshCw, Share2, Printer, ShieldAlert, XCircle } from "lucide-react";
 import { preloadImages } from "@/utils/image-optimization";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -1296,26 +1296,51 @@ export const Route = createFileRoute("/ao-vivo")({
 
                                 <div className="space-y-4">
                                   <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Histórico Veterinário</p>
-                                  <div className="grid grid-cols-2 gap-2">
-                                    {[
-                                      { id: "prognata", label: "Prognata" },
-                                      { id: "aerofagico", label: "Aerofágico" },
-                                      { id: "criptorquidico", label: "Criptorquídico" },
-                                      { id: "cirurgia_neurectomia", label: "Neurectomia" },
-                                      { id: "laminite", label: "Laminite" },
-                                      { id: "cirurgia_colica", label: "Cirurgia Cólica" },
-                                      { id: "dpco", label: "DPCO" },
-                                      { id: "hypp", label: "HYPP" },
-                                    ].map(item => {
-                                      const val = liveLot.animal?.veterinary_history?.[item.id];
+                                   <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                                     {(() => {
+                                       const staticItems = [
+                                         { id: "prognata", label: "Prognata" },
+                                         { id: "aerofagico", label: "Aerofágico" },
+                                         { id: "criptorquidico", label: "Criptorquídico" },
+                                         { id: "cirurgia_neurectomia", label: "Neurectomia" },
+                                         { id: "laminite", label: "Laminite" },
+                                         { id: "cirurgia_colica", label: "Cirurgia Cólica" },
+                                         { id: "dpco", label: "DPCO" },
+                                         { id: "hypp", label: "HYPP" },
+                                       ];
+                                       
+                                       const history = liveLot.animal?.veterinary_history || {};
+                                       const customKeys = Object.keys(history).filter(k => 
+                                         k !== 'other_info' && 
+                                         k !== 'health_photo_url' && 
+                                         !staticItems.find(i => i.id === k)
+                                       );
+                                       
+                                       const allItems = [
+                                         ...staticItems,
+                                         ...customKeys.map(k => ({ id: k, label: k }))
+                                       ];
+
+                                       return allItems.map(item => {
+                                         const val = history[item.id];
+                                         const isSelected = val === true;
+                                         const isNo = val === false;
+
                                       return (
-                                        <div key={item.id} className={`flex items-center justify-between p-2 rounded-lg border ${val ? 'bg-emerald-50 border-emerald-200' : 'bg-muted/30 border-muted'}`}>
-                                          <span className="text-[10px] font-bold">{item.label}</span>
-                                          {val ? <BadgeCheck className="h-3 w-3 text-emerald-600" /> : <div className="h-3 w-3 rounded-full border border-muted" />}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
+                                           <div key={item.id} className={`flex items-center justify-between p-2 rounded-lg border ${isSelected ? 'bg-emerald-50 border-emerald-200' : isNo ? 'bg-red-50 border-red-200' : 'bg-muted/30 border-muted'}`}>
+                                             <span className="text-[10px] font-bold">{item.label}</span>
+                                             {isSelected ? (
+                                               <BadgeCheck className="h-3 w-3 text-emerald-600" />
+                                             ) : isNo ? (
+                                               <XCircle className="h-3 w-3 text-red-600" />
+                                             ) : (
+                                               <div className="h-3 w-3 rounded-full border border-muted" />
+                                             )}
+                                           </div>
+                                         );
+                                       });
+                                     })()}
+                                    </div>
                                   {liveLot.animal?.veterinary_history?.other_info && (
                                     <div className="mt-4 p-3 bg-gold/5 border border-gold/10 rounded-lg">
                                       <p className="text-[10px] font-black uppercase text-gold/60 mb-1">Observações:</p>
