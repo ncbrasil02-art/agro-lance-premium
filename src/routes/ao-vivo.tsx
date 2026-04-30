@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
   import { supabase } from "@/integrations/supabase/client";
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema } from "@/lib/schemas";
