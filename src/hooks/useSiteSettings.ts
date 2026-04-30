@@ -35,6 +35,7 @@
    show_sale_menu: boolean;
    show_animated_slides: boolean;
    order: string[];
+  template_id?: 'model1' | 'model2' | 'model3';
  }
  
   export interface CustomTexts {

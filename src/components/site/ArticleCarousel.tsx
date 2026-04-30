@@ -18,7 +18,7 @@
    category?: { name: string | null } | null
  }
 
- export function ArticleCarousel({ articles }: { articles: Article[] }) {
+  export function ArticleCarousel({ articles, variant = 'model1' }: { articles: Article[], variant?: string }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
      align: "start",
      loop: true,
@@ -34,15 +34,28 @@
 
    if (!articles || articles.length === 0) return null
 
-   return (
-     <section className="bg-emerald-deep/20 py-16 border-t border-gold/10 overflow-hidden">
+    const isModern = variant === 'model2';
+    const isTraditional = variant === 'model3';
+
+    return (
+      <section className={cn(
+        "py-16 overflow-hidden",
+        variant === 'model1' ? "bg-emerald-deep/20 border-t border-gold/10" : 
+        isModern ? "bg-background" : "bg-muted/30"
+      )}>
        <div className="container mx-auto px-4">
          <div className="mb-10 flex items-center justify-between">
            <div>
-             <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-white">
-               Blog & <span className="text-gradient-gold uppercase italic">Notícias</span>
+              <h2 className={cn(
+                "text-3xl font-bold tracking-tight md:text-4xl",
+                variant === 'model1' ? "text-white" : "text-foreground"
+              )}>
+                {isModern ? "O que há de novo no " : "Blog & "} 
+                <span className="text-gradient-gold uppercase italic">{isModern ? "Mercado" : "Notícias"}</span>
              </h2>
-             <p className="mt-2 text-muted-foreground">Fique por dentro das principais novidades do mercado agropecuário.</p>
+              <p className="mt-2 text-muted-foreground">
+                {isModern ? "Informação estratégica para investidores de elite." : "Fique por dentro das principais novidades do mercado agropecuário."}
+              </p>
            </div>
            <div className="flex gap-2">
              <Button 
@@ -68,7 +81,13 @@
            <div className="flex -ml-4">
              {articles.map((article) => (
                <div key={article.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] pl-4">
-                 <div className="group h-full flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm transition-all hover:border-gold/30 hover:bg-white/10">
+                  <div className={cn(
+                    "group h-full flex flex-col overflow-hidden transition-all",
+                    variant === 'model1' ? "rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:border-gold/30 hover:bg-white/10" :
+                    isModern ? "rounded-none border-b border-border bg-transparent hover:bg-muted/50 shadow-none" :
+                    isTraditional ? "rounded-none border-l-4 border-gold bg-emerald-deep shadow-2xl" :
+                    "rounded-3xl border border-border bg-card shadow-sm hover:shadow-xl"
+                  )}>
                    <div className="relative aspect-[16/9] overflow-hidden">
                      <OptimizedImage
                        src={article.featured_image || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"}
@@ -82,7 +101,7 @@
                      )}
                    </div>
                    
-                   <div className="flex flex-1 flex-col p-6">
+                    <div className={cn("flex flex-1 flex-col p-6", isModern && "px-0", isTraditional && "text-white")}>
                      <div className="mb-3 flex items-center gap-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                        <div className="flex items-center gap-1">
                          <Calendar className="h-3 w-3 text-gold" />

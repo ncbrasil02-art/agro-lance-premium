@@ -3,8 +3,9 @@
  import { ChevronLeft, ChevronRight, Calendar, MapPin, Users } from "lucide-react"
  import { Button } from "@/components/ui/button"
  import { EventCard } from "@/components/auctions/event-card"
+import { cn } from "@/lib/utils"
 
- export function EventCarousel({ events, title, subtitle }: { events: any[], title: string, subtitle: string }) {
+  export function EventCarousel({ events, title, subtitle, variant = 'model1' }: { events: any[], title: string, subtitle: string, variant?: string }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
      align: "start",
      loop: events.length > 3,
@@ -20,12 +21,23 @@
 
    if (!events || events.length === 0) return null
 
-   return (
-     <section className="container mx-auto px-4 py-16">
-       <div className="mb-10 flex items-center justify-between">
+    const isModern = variant === 'model2';
+
+    return (
+      <section className={cn(
+        "py-16",
+        variant === 'model3' ? "bg-emerald-deep text-white" : "container mx-auto px-4"
+      )}>
+        <div className={cn("mb-10 flex items-center justify-between", variant === 'model3' && "container mx-auto px-4")}>
          <div>
-           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h2>
-           <p className="mt-2 text-muted-foreground">{subtitle}</p>
+            <h2 className={cn(
+              "text-3xl font-bold tracking-tight md:text-4xl",
+              variant === 'model3' && "text-white"
+            )}>{title}</h2>
+            <p className={cn(
+              "mt-2 text-muted-foreground",
+              variant === 'model3' && "text-white/60"
+            )}>{subtitle}</p>
          </div>
          {events.length > 3 && (
            <div className="flex gap-2">
@@ -49,7 +61,7 @@
          )}
        </div>
 
-       <div className="overflow-hidden" ref={emblaRef}>
+        <div className={cn("overflow-hidden", variant === 'model3' && "container mx-auto px-4")} ref={emblaRef}>
          <div className="flex -ml-6">
            {events.map((event) => (
              <div key={event.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] pl-6">
