@@ -1390,6 +1390,25 @@ import { ImageCropper } from "./ImageCropper";
            )}
          </CardContent>
        </Card>
+
+       {croppingImage && (
+         <ImageCropper
+           image={croppingImage.url}
+           onCropComplete={handleCropComplete}
+           onCancel={() => {
+             setCroppingImage(null);
+             if (uploadQueue.length > 0) {
+               const nextFile = uploadQueue[0];
+               setUploadQueue(prev => prev.slice(1));
+               const reader = new FileReader();
+               reader.onload = () => {
+                 setCroppingImage({ url: reader.result as string, name: nextFile.name });
+               };
+               reader.readAsDataURL(nextFile);
+             }
+           }}
+         />
+       )}
      </div>
    );
  }
