@@ -28,10 +28,11 @@ import {
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema } from "@/lib/schemas";
   import { z } from "zod";
-  import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
  import { toast } from "sonner";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
  import { useAuth } from "@/components/auth/auth-provider";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/ao-vivo")({
   head: () => ({
@@ -175,6 +176,14 @@ export const Route = createFileRoute("/ao-vivo")({
 
   function LivePage() {
     const { liveEvent: initialEvent, initialBids } = Route.useLoaderData() as any;
+    const rootContext = Route.useRouteContext() as any;
+    const animations = useMemo(() => rootContext.animations || {
+      badge_blink: true,
+      badge_glow: true,
+      bid_button_pulse: true,
+      animal_name_entry: "slide-up"
+    }, [rootContext.animations]);
+
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
