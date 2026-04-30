@@ -1144,26 +1144,14 @@ import { ImageCropper } from "./ImageCropper";
                            
                            const validFiles = Array.from(files).filter(validateImage);
                            if (validFiles.length === 0) return;
-
-                           const toastId = toast.loading("Enviando fotos...");
-                           const uploadedUrls = [];
-                           for (const file of validFiles) {
-                             const fileExt = file.name.split('.').pop();
-                             const fileName = `${Math.random()}.${fileExt}`;
-                             const { data, error } = await supabase.storage.from('animals').upload(fileName, file);
-                             if (error) {
-                               toast.error(`Erro no upload: ${error.message}`);
-                               continue;
-                             }
-                             const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(data.path);
-                             uploadedUrls.push(publicUrl);
-                           }
-                            const currentUrls = formData.photos_urls ? formData.photos_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-                           setFormData({ ...formData, photos_urls: [...currentUrls, ...uploadedUrls].join(", ") });
-                           toast.dismiss(toastId);
-                           if (uploadedUrls.length > 0) {
-                             toast.success(`${uploadedUrls.length} fotos enviadas!`);
-                           }
+                           const firstFile = validFiles[0];
+                           const remainingFiles = validFiles.slice(1);
+                           setUploadQueue(remainingFiles);
+                           const reader = new FileReader();
+                           reader.onload = () => {
+                             setCroppingImage({ url: reader.result as string, name: firstFile.name });
+                           };
+                           reader.readAsDataURL(firstFile);
                          }}
                       />
                       <Button 
