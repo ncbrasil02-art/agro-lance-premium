@@ -157,9 +157,10 @@ import {
 
         useEffect(() => {
           if (!expandedLotId) return;
-          
+
+          const uniqueId = `lot-bids-${expandedLotId}-${Math.random().toString(36).slice(2, 9)}`;
           const channel = supabase
-            .channel(`lot-bids-${expandedLotId}`)
+            .channel(uniqueId)
             .on(
               'postgres_changes',
               { event: '*', schema: 'public', table: 'bids', filter: `lot_id=eq.${expandedLotId}` },
