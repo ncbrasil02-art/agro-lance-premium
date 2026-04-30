@@ -139,6 +139,7 @@ export const Route = createFileRoute("/painel")({
       pref_outbid_email: true,
       pref_outbid_push: true,
       pref_new_event_email: true,
+      pref_followed_lot_update: true,
     });
 
      const fileInputRef = useRef<HTMLInputElement>(null);
@@ -260,6 +261,7 @@ export const Route = createFileRoute("/painel")({
             pref_outbid_email: profile.pref_outbid_email !== false,
             pref_outbid_push: profile.pref_outbid_push !== false,
             pref_new_event_email: profile.pref_new_event_email !== false,
+            pref_followed_lot_update: profile.pref_followed_lot_update !== false,
           });
        }
  
@@ -341,6 +343,7 @@ export const Route = createFileRoute("/painel")({
             pref_outbid_email: formData.pref_outbid_email,
             pref_outbid_push: formData.pref_outbid_push,
             pref_new_event_email: formData.pref_new_event_email,
+            pref_followed_lot_update: formData.pref_followed_lot_update,
           })
           .eq("id", user.id);
 
@@ -929,6 +932,17 @@ export const Route = createFileRoute("/painel")({
                     <Switch 
                       checked={formData.pref_outbid_push} 
                       onCheckedChange={(checked) => setFormData({...formData, pref_outbid_push: checked})}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between space-x-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-bold">Lotes Seguidos</Label>
+                      <p className="text-[10px] text-muted-foreground">Alertas sobre mudanças de preço ou status nos animais que você segue.</p>
+                    </div>
+                    <Switch 
+                      checked={formData.pref_followed_lot_update} 
+                      onCheckedChange={(checked) => setFormData({...formData, pref_followed_lot_update: checked})}
                     />
                   </div>
                   <Separator />
