@@ -371,6 +371,15 @@ function LotDetail() {
             const isOutbiddingMe = user && prev.length > 0 && prev[0].user_id === user.id && newBid.user_id !== user.id;
 
             if (isOutbiddingMe) {
+              // Tocar som de alerta
+              try {
+                const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+                audio.volume = 0.5;
+                audio.play();
+              } catch (e) {
+                console.error("Erro ao tocar som:", e);
+              }
+
               toast.error("VOCÊ FOI SUPERADO!", {
                 description: `Seu lance no lote #${lot.lot_number} foi superado por ${formatBRL(newBid.amount)}. Deseja cobrir?`,
                 icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
@@ -914,8 +923,8 @@ function LotDetail() {
                 </Tabs>
               </div>
 
-              <div className="space-y-6 order-1 lg:order-2">
-                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full">
+              <div className="space-y-6 order-1 lg:order-2" id="bid-actions">
+                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full shadow-2xl">
                   <div className="flex justify-between items-start mb-6">
                     <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
                     <Button 
