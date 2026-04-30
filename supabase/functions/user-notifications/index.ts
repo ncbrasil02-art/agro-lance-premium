@@ -36,7 +36,7 @@ const corsHeaders = {
       throw new Error('Forbidden: Only admins can send notifications')
     }
 
-    const { userId, type, data } = await req.json()
+     const { userId, type, data, userEmail } = await req.json()
     
     // Use service role for admin tasks
     const adminClient = createClient(
@@ -55,20 +55,21 @@ const corsHeaders = {
       throw new Error('User not found')
     }
 
-    const { data: { user }, error: userError } = await adminClient.auth.admin.getUserById(userId)
-    if (userError || !user) {
-      throw new Error('User email not found')
-    }
+     let email = userEmail;
+     
+     if (!email && userId) {
+       const { data: { user }, error: userError } = await adminClient.auth.admin.getUserById(userId)
+       if (!userError && user) {
+         email = user.email
+       }
+     }
 
-    const email = user.email
-
-    if (type === 'user_approved') {
+     const resendKey = Deno.env.get('RESEND_API_KEY')
+ 
+     if (type === 'user_approved' && email) {
       console.log(`Sending approval email to ${email}`)
       
-      // We'll use the Resend SDK if the key is available
-      const resendKey = Deno.env.get('RESEND_API_KEY')
-      
-      if (resendKey) {
+       if (resendKey) {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -107,7 +108,94 @@ const corsHeaders = {
         if (!res.ok) {
           const errorData = await res.json()
           console.error('Error sending email via Resend:', errorData)
-        }
+     } else if (type === 'offer_received' && resendKey) {
+       // Notify admins about new offer
+       const { amount, itemName, bidderName } = data;
+       
+       // Get all admin emails
+       const { data: admins } = await adminClient
+         .from('profiles')
+         .select('id')
+         .eq('role', 'admin');
+ 
+       if (admins && admins.length > 0) {
+         for (const admin of admins) {
+           const { data: { user: adminUser } } = await adminClient.auth.admin.getUserById(admin.id);
+           if (adminUser?.email) {
+             await fetch('https://api.resend.com/emails', {
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${resendKey}`,
+               },
+               body: JSON.stringify({
+                 from: 'Elite Leilões <contato@premiumagro.com.br>',
+                 to: [adminUser.email],
+                 subject: 'Nova Proposta Recebida! 💰',
+                 html: `
+                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+                     <div style="background-color: #064e3b; padding: 30px; text-align: center;">
+                       <h1 style="color: #fbbf24; margin: 0; font-size: 24px; letter-spacing: 2px;">ELITE LEILÕES</h1>
+                     </div>
+                     <div style="padding: 30px; color: #374151; line-height: 1.6;">
+                       <h2 style="color: #064e3b;">Nova Proposta Recebida</h2>
+                       <p>Uma nova proposta foi enviada para o item <strong>${itemName}</strong>.</p>
+                       <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                         <p style="margin: 0; font-size: 14px; color: #6b7280;">Proponente:</p>
+                         <p style="margin: 5px 0 15px 0; font-weight: bold; font-size: 18px;">${bidderName}</p>
+                         <p style="margin: 0; font-size: 14px; color: #6b7280;">Valor Ofertado:</p>
+                         <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 24px; color: #059669;">R$ ${amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                       </div>
+                       <div style="margin: 40px 0; text-align: center;">
+                         <a href="https://agro-ncbrasil.lovable.app/admin" style="background-color: #fbbf24; color: #064e3b; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">GERENCIAR PROPOSTAS</a>
+                       </div>
+                     </div>
+                   </div>
+                 `,
+               }),
+             });
+           }
+         }
+       }
+     } else if (type === 'offer_status_update' && email && resendKey) {
+       // Notify bidder about status update
+       const { amount, itemName, status } = data;
+       const statusLabel = status === 'approved' ? 'APROVADA' : status === 'rejected' ? 'REJEITADA' : 'EM ANÁLISE';
+       const statusColor = status === 'approved' ? '#059669' : status === 'rejected' ? '#dc2626' : '#d97706';
+ 
+       await fetch('https://api.resend.com/emails', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${resendKey}`,
+         },
+         body: JSON.stringify({
+           from: 'Elite Leilões <contato@premiumagro.com.br>',
+           to: [email],
+           subject: `Sua proposta foi ${statusLabel.toLowerCase()}!`,
+           html: `
+             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+               <div style="background-color: #064e3b; padding: 30px; text-align: center;">
+                 <h1 style="color: #fbbf24; margin: 0; font-size: 24px; letter-spacing: 2px;">ELITE LEILÕES</h1>
+               </div>
+               <div style="padding: 30px; color: #374151; line-height: 1.6;">
+                 <h2 style="color: #064e3b;">Status da sua Proposta</h2>
+                 <p>O status da sua proposta para <strong>${itemName}</strong> foi atualizado.</p>
+                 <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                   <p style="margin: 0; font-size: 14px; color: #6b7280;">Novo Status:</p>
+                   <p style="margin: 10px 0; font-weight: bold; font-size: 24px; color: ${statusColor}; text-transform: uppercase;">${statusLabel}</p>
+                   <p style="margin: 0; font-size: 14px; color: #6b7280;">Valor: R$ ${amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
+                 <div style="margin: 40px 0; text-align: center;">
+                   <a href="https://agro-ncbrasil.lovable.app/painel" style="background-color: #fbbf24; color: #064e3b; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">VER MINHAS PROPOSTAS</a>
+                 </div>
+                 <p>Equipe Elite Leilões</p>
+               </div>
+             </div>
+           `,
+         }),
+       });
+     }
       } else {
         console.warn('RESEND_API_KEY not found. Email not sent.')
       }
