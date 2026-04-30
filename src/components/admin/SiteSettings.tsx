@@ -9,7 +9,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
- import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck } from "lucide-react";
+import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap } from "lucide-react";
  import { BulkSeoAudit } from "./BulkSeoAudit";
  
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
