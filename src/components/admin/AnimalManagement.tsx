@@ -982,7 +982,6 @@ import { RichResultsPreview } from "./RichResultsPreview";
                           Preencher "Não" nos vazios
                         </Button>
                       </div>
-                     ))}
                    </div>
 
                    <div className="grid gap-2 border rounded-md p-4 bg-muted/30">
