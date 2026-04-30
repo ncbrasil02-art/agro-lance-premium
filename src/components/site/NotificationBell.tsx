@@ -83,8 +83,21 @@ export function NotificationBell({ userId }: { userId: string }) {
         (payload) => {
           setNotifications(prev => [payload.new, ...prev].slice(0, 10));
           setUnreadCount(prev => prev + 1);
+          // Tocar som de alerta global
+          try {
+            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+            audio.volume = 0.4;
+            audio.play();
+          } catch (e) {
+            console.error("Erro ao tocar som:", e);
+          }
+
           toast.info(payload.new.title, {
             description: payload.new.message,
+            action: payload.new.link ? {
+              label: "VER",
+              onClick: () => window.location.href = payload.new.link
+            } : undefined
           });
         }
       )
