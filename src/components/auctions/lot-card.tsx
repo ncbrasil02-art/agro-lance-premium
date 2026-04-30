@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Eye, Gavel, Info, ChevronRight, MessageSquare } from "lucide-react";
+import { Eye, Gavel, Info, ChevronRight, ChevronLeft, MessageSquare, Play } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { Lot } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
@@ -36,7 +36,7 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
   );
 };
 
-export function LotCard({ lot }: { 
+export function LotCard({ lot, settings: propSettings }: { 
   lot: Lot & { 
     eventStartDate?: string; 
     eventEndDate?: string; 
@@ -52,17 +52,35 @@ export function LotCard({ lot }: {
     location?: string;
     winnerName?: string;
     acceptsOffers?: boolean;
-  } 
+    photos?: string[];
+    youtube_url?: string;
+    registration_number?: string;
+    vaccination_records?: any;
+  },
+  settings?: any
 }) {
   const [isUrgent, setIsUrgent] = useState(false);
   const [isOfferOpen, setIsOfferOpen] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const router = useRouter();
   const rootContext = router.state.matches.find(m => m.id === '__root__')?.context as any;
+  
   const animations = useMemo(() => rootContext?.animations || {
     badge_blink: true,
     badge_glow: true,
     card_hover_tilt: true
   }, [rootContext?.animations]);
+
+  const settings = useMemo(() => propSettings || rootContext?.lot_card_settings || {
+    media_mode: 'gallery',
+    displayed_fields: [
+      { key: "father", label: "Pai", enabled: true },
+      { key: "mother", label: "Mãe", enabled: true },
+      { key: "sex", label: "Sexo", enabled: true },
+      { key: "breed", label: "Raça", enabled: true },
+      { key: "seller", label: "Vendedor", enabled: true }
+    ]
+  }, [propSettings, rootContext?.lot_card_settings]);
   
   const dynamicStatus = useEffectiveLotStatus({
     status: lot.status,
@@ -93,15 +111,69 @@ export function LotCard({ lot }: {
         className={`group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
         aria-labelledby={`lot-title-${lot.id}`}
       >
-        <div className="relative overflow-hidden bg-muted">
-          <OptimizedImage 
-            src={lot?.cover || ""} 
-            alt={lot?.name || "Animal"} 
-            width={400}
-            aspectRatio="portrait"
-            category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
-            className="transition-smooth group-hover:scale-105" 
-          />
+        <div className="relative overflow-hidden bg-muted aspect-[3/4] sm:aspect-square md:aspect-[3/4]">
+          {settings.media_mode === 'video' && lot.youtube_url ? (
+            <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
+              <iframe 
+                src={`https://www.youtube.com/embed/${lot.youtube_url.split('v=')[1]?.split('&')[0] || lot.youtube_url.split('/').pop()}?autoplay=0&mute=1&controls=0&loop=1&playlist=${lot.youtube_url.split('v=')[1]?.split('&')[0] || lot.youtube_url.split('/').pop()}`}
+                className="w-full h-full pointer-events-none"
+                allow="autoplay; encrypted-media"
+                title="Animal Video"
+              />
+              <div className="absolute inset-0 bg-transparent z-10" />
+            </div>
+          ) : (
+            <div className="relative h-full w-full">
+              <OptimizedImage 
+                src={(lot.photos && lot.photos.length > 0) ? lot.photos[currentPhotoIndex] : (lot?.cover || "")} 
+                alt={lot?.name || "Animal"} 
+                width={400}
+                aspectRatio="portrait"
+                category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
+                className="transition-smooth group-hover:scale-105 h-full w-full object-cover" 
+              />
+              
+              {lot.photos && lot.photos.length > 1 && settings.media_mode === 'gallery' && (
+                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8 rounded-full bg-black/40 border-white/20 backdrop-blur hover:bg-gold hover:text-emerald-deep"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentPhotoIndex((prev) => (prev === 0 ? lot.photos!.length - 1 : prev - 1));
+                    }}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8 rounded-full bg-black/40 border-white/20 backdrop-blur hover:bg-gold hover:text-emerald-deep"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentPhotoIndex((prev) => (prev === lot.photos!.length - 1 ? 0 : prev + 1));
+                    }}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {lot.photos && lot.photos.length > 1 && settings.media_mode === 'gallery' && (
+                <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1 z-20">
+                  {lot.photos.map((_, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`h-1 rounded-full transition-all ${idx === currentPhotoIndex ? 'w-4 bg-gold' : 'w-1.5 bg-white/40'}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
           
           <div className="absolute left-3 top-3 flex flex-col gap-2.5 items-start">
@@ -167,27 +239,38 @@ export function LotCard({ lot }: {
             </motion.h3>
           </div>
 
-          <div className="grid grid-cols-1 gap-y-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3">
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Pai:</span>
-              <span className="text-foreground font-semibold truncate ml-2">{lot.father || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Mãe:</span>
-              <span className="text-foreground font-semibold truncate ml-2">{lot.mother || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Sexo:</span>
-              <span className="text-foreground font-semibold uppercase">{lot.sex === 'M' ? 'Macho' : lot.sex === 'F' ? 'Fêmea' : lot.sex || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium uppercase">Raça:</span>
-              <span className="text-foreground font-semibold">{lot.breed || "--"}</span>
-            </div>
-            <div className="flex justify-between items-center pt-1 mt-1 border-t border-border/30">
-              <span className="font-medium uppercase">Vendedor:</span>
-              <span className="text-emerald-deep font-bold truncate ml-2">{lot.seller || "--"}</span>
-            </div>
+          <div className="grid grid-cols-1 gap-y-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3 min-h-[140px]">
+            {settings.displayed_fields
+              .filter((f: any) => f.enabled)
+              .map((field: any, idx: number) => {
+                let value: any = lot[field.key as keyof typeof lot];
+                
+                // Formatting logic
+                if (field.key === 'sex') {
+                  value = value === 'M' ? 'Macho' : value === 'F' ? 'Fêmea' : value;
+                } else if (field.key === 'birth_date' && value) {
+                  value = new Date(value).toLocaleDateString('pt-BR');
+                } else if (field.key === 'vaccination_records' && value) {
+                  value = Array.isArray(value) ? `${value.length} vacinas` : "Sim";
+                } else if (field.key === 'registration_number') {
+                  value = value || lot.registration_number || "--";
+                }
+
+                const isLast = idx === settings.displayed_fields.filter((f: any) => f.enabled).length - 1;
+                const isSeller = field.key === 'seller';
+
+                return (
+                  <div 
+                    key={field.key} 
+                    className={`flex justify-between items-center ${isLast ? 'pt-1 mt-1 border-t border-border/30' : ''}`}
+                  >
+                    <span className="font-medium uppercase">{field.label}:</span>
+                    <span className={`font-semibold truncate ml-2 ${isSeller ? 'text-emerald-deep' : 'text-foreground'}`}>
+                      {value || "--"}
+                    </span>
+                  </div>
+                );
+              })}
           </div>
 
           <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-3">
