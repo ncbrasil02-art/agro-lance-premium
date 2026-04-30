@@ -897,26 +897,27 @@ export const Route = createFileRoute("/painel")({
                     ) : (
                       filteredBids.map((bid) => (
                         <tr key={bid.id} className="hover:bg-muted/10 transition-colors">
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          {new Date(bid.created_at).toLocaleString("pt-BR")}
-                        </td>
-                        <td className="px-4 py-4 font-medium">
-                          {bid.lot?.animal?.name || "Lote #"+bid.lot?.lot_number}
-                        </td>
-                        <td className="px-4 py-4 font-bold text-emerald-deep">
-                          {formatBRL(bid.amount)}
-                        </td>
-                         <td className="px-4 py-4">
-                           {bid.lot?.winner_id === user.id && bid.lot?.status === 'sold' ? (
-                             <Badge className="bg-emerald-600 text-white border-none">ARREMATADO</Badge>
-                           ) : bid.amount >= (bid.lot?.current_price || 0) ? (
-                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Maior lance</Badge>
-                           ) : (
-                             <Badge variant="outline" className="text-muted-foreground">Lance superado</Badge>
-                           )}
-                         </td>
-                      </tr>
-                    ))}
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            {new Date(bid.created_at).toLocaleString("pt-BR")}
+                          </td>
+                          <td className="px-4 py-4 font-medium">
+                            {bid.lot?.animal?.name || "Lote #" + bid.lot?.lot_number}
+                          </td>
+                          <td className="px-4 py-4 font-bold text-emerald-deep">
+                            {formatBRL(bid.amount)}
+                          </td>
+                          <td className="px-4 py-4">
+                            {bid.lot?.winner_id === user.id && bid.lot?.status === 'sold' ? (
+                              <Badge className="bg-emerald-600 text-white border-none">ARREMATADO</Badge>
+                            ) : bid.amount >= (bid.lot?.current_price || 0) ? (
+                              <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Maior lance</Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-muted-foreground">Lance superado</Badge>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
