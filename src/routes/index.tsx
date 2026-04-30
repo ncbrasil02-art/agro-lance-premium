@@ -25,6 +25,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HomeSaleLots } from "@/components/site/HomeSaleLots";
+import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTemplates";
 
     export const Route = createFileRoute("/")({
       head: ({ matches }) => {
@@ -97,7 +98,8 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
           show_upcoming_events: true, 
           show_featured_lots: true,
           show_animated_slides: true,
-          order: ["upcoming_events", "featured_lots", "sale_menu", "articles"]
+          order: ["upcoming_events", "featured_lots", "sale_menu", "articles"],
+          template_id: 'model1'
         };
     const [now, setNow] = useState(Date.now());
 
@@ -202,6 +204,8 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
      totalUsers: 38420,
      activeEvents: 14,
    };
+
+   const templateId = (activeSections as any)?.template_id || 'model1';
 
   return (
     <>
