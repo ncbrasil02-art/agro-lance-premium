@@ -1434,12 +1434,43 @@ import { useAuth } from "@/components/auth/auth-provider";
                                     ) : data?.lots && data.lots.length > 0 ? (
                                       data.lots.map((lot: any) => (
                                         <div key={lot.id} className="flex items-center gap-3 p-2 rounded-lg bg-background border hover:border-gold/30 transition-colors">
-                                          <div className="h-10 w-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                                          <div className="relative group h-10 w-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
                                             {lot.animal?.photos?.[0] ? (
                                               <img src={lot.animal.photos[0]} alt="" className="w-full h-full object-cover" />
                                             ) : (
                                               <div className="w-full h-full flex items-center justify-center"><ImageIcon className="h-4 w-4 text-muted-foreground/30" /></div>
                                             )}
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                              <Input 
+                                                type="file" 
+                                                className="hidden" 
+                                                id={`replace-animal-${lot.animal?.id}`} 
+                                                onChange={async (e) => {
+                                                  const file = e.target.files?.[0];
+                                                  if (!file) return;
+                                                  const tid = toast.loading("Atualizando foto...");
+                                                  const fileExt = file.name.split('.').pop();
+                                                  const fileName = `${lot.animal?.id}_${Math.random()}.${fileExt}`;
+                                                  const { data: uploadData, error } = await supabase.storage.from('animals').upload(fileName, file);
+                                                  if (error) toast.error("Erro: " + error.message);
+                                                  else {
+                                                    const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(uploadData.path);
+                                                    await supabase.from('animals').update({ photos: [publicUrl] }).eq('id', lot.animal?.id);
+                                                    toast.success("Foto atualizada!");
+                                                    fetchExpandedData(event.id);
+                                                  }
+                                                  toast.dismiss(tid);
+                                                }}
+                                              />
+                                              <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="h-6 w-6 text-white" 
+                                                onClick={() => document.getElementById(`replace-animal-${lot.animal?.id}`)?.click()}
+                                              >
+                                                <Pencil className="h-3 w-3" />
+                                              </Button>
+                                            </div>
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <p className="text-xs font-bold truncate">{lot.animal?.name}</p>
