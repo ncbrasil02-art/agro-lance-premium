@@ -198,7 +198,31 @@ export const Route = createFileRoute("/painel")({
           .order("updated_at", { ascending: false });
         
         if (wonError) throw wonError;
-        setMyLots(wonLots || []);
+
+        // Fetch direct sales (animal purchases)
+        const { data: directSales, error: dsError } = await supabase
+          .from("direct_sales")
+          .select(`
+            id, total_price, status, created_at, updated_at, negotiated_terms,
+            animal:animals(id, name, breed, species, photos, internal_code)
+          `)
+          .eq("buyer_id", user.id)
+          .order("updated_at", { ascending: false });
+
+        if (dsError) console.error("Error fetching direct sales:", dsError);
+
+        // Combine auction wins and direct sales for the "Arremates" tab
+        const combinedPurchases = [
+          ...(wonLots || []).map(l => ({ ...l, is_direct_sale: false })),
+          ...(directSales || []).map(ds => ({
+            ...ds,
+            is_direct_sale: true,
+            current_price: ds.total_price,
+            lot_number: null // Direct sales don't have lot numbers
+          }))
+        ].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+
+        setMyLots(combinedPurchases);
  
          const { data: userBids } = await supabase
            .from("bids")
