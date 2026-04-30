@@ -1011,15 +1011,37 @@ export const Route = createFileRoute("/painel")({
                   <CardDescription>Escolha como deseja ser notificado.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between space-x-2">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-bold">Lance Superado (E-mail)</Label>
-                      <p className="text-[10px] text-muted-foreground">Receba um e-mail imediato quando alguém cobrir seu lance.</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Lance Superado (E-mail)</Label>
+                        <p className="text-[10px] text-muted-foreground">Receba um e-mail imediato quando alguém cobrir seu lance.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_outbid_email} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_outbid_email: checked})}
+                      />
                     </div>
-                    <Switch 
-                      checked={formData.pref_outbid_email} 
-                      onCheckedChange={(checked) => setFormData({...formData, pref_outbid_email: checked})}
-                    />
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Lance Superado (WhatsApp)</Label>
+                        <p className="text-[10px] text-muted-foreground text-emerald-600 font-medium">Notificação em tempo real no seu celular.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_outbid_whatsapp} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_outbid_whatsapp: checked})}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between space-x-2 opacity-50">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Lance Superado (SMS)</Label>
+                        <p className="text-[10px] text-muted-foreground">Aviso via SMS tradicional.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_outbid_sms} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_outbid_sms: checked})}
+                      />
+                    </div>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between space-x-2">
@@ -1044,15 +1066,27 @@ export const Route = createFileRoute("/painel")({
                     />
                   </div>
                   <Separator />
-                  <div className="flex items-center justify-between space-x-2">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-bold">Novos Eventos</Label>
-                      <p className="text-[10px] text-muted-foreground">Fique por dentro dos novos leilões e oportunidades.</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Novos Eventos (E-mail)</Label>
+                        <p className="text-[10px] text-muted-foreground">Receba as novidades por e-mail.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_new_event_email} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_new_event_email: checked})}
+                      />
                     </div>
-                    <Switch 
-                      checked={formData.pref_new_event_email} 
-                      onCheckedChange={(checked) => setFormData({...formData, pref_new_event_email: checked})}
-                    />
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Novos Eventos (WhatsApp)</Label>
+                        <p className="text-[10px] text-muted-foreground text-emerald-600">Catálogo e convites via WhatsApp.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_new_event_whatsapp} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_new_event_whatsapp: checked})}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
