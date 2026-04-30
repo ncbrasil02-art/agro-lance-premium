@@ -571,6 +571,49 @@ import { LotCard } from "../auctions/lot-card";
                     onChange={e => setCustomTexts({...customTexts, hero_subtitle: e.target.value})} 
                   />
                 </div>
+                <div className="space-y-4 pt-4 border-t">
+                  <Label className="flex justify-between items-center">
+                    Frases Rotativas (Hero Slider)
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-7 text-[10px]"
+                      onClick={() => setCustomTexts({...customTexts, hero_phrases: [...(customTexts.hero_phrases || []), ""]})}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> Adicionar Frase
+                    </Button>
+                  </Label>
+                  <div className="space-y-2">
+                    {(customTexts.hero_phrases || []).map((phrase, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <Input 
+                          placeholder="Escreva a frase aqui..." 
+                          value={phrase} 
+                          onChange={e => {
+                            const newPhrases = [...(customTexts.hero_phrases || [])];
+                            newPhrases[idx] = e.target.value;
+                            setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                          }} 
+                        />
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-destructive h-10 w-10 shrink-0"
+                          onClick={() => {
+                            const newPhrases = customTexts.hero_phrases.filter((_, i) => i !== idx);
+                            setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    <p className="text-[10px] text-muted-foreground italic">
+                      As frases aparecerão no topo da home com um efeito de transição suave.
+                    </p>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="footer_text">Texto Institucional (Rodapé)</Label>
                   <Textarea 
