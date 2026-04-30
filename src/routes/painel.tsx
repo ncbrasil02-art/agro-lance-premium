@@ -797,12 +797,12 @@ export const Route = createFileRoute("/painel")({
                                 className="h-7 text-[10px] font-bold border-gold text-gold hover:bg-gold hover:text-white"
                                 onClick={() => handleRequestRevision(offer.id, offer.animal?.name || 'item', offer.amount)}
                               >
-                                Solicitar Revisão
-                              </Button>
-                        )}
-                      </td>
-                   </tr>
-                 )))}
+                               Solicitar Revisão
+                             </Button>
+                           )}
+                         </td>
+                       </tr>
+                     ))}
                     </tbody>
                   </table>
                 </div>
