@@ -6,7 +6,9 @@ import { formatBRL } from "@/lib/mock-data";
 import { StatusBadge } from "./status-badge";
 import { Countdown } from "./countdown";
  import { useEffectiveLotStatus } from "@/utils/auction-status";
- import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
+import { useRouter } from "@tanstack/react-router";
 
  const AnimalIcon = ({ breed }: { breed?: string }) => {
    const b = breed?.toLowerCase() || "";
@@ -35,7 +37,7 @@ import { Countdown } from "./countdown";
  import { Button } from "@/components/ui/button";
  import { OfferDialog } from "./OfferDialog";
  
-  export function LotCard({ lot }: { 
+   export function LotCard({ lot }: { 
     lot: Lot & { 
       eventStartDate?: string; 
       eventEndDate?: string; 
@@ -55,6 +57,13 @@ import { Countdown } from "./countdown";
   }) {
    const [isUrgent, setIsUrgent] = useState(false);
    const [isOfferOpen, setIsOfferOpen] = useState(false);
+   const router = useRouter();
+   const rootContext = router.state.matches.find(m => m.id === '__root__')?.context as any;
+   const animations = useMemo(() => rootContext?.animations || {
+     badge_blink: true,
+     badge_glow: true,
+     card_hover_tilt: true
+   }, [rootContext?.animations]);
    
    const dynamicStatus = useEffectiveLotStatus({
      status: lot.status,
