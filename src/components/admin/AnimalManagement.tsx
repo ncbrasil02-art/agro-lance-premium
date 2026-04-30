@@ -1392,10 +1392,11 @@ import { ImageCropper } from "./ImageCropper";
        </Card>
 
        {croppingImage && (
-         <ImageCropper
-           image={croppingImage.url}
-           onCropComplete={handleCropComplete}
-           onCancel={() => {
+          <ImageCropper
+            image={croppingImage.url}
+            aspect={4 / 3}
+            onCropComplete={handleCropComplete}
+            onCancel={() => {
              setCroppingImage(null);
              if (uploadQueue.length > 0) {
                const nextFile = uploadQueue[0];
