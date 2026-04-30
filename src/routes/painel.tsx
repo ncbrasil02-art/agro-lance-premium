@@ -198,7 +198,35 @@ export const Route = createFileRoute("/painel")({
           .order("updated_at", { ascending: false });
         
         if (wonError) throw wonError;
-        setMyLots(wonLots || []);
+
+        // Fetch direct sales (animal purchases)
+        const { data: directSales, error: dsError } = await supabase
+          .from("direct_sales")
+          .select(`
+            id, total_price, status, created_at, updated_at, negotiated_terms,
+            animal:animals(id, name, breed, species, photos, internal_code)
+          `)
+          .eq("buyer_id", user.id)
+          .order("updated_at", { ascending: false });
+
+        if (dsError) console.error("Error fetching direct sales:", dsError);
+
+        // Combine auction wins and direct sales for the "Arremates" tab
+        const combinedPurchases = [
+          ...(wonLots || []).map(l => ({ ...l, is_direct_sale: false })),
+          ...(directSales || []).map(ds => ({
+            ...ds,
+            is_direct_sale: true,
+            current_price: ds.total_price,
+            lot_number: null // Direct sales don't have lot numbers
+          }))
+        ].sort((a, b) => {
+          const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+          const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+          return dateB - dateA;
+        });
+
+        setMyLots(combinedPurchases);
  
          const { data: userBids } = await supabase
            .from("bids")
@@ -798,8 +826,14 @@ export const Route = createFileRoute("/painel")({
                               </p>
                             </div>
                           </td>
-                          <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px] truncate" title={offer.description}>
-                            {offer.description || "-"}
+                          <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px]" title={offer.negotiated_terms || offer.description}>
+                            <div className="line-clamp-2">
+                              {offer.negotiated_terms ? (
+                                <span className="text-emerald-600 font-bold">Acordado: {offer.negotiated_terms}</span>
+                              ) : (
+                                offer.description || "-"
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-4 text-right">
                             {offer.status === 'rejected' && (
@@ -1348,7 +1382,10 @@ export const Route = createFileRoute("/painel")({
   );
 }
 
- function DocumentButton({ title, lot, profile, siteInfo, type }: { title: string, lot: any, profile: any, siteInfo: any, type: string }) {
+  function DocumentButton({ title, lot, profile, siteInfo, type }: { title: string, lot: any, profile: any, siteInfo: any, type: string }) {
+    const isDirectSale = lot.is_direct_sale || !lot.lot_number;
+    const finalNegotiatedTerms = lot.negotiated_terms || lot.description || "As condições de pagamento seguem o regulamento padrão da plataforma.";
+
   return (
     <Dialog>
       <DialogTrigger asChild>

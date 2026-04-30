@@ -230,7 +230,7 @@ import { Countdown } from "./countdown";
       </Link>
 
       {lot.acceptsOffers && (dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento' || dynamicStatus === 'pre_lance') && (
-        <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20">
+        <div className="absolute top-12 right-3 z-20">
           <Button 
             size="sm"
             className="bg-emerald-bright text-white font-bold gap-1 rounded-full shadow-lg hover:scale-110 transition-transform h-8 px-3 border border-white/20"
@@ -241,7 +241,7 @@ import { Countdown } from "./countdown";
             }}
           >
             <MessageSquare className="h-3 w-3" />
-            Oferta
+            Fazer uma oferta
           </Button>
         </div>
       )}
