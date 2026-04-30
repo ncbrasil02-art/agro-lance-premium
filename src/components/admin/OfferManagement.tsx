@@ -90,9 +90,15 @@ export function OfferManagement() {
       if (error) throw error;
 
        // Create notification for the user
-       const statusLabel = status === 'approved' ? 'APROVADA' : status === 'rejected' ? 'REJEITADA' : 'EM ANÁLISE';
-       const title = `Sua proposta foi ${statusLabel.toLowerCase()}`;
-       const content = `A proposta de ${formatBRL(offer.amount)} para o animal ${offer.animal?.name} foi alterada para o status: ${statusLabel}.`;
+        const isRevision = offer.status === 'under_review';
+        const statusLabel = status === 'approved' ? 'APROVADA' : status === 'rejected' ? 'REJEITADA' : 'EM ANÁLISE';
+        
+        let title = `Sua proposta foi ${statusLabel.toLowerCase()}`;
+        if (isRevision && (status === 'approved' || status === 'rejected')) {
+          title = `Decisão sobre sua revisão: ${statusLabel}`;
+        }
+
+        const content = `A proposta de ${formatBRL(offer.amount)} para o animal ${offer.animal?.name} foi alterada para o status: ${statusLabel}.${isRevision ? ' Esta decisão foi tomada após a sua solicitação de revisão.' : ''}`;
 
         await supabase.from("messages").insert({
           sender_id: user.id,
