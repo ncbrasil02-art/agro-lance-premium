@@ -9,27 +9,88 @@
  import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
  import { Badge } from "@/components/ui/badge";
  
- interface HeroProps {
-   siteInfo: any;
-   nextEvent: any;
-   customTexts: any;
-   stats: any;
- }
+  interface HeroProps {
+    siteInfo: any;
+    nextEvent: any;
+    customTexts: any;
+    stats: any;
+    homepageSettings?: any;
+  }
+
+  const HeroBackground = ({ backgrounds, opacity, blur }: { backgrounds: string[], opacity: number, blur: number }) => {
+    const [index, setIndex] = useState(0);
+    const images = (backgrounds && backgrounds.length > 0) ? backgrounds : ["https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"];
+
+    useEffect(() => {
+      if (images.length <= 1) return;
+      const interval = setInterval(() => setIndex(prev => (prev + 1) % images.length), 5000);
+      return () => clearInterval(interval);
+    }, [images.length]);
+
+    return (
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={images[index]}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: opacity / 100, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0"
+            style={{ filter: `blur(${blur}px)` }}
+          >
+            <OptimizedImage 
+              src={images[index]} 
+              alt="Hero Background" 
+              width={1920} 
+              className="h-full w-full object-cover" 
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  };
+
+  const HeroPhrase = ({ phrases, defaultTitle, className }: { phrases: string[], defaultTitle: ReactNode, className?: string }) => {
+    const [index, setIndex] = useState(0);
+    const items = (phrases && phrases.length > 0) ? phrases : [];
+
+    useEffect(() => {
+      if (items.length <= 1) return;
+      const interval = setInterval(() => setIndex(prev => (prev + 1) % items.length), 6000);
+      return () => clearInterval(interval);
+    }, [items.length]);
+
+    if (items.length === 0) return <>{defaultTitle}</>;
+
+    return (
+      <div className={className}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            {items[index]}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  };
  
- export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats }: HeroProps) => (
-   <section className="relative overflow-hidden min-h-[85vh] flex items-center">
-     <div className="absolute inset-0">
-       <OptimizedImage 
-         src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
-         alt="Elite" 
-         width={1920} 
-         className="h-full w-full object-cover opacity-50" 
-       />
-       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-     </div>
+  export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => (
+    <section className="relative overflow-hidden min-h-[85vh] flex items-center">
+      <HeroBackground 
+        backgrounds={homepageSettings?.hero_backgrounds} 
+        opacity={homepageSettings?.hero_bg_opacity ?? 50} 
+        blur={homepageSettings?.hero_bg_blur ?? 0} 
+      />
+      <div className="absolute inset-0 z-1 bg-gradient-to-r from-background via-background/80 to-transparent" />
+      <div className="absolute inset-0 z-1 bg-gradient-to-t from-background via-transparent to-transparent" />
  
-     <div className="container relative mx-auto px-4 py-20">
+      <div className="container relative z-10 mx-auto px-4 py-20">
        <div className="max-w-3xl">
          <Badge variant="outline" className="mb-6 bg-gold/10 text-gold border-gold/20 px-4 py-1.5 uppercase tracking-widest text-[10px] font-black animate-pulse">
            <Sparkles className="h-3 w-3 mr-2" />
