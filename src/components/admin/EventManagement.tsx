@@ -1,7 +1,7 @@
   import { useRealtimeLots } from "@/hooks/useRealtimeEvent";
   import { useRealtimeFallback } from "@/hooks/useRealtimeFallback";
 import { Textarea } from "@/components/ui/textarea";
- import { useState, useEffect, useCallback } from "react";
+  import React, { useState, useEffect, useCallback, Fragment } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
@@ -1157,7 +1157,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                     filteredEvents.map((event) => {
                       const data = expandedData[event.id];
                       return (
-                      <React.Fragment key={event.id}>
+                      <Fragment key={event.id}>
                       <TableRow className={expandedEventId === event.id ? "bg-muted/30 border-b-0" : ""}>
                         <TableCell>
                           <Button 
@@ -1461,7 +1461,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                           </TableCell>
                         </TableRow>
                       )}
-                      </React.Fragment>
+                      </Fragment>
                     );
                   })
                  )}
