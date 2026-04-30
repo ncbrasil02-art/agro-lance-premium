@@ -1,4 +1,9 @@
- import { useSiteSettings } from "@/hooks/useSiteSettings";
+  import { useSiteSettings } from "@/hooks/useSiteSettings";
+  import { useState } from "react";
+  import { toast } from "sonner";
+  import { Input } from "@/components/ui/input";
+  import { Button } from "@/components/ui/button";
+  import { Send } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
 
@@ -8,7 +13,55 @@ import { Gavel, Instagram, Youtube, Facebook } from "lucide-react";
   return (
     <footer className="border-t border-border/60 bg-card/40">
       <div className="container mx-auto grid gap-8 px-4 py-12 md:grid-cols-4">
+        <div className="md:col-span-1">
+          <h4 className="mb-3 text-sm font-semibold uppercase tracking-widest text-gold/60">Newsletter</h4>
+          <p className="text-xs text-muted-foreground mb-4 italic">Fique por dentro das novidades e próximos leilões de elite.</p>
+          <NewsletterForm />
+        </div>
         <div>
+
+ function NewsletterForm() {
+   const [email, setEmail] = useState("");
+   const [isLoading, setIsLoading] = useState(false);
+
+   const handleSubmit = async (e: React.FormEvent) => {
+     e.preventDefault();
+     if (!email) return;
+     setIsLoading(true);
+     // Simulate subscription
+     await new Promise(resolve => setTimeout(resolve, 800));
+     toast.success("Inscrição realizada com sucesso!", {
+       description: "Você receberá nossas novidades em breve."
+     });
+     setEmail("");
+     setIsLoading(false);
+   };
+
+   return (
+     <form onSubmit={handleSubmit} className="space-y-2">
+       <div className="relative">
+         <Input 
+           type="email" 
+           placeholder="Seu melhor e-mail" 
+           className="bg-white/5 border-white/10 text-xs h-10 pr-10 focus:ring-gold"
+           value={email}
+           onChange={e => setEmail(e.target.value)}
+           required
+         />
+         <button 
+           type="submit" 
+           disabled={isLoading}
+           className="absolute right-2 top-1/2 -translate-y-1/2 text-gold hover:text-white transition-colors disabled:opacity-50"
+         >
+           <Send className="h-4 w-4" />
+         </button>
+       </div>
+       <p className="text-[10px] text-muted-foreground opacity-50">
+         * Ao assinar, você concorda com nossos termos.
+       </p>
+     </form>
+   );
+ }
           <Link to="/" className="flex items-center gap-2 font-bold">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient">
               <Gavel className="h-5 w-5 text-emerald-deep" />
