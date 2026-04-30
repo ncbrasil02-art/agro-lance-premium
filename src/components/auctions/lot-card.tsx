@@ -111,7 +111,7 @@ import { useRouter } from "@tanstack/react-router";
                 AO VIVO
               </div>
             )}
-           <StatusBadge status={dynamicStatus} urgent={isUrgent} />
+            <StatusBadge status={dynamicStatus} urgent={isUrgent} animations={animations} />
           {dynamicStatus === 'loteamento' && (
             <div className="group/info relative">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-gold backdrop-blur-md border border-gold/30 cursor-help">
@@ -128,13 +128,13 @@ import { useRouter } from "@tanstack/react-router";
             </div>
           )}
         </div>
-        <div className="absolute right-3 top-3 z-10 rounded-full bg-background/80 px-2.5 py-1 text-xs font-bold text-foreground backdrop-blur shadow-sm">
+        <div className={`absolute right-3 top-3 z-10 rounded-full bg-emerald-deep/90 px-2.5 py-1 text-[10px] font-black text-gold border border-gold/30 backdrop-blur shadow-gold/20 ${animations.badge_glow ? 'shadow-[0_0_10px_rgba(212,175,55,0.3)]' : ''}`}>
           LOTE {lot?.number ? String(lot.number).padStart(2, "0") : "--"}
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white/90 z-10" aria-label={`${lot?.viewers || 0} visualizações, ${lot?.bidsCount || 0} lances`}>
           <span className="flex items-center gap-1"><Eye className="h-3 w-3" aria-hidden="true" /> {lot?.viewers || 0}</span>
           {dynamicStatus === 'recebendo_lances' && (
-            <span className="bg-emerald-500/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider animate-pulse">
+            <span className={`bg-emerald-500/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${animations.badge_blink ? 'animate-pulse' : ''} ${animations.badge_glow ? 'shadow-[0_0_10px_rgba(16,185,129,0.4)]' : ''}`}>
               Recebendo Lance
             </span>
           )}
@@ -238,22 +238,6 @@ import { useRouter } from "@tanstack/react-router";
       </div>
       </Link>
 
-      {lot.acceptsOffers && (dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento' || dynamicStatus === 'pre_lance') && (
-        <div className="absolute top-12 right-3 z-20">
-          <Button 
-            size="sm"
-            className="bg-emerald-bright text-white font-bold gap-1 rounded-full shadow-lg hover:scale-110 transition-transform h-8 px-3 border border-white/20"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsOfferOpen(true);
-            }}
-          >
-            <MessageSquare className="h-3 w-3" />
-            Fazer uma oferta
-          </Button>
-        </div>
-      )}
 
       <OfferDialog 
         isOpen={isOfferOpen} 
