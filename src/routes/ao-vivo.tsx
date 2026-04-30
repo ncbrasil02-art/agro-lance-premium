@@ -579,6 +579,15 @@ export const Route = createFileRoute("/ao-vivo")({
                       const isOutbiddingMe = user && prevBids.length > 0 && prevBids[0].user_id === user.id && newBid.user_id !== user.id;
 
                       if (isOutbiddingMe) {
+                        // Tocar som de alerta
+                        try {
+                          const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+                          audio.volume = 0.5;
+                          audio.play();
+                        } catch (e) {
+                          console.error("Erro ao tocar som:", e);
+                        }
+
                         toast.error("VOCÊ FOI SUPERADO!", {
                           description: `Seu lance no lote #${liveLot?.lot_number} foi superado por ${formatBRL(newBid.amount)}.`,
                           icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
