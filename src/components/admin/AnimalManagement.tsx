@@ -39,6 +39,7 @@ import { ImageCropper } from "./ImageCropper";
  export function AnimalManagement() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [editingAnimal, setEditingAnimal] = useState<any>(null);
+  const [croppingImage, setCroppingImage] = useState<{ url: string, name: string } | null>(null);
   const [customHealthItem, setCustomHealthItem] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [isAiFixing, setIsAiFixing] = useState(false);
