@@ -682,14 +682,22 @@ function LotDetail() {
                     </div>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 z-20">
-                    <Button 
-                      size="sm" 
-                      className="bg-emerald-deep/90 text-gold hover:bg-emerald-bright hover:text-white transition-all shadow-gold font-bold border border-gold/40 backdrop-blur-md"
-                      onClick={() => setActivePhoto(activePhoto)} // Just to trigger something if needed, but it's mainly for contrast/UI
+                  <div className="absolute bottom-6 left-6 z-20">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      animate={{ 
+                        boxShadow: ["0 0 10px rgba(212,175,55,0.2)", "0 0 20px rgba(212,175,55,0.4)", "0 0 10px rgba(212,175,55,0.2)"]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <Expand className="mr-2 h-4 w-4" /> VER GALERIA
-                    </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-gold text-emerald-deep hover:bg-gold-bright hover:text-emerald-deep transition-all shadow-gold font-black border-2 border-emerald-deep/20 px-6 h-10 rounded-full"
+                        onClick={() => setActivePhoto(activePhoto)}
+                      >
+                        <Expand className="mr-2 h-4 w-4" /> VER GALERIA
+                      </Button>
+                    </motion.div>
                   </div>
                   
                   {/* Next/Prev overlays on image */}
