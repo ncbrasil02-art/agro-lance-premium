@@ -56,6 +56,7 @@ import { toast } from "sonner";
      { to: "/lotes", label: "Lotes", show: true },
      { to: "/ao-vivo", label: "Ao Vivo", show: true },
       { to: "/sobre", label: aboutPage?.title || "Sobre", show: aboutPage?.enabled !== false },
+     { to: "/test-carousel", label: "TESTE", show: true },
    ].filter(i => i.show);
 
   return (
