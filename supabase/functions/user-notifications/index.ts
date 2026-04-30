@@ -1,3 +1,29 @@
+  const sendWhatsApp = async (phone: string, message: string) => {
+    const url = Deno.env.get('WHATSAPP_API_URL')
+    const key = Deno.env.get('WHATSAPP_API_KEY')
+    if (!url || !key || !phone) return
+    
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({
+          number: phone.replace(/\D/g, ''),
+          message: message
+        })
+      })
+    } catch (e) {
+      console.error('WhatsApp error:', e)
+    }
+  }
+
+  const sendSMS = async (phone: string, message: string) => {
+    const key = Deno.env.get('SMS_API_KEY')
+    if (!key || !phone) return
+    // SMS implementation would go here (e.g., Twilio)
+    console.log('SMS would be sent to', phone, ':', message)
+  }
+
  import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
  import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
  
@@ -39,12 +65,23 @@
        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
      )
  
-     let email = userEmail;
-     if (!email && userId) {
-       const { data: { user } } = await adminClient.auth.admin.getUserById(userId)
-       if (user) email = user.email
-     }
- 
+      let email = userEmail;
+      let phone = '';
+      let profileData = null;
+
+      if (userId) {
+        const { data: { user } } = await adminClient.auth.admin.getUserById(userId)
+        if (user) email = user.email
+        
+        const { data: profile } = await adminClient
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single()
+        profileData = profile
+        phone = profile?.phone || ''
+      }
+
      const resendKey = Deno.env.get('RESEND_API_KEY')
      if (!resendKey) {
        console.warn('RESEND_API_KEY not found. Email not sent.')
@@ -95,21 +132,23 @@
             html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`,
           }),
         });
-      } else if (type === 'outbid' && email && resendKey) {
-        // Check user preferences
-        if (userId) {
-          const { data: prefData } = await adminClient
-            .from('profiles')
-            .select('pref_outbid_email')
-            .eq('id', userId)
-            .single();
-          
-          if (prefData && prefData.pref_outbid_email === false) {
-            return new Response(JSON.stringify({ success: true, message: 'Email skipped due to user preferences' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-          }
-        }
+       } else if (type === 'outbid') {
+         const { amount, lotNumber, animalName } = data;
 
-        const { amount, lotNumber, animalName } = data;
+         // WhatsApp Notification
+         if (profileData?.pref_outbid_whatsapp !== false && phone) {
+           const wsMessage = `📢 *Elite Leilões: Seu lance foi superado!*\n\nO lance no Lote #${lotNumber} (${animalName}) foi coberto.\nValor atual: R$ ${amount.toLocaleString('pt-BR')}\n\nClique para cobrir o lance:\nhttps://eliteleiloes.lovable.app/lotes/${lotId}`
+           await sendWhatsApp(phone, wsMessage)
+         }
+
+         // SMS Notification
+         if (profileData?.pref_outbid_sms && phone) {
+           const smsMessage = `Elite Leilões: Seu lance no Lote #${lotNumber} foi superado! Valor: R$ ${amount.toLocaleString('pt-BR')}. Acesse: https://eliteleiloes.lovable.app/lotes/${lotId}`
+           await sendSMS(phone, smsMessage)
+         }
+
+         // Email Notification
+         if (email && resendKey && profileData?.pref_outbid_email !== false) {
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
