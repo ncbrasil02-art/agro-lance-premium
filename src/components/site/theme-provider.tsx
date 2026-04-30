@@ -34,14 +34,7 @@ function applyTheme(theme: Theme) {
      applyTheme("dark");
    }, []);
 
-  const toggle = () => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("theme", next);
-      applyTheme(next);
-      return next;
-    });
-  };
+   const toggle = () => {};
 
   return <ThemeCtx.Provider value={{ theme, toggle }}>{children}</ThemeCtx.Provider>;
 }
