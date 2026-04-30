@@ -129,7 +129,7 @@ export function LotCard({ lot, settings: propSettings }: {
               <OptimizedImage 
                 src={(lot.photos && lot.photos.length > 0) ? lot.photos[currentPhotoIndex] : (lot?.cover || "")} 
                 alt={lot?.name || "Animal"} 
-                width={400}
+                 width={800}
                  aspectRatio="landscape"
                 category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
                 className="transition-smooth group-hover:scale-105 h-full w-full object-cover" 

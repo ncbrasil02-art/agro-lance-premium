@@ -87,7 +87,7 @@ export function getOptimizedImageUrl(
 ): string {
   if (!originalUrl) return fallbackSrc;
 
-  const { width, height, quality = 80, format = "webp" } = options;
+   const { width, height, quality = 85, format = "webp" } = options;
   
   // Create a unique cache key based on URL and transformation parameters
   const cacheKey = `${originalUrl}|w:${width}|h:${height}|q:${quality}|f:${format}`;
