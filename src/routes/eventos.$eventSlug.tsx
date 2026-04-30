@@ -219,6 +219,38 @@ function EventDetail() {
                 </div>
               </div>
 
+              {/* Marcas e Assinaturas */}
+              <div className="flex flex-wrap items-center gap-8 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                {event.seller?.logo_url && (
+                  <div className="flex flex-col gap-2 group cursor-default">
+                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Vendedor</span>
+                    <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
+                      <img src={event.seller.logo_url} alt={event.seller.name} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                    </div>
+                  </div>
+                )}
+
+                {event.promoter_logo_url && (
+                  <div className="flex flex-col gap-2 group cursor-default">
+                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Promotora</span>
+                    <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
+                      <img src={event.promoter_logo_url} alt={event.promoter_company} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                    </div>
+                  </div>
+                )}
+
+                {event.auctioneer_name && (
+                  <div className="flex flex-col gap-2 group cursor-default">
+                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Leiloeiro</span>
+                    <div className="h-16 flex items-center px-4">
+                      <div className="text-xl md:text-2xl font-signature text-foreground opacity-40 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter">
+                        {event.auctioneer_name}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-4 mb-12">
                 {[
                    { icon: Calendar, label: "Cronograma", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
