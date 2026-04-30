@@ -11,7 +11,7 @@ function applyTheme(theme: Theme) {
 }
 
  export function ThemeProvider({ children }: { children: ReactNode }) {
-   const [theme, setTheme] = useState<Theme>("dark");
+    const [theme] = useState<Theme>("dark");
    const { theme: siteTheme } = useSiteSettings();
  
   useEffect(() => {
@@ -30,12 +30,9 @@ function applyTheme(theme: Theme) {
     }
   }, [siteTheme]);
 
-  useEffect(() => {
- 
-    const stored = (localStorage.getItem("theme") as Theme | null) ?? "dark";
-    setTheme(stored);
-    applyTheme(stored);
-  }, []);
+   useEffect(() => {
+     applyTheme("dark");
+   }, []);
 
   const toggle = () => {
     setTheme((prev) => {
