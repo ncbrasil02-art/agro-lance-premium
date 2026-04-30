@@ -1150,7 +1150,20 @@ export const Route = createFileRoute("/ao-vivo")({
                         <span className="text-[10px] text-muted-foreground font-mono">Registro: {liveLot.animal.registration_number}</span>
                       )}
                     </div>
-                    <h2 className="text-2xl font-black text-emerald-deep tracking-tighter leading-none">{liveLot.animal?.name}</h2>
+                    <motion.h2 
+                      key={liveLot.animal?.id}
+                      initial={
+                        animations.animal_name_entry === 'slide-up' ? { y: 20, opacity: 0 } :
+                        animations.animal_name_entry === 'fade' ? { opacity: 0 } :
+                        animations.animal_name_entry === 'scale' ? { scale: 0.8, opacity: 0 } :
+                        {}
+                      }
+                      animate={{ y: 0, opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="text-2xl font-black text-emerald-deep tracking-tighter leading-none"
+                    >
+                      {liveLot.animal?.name}
+                    </motion.h2>
                     <p className="text-sm text-muted-foreground font-medium">{liveLot.animal?.breed} · {liveLot.animal?.species}</p>
                   </div>
                   {liveLot.end_date && (
