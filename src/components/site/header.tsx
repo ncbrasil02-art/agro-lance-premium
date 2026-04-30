@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
    import { RefreshCw, Zap, ZapOff, WifiOff } from "lucide-react";
 
     export function Header() {
