@@ -269,9 +269,9 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
        {/* HERO / BANNERS */}
        {(!activeSections || (activeSections as any).show_animated_slides) && (
          <>
-           {templateId === 'model1' && <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} />}
-           {templateId === 'model2' && <ModernHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} />}
-           {templateId === 'model3' && <TraditionalHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} />}
+            {templateId === 'model1' && <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
+            {templateId === 'model2' && <ModernHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
+            {templateId === 'model3' && <TraditionalHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
          </>
        )}
 
