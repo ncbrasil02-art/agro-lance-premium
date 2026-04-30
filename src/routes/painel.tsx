@@ -84,9 +84,10 @@
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
  import {
-    User, Gavel, FileText, Receipt, CreditCard, Clock, Camera,
-    ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
-    ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
+     User, Gavel, FileText, Receipt, CreditCard, Clock, Camera,
+     ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
+     ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
+     Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
     MapPin, Globe, Loader2, Send
  } from "lucide-react";
@@ -117,7 +118,8 @@ export const Route = createFileRoute("/painel")({
     const [myLots, setMyLots] = useState<any[]>([]);
      const [myBids, setMyBids] = useState<any[]>([]);
      const [myOffers, setMyOffers] = useState<any[]>([]);
-     const [myFavorites, setMyFavorites] = useState<any[]>([]);
+      const [myFavorites, setMyFavorites] = useState<any[]>([]);
+      const [myContracts, setMyContracts] = useState<any[]>([]);
      const [messages, setMessages] = useState<any[]>([]);
      const [siteInfo, setSiteInfo] = useState<any>(null);
      const [isLoading, setIsLoading] = useState(true);
@@ -184,7 +186,21 @@ export const Route = createFileRoute("/painel")({
             .select("*, lot:lots!followed_lots_lot_id_fkey(*, animal:animals!lots_animal_id_fkey(*), event:events!lots_event_id_fkey(*))")
             .eq("user_id", user.id);
          
-         setMyFavorites(followedData || []);
+           setMyFavorites(followedData || []);
+
+           const { data: contractsData } = await supabase
+             .from("contracts")
+             .select(`
+               *,
+               transaction:transactions!inner(
+                 id, buyer_id, final_price,
+                 lot:lots!inner(lot_number, animal:animals(name, breed, photos))
+               )
+             `)
+             .eq("transaction.buyer_id", user.id)
+             .order("created_at", { ascending: false });
+           
+           setMyContracts(contractsData || []);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         toast.error("Erro ao carregar dados do painel");
@@ -421,10 +437,79 @@ export const Route = createFileRoute("/painel")({
            <TabsTrigger value="lances" className="gap-2">
              <Clock className="h-4 w-4" /> Meus Lances
            </TabsTrigger>
-           <TabsTrigger value="ofertas" className="gap-2">
-             <TrendingUp className="h-4 w-4" /> Minhas Ofertas
-           </TabsTrigger>
-         <TabsContent value="ofertas" className="space-y-6">
+            <TabsTrigger value="ofertas" className="gap-2">
+              <TrendingUp className="h-4 w-4" /> Minhas Ofertas
+            </TabsTrigger>
+            <TabsTrigger value="assinaturas" className="gap-2">
+              <FileText className="h-4 w-4" /> Assinaturas
+              {myContracts.some(c => c.status === 'pending') && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {myContracts.filter(c => c.status === 'pending').length}
+                </span>
+              )}
+            </TabsTrigger>
+          <TabsContent value="assinaturas" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Assinaturas Digitais</CardTitle>
+                <CardDescription>Visualize e assine seus contratos de compra e venda de forma digital.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {myContracts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <FileText className="h-12 w-12 text-muted-foreground/20 mb-4" />
+                    <p className="text-muted-foreground">Você ainda não possui contratos para assinatura.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {myContracts.map((contract) => (
+                      <div key={contract.id} className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl border border-border bg-card hover:bg-muted/30 transition-all gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="h-16 w-16 rounded-xl overflow-hidden bg-muted">
+                            <img 
+                              src={contract.transaction?.lot?.animal?.photos?.[0]} 
+                              alt="" 
+                              className="h-full w-full object-cover" 
+                            />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-emerald-deep leading-tight">Contrato Lote #{contract.transaction?.lot?.lot_number}</h4>
+                            <p className="text-sm text-muted-foreground">{contract.transaction?.lot?.animal?.name}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant={contract.status === 'signed' ? 'default' : 'secondary'} className="text-[10px]">
+                                {contract.status === 'signed' ? 'Assinado' : 'Pendente'}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground">Emitido em {new Date(contract.created_at).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {contract.contract_url && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={contract.contract_url} target="_blank" rel="noopener noreferrer">
+                                <Download className="h-4 w-4 mr-2" /> Baixar PDF
+                              </a>
+                            </Button>
+                          )}
+                          {contract.status === 'pending' ? (
+                            <Button size="sm" className="bg-gold text-emerald-deep font-bold">
+                              <Pencil className="h-4 w-4 mr-2" /> Assinar Agora
+                            </Button>
+                          ) : (
+                            <Button size="sm" variant="ghost" disabled className="text-emerald-600 font-bold">
+                              <BadgeCheck className="h-4 w-4 mr-2" /> Assinado em {contract.signed_at && new Date(contract.signed_at).toLocaleDateString('pt-BR')}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ofertas" className="space-y-6">
            <Card>
              <CardHeader>
                <CardTitle>Suas Propostas de Compra</CardTitle>
