@@ -78,7 +78,9 @@ export function LotCard({ lot, settings: propSettings }: {
       { key: "mother", label: "Mãe", enabled: true },
       { key: "sex", label: "Sexo", enabled: true },
       { key: "breed", label: "Raça", enabled: true },
-      { key: "seller", label: "Vendedor", enabled: true }
+      { key: "seller", label: "Vendedor", enabled: true },
+      { key: "registration_number", label: "Registro", enabled: false },
+      { key: "vaccination_records", label: "Vacinação", enabled: false }
     ]
   }, [propSettings, rootContext?.lot_card_settings]);
   
@@ -138,7 +140,7 @@ export function LotCard({ lot, settings: propSettings }: {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="h-8 w-8 rounded-full bg-black/40 border-white/20 backdrop-blur hover:bg-gold hover:text-emerald-deep"
+                    className="h-10 w-10 rounded-full bg-black/60 border-white/30 backdrop-blur-md hover:bg-gold hover:text-emerald-deep hover:scale-110 transition-all shadow-lg"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -150,7 +152,7 @@ export function LotCard({ lot, settings: propSettings }: {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="h-8 w-8 rounded-full bg-black/40 border-white/20 backdrop-blur hover:bg-gold hover:text-emerald-deep"
+                    className="h-10 w-10 rounded-full bg-black/60 border-white/30 backdrop-blur-md hover:bg-gold hover:text-emerald-deep hover:scale-110 transition-all shadow-lg"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
