@@ -6,7 +6,7 @@
  import { LotCard } from "@/components/auctions/lot-card"
  import { cn } from "@/lib/utils"
 
- export function FeaturedLotsCarousel({ lots }: { lots: any[] }) {
+  export function FeaturedLotsCarousel({ lots, variant = 'model1' }: { lots: any[], variant?: string }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
      align: "start",
      loop: true,
@@ -22,8 +22,16 @@
 
    if (!lots || lots.length === 0) return null
 
-   return (
-     <section className="container mx-auto px-4 py-16 relative">
+    const isModern = variant === 'model2';
+    const isTraditional = variant === 'model3';
+
+    return (
+      <section className={cn(
+        "py-16 relative",
+        isModern ? "bg-black text-white" : "container mx-auto px-4"
+      )}>
+        {isModern && <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80')] bg-cover bg-fixed" />}
+        <div className={cn("relative z-10", isModern && "container mx-auto px-4")}>
        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
          <div>
             <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/30 text-gold text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
