@@ -23,7 +23,7 @@
      image.src = url;
    });
  
- async function getCroppedImg(
+ export async function getCroppedImg(
    imageSrc: string,
    pixelCrop: { x: number; y: number; width: number; height: number }
  ): Promise<Blob> {
