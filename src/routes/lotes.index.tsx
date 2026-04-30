@@ -168,8 +168,13 @@ export const Route = createFileRoute("/lotes/")({
                  <SelectValue placeholder="Ordenar por" />
                </SelectTrigger>
                <SelectContent>
-                 <SelectItem value="newest">Mais Recentes</SelectItem>
-                 <SelectItem value="lot_number">Nº do Lote</SelectItem>
+                  <SelectItem value="newest">Mais Recentes</SelectItem>
+                  <SelectItem value="lot_number">Nº do Lote</SelectItem>
+                  <SelectItem value="price_desc">Maior Valor</SelectItem>
+                  <SelectItem value="price_asc">Menor Valor</SelectItem>
+                  <SelectItem value="name_asc">Nome (A-Z)</SelectItem>
+                  <SelectItem value="most_bids">Mais Disputados</SelectItem>
+                  <SelectItem value="ending_soon">Encerrando em Breve</SelectItem>
                </SelectContent>
              </Select>
            </div>
