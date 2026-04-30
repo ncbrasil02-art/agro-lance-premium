@@ -1649,7 +1649,9 @@ export const Route = createFileRoute("/painel")({
 
           {type === 'contrato' && (
             <div className="space-y-6 text-sm leading-relaxed text-justify text-gray-700 font-serif">
-               <h1 className="text-xl font-bold text-center uppercase mb-8 underline">Instrumento Particular de Compra e Venda de Semovente</h1>
+                <h1 className="text-xl font-bold text-center uppercase mb-8 underline">
+                  {isDirectSale ? "Contrato de Compra e Venda de Animal (Direta)" : "Instrumento Particular de Compra e Venda de Semovente (Leilão)"}
+                </h1>
                
                <p>
                  Pelo presente instrumento particular, as partes abaixo identificadas têm entre si, justo e contratado, a compra e venda do animal descrito, mediante as cláusulas e condições seguintes:
@@ -1664,11 +1666,11 @@ export const Route = createFileRoute("/painel")({
                </p>
 
                <p>
-                 <strong>CLÁUSULA PRIMEIRA - DO OBJETO:</strong> O objeto do presente contrato é a venda e compra do animal denominado <strong>{lot.animal?.name?.toUpperCase()}</strong>, da raça <strong>{lot.animal?.breed?.toUpperCase()}</strong>, Lote nº <strong>{lot.lot_number}</strong> arrematado no leilão <strong>{lot.event?.name?.toUpperCase()}</strong>.
+                 <strong>CLÁUSULA PRIMEIRA - DO OBJETO:</strong> O objeto do presente contrato é a venda e compra do animal denominado <strong>{lot.animal?.name?.toUpperCase()}</strong>, da raça <strong>{lot.animal?.breed?.toUpperCase()}</strong>, {isDirectSale ? "adquirido via venda direta" : `Lote nº ${lot.lot_number} arrematado no leilão ${lot.event?.name?.toUpperCase()}`}.
                </p>
 
                <p>
-                 <strong>CLÁUSULA SEGUNDA - DO PREÇO E CONDIÇÕES:</strong> O COMPRADOR pagará ao VENDEDOR a quantia total de <strong>{formatBRL(lot.current_price)}</strong>, à vista ou conforme condições parceladas pactuadas no pregão.
+                 <strong>CLÁUSULA SEGUNDA - DO PREÇO E CONDIÇÕES:</strong> O COMPRADOR pagará ao VENDEDOR a quantia total de <strong>{formatBRL(lot.current_price)}</strong>, {isDirectSale ? "conforme condições negociadas entre as partes" : "à vista ou conforme condições parceladas pactuadas no pregão"}.
                </p>
 
                <p>
