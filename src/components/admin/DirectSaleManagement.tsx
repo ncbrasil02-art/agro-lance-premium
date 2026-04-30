@@ -69,6 +69,22 @@ export function DirectSaleManagement() {
         .eq("id", id);
 
       if (error) throw error;
+
+      // Get the sale details to notify the buyer
+      const sale = sales.find(s => s.id === id);
+      if (sale) {
+        await supabase.functions.invoke('user-notifications', {
+          body: {
+            userEmail: sale.buyer_email,
+            type: 'direct_sale_status_update',
+            data: {
+              amount: sale.total_price,
+              itemName: sale.animals?.name || 'item',
+              status: status
+            }
+          }
+        });
+      }
       
       toast.success(`Pedido ${status === 'confirmed' ? 'confirmado' : 'cancelado'} com sucesso!`);
       fetchSales();
