@@ -153,11 +153,19 @@
    </section>
  );
  
- export const ModernHero = ({ siteInfo, nextEvent, customTexts }: HeroProps) => (
+  export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => (
    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-     <div className="absolute inset-0 opacity-10">
-       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--gold)_1px,transparent_1px)] bg-[size:40px_40px]" />
-     </div>
+      {homepageSettings?.hero_backgrounds?.length > 0 ? (
+        <HeroBackground 
+          backgrounds={homepageSettings?.hero_backgrounds} 
+          opacity={homepageSettings?.hero_bg_opacity ?? 10} 
+          blur={homepageSettings?.hero_bg_blur ?? 0} 
+        />
+      ) : (
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--gold)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        </div>
+      )}
      
      <div className="container relative mx-auto px-4 text-center">
        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-emerald-deep text-[10px] font-bold uppercase tracking-widest mb-8">
@@ -165,14 +173,20 @@
          Plataforma de Investimento Genético
        </div>
  
-       <h1 className="text-5xl md:text-9xl font-black tracking-tighter uppercase mb-8 leading-[0.9]">
-         {customTexts?.hero_title || (
-           <>
-             REVOLUCIONANDO O <br />
-             <span className="text-gradient-gold">AGRONEGÓCIO</span>
-           </>
-         )}
-       </h1>
+        <HeroPhrase 
+          phrases={customTexts?.hero_phrases} 
+          className="text-5xl md:text-9xl font-black tracking-tighter uppercase mb-8 leading-[0.9]"
+          defaultTitle={
+            <h1>
+              {customTexts?.hero_title || (
+                <>
+                  REVOLUCIONANDO O <br />
+                  <span className="text-gradient-gold">AGRONEGÓCIO</span>
+                </>
+              )}
+            </h1>
+          }
+        />
  
        <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-12 font-medium">
          {customTexts?.hero_subtitle || "A mais avançada experiência de leilões digitais com lances em tempo real e segurança inabalável."}
