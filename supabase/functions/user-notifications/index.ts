@@ -1,6 +1,32 @@
- import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
- import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
- 
+  import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+  const sendWhatsApp = async (phone: string, message: string) => {
+    const url = Deno.env.get('WHATSAPP_API_URL')
+    const key = Deno.env.get('WHATSAPP_API_KEY')
+    if (!url || !key || !phone) return
+    
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({
+          number: phone.replace(/\D/g, ''),
+          message: message
+        })
+      })
+    } catch (e) {
+      console.error('WhatsApp error:', e)
+    }
+  }
+
+  const sendSMS = async (phone: string, message: string) => {
+    const key = Deno.env.get('SMS_API_KEY')
+    if (!key || !phone) return
+    // SMS implementation would go here (e.g., Twilio)
+    console.log('SMS would be sent to', phone, ':', message)
+  }
+
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+
  const corsHeaders = {
    'Access-Control-Allow-Origin': '*',
    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -31,26 +57,37 @@
      
      // Permissions check: only admins can send notifications (except for certain types if allowed)
       if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
-       throw new Error('Forbidden')
-     }
- 
+        throw new Error('Forbidden')
+      }
+
      const adminClient = createClient(
        Deno.env.get('SUPABASE_URL') ?? '',
        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
      )
  
-     let email = userEmail;
-     if (!email && userId) {
-       const { data: { user } } = await adminClient.auth.admin.getUserById(userId)
-       if (user) email = user.email
-     }
- 
+      let email = userEmail;
+      let phone = '';
+      let profileData = null;
+
+      if (userId) {
+        const { data: { user } } = await adminClient.auth.admin.getUserById(userId)
+        if (user) email = user.email
+        
+        const { data: profile } = await adminClient
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single()
+        profileData = profile
+        phone = profile?.phone || ''
+      }
+
      const resendKey = Deno.env.get('RESEND_API_KEY')
      if (!resendKey) {
        console.warn('RESEND_API_KEY not found. Email not sent.')
        return new Response(JSON.stringify({ success: true, message: 'Key missing' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
      }
- 
+
      if (type === 'user_approved' && email) {
        await fetch('https://api.resend.com/emails', {
          method: 'POST',
@@ -59,9 +96,13 @@
            from: 'Elite Leilões <contato@premiumagro.com.br>',
            to: [email],
            subject: 'Seu cadastro foi aprovado! 🚀',
-           html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Olá! Seu cadastro foi aprovado.</h2><p>Você já pode participar dos leilões.</p></div>`,
-         }),
-       })
+            html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Olá! Seu cadastro foi aprovado.</h2><p>Você já pode participar dos leilões.</p></div>`,
+          }),
+        })
+        
+        if (phone) {
+          await sendWhatsApp(phone, `🚀 *Elite Leilões: Seu cadastro foi aprovado!*\n\nOlá! Seu cadastro foi aprovado com sucesso. Você já pode participar de todos os nossos leilões e realizar lances.\n\nBoas compras!`)
+        }
      } else if ((type === 'offer_received' || type === 'direct_sale_request') && resendKey) {
        const { amount, itemName, bidderName } = data;
        const { data: admins } = await adminClient.from('profiles').select('id').eq('role', 'admin');
@@ -95,21 +136,23 @@
             html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`,
           }),
         });
-      } else if (type === 'outbid' && email && resendKey) {
-        // Check user preferences
-        if (userId) {
-          const { data: prefData } = await adminClient
-            .from('profiles')
-            .select('pref_outbid_email')
-            .eq('id', userId)
-            .single();
-          
-          if (prefData && prefData.pref_outbid_email === false) {
-            return new Response(JSON.stringify({ success: true, message: 'Email skipped due to user preferences' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-          }
-        }
+       } else if (type === 'outbid') {
+         const { amount, lotNumber, animalName } = data;
 
-        const { amount, lotNumber, animalName } = data;
+         // WhatsApp Notification
+         if (profileData?.pref_outbid_whatsapp !== false && phone) {
+           const wsMessage = `📢 *Elite Leilões: Seu lance foi superado!*\n\nO lance no Lote #${lotNumber} (${animalName}) foi coberto.\nValor atual: R$ ${amount.toLocaleString('pt-BR')}\n\nClique para cobrir o lance:\nhttps://eliteleiloes.lovable.app/lotes/${lotId}`
+           await sendWhatsApp(phone, wsMessage)
+         }
+
+         // SMS Notification
+         if (profileData?.pref_outbid_sms && phone) {
+           const smsMessage = `Elite Leilões: Seu lance no Lote #${lotNumber} foi superado! Valor: R$ ${amount.toLocaleString('pt-BR')}. Acesse: https://eliteleiloes.lovable.app/lotes/${lotId}`
+           await sendSMS(phone, smsMessage)
+         }
+
+         // Email Notification
+         if (email && resendKey && profileData?.pref_outbid_email !== false) {
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
@@ -174,8 +217,9 @@
             `,
          }),
        });
+       }
      }
- 
+
      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
    } catch (error) {
      return new Response(JSON.stringify({ error: error.message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })

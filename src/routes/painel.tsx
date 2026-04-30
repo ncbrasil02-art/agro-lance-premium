@@ -144,7 +144,11 @@ export const Route = createFileRoute("/painel")({
       nationality: "Brasileira",
       pref_outbid_email: true,
       pref_outbid_push: true,
+      pref_outbid_whatsapp: true,
+      pref_outbid_sms: false,
       pref_new_event_email: true,
+      pref_new_event_whatsapp: true,
+      pref_new_event_sms: false,
       pref_followed_lot_update: true,
     });
 
@@ -293,7 +297,11 @@ export const Route = createFileRoute("/painel")({
             nationality: profile.nationality || "Brasileira",
             pref_outbid_email: profile.pref_outbid_email !== false,
             pref_outbid_push: profile.pref_outbid_push !== false,
+            pref_outbid_whatsapp: profile.pref_outbid_whatsapp !== false,
+            pref_outbid_sms: !!profile.pref_outbid_sms,
             pref_new_event_email: profile.pref_new_event_email !== false,
+            pref_new_event_whatsapp: profile.pref_new_event_whatsapp !== false,
+            pref_new_event_sms: !!profile.pref_new_event_sms,
             pref_followed_lot_update: profile.pref_followed_lot_update !== false,
           });
        }
@@ -375,7 +383,11 @@ export const Route = createFileRoute("/painel")({
             nationality: formData.nationality,
             pref_outbid_email: formData.pref_outbid_email,
             pref_outbid_push: formData.pref_outbid_push,
+            pref_outbid_whatsapp: formData.pref_outbid_whatsapp,
+            pref_outbid_sms: formData.pref_outbid_sms,
             pref_new_event_email: formData.pref_new_event_email,
+            pref_new_event_whatsapp: formData.pref_new_event_whatsapp,
+            pref_new_event_sms: formData.pref_new_event_sms,
             pref_followed_lot_update: formData.pref_followed_lot_update,
           })
           .eq("id", user.id);
@@ -799,12 +811,11 @@ export const Route = createFileRoute("/painel")({
                               >
                                 Solicitar Revisão
                               </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-                    </tbody>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
                   </table>
                 </div>
               )}
@@ -886,26 +897,27 @@ export const Route = createFileRoute("/painel")({
                     ) : (
                       filteredBids.map((bid) => (
                         <tr key={bid.id} className="hover:bg-muted/10 transition-colors">
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          {new Date(bid.created_at).toLocaleString("pt-BR")}
-                        </td>
-                        <td className="px-4 py-4 font-medium">
-                          {bid.lot?.animal?.name || "Lote #"+bid.lot?.lot_number}
-                        </td>
-                        <td className="px-4 py-4 font-bold text-emerald-deep">
-                          {formatBRL(bid.amount)}
-                        </td>
-                         <td className="px-4 py-4">
-                           {bid.lot?.winner_id === user.id && bid.lot?.status === 'sold' ? (
-                             <Badge className="bg-emerald-600 text-white border-none">ARREMATADO</Badge>
-                           ) : bid.amount >= (bid.lot?.current_price || 0) ? (
-                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Maior lance</Badge>
-                           ) : (
-                             <Badge variant="outline" className="text-muted-foreground">Lance superado</Badge>
-                           )}
-                         </td>
-                      </tr>
-                    ))}
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            {new Date(bid.created_at).toLocaleString("pt-BR")}
+                          </td>
+                          <td className="px-4 py-4 font-medium">
+                            {bid.lot?.animal?.name || "Lote #" + bid.lot?.lot_number}
+                          </td>
+                          <td className="px-4 py-4 font-bold text-emerald-deep">
+                            {formatBRL(bid.amount)}
+                          </td>
+                          <td className="px-4 py-4">
+                            {bid.lot?.winner_id === user.id && bid.lot?.status === 'sold' ? (
+                              <Badge className="bg-emerald-600 text-white border-none">ARREMATADO</Badge>
+                            ) : bid.amount >= (bid.lot?.current_price || 0) ? (
+                              <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Maior lance</Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-muted-foreground">Lance superado</Badge>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -999,15 +1011,37 @@ export const Route = createFileRoute("/painel")({
                   <CardDescription>Escolha como deseja ser notificado.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between space-x-2">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-bold">Lance Superado (E-mail)</Label>
-                      <p className="text-[10px] text-muted-foreground">Receba um e-mail imediato quando alguém cobrir seu lance.</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Lance Superado (E-mail)</Label>
+                        <p className="text-[10px] text-muted-foreground">Receba um e-mail imediato quando alguém cobrir seu lance.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_outbid_email} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_outbid_email: checked})}
+                      />
                     </div>
-                    <Switch 
-                      checked={formData.pref_outbid_email} 
-                      onCheckedChange={(checked) => setFormData({...formData, pref_outbid_email: checked})}
-                    />
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Lance Superado (WhatsApp)</Label>
+                        <p className="text-[10px] text-muted-foreground text-emerald-600 font-medium">Notificação em tempo real no seu celular.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_outbid_whatsapp} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_outbid_whatsapp: checked})}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between space-x-2 opacity-50">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Lance Superado (SMS)</Label>
+                        <p className="text-[10px] text-muted-foreground">Aviso via SMS tradicional.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_outbid_sms} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_outbid_sms: checked})}
+                      />
+                    </div>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between space-x-2">
@@ -1032,15 +1066,27 @@ export const Route = createFileRoute("/painel")({
                     />
                   </div>
                   <Separator />
-                  <div className="flex items-center justify-between space-x-2">
-                    <div className="space-y-0.5">
-                      <Label className="text-sm font-bold">Novos Eventos</Label>
-                      <p className="text-[10px] text-muted-foreground">Fique por dentro dos novos leilões e oportunidades.</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Novos Eventos (E-mail)</Label>
+                        <p className="text-[10px] text-muted-foreground">Receba as novidades por e-mail.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_new_event_email} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_new_event_email: checked})}
+                      />
                     </div>
-                    <Switch 
-                      checked={formData.pref_new_event_email} 
-                      onCheckedChange={(checked) => setFormData({...formData, pref_new_event_email: checked})}
-                    />
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Novos Eventos (WhatsApp)</Label>
+                        <p className="text-[10px] text-muted-foreground text-emerald-600">Catálogo e convites via WhatsApp.</p>
+                      </div>
+                      <Switch 
+                        checked={formData.pref_new_event_whatsapp} 
+                        onCheckedChange={(checked) => setFormData({...formData, pref_new_event_whatsapp: checked})}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
