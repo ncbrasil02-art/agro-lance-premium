@@ -28,6 +28,12 @@ export const Route = createFileRoute("/lotes/")({
     loader: async () => {
       logger.info("Iniciando carregamento da página de Lotes");
       try {
+         const { data: settingsData } = await supabase
+            .from("site_settings")
+            .select("key, value")
+            .eq("key", "lot_card_settings")
+            .maybeSingle();
+
          const { data: lots, error } = await supabase
             .from("lots")
             .select("*, animal:animals!lots_animal_id_fkey(*, sellers!animals_seller_id_fkey(name)), event:events!lots_event_id_fkey(*)")
@@ -41,7 +47,7 @@ export const Route = createFileRoute("/lotes/")({
 
         const validatedLots = z.array(lotSchema).parse(lots || []);
         logger.info("Lotes carregados e validados com sucesso", { count: validatedLots.length });
-        return { lots: validatedLots };
+        return { lots: validatedLots, settings: settingsData?.value || null };
       } catch (error) {
         logger.error("Erro ao carregar página de Lotes", { error });
         throw error;
@@ -52,9 +58,9 @@ export const Route = createFileRoute("/lotes/")({
    errorComponent: ErrorFallback,
 });
 
- function LotsPage() {
-   const { lots = [] } = Route.useLoaderData() as any;
-   const router = useRouter();
+  function LotsPage() {
+    const { lots = [], settings } = Route.useLoaderData() as any;
+    const router = useRouter();
    const [filter, setFilter] = useState("all");
    const [searchTerm, setSearchTerm] = useState("");
    const [sortBy, setSortBy] = useState("newest");
@@ -71,8 +77,12 @@ export const Route = createFileRoute("/lotes/")({
        name: l.animal?.name || "Sem nome",
        breed: l.animal?.breed || "",
        category: l.animal?.species as any,
-       cover: l.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
-       currentBid: l.current_price || l.starting_price,
+        cover: l.animal?.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80",
+        photos: l.animal?.photos || [],
+        youtube_url: l.animal?.youtube_url || "",
+        registration_number: l.animal?.registration_number || "",
+        vaccination_records: l.animal?.vaccination_records || null,
+        currentBid: l.current_price || l.starting_price,
        minIncrement: l.bid_increment,
        bidsCount: l.bids_count || 0,
        viewers: l.viewers || 0,
@@ -210,9 +220,9 @@ export const Route = createFileRoute("/lotes/")({
            <p className="text-muted-foreground">Nenhum lote encontrado com os filtros selecionados.</p>
          </div>
        ) : (
-         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-           {filteredLots?.map((l: any) => <LotCard key={l.id} lot={l as any} />)}
-         </div>
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredLots?.map((l: any) => <LotCard key={l.id} lot={l as any} settings={settings} />)}
+          </div>
        )}
      </div>
    );
