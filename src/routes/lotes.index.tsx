@@ -130,16 +130,29 @@ export const Route = createFileRoute("/lotes/")({
        });
      }
 
-     // Sorting
-     result = [...result].sort((a: any, b: any) => {
-       if (sortBy === "newest") {
-         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-       }
-       if (sortBy === "lot_number") {
-         return (a.number || 0) - (b.number || 0);
-       }
-       return 0;
-     });
+      // Sorting
+      result = [...result].sort((a: any, b: any) => {
+        switch (sortBy) {
+          case "newest":
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          case "lot_number":
+            return (a.number || 0) - (b.number || 0);
+          case "price_desc":
+            return (b.currentBid || 0) - (a.currentBid || 0);
+          case "price_asc":
+            return (a.currentBid || 0) - (b.currentBid || 0);
+          case "name_asc":
+            return a.name.localeCompare(b.name);
+          case "most_bids":
+            return (b.bidsCount || 0) - (a.bidsCount || 0);
+          case "ending_soon":
+            if (!a.endsAt) return 1;
+            if (!b.endsAt) return -1;
+            return new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime();
+          default:
+            return 0;
+        }
+      });
 
      return result;
    }, [mappedLots, filter, searchTerm, sortBy]);
