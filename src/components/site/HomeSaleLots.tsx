@@ -43,11 +43,12 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
           <Link key={animal.id} to="/compra-direta" className="group h-full">
             <Card className="overflow-hidden border-border/40 bg-card/40 hover:bg-card/60 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] rounded-[2.5rem] h-full flex flex-col border-b-8 border-b-gold/20 hover:border-b-gold group-hover:-translate-y-3">
               <div className="relative aspect-[4/3] overflow-hidden">
-                <OptimizedImage 
-                  src={animal.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
-                  alt={animal.name} 
-                  className="group-hover:scale-110 transition-transform duration-700 ease-out"
-                />
+                 <OptimizedImage 
+                   src={animal.photos?.[0] || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"} 
+                   alt={animal.name} 
+                   aspectRatio="landscape"
+                   className="group-hover:scale-110 transition-transform duration-700 ease-out"
+                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
                 
                 <div className="absolute top-4 left-4">
