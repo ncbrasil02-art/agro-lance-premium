@@ -549,6 +549,74 @@ export const Route = createFileRoute("/painel")({
             </Card>
           </TabsContent>
 
+          <TabsContent value="notificacoes" className="space-y-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle>Notificações do Sistema</CardTitle>
+                  <CardDescription>Avisos importantes sobre seus lances e conta.</CardDescription>
+                </div>
+                {notifications.some(n => !n.is_read) && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-xs text-gold hover:text-gold-bright"
+                    onClick={async () => {
+                      if (user) {
+                        await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id);
+                        fetchNotifications();
+                      }
+                    }}
+                  >
+                    Marcar todas como lidas
+                  </Button>
+                )}
+              </CardHeader>
+              <CardContent>
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <ShieldCheck className="h-12 w-12 text-muted-foreground/20 mb-4" />
+                    <p className="text-muted-foreground">Nenhuma notificação por enquanto.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {notifications.map((n) => (
+                      <div 
+                        key={n.id} 
+                        className={`p-4 rounded-2xl border transition-all ${n.is_read ? 'bg-background border-border opacity-70' : 'bg-gold/5 border-gold/20 shadow-sm'}`}
+                      >
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="space-y-1 flex-1">
+                            <div className="flex items-center gap-2">
+                              {!n.is_read && <div className="h-2 w-2 rounded-full bg-gold animate-pulse" />}
+                              <h4 className="font-bold text-sm text-emerald-deep">{n.title}</h4>
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-relaxed">{n.message}</p>
+                            <p className="text-[10px] text-muted-foreground/60 pt-1">
+                              {new Date(n.created_at).toLocaleString('pt-BR')}
+                            </p>
+                          </div>
+                          {n.link && (
+                            <Button variant="outline" size="sm" asChild className="h-8 text-[10px] font-bold border-emerald-deep/20">
+                              <Link to={n.link as any} onClick={async () => {
+                                if (!n.is_read) {
+                                  await supabase.from('notifications').update({ is_read: true }).eq('id', n.id);
+                                  fetchNotifications();
+                                }
+                              }}>
+                                Ver Detalhes
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="ofertas" className="space-y-6">
            <Card>
              <CardHeader>
