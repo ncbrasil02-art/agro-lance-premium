@@ -363,18 +363,36 @@ function LotDetail() {
          if (!newBid || newBid.id === lastBidId) return;
          lastBidId = newBid.id;
  
-         setRecentBids(prev => {
-           if (prev.some(b => b.id === newBid.id)) return prev;
-           const updated = [newBid, ...prev].slice(0, 10);
-           
-           toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
-             description: newBid.bidder_name || "Licitante",
-             icon: <Gavel className="h-4 w-4 text-gold" />,
-             duration: 3000
-           });
-           
-           return updated;
-         });
+          setRecentBids(prev => {
+            if (prev.some(b => b.id === newBid.id)) return prev;
+            const updated = [newBid, ...prev].slice(0, 10);
+            
+            // Se o novo lance não for do próprio usuário e o usuário tiver o lance anterior
+            const isOutbiddingMe = user && prev.length > 0 && prev[0].user_id === user.id && newBid.user_id !== user.id;
+
+            if (isOutbiddingMe) {
+              toast.error("VOCÊ FOI SUPERADO!", {
+                description: `Seu lance no lote #${lot.lot_number} foi superado por ${formatBRL(newBid.amount)}. Deseja cobrir?`,
+                icon: <AlertTriangle className="h-5 w-5 text-destructive" />,
+                duration: 6000,
+                action: {
+                  label: "DAR LANCE",
+                  onClick: () => {
+                    const el = document.getElementById('bid-actions');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }
+              });
+            } else {
+              toast.info(`Novo lance: ${formatBRL(newBid.amount)}`, {
+                description: newBid.bidder_name || "Licitante",
+                icon: <Gavel className="h-4 w-4 text-gold" />,
+                duration: 3000
+              });
+            }
+            
+            return updated;
+          });
  
          setLot((prev: any) => {
            if (newBid.amount > (prev.current_price || 0)) {
@@ -423,9 +441,25 @@ function LotDetail() {
       
       if (error) throw error;
       
-      const result = data as { success: boolean; message: string };
+      const result = data as { success: boolean; message: string; previous_bidder_id?: string };
       if (result.success) {
         toast.success(result.message || "Lance efetuado!");
+
+        // Enviar notificação por e-mail se houver um licitante anterior superado
+        if (result.previous_bidder_id && user && result.previous_bidder_id !== user.id) {
+          supabase.functions.invoke('user-notifications', {
+            body: {
+              userId: result.previous_bidder_id,
+              type: 'outbid',
+              lotId: lot.id,
+              data: {
+                amount: amount,
+                lotNumber: lot.lot_number,
+                animalName: lot.animal?.name
+              }
+            }
+          }).catch(err => console.error("Erro ao enviar e-mail de outbid:", err));
+        }
       } else {
         toast.error(result.message, {
           duration: 6000,

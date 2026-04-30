@@ -27,10 +27,10 @@
        .eq('id', authUser.id)
        .single()
  
-     const { userId, type, data, userEmail } = await req.json()
+      const { userId, type, data, userEmail, lotId } = await req.json()
      
      // Permissions check: only admins can send notifications (except for certain types if allowed)
-     if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request'].includes(type)) {
+      if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
        throw new Error('Forbidden')
      }
  
@@ -92,7 +92,29 @@
            from: 'Elite Leilões <contato@premiumagro.com.br>',
            to: [email],
            subject: `Sua solicitação foi ${statusLabel.toLowerCase()}!`,
-           html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`,
+            html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`,
+          }),
+        });
+      } else if (type === 'outbid' && email && resendKey) {
+        const { amount, lotNumber, animalName } = data;
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
+          body: JSON.stringify({
+            from: 'Elite Leilões <contato@premiumagro.com.br>',
+            to: [email],
+            subject: 'Seu lance foi superado! 📢',
+            html: `
+              <div style="font-family: sans-serif; padding: 20px; color: #1a1a1a;">
+                <h2 style="color: #c5a059;">Seu lance foi superado!</h2>
+                <p>O seu lance no <strong>Lote #${lotNumber} (${animalName})</strong> foi superado por um novo lance de <strong>R$ ${amount.toLocaleString('pt-BR')}</strong>.</p>
+                <p>Não perca a oportunidade! Clique no botão abaixo para retornar ao lote e ofertar um lance superior.</p>
+                <div style="margin-top: 30px;">
+                  <a href="https://eliteleiloes.lovable.app/lotes/${lotId}" style="background-color: #064e3b; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Dar novo lance</a>
+                </div>
+                <p style="margin-top: 30px; font-size: 12px; color: #666;">Este é um e-mail automático da Elite Leilões.</p>
+              </div>
+            `,
          }),
        });
      }
