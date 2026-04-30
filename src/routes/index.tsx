@@ -271,11 +271,12 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
                 events={upcomingEvents} 
                 title="Próximos eventos" 
                 subtitle="Reserve sua agenda e participe das maiores oportunidades."
+                variant={templateId}
               />
             )}
             {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
               <>
-                <FeaturedLotsCarousel lots={mappedLots} />
+                <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
                 {/* Mobile/Alternative Grid for "chamativo" feel */}
                 <section className="container mx-auto px-4 py-8 lg:hidden">
                    <div className="grid gap-6 sm:grid-cols-2">
@@ -287,7 +288,7 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
               </>
             )}
             {sectionId === "articles" && (activeSections as any)?.show_articles && (
-              <ArticleCarousel articles={articles} />
+              <ArticleCarousel articles={articles} variant={templateId} />
             )}
             {sectionId === "articles" && directSales.length > 0 && (
               <HomeSaleLots directSales={directSales} />
