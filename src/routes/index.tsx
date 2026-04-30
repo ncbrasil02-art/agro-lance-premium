@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
   import { eventSchema, lotSchema, announcementSchema, ValidatedEvent, ValidatedLot } from "@/lib/schemas";
   import { z } from "zod";
 import { OptimizedImage } from "@/components/ui/optimized-image";
+import { cn } from "@/lib/utils";
   import { HomeSkeleton, PageSkeleton } from "@/components/ui/page-skeleton";
   import { ErrorFallback, ErrorBoundary } from "@/components/ui/error-fallback";
 import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
