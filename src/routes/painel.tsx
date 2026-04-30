@@ -657,6 +657,14 @@ export const Route = createFileRoute("/painel")({
           <TabsTrigger value="favoritos" className="gap-2">
             <Heart className="h-4 w-4" /> Meus Favoritos
           </TabsTrigger>
+          <TabsTrigger value="notificacoes" className="gap-2 relative">
+            <ShieldCheck className="h-4 w-4" /> Notificações
+            {notifications.some(n => !n.is_read) && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {notifications.filter(n => !n.is_read).length}
+              </span>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="mensagens" className="gap-2 relative">
             <MessageSquare className="h-4 w-4" /> Mensagens
             {messages.some(m => !m.is_read) && (
