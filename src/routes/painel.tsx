@@ -799,12 +799,11 @@ export const Route = createFileRoute("/painel")({
                               >
                                 Solicitar Revisão
                               </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-                    </tbody>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
                   </table>
                 </div>
               )}
