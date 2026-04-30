@@ -235,107 +235,12 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
 
        {/* HERO / BANNERS */}
        {(!activeSections || (activeSections as any).show_animated_slides) && (
-         <section className="relative overflow-hidden">
-           <div className="absolute inset-0">
-             <OptimizedImage 
-               src="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80" 
-               alt="Cavalo de elite ao entardecer" 
-               width={1920} 
-               className="h-full w-full opacity-40" 
-             />
-             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
-             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-           </div>
-
-        <div className="container relative mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" />
-              A nova era dos leilões agropecuários
-            </div>
-            {nextEvent && nextEvent.slug && (
-              <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-gold/30 bg-black/40 p-6 backdrop-blur-xl md:w-fit mb-12 shadow-[0_0_40px_rgba(212,175,55,0.1)] border-l-4 border-l-gold">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/20 text-gold">
-                    <Calendar className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/80">Próximo Evento de Elite</div>
-                    <div className="text-xl font-black text-white uppercase italic tracking-tighter">{nextEvent.name}</div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-8">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/40">Inicia em</span>
-                    <Countdown endsAt={nextEvent.date} variant="segmented" className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent" />
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Link 
-                      to="/eventos/$eventSlug" 
-                      params={{ eventSlug: nextEvent.slug }} 
-                      className="group/btn flex items-center gap-2 rounded-xl bg-gold px-6 py-3 text-xs font-black uppercase text-emerald-deep transition-all hover:bg-gold-bright active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)]"
-                    >
-                      Ver Catálogo
-                      <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
-                    <Link 
-                      to="/cadastro" 
-                      className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-xs font-black uppercase text-white transition-all hover:bg-white/10 active:scale-95"
-                    >
-                      Garantir Vaga
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl uppercase whitespace-pre-line" key="main-title">
-               {customTexts?.hero_title || (
-                 <>
-                   {(currentSiteInfo?.name || "Premium Agro")?.split(' ')?.[0]} <span className="text-gradient-gold">{(currentSiteInfo?.name || "Premium Agro")?.split(' ')?.slice(1)?.join(' ')}</span><br />
-                   em tempo real
-                 </>
-               )}
-             </h1>
-              <p className="mt-5 max-w-xl text-lg text-muted-foreground italic whitespace-pre-line">
-               {customTexts?.hero_subtitle || (
-                 `${currentSiteInfo?.name || "Premium Agro"} - A elite do agronegócio com transmissão ao vivo, curadoria genética e tecnologia de ponta para compradores e leiloeiros profissionais.`
-               )}
-             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/ao-vivo">
-                <Button size="lg" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">
-                  <Radio className="mr-2 h-4 w-4 animate-pulse-live" />
-                  Assistir agora
-                </Button>
-              </Link>
-              <Link to="/eventos">
-                <Button size="lg" variant="outline" className="border-gold/40 hover:bg-gold/10">
-                  Ver próximos eventos <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <EventRequestDialog />
-            </div>
-
-            {/* Stats inline */}
-            <dl className="mt-12 grid max-w-lg grid-cols-2 gap-6 sm:grid-cols-4">
-              {[
-                { v: formatBRL(stats.totalSold), l: "Vendido" },
-                { v: stats.totalAnimals.toLocaleString("pt-BR"), l: "Animais" },
-                { v: stats.totalUsers.toLocaleString("pt-BR"), l: "Usuários" },
-                { v: stats.activeEvents, l: "Eventos ativos" },
-              ].map((s) => (
-                <div key={s.l}>
-                  <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">{s.l}</dt>
-                  <dd className="mt-1 text-lg font-bold text-foreground">{s.v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
-      )}
+         <>
+           {templateId === 'model1' && <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} />}
+           {templateId === 'model2' && <ModernHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} />}
+           {templateId === 'model3' && <TraditionalHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} />}
+         </>
+       )}
 
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
