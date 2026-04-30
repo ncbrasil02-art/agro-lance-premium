@@ -174,7 +174,7 @@ function DirectSalePage() {
                   <OptimizedImage 
                     src={animal.photos[0]} 
                     alt={animal.name} 
-                    width={400}
+                     width={800}
                     aspectRatio="landscape"
                     className="group-hover:scale-110 transition-transform duration-500"
                   />

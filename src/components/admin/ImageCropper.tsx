@@ -48,11 +48,21 @@
      pixelCrop.height
    );
  
-   return new Promise((resolve) => {
-     canvas.toBlob((blob) => {
-       if (blob) resolve(blob);
-     }, 'image/jpeg');
-   });
+     return new Promise((resolve, reject) => {
+       // Usar WebP se suportado para melhor qualidade/tamanho, caso contrário JPEG
+       const type = 'image/webp';
+       canvas.toBlob((blob) => {
+         if (blob) {
+           resolve(blob);
+         } else {
+           // Fallback para JPEG
+           canvas.toBlob((jpegBlob) => {
+             if (jpegBlob) resolve(jpegBlob);
+             else reject(new Error('Falha ao gerar o blob da imagem'));
+           }, 'image/jpeg', 0.9);
+         }
+       }, type, 0.9);
+     });
  }
  
  export function ImageCropper({ image, aspect = 4 / 3, onCropComplete, onCancel }: ImageCropperProps) {

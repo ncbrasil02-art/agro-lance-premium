@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+ export const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 export const MAX_DOC_SIZE = 10 * 1024 * 1024; // 10MB
 
 export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
