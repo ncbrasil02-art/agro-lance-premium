@@ -119,14 +119,28 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
       closed_color: "#64748B"
    });
  
-   const [homepage, setHomepage] = useState({
-     show_articles: true,
-     show_upcoming_events: true,
-     show_featured_lots: true,
-     show_sale_menu: true,
-     show_animated_slides: true,
-     order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"]
-   });
+    const [homepage, setHomepage] = useState({
+      show_articles: true,
+      show_upcoming_events: true,
+      show_featured_lots: true,
+      show_sale_menu: true,
+      show_animated_slides: true,
+      order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"]
+    });
+
+    const [lotCardSettings, setLotCardSettings] = useState({
+      media_mode: "gallery",
+      displayed_fields: [
+        { key: "father", label: "Pai", enabled: true },
+        { key: "mother", label: "Mãe", enabled: true },
+        { key: "sex", label: "Sexo", enabled: true },
+        { key: "breed", label: "Raça", enabled: true },
+        { key: "seller", label: "Vendedor", enabled: true },
+        { key: "birth_date", label: "Data de Nasc.", enabled: false },
+        { key: "registration_number", label: "Registro", enabled: false },
+        { key: "location", label: "Localização", enabled: false }
+      ]
+    });
  
    useEffect(() => {
      fetchSettings();
@@ -158,6 +172,7 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
           if (seoData) setSeoSettings((prev: any) => ({ ...prev, ...(seoData as any) }));
          if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
          if (animData) setAnimations((prev: any) => ({ ...prev, ...(animData as any) }));
+         if (lotCardData) setLotCardSettings((prev: any) => ({ ...prev, ...(lotCardData as any) }));
 
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
@@ -316,6 +331,9 @@ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, 
           </TabsTrigger>
           <TabsTrigger value="audit" className="gap-2">
             <ShieldCheck className="h-4 w-4" /> Auditoria SEO
+          </TabsTrigger>
+          <TabsTrigger value="lots" className="gap-2">
+            <Star className="h-4 w-4" /> Card do Lote
           </TabsTrigger>
         </TabsList>
 
