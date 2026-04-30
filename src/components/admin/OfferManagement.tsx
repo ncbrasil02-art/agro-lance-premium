@@ -87,13 +87,27 @@ export function OfferManagement() {
           is_read: false
         });
 
-       await supabase.from("notifications").insert({
-         user_id: offer.user_id,
-         title: title,
-         message: content,
-         is_read: false,
-         link: "/painel"
-       });
+        await supabase.from("notifications").insert({
+          user_id: offer.user_id,
+          title: title,
+          message: content,
+          is_read: false,
+          link: "/painel"
+        });
+
+        // Call Edge Function for email notification
+        await supabase.functions.invoke('user-notifications', {
+          body: {
+            userId: offer.user_id,
+            userEmail: offer.profiles?.email,
+            type: 'offer_status_update',
+            data: {
+              amount: offer.amount,
+              itemName: offer.animal?.name || 'item',
+              status: status
+            }
+          }
+        });
 
        toast.success(`Proposta ${statusLabel.toLowerCase()} com sucesso! O usuário foi notificado.`);
       fetchOffers();
