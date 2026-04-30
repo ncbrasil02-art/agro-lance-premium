@@ -1214,11 +1214,39 @@ export const Route = createFileRoute("/ao-vivo")({
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] gap-2">
-                    <Button
-                      className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
-                      disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
-                      onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
+                    <motion.div
+                      className="w-full"
+                      animate={animations.bid_button_pulse && !(isBidding || liveLot.status === 'sold' || liveLot.status === 'passed') ? {
+                        scale: [1, 1.02, 1],
+                        boxShadow: [
+                          "0 0 0 rgba(212,175,55,0)",
+                          "0 0 15px rgba(212,175,55,0.4)",
+                          "0 0 0 rgba(212,175,55,0)"
+                        ]
+                      } : {}}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
                     >
+                      <Button
+                        className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
+                        disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
+                        onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
+                      >
+                        {isBidding ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
+                          <Ban className="mr-2 h-4 w-4" />
+                        ) : (
+                          <Gavel className="mr-2 h-4 w-4" />
+                        )}
+                        {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
+                         liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
+                         'DAR LANCE AGORA'}
+                      </Button>
+                    </motion.div>
                       {isBidding ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : liveLot.status === 'sold' || liveLot.status === 'passed' ? (
