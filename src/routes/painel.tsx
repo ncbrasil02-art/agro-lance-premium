@@ -826,8 +826,14 @@ export const Route = createFileRoute("/painel")({
                               </p>
                             </div>
                           </td>
-                          <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px] truncate" title={offer.description}>
-                            {offer.description || "-"}
+                          <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px]" title={offer.negotiated_terms || offer.description}>
+                            <div className="line-clamp-2">
+                              {offer.negotiated_terms ? (
+                                <span className="text-emerald-600 font-bold">Acordado: {offer.negotiated_terms}</span>
+                              ) : (
+                                offer.description || "-"
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-4 text-right">
                             {offer.status === 'rejected' && (
