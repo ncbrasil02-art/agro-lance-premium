@@ -113,7 +113,7 @@ export function LotCard({ lot, settings: propSettings }: {
         className={`group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : dynamicStatus === 'recebendo_lances' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
         aria-labelledby={`lot-title-${lot.id}`}
       >
-        <div className="relative overflow-hidden bg-muted aspect-[3/4] sm:aspect-square md:aspect-[3/4]">
+         <div className="relative overflow-hidden bg-muted aspect-[4/3]">
           {settings.media_mode === 'video' && lot.youtube_url ? (
             <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
               <iframe 
@@ -130,7 +130,7 @@ export function LotCard({ lot, settings: propSettings }: {
                 src={(lot.photos && lot.photos.length > 0) ? lot.photos[currentPhotoIndex] : (lot?.cover || "")} 
                 alt={lot?.name || "Animal"} 
                 width={400}
-                aspectRatio="portrait"
+                 aspectRatio="landscape"
                 category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
                 className="transition-smooth group-hover:scale-105 h-full w-full object-cover" 
               />

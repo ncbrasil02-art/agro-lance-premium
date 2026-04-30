@@ -55,7 +55,7 @@
    });
  }
  
- export function ImageCropper({ image, aspect = 3 / 4, onCropComplete, onCancel }: ImageCropperProps) {
+ export function ImageCropper({ image, aspect = 4 / 3, onCropComplete, onCancel }: ImageCropperProps) {
    const [crop, setCrop] = useState({ x: 0, y: 0 });
    const [zoom, setZoom] = useState(1);
    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
