@@ -229,7 +229,7 @@
    </section>
  );
  
- export const TraditionalHero = ({ siteInfo, nextEvent, customTexts }: HeroProps) => (
+  export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => (
    <section className="relative min-h-screen grid lg:grid-cols-2">
      <div className="relative flex items-center p-8 md:p-20 bg-emerald-deep text-white overflow-hidden">
        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-3xl -mr-32 -mt-32" />
@@ -242,14 +242,20 @@
            className="h-16 object-contain mb-12 invert brightness-0"
          />
          
-         <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
-           {customTexts?.hero_title || (
-             <>
-               TRADIÇÃO <br />
-               <span className="text-gold">E RESULTADO</span>
-             </>
-           )}
-         </h1>
+          <HeroPhrase 
+            phrases={customTexts?.hero_phrases} 
+            className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] mb-8"
+            defaultTitle={
+              <h1>
+                {customTexts?.hero_title || (
+                  <>
+                    TRADIÇÃO <br />
+                    <span className="text-gold">E RESULTADO</span>
+                  </>
+                )}
+              </h1>
+            }
+          />
          
          <p className="text-xl text-emerald-bright/80 max-w-md mb-12 leading-relaxed font-medium">
            {customTexts?.hero_subtitle || "Unindo o campo à tecnologia com a confiança de quem entende de genética animal."}
@@ -266,14 +272,22 @@
        </div>
      </div>
      
-     <div className="relative min-h-[400px] lg:min-h-full">
-       <OptimizedImage 
-         src="https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80" 
-         alt="Farm" 
-         width={1200} 
-         className="h-full w-full object-cover" 
-       />
-       <div className="absolute inset-0 bg-emerald-deep/20" />
+      <div className="relative min-h-[400px] lg:min-h-full overflow-hidden">
+        {homepageSettings?.hero_backgrounds?.length > 0 ? (
+          <HeroBackground 
+            backgrounds={homepageSettings?.hero_backgrounds} 
+            opacity={homepageSettings?.hero_bg_opacity ?? 100} 
+            blur={homepageSettings?.hero_bg_blur ?? 0} 
+          />
+        ) : (
+          <OptimizedImage 
+            src="https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80" 
+            alt="Farm" 
+            width={1200} 
+            className="h-full w-full object-cover" 
+          />
+        )}
+        <div className="absolute inset-0 z-1 bg-emerald-deep/20" />
        
        {nextEvent && (
          <div className="absolute bottom-10 left-10 right-10 bg-white/95 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border-l-8 border-gold">
