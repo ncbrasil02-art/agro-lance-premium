@@ -70,7 +70,7 @@ import { Countdown } from "@/components/auctions/countdown";
         className={`flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-smooth hover-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${isUrgent ? 'animate-neon-urgent border-live/40 ring-1 ring-live/20' : effectiveStatus === 'live' ? 'animate-neon border-emerald-bright/40 ring-1 ring-emerald-bright/20' : ''}`}
         aria-labelledby={`event-title-${event.id}`}
       >
-        <div className="relative aspect-[3/4] overflow-hidden bg-emerald-deep/20">
+         <div className="relative aspect-[4/3] overflow-hidden bg-emerald-deep/20">
           {/* Background Blur */}
           <OptimizedImage 
             src={event?.cover || ""} 
@@ -81,13 +81,14 @@ import { Countdown } from "@/components/auctions/countdown";
             className="absolute inset-0 h-full w-full object-cover blur-md opacity-30 scale-110" 
           />
           {/* Main Image */}
-          <OptimizedImage 
-            src={event?.cover || ""} 
-            alt={event?.name || "Evento"} 
-            width={800}
-            category="event"
-            className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
-          />
+           <OptimizedImage 
+             src={event?.cover || ""} 
+             alt={event?.name || "Evento"} 
+             width={800}
+             aspectRatio="landscape"
+             category="event"
+             className="h-full w-full object-cover transition-smooth group-hover:scale-105" 
+           />
           
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent" />
           
