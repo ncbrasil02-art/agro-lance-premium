@@ -93,15 +93,23 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
         });
         
         const currentSiteInfo = dynamicSiteInfo || ctxSiteInfo;
-        const activeSections = sectionsSettings || ctxHomepage || { 
+        const baseSettings = sectionsSettings || ctxHomepage || { 
           show_articles: true, 
           show_upcoming_events: true, 
           show_featured_lots: true,
           show_animated_slides: true,
-          order: templateId === 'model2' ? ["featured_lots", "upcoming_events", "articles", "sale_menu"] : 
-                 templateId === 'model3' ? ["upcoming_events", "articles", "featured_lots", "sale_menu"] : 
-                 ["upcoming_events", "featured_lots", "sale_menu", "articles"],
           template_id: 'model1'
+        };
+        
+        const templateId = (baseSettings as any)?.template_id || 'model1';
+        
+        const activeSections = {
+          ...baseSettings,
+          order: (baseSettings as any).order || (
+            templateId === 'model2' ? ["featured_lots", "upcoming_events", "articles", "sale_menu"] : 
+            templateId === 'model3' ? ["upcoming_events", "articles", "featured_lots", "sale_menu"] : 
+            ["upcoming_events", "featured_lots", "sale_menu", "articles"]
+          )
         };
     const [now, setNow] = useState(Date.now());
 
@@ -206,8 +214,6 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
      totalUsers: 38420,
      activeEvents: 14,
    };
-
-   const templateId = (activeSections as any)?.template_id || 'model1';
 
   return (
     <>
