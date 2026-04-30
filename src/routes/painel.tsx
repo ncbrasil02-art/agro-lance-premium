@@ -290,6 +290,37 @@ export const Route = createFileRoute("/painel")({
      }
    };
 
+   const handleRequestRevision = async (offerId: string, itemName: string, amount: number) => {
+     try {
+       const { error } = await supabase
+         .from("offers")
+         .update({ 
+           status: "under_review", 
+           updated_at: new Date().toISOString() 
+         })
+         .eq("id", offerId);
+
+       if (error) throw error;
+
+       // Notify admins
+       await supabase.functions.invoke('user-notifications', {
+         body: {
+           type: 'offer_received',
+           data: {
+             amount: amount,
+             itemName: itemName + " (PEDIDO DE REVISÃO)",
+             bidderName: profile?.full_name || user?.email?.split('@')[0]
+           }
+         }
+       });
+
+       toast.success("Solicitação de revisão enviada com sucesso!");
+       fetchDashboardData();
+     } catch (error: any) {
+       toast.error("Erro ao solicitar revisão: " + error.message);
+     }
+   };
+
    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'document') => {
      const file = e.target.files?.[0];
      if (!file || !user?.id) return;
@@ -403,9 +434,10 @@ export const Route = createFileRoute("/painel")({
                           <th className="px-4 py-3">Data/Últ. Att.</th>
                          <th className="px-4 py-3">Animal</th>
                          <th className="px-4 py-3">Valor</th>
-                         <th className="px-4 py-3">Status</th>
-                         <th className="px-4 py-3">Mensagem</th>
-                       </tr>
+                          <th className="px-4 py-3">Status</th>
+                          <th className="px-4 py-3">Mensagem</th>
+                          <th className="px-4 py-3 text-right">Ações</th>
+                        </tr>
                      </thead>
                      <tbody className="divide-y border-b">
                        {myOffers.map((offer) => (
@@ -461,6 +493,18 @@ export const Route = createFileRoute("/painel")({
                            </td>
                            <td className="px-4 py-4 text-xs text-muted-foreground max-w-[200px] truncate" title={offer.description}>
                              {offer.description || "-"}
+                           </td>
+                           <td className="px-4 py-4 text-right">
+                             {offer.status === 'rejected' && (
+                               <Button 
+                                 size="sm" 
+                                 variant="outline" 
+                                 className="h-7 text-[10px] font-bold border-gold text-gold hover:bg-gold hover:text-white"
+                                 onClick={() => handleRequestRevision(offer.id, offer.animal?.name || 'item', offer.amount)}
+                               >
+                                 Solicitar Revisão
+                               </Button>
+                             )}
                            </td>
                          </tr>
                        ))}
