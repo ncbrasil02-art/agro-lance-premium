@@ -71,7 +71,8 @@ import { LotCard } from "../auctions/lot-card";
     const [customTexts, setCustomTexts] = useState({
       hero_title: "",
       hero_subtitle: "",
-      footer_text: ""
+      footer_text: "",
+      hero_phrases: [] as string[]
     });
    const [isSaving, setIsSaving] = useState(false);
    const [isUploading, setIsUploading] = useState(false);
@@ -126,7 +127,10 @@ import { LotCard } from "../auctions/lot-card";
       show_featured_lots: true,
       show_sale_menu: true,
       show_animated_slides: true,
-      order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"]
+      order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"],
+      hero_backgrounds: [] as string[],
+      hero_bg_opacity: 50,
+      hero_bg_blur: 0
     });
 
     const [lotCardSettings, setLotCardSettings] = useState({
