@@ -1546,7 +1546,16 @@ export const Route = createFileRoute("/painel")({
                   </div>
                  <div className="w-64 border-t border-gray-400 text-center pt-2">
                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{profile?.full_name}</p>
-                   <p className="text-[10px] text-gray-400">Arrematante</p>
+                   {lot.accepted_at ? (
+                     <div className="space-y-1">
+                       <p className="text-[10px] text-emerald-600 font-bold flex items-center justify-center gap-1">
+                         <ShieldCheck className="h-3 w-3" /> ACEITE DIGITAL EM {new Date(lot.accepted_at).toLocaleDateString('pt-BR')}
+                       </p>
+                       <p className="text-[8px] text-gray-400 uppercase">Auditado: {lot.accepted_ip || 'REGISTRO DE PAINEL'}</p>
+                     </div>
+                   ) : (
+                     <p className="text-[10px] text-gray-400">Arrematante</p>
+                   )}
                  </div>
               </div>
             </div>
