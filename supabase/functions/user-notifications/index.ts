@@ -25,8 +25,8 @@
     console.log('SMS would be sent to', phone, ':', message)
   }
 
- import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
- 
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+
  const corsHeaders = {
    'Access-Control-Allow-Origin': '*',
    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -57,9 +57,8 @@
      
      // Permissions check: only admins can send notifications (except for certain types if allowed)
       if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
-       throw new Error('Forbidden')
-       }
-     }
+        throw new Error('Forbidden')
+      }
 
      const adminClient = createClient(
        Deno.env.get('SUPABASE_URL') ?? '',
