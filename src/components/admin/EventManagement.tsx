@@ -1137,8 +1137,9 @@ import { useAuth } from "@/components/auth/auth-provider";
            ) : (
              <Table>
                <TableHeader>
-                 <TableRow>
-                   <TableHead>Evento</TableHead>
+                  <TableRow>
+                    <TableHead className="w-[40px]"></TableHead>
+                    <TableHead>Evento</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Local/Promotor/Vendedor</TableHead>
                    <TableHead>Status</TableHead>
@@ -1153,9 +1154,29 @@ import { useAuth } from "@/components/auth/auth-provider";
                      </TableCell>
                    </TableRow>
                  ) : (
-                   filteredEvents.map((event) => (
-                     <TableRow key={event.id}>
-                       <TableCell className="font-medium">
+                    filteredEvents.map((event) => (
+                      <React.Fragment key={event.id}>
+                      <TableRow className={expandedEventId === event.id ? "bg-muted/50" : ""}>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => {
+                              if (expandedEventId === event.id) {
+                                setExpandedEventId(null);
+                              } else {
+                                setExpandedEventId(event.id);
+                                if (!expandedData[event.id]) {
+                                  fetchExpandedData(event.id);
+                                }
+                              }
+                            }}
+                          >
+                            {expandedEventId === event.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="font-medium">
                          <div>{event.name}</div>
                           <div className="text-xs text-muted-foreground">{event.event_type === 'online' ? 'Online' : 'Ao Vivo'}</div>
                        </TableCell>
