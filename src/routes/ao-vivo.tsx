@@ -960,7 +960,7 @@ export const Route = createFileRoute("/ao-vivo")({
                     ) : (
                       <Zap className="h-3.5 w-3.5" />
                     )}
-                    <span className="text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
                       {isOffline ? 'Offline' : isPolling ? 'Polling' : 'Realtime'}
                     </span>
                     {delaySeconds > 0 && <span className="text-[9px] opacity-70 border-l border-current pl-2 ml-1">{delaySeconds}s</span>}
