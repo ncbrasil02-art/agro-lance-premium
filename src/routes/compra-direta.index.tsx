@@ -98,6 +98,18 @@ function DirectSalePage() {
 
       if (error) throw error;
 
+      // Notify admins
+      await supabase.functions.invoke('user-notifications', {
+        body: {
+          type: 'direct_sale_request',
+          data: {
+            amount: selectedAnimal.sale_price,
+            itemName: selectedAnimal.name,
+            bidderName: buyerInfo.name
+          }
+        }
+      });
+
       toast.success("Solicitação de compra enviada com sucesso! Entraremos em contato em breve para combinar a entrega.");
       setIsCheckoutOpen(false);
       setBuyerInfo({ name: "", email: "", phone: "", address: "" });
