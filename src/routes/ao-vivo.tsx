@@ -1158,7 +1158,7 @@ export const Route = createFileRoute("/ao-vivo")({
                     </div>
                   )}
 
-                  <div className="rounded-2xl bg-emerald-deep/5 border border-emerald-deep/10 p-5 relative overflow-hidden group/price">
+                  <div className="rounded-2xl bg-emerald-deep/5 border border-emerald-deep/10 p-5 relative overflow-hidden group/price" id="bid-actions">
                     <div className="absolute top-0 right-0 p-3 opacity-20 group-hover/price:opacity-100 transition-opacity">
                        <Gavel className="h-10 w-10 text-gold" />
                     </div>

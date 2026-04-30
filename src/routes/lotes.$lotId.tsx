@@ -923,8 +923,8 @@ function LotDetail() {
                 </Tabs>
               </div>
 
-              <div className="space-y-6 order-1 lg:order-2">
-                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full">
+              <div className="space-y-6 order-1 lg:order-2" id="bid-actions">
+                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full shadow-2xl">
                   <div className="flex justify-between items-start mb-6">
                     <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
                     <Button 
