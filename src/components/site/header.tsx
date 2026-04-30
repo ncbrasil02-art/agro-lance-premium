@@ -94,7 +94,7 @@ import {
            <TooltipProvider>
              <Tooltip>
                <TooltipTrigger asChild>
-                 <div className={`hidden lg:flex items-center gap-2 cursor-help px-3 py-1.5 rounded-full bg-secondary/50 border border-border/40 transition-smooth hover:bg-secondary ${!isOnline ? 'border-destructive/40' : ''}`}>
+                  <div className={`flex items-center gap-2 cursor-help px-2 sm:px-3 py-1.5 rounded-full bg-secondary/50 border border-border/40 transition-smooth hover:bg-secondary ${!isOnline ? 'border-destructive/40' : ''}`}>
                    {!isOnline ? (
                      <WifiOff className="h-3.5 w-3.5 text-destructive animate-pulse" />
                    ) : isPolling ? (
@@ -102,7 +102,7 @@ import {
                    ) : (
                      <Zap className="h-3.5 w-3.5 text-emerald-500" />
                    )}
-                   <span className={`text-[10px] font-bold uppercase tracking-wider ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider hidden xs:inline ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
                      {!isOnline ? 'Offline' : isPolling ? 'Polling' : 'Realtime'}
                    </span>
                    {delaySeconds > 0 && (
