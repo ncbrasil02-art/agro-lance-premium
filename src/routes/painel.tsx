@@ -216,7 +216,15 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                    </div>
                    <div>
                      <p className="text-sm font-bold text-gray-800">Vencimento: {inst.due_date.toLocaleDateString('pt-BR')}</p>
-                     <p className="text-[10px] text-gray-400">Status: Pendente</p>
+                      <p className="text-[10px] text-gray-400">
+                        Status: <span className={
+                          inst.status === 'paid' ? 'text-emerald-600 font-bold' : 
+                          inst.status === 'overdue' ? 'text-red-600 font-bold' : 
+                          'text-amber-600 font-bold'
+                        }>
+                          {inst.status === 'paid' ? 'Pago' : inst.status === 'overdue' ? 'Atrasado' : 'Pendente'}
+                        </span>
+                      </p>
                    </div>
                  </div>
                  <div className="flex items-center gap-4">
@@ -264,7 +272,7 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                              <Input 
                                type="file" 
                                accept="image/*,application/pdf"
-                               onChange={(e) => handleUploadProof(inst.installment_number, e)}
+                               onChange={(e) => handleUploadProof(inst, e)}
                                disabled={!!uploadingId}
                              />
                              {uploadingId === inst.installment_number.toString() && (
