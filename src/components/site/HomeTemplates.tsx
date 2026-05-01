@@ -156,10 +156,9 @@
          </div>
        </div>
         </div>
-      </section>
-    );
-  };
-  };
+     </section>
+     );
+   };
  
   export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
     const isMobileMode = homepageSettings?.mobile_mode_enabled;
@@ -239,8 +238,9 @@
          </div>
         )}
       </div>
-    </section>
+      </section>
     );
+  };
   };
  
   export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
