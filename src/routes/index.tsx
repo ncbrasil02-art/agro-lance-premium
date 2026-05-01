@@ -272,9 +272,9 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
                <div className={cn(
                  "relative py-20 overflow-hidden",
-                 templateId === 'model3' && "border-y border-[#8b6b45]/20",
-                 templateId === 'model4' && "bg-gradient-to-b from-black/50 to-transparent",
-                 templateId === 'model5' && "bg-white",
+                 false,
+                 false,
+                 false,
                )}>
                  {templateId === 'model2' && (
                    <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
@@ -287,18 +287,18 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                  )}
                  <EventCarousel 
                    events={upcomingEvents} 
-                   title={templateId === 'model3' ? "Agenda de Leilões" : "Próximos eventos"} 
-                   subtitle={templateId === 'model3' ? "Acompanhe os principais pregões e negociações do campo." : "Reserve sua agenda e participe das maiores oportunidades."}
-                   variant={templateId}
+                   title="Próximos eventos" 
+                   subtitle="Reserve sua agenda e participe das maiores oportunidades."
+                   variant="model1"
                  />
                </div>
              )}
              {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
                <div className={cn(
                  "relative py-24",
-                 templateId === 'model2' && "bg-zinc-950",
-                 templateId === 'model3' && "bg-emerald-deep text-white py-32",
-                 templateId === 'model6' && "bg-black"
+                 false,
+                 false,
+                 false
                )}>
                  {templateId === 'model3' && (
                    <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
@@ -308,7 +308,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                      <Gavel size={200} className="text-[#8b6b45]" />
                    </div>
                  )}
-                 <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
+                 <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
                  
                  {/* Mobile Grid */}
                  <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
@@ -323,12 +323,12 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
              {sectionId === "articles" && (activeSections as any)?.show_articles && (
                <div className={cn(
                  "relative py-24",
-                 templateId === 'model5' && "bg-white",
+                 false,
                  templateId === 'model3' && "bg-[#fdfbf7] border-t-8 border-[#8b6b45]/10",
                )}>
                  <ArticleCarousel 
                    articles={articles} 
-                   variant={templateId} 
+                   variant="model1" 
                    settings={articleSettings}
                  />
                </div>
