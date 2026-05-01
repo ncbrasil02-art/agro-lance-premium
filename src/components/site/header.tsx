@@ -227,12 +227,18 @@ import { toast } from "sonner";
                </SheetTrigger>
                <SheetContent side="right" className="w-[80%] p-0">
                  <SheetHeader className="p-6 border-b">
-                   <SheetTitle className="text-left flex items-center gap-2">
-                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold-gradient">
-                       <Gavel className="h-4 w-4 text-emerald-deep" />
-                     </span>
-                     Premium Agro
-                   </SheetTitle>
+                    <SheetTitle className="text-left flex items-center gap-2">
+                      {siteInfo?.logo_url ? (
+                        <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-6 object-contain" />
+                      ) : (
+                        <>
+                          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold-gradient">
+                            <Gavel className="h-4 w-4 text-emerald-deep" />
+                          </span>
+                          {siteInfo?.name || "Premium Agro"}
+                        </>
+                      )}
+                    </SheetTitle>
                  </SheetHeader>
                  <div className="flex flex-col p-6 gap-4">
                    <div className="grid gap-2">

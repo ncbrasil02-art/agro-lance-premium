@@ -142,11 +142,11 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                 Assista Agora
               </Button>
             </Link>
-             <Link to="/eventos">
-               <Button size="lg" variant="outline" className="border-gold text-gold hover:bg-gold hover:text-emerald-deep font-black uppercase tracking-widest h-14 px-8 rounded-none transition-all duration-300">
-                 Catálogo Completo
-               </Button>
-             </Link>
+              <Link to="/eventos">
+                <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold-gradient hover:text-emerald-deep hover:border-transparent font-black uppercase tracking-widest h-14 px-8 rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-gold/20 hover:scale-105">
+                  Catálogo Completo
+                </Button>
+              </Link>
           </div>
 
           <div className="flex flex-col gap-12">
