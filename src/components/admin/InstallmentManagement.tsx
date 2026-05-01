@@ -4,7 +4,7 @@
  import { Button } from "@/components/ui/button";
  import { Badge } from "@/components/ui/badge";
  import { toast } from "sonner";
- import { Loader2, Search, Filter, ExternalLink, CheckCircle, XCircle, FileText, User, Calendar, Printer, Save, Edit2, RefreshCw } from "lucide-react";
+ import { Loader2, Search, Filter, ExternalLink, CheckCircle, XCircle, FileText, User, Calendar, Printer, Save, Edit2, RefreshCw, MessageCircle, Send } from "lucide-react";
  import { Input } from "@/components/ui/input";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
  import { formatBRL } from "@/utils/format";
@@ -114,6 +114,34 @@
        </html>
      `);
      printWindow.document.close();
+   };
+ 
+   const handleWhatsAppNotify = (inst: any) => {
+     const message = `Olá ${inst.buyer?.full_name}, informamos que realizamos a baixa da parcela ${inst.installment_number} no valor de ${formatBRL(inst.amount)}. Obrigado pela confiança!`;
+     const phone = inst.buyer?.phone?.replace(/\D/g, '');
+     if (phone) {
+       window.open(`https://wa.me/${phone.startsWith('55') ? '' : '55'}${phone}?text=${encodeURIComponent(message)}`, '_blank');
+     } else {
+       toast.error("Comprador sem telefone cadastrado.");
+     }
+   };
+ 
+   const handleManualNotify = async (inst: any) => {
+     try {
+       const { error } = await supabase
+         .from("notifications")
+         .insert({
+           user_id: inst.buyer_id,
+           title: "Baixa de Parcela Efetuada",
+           message: `A baixa da parcela ${inst.installment_number} foi realizada manualmente pelo administrador.`,
+           link: "/painel"
+         });
+       
+       if (error) throw error;
+       toast.success("Notificação enviada ao comprador!");
+     } catch (error: any) {
+       toast.error("Erro ao enviar notificação: " + error.message);
+     }
    };
  
    const handleStatusUpdate = async (id: string, newStatus: string) => {
@@ -308,17 +336,37 @@
                            </div>
                          </DialogContent>
                        </Dialog>
-                       {inst.status !== 'paid' && (
-                         <Button 
-                           size="sm" 
-                           variant="outline" 
-                           className="h-8 w-8 p-0 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                           onClick={() => handleStatusUpdate(inst.id, 'paid')}
-                           title="Confirmar Pagamento (Baixa)"
-                         >
-                           <CheckCircle className="h-4 w-4" />
-                         </Button>
-                       )}
+                        <div className="flex gap-1">
+                          {inst.status !== 'paid' && (
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-8 w-8 p-0 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                              onClick={() => handleStatusUpdate(inst.id, 'paid')}
+                              title="Confirmar Pagamento (Baixa)"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-8 w-8 p-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+                            onClick={() => handleWhatsAppNotify(inst)}
+                            title="Notificar via WhatsApp"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-8 w-8 p-0 text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                            onClick={() => handleManualNotify(inst)}
+                            title="Notificar no Painel"
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
                        {inst.status === 'paid' && (
                          <Button 
                            size="sm" 
