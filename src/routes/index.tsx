@@ -304,9 +304,9 @@ function Home() {
                  )}
                </>
              )}
-             {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
-               <div className="relative py-20 overflow-hidden">
-                 <EventCarousel 
+              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
+                <div className="relative py-8 overflow-hidden">
+                  <EventCarousel 
                    events={upcomingEvents} 
                    title="Próximos eventos" 
                    subtitle="Reserve sua agenda e participe das maiores oportunidades."
@@ -314,9 +314,9 @@ function Home() {
                  />
                </div>
              )}
-             {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-               <div className="relative py-24">
-                 <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
+              {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
+                <div className="relative py-12">
+                  <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
                  <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
                     <div className="grid gap-6 sm:grid-cols-2">
                        {mappedLots.slice(0, 4).map((lot: any) => (
@@ -326,9 +326,9 @@ function Home() {
                  </section>
                </div>
              )}
-             {sectionId === "articles" && (activeSections as any)?.show_articles && (
-               <div className="relative py-24">
-                 <ArticleCarousel 
+              {sectionId === "articles" && (activeSections as any)?.show_articles && (
+                <div className="relative py-12">
+                  <ArticleCarousel 
                    articles={articles} 
                    variant="model1" 
                    settings={articleSettings}
