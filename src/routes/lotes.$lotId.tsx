@@ -887,7 +887,8 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                                   { id: "hypp", label: "HYPP" },
                                 ];
                                 
-                                 const history = lot.animal?.veterinary_history || lot.animal?.health_info || {};
+                                 const history = (lot.animal?.veterinary_history && typeof lot.animal.veterinary_history === 'object') ? lot.animal.veterinary_history : 
+                                                (lot.animal?.health_info && typeof lot.animal.health_info === 'object') ? lot.animal.health_info : {};
                                 const customKeys = Object.keys(history).filter(k => 
                                   k !== 'other_info' && 
                                   k !== 'health_photo_url' && 
