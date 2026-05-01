@@ -1,7 +1,7 @@
  import { useEffect, useState } from "react";
  import { cn } from "@/lib/utils";
 
- export function Countdown({ endsAt, className, variant = "default" }: { endsAt: string; className?: string; variant?: "default" | "segmented" }) {
+ export function Countdown({ endsAt, className, variant = "default", onEnd }: { endsAt: string; className?: string; variant?: "default" | "segmented", onEnd?: () => void }) {
    const [mounted, setMounted] = useState(false);
    const [now, setNow] = useState(0);
  
@@ -23,6 +23,12 @@
   const m = Math.floor((diff % 3_600_000) / 60_000);
   const s = Math.floor((diff % 60_000) / 1000);
 
+    useEffect(() => {
+      if (mounted && diff <= 0 && onEnd) {
+        onEnd();
+      }
+    }, [diff, mounted, onEnd]);
+ 
    const isCritical = diff > 0 && diff < 600000; // Less than 10 minutes
  
    if (diff <= 0) return <span className={className} suppressHydrationWarning>{variant === 'segmented' ? '00:00:00' : 'Encerrado'}</span>;

@@ -1217,7 +1217,14 @@ export const Route = createFileRoute("/ao-vivo")({
                   {liveLot.end_date && (
                     <div className="text-right">
                       <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Encerra em</div>
-                      <Countdown endsAt={liveLot.end_date as string} className="font-mono text-xl font-black text-live" />
+                      <Countdown 
+                        endsAt={liveLot.end_date as string} 
+                        className="font-mono text-xl font-black text-live" 
+                        onEnd={() => {
+                          toast.success("Tempo esgotado no lote atual!");
+                          refreshAllData();
+                        }}
+                      />
                     </div>
                   )}
                 </div>

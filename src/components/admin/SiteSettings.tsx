@@ -134,9 +134,21 @@
       show_featured_lots: true,
       show_sale_menu: true,
       show_animated_slides: true,
-      mobile_mode_enabled: false,
-      order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"],
-       hero_backgrounds: [] as string[],
+       mobile_mode_enabled: false,
+       order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"],
+       stats: {
+         totalSold: 184500000,
+         totalAnimals: 12847,
+         totalUsers: 38420,
+         activeEvents: 14,
+         labels: {
+           totalSold: "Volume Negociado",
+           totalAnimals: "Animais Registrados",
+           totalUsers: "Base de Investidores",
+           activeEvents: "Eventos Ativos"
+         }
+       },
+        hero_backgrounds: [] as string[],
        hero_bg_opacity: 50,
        hero_bg_blur: 0,
        template_id: 'model1'
@@ -620,9 +632,63 @@
                    </div>
                  ))}
                </div>
-             </div>
-           </CardContent>
-         </Card>
+              </div>
+            </CardContent>
+          </Card>
+ 
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5 text-gold" /> Estatísticas do Painel Hero
+              </CardTitle>
+              <CardDescription>Edite os números e legendas que aparecem no topo da página inicial.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { key: 'totalSold', type: 'number' },
+                  { key: 'totalAnimals', type: 'number' },
+                  { key: 'totalUsers', type: 'number' },
+                  { key: 'activeEvents', type: 'number' }
+                ].map((stat) => (
+                  <div key={stat.key} className="space-y-4 p-4 border rounded-xl bg-muted/20">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-muted-foreground">Legenda</Label>
+                      <Input 
+                        value={homepage.stats?.labels?.[stat.key] || ""} 
+                        onChange={e => {
+                          const newStats = { ...homepage.stats };
+                          if (!newStats.labels) newStats.labels = {};
+                          newStats.labels[stat.key] = e.target.value;
+                          setHomepage({...homepage, stats: newStats});
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-muted-foreground">Valor (Número)</Label>
+                      <Input 
+                        type="number"
+                        value={homepage.stats?.[stat.key] || 0} 
+                        onChange={e => {
+                          const newStats = { ...homepage.stats };
+                          newStats[stat.key] = parseFloat(e.target.value);
+                          setHomepage({...homepage, stats: newStats});
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button 
+                className="w-full bg-gold text-emerald-deep font-bold h-12" 
+                onClick={() => handleSave("homepage_sections", homepage)}
+                disabled={isSaving}
+              >
+                {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                Salvar Estatísticas
+              </Button>
+            </CardContent>
+          </Card>
        </TabsContent>
 
        <TabsContent value="content">

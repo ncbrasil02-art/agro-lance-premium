@@ -134,7 +134,7 @@ function EventDetail() {
             {/* Main Rectangular Banner */}
             <div className="relative group mx-auto w-full max-w-md lg:max-w-none flex flex-col gap-4">
               <div className="absolute -inset-2 bg-gold/10 blur-3xl rounded-[2.5rem] opacity-30 group-hover:opacity-50 transition-opacity" />
-              <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30 group/banner">
+               <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30 group/banner print-block">
                 {/* Blurred background to fill gaps */}
                 <OptimizedImage 
                   src={event.banner_url || ""} 
@@ -144,12 +144,18 @@ function EventDetail() {
                   className="absolute inset-0 h-full w-full blur-2xl opacity-40 scale-110" 
                 />
                 {/* Main image - now object-cover to fill the space as requested */}
-                <OptimizedImage 
-                  src={event.banner_url || ""} 
-                  alt={event.name} 
-                  width={1200}
-                  className="relative h-full w-full object-cover transition-transform duration-700 group-hover/banner:scale-[1.03]" 
-                />
+                 {event.banner_url ? (
+                   <OptimizedImage 
+                     src={event.banner_url} 
+                     alt={event.name} 
+                     width={1200}
+                     className="relative h-full w-full object-cover transition-transform duration-700 group-hover/banner:scale-[1.03]" 
+                   />
+                 ) : (
+                   <div className="w-full h-full flex items-center justify-center bg-white/5 text-white/20">
+                     <ImageIcon className="h-20 w-20" />
+                   </div>
+                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="flex items-center gap-2 mb-2">
@@ -162,8 +168,8 @@ function EventDetail() {
                 </div>
               </div>
               
-              <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
-                <DialogTrigger asChild>
+               <Dialog open={isFlyerOpen} onOpenChange={(open) => setIsFlyerOpen(open)}>
+                 <DialogTrigger asChild onClick={(e) => { e.preventDefault(); setIsFlyerOpen(true); }}>
                   <Button 
                     variant="outline" 
                     className="w-full h-12 rounded-2xl border-white/10 bg-white/5 hover:bg-gold/10 hover:border-gold/30 hover:text-gold transition-all flex items-center gap-2 group/btn shadow-lg"
@@ -231,7 +237,7 @@ function EventDetail() {
                         </div>
                       )}
                       <div className="h-16 flex flex-col justify-center">
-                        <div className="text-2xl md:text-3xl font-signature text-gold opacity-60 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter">
+                       <div className="text-3xl md:text-4xl font-signature text-gold opacity-90 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter drop-shadow-sm">
                           {event.seller?.name || event.seller_name}
                         </div>
                         <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] -mt-1">
@@ -255,7 +261,7 @@ function EventDetail() {
                   <div className="flex flex-col gap-2 group cursor-default">
                     <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Leiloeiro</span>
                     <div className="h-16 flex items-center px-4">
-                      <div className="text-xl md:text-2xl font-signature text-foreground opacity-40 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter">
+                       <div className="text-2xl md:text-3xl font-signature text-foreground opacity-80 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter drop-shadow-sm">
                         {event.auctioneer_name}
                       </div>
                     </div>

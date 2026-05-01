@@ -36,6 +36,15 @@
     background_color: string;
   }
  
+  export interface AnimationsSettings {
+    badge_blink: boolean;
+    badge_glow: boolean;
+    bid_button_pulse: boolean;
+    animal_name_entry: string;
+    card_hover_tilt: boolean;
+    enable_confetti: boolean;
+  }
+ 
  export interface HomepageSettings {
    show_articles: boolean;
    show_upcoming_events: boolean;
@@ -49,6 +58,12 @@
   hero_bg_blur?: number;
   mobile_mode_enabled?: boolean;
   partners_logo_fit?: 'cover' | 'contain';
+   stats?: {
+     totalSold: number;
+     totalAnimals: number;
+     totalUsers: number;
+     activeEvents: number;
+   };
  }
  
   export interface CustomTexts {
@@ -62,10 +77,12 @@
       siteInfo?: SiteInfo | null, 
       theme?: ThemeSettings | null, 
       homepage?: HomepageSettings | null,
-      customTexts?: CustomTexts | null,
-      aboutPage?: AboutPageSettings | null,
-      articleSettings?: ArticleSettings | null
+       customTexts?: CustomTexts | null,
+       aboutPage?: AboutPageSettings | null,
+       articleSettings?: ArticleSettings | null,
+       animations?: AnimationsSettings | null
     }) {
+       const [animations, setAnimations] = useState<AnimationsSettings | null>(initialData?.animations || null);
       const [articleSettings, setArticleSettings] = useState<ArticleSettings | null>(initialData?.articleSettings || null);
       const [aboutPage, setAboutPage] = useState<AboutPageSettings | null>(initialData?.aboutPage || null);
       const [customTexts, setCustomTexts] = useState<CustomTexts | null>(initialData?.customTexts || null);
@@ -106,14 +123,16 @@
           const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
           const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
           const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
-          const articleData = data.find(i => i.key === "article_settings")?.value as any as ArticleSettings;
+           const articleData = data.find(i => i.key === "article_settings")?.value as any as ArticleSettings;
+           const animationsData = data.find(i => i.key === "animations")?.value as any as AnimationsSettings;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
           if (homeSettings) setHomepage(homeSettings);
           if (textsSettings) setCustomTexts(textsSettings);
           if (aboutSettings) setAboutPage(aboutSettings);
-          if (articleData) setArticleSettings(articleData);
+           if (articleData) setArticleSettings(articleData);
+           if (animationsData) setAnimations(animationsData);
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
         } finally {
@@ -141,7 +160,8 @@
               if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "about_page") setAboutPage(prev => ({ ...prev, ...(updated.value as any) } as any));
-              if (updated.key === "article_settings") setArticleSettings(prev => ({ ...prev, ...(updated.value as any) } as any));
+               if (updated.key === "article_settings") setArticleSettings(prev => ({ ...prev, ...(updated.value as any) } as any));
+               if (updated.key === "animations") setAnimations(prev => ({ ...prev, ...(updated.value as any) } as any));
             }
           )
           .subscribe((newStatus) => {
@@ -161,5 +181,5 @@
         initialPollInterval: 15000
       });
  
-    return { siteInfo, theme, homepage, customTexts, aboutPage, articleSettings, isLoading };
+     return { siteInfo, theme, homepage, customTexts, aboutPage, articleSettings, animations, isLoading };
  }

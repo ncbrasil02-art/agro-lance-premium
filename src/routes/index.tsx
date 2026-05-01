@@ -84,10 +84,10 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const router = useRouter();
-  const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData();
+   const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData() as any;
   const context = Route.useRouteContext();
   const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
-  const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts, articleSettings } = useSiteSettings({
+   const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts, articleSettings, animations } = useSiteSettings({
     siteInfo: ctxSiteInfo, 
     theme: ctxTheme, 
     homepage: ctxHomepage 
@@ -202,12 +202,12 @@ function Home() {
 
   const featuredLots = mappedLots.slice(0, 6);
 
-  const stats = {
-    totalSold: 184500000,
-    totalAnimals: 12847,
-    totalUsers: 38420,
-    activeEvents: 14,
-  };
+   const siteStats = sectionsSettings?.stats || {
+     totalSold: 184500000,
+     totalAnimals: 12847,
+     totalUsers: 38420,
+     activeEvents: 14,
+   };
 
   return (
     <div className="relative min-h-screen transition-colors duration-700">
@@ -239,7 +239,7 @@ function Home() {
           <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
              {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
                <>
-                 <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
+                  <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={siteStats} homepageSettings={activeSections} />
                  {liveEvents.length > 0 && (
                    <section className="container mx-auto px-4 -mt-10 mb-20 relative z-20">
                      <motion.div 
@@ -279,10 +279,12 @@ function Home() {
                            </div>
 
                            <div className="flex flex-wrap items-center gap-6">
-                             <div className="flex items-center gap-2 text-live">
-                               <Radio className="h-5 w-5 animate-pulse" />
-                               <span className="text-sm font-black uppercase tracking-widest">{liveEvents[0].viewers.toLocaleString()} assistindo</span>
-                             </div>
+               <div className="flex items-center gap-2 text-live group/viewers">
+                 <Radio className="h-5 w-5 animate-pulse" />
+                 <span className="text-sm font-black uppercase tracking-widest">
+                   {Math.max(1, liveEvents[0].viewers + (Math.floor(Math.random() * 3) - 1)).toLocaleString()} assistindo
+                 </span>
+               </div>
                              <Link to="/ao-vivo" className="ml-auto md:ml-0">
                                <Button size="lg" className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-widest h-16 px-10 rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:scale-105 transition-all">
                                  ENTRAR NO LEILÃO
@@ -304,9 +306,9 @@ function Home() {
                  )}
                </>
              )}
-             {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
-               <div className="relative py-20 overflow-hidden">
-                 <EventCarousel 
+              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
+                <div className="relative py-8 overflow-hidden">
+                  <EventCarousel 
                    events={upcomingEvents} 
                    title="Próximos eventos" 
                    subtitle="Reserve sua agenda e participe das maiores oportunidades."
@@ -314,9 +316,9 @@ function Home() {
                  />
                </div>
              )}
-             {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-               <div className="relative py-24">
-                 <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
+              {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
+                <div className="relative py-12">
+                  <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
                  <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
                     <div className="grid gap-6 sm:grid-cols-2">
                        {mappedLots.slice(0, 4).map((lot: any) => (
@@ -326,9 +328,9 @@ function Home() {
                  </section>
                </div>
              )}
-             {sectionId === "articles" && (activeSections as any)?.show_articles && (
-               <div className="relative py-24">
-                 <ArticleCarousel 
+              {sectionId === "articles" && (activeSections as any)?.show_articles && (
+                <div className="relative py-12">
+                  <ArticleCarousel 
                    articles={articles} 
                    variant="model1" 
                    settings={articleSettings}
