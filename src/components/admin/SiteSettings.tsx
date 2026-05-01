@@ -726,7 +726,6 @@
                               </div>
                             </div>
                           </div>
-                        </CardContent>
                          </CardContent>
                        </Card>
                       </Reorder.Item>
