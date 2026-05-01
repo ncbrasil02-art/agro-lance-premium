@@ -1410,9 +1410,9 @@ export const Route = createFileRoute("/ao-vivo")({
                               <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
                                   <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Registros de Vacinação</p>
-                                  {liveLot.animal?.vaccination_records && liveLot.animal.vaccination_records.length > 0 ? (
+                                   {liveLot.animal?.vaccination_records && (typeof liveLot.animal.vaccination_records === 'string' ? liveLot.animal.vaccination_records.length > 0 : liveLot.animal.vaccination_records.length > 0) ? (
                                     <div className="bg-emerald-deep/5 rounded-xl p-3 space-y-2 border border-emerald-deep/10">
-                                      {liveLot.animal.vaccination_records.map((v: any, i: number) => (
+                                       {(typeof liveLot.animal.vaccination_records === 'string' ? liveLot.animal.vaccination_records.split(',').map((s: string) => s.trim()).filter(Boolean) : liveLot.animal.vaccination_records).map((v: any, i: number) => (
                                         <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
                                           <div className="flex items-center gap-2">
                                             <BadgeCheck className="h-4 w-4 text-emerald-600" />
