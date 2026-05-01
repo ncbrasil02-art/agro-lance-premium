@@ -137,11 +137,16 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                 Assista Agora
               </Button>
             </Link>
-            <Link to="/eventos">
-              <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 font-black uppercase tracking-wider h-14">
-                Catálogo Completo
-              </Button>
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link to="/eventos">
+                <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold/20 hover:border-gold font-black uppercase tracking-wider h-14 transition-all shadow-lg hover:shadow-gold/20">
+                  Catálogo Completo
+                </Button>
+              </Link>
+            </motion.div>
           </div>
 
           <div className="flex flex-col gap-12">
