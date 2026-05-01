@@ -22,7 +22,9 @@ import {
 import { toast } from "sonner";
    import { RefreshCw, Zap, ZapOff, WifiOff } from "lucide-react";
 
-    export function Header() {
+     export function Header() {
+       const { siteInfo, homepage, aboutPage } = useSiteSettings();
+       const isMobileMode = homepage?.mobile_mode_enabled;
       const router = useRouter();
       const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
  
@@ -59,8 +61,11 @@ import { toast } from "sonner";
    ].filter(i => i.show);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+     <header className={cn(
+       "sticky top-0 z-50 border-b border-border/60 transition-all duration-300",
+       isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : "bg-background/80 backdrop-blur-xl h-16"
+     )}>
+       <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
         <Link to="/" className="flex items-center gap-2 font-bold group">
           {siteInfo?.logo_url ? (
             <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
