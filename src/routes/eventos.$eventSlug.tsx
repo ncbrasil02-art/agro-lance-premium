@@ -221,11 +221,23 @@ function EventDetail() {
 
               {/* Marcas e Assinaturas */}
               <div className="flex flex-wrap items-center gap-8 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-                {event.seller?.logo_url && (
+                {(event.seller?.logo_url || event.seller?.name || event.seller_name) && (
                   <div className="flex flex-col gap-2 group cursor-default">
                     <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Vendedor</span>
-                    <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
-                      <img src={event.seller.logo_url} alt={event.seller.name} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="flex items-center gap-4">
+                      {event.seller?.logo_url && (
+                        <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
+                          <img src={event.seller.logo_url} alt={event.seller.name} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                        </div>
+                      )}
+                      <div className="h-16 flex flex-col justify-center">
+                        <div className="text-2xl md:text-3xl font-signature text-gold opacity-60 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter">
+                          {event.seller?.name || event.seller_name}
+                        </div>
+                        <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] -mt-1">
+                          Assinatura Autorizada
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

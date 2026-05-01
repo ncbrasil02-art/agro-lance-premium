@@ -1,3 +1,4 @@
+import { SellerCarousel } from "@/components/site/SellerCarousel";
 import { generateMetaTags } from "@/utils/seo";
 import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -369,6 +370,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <SellerCarousel />
     </div>
   );
 }
