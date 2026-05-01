@@ -233,10 +233,6 @@ function Home() {
         </div>
       )}
 
-      {(!activeSections || (activeSections as any).show_animated_slides) && (
-        <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
-      )}
-
       {liveEvents.length > 0 && (
         <section className="container mx-auto px-4 py-16">
           <div className="mb-8 flex items-end justify-between">
@@ -259,6 +255,9 @@ function Home() {
       <div className="flex flex-col gap-0">
         {(activeSections.order).map((sectionId: string) => (
           <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
+             {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
+               <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
+             )}
              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
                <div className="relative py-20 overflow-hidden">
                  <EventCarousel 
@@ -293,21 +292,26 @@ function Home() {
              {sectionId === "articles" && directSales.length > 0 && (
                <HomeSaleLots directSales={directSales} />
              )}
-             {sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu && (
-               <section className="container mx-auto px-4 py-16">
-                 <div className="rounded-3xl bg-emerald-deep/40 border border-gold/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
-                   <div>
-                     <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">Compra Direta de Elite</h2>
-                     <p className="text-white/60 max-w-md">Acesse nosso catálogo exclusivo de venda direta e garanta seu animal sem a necessidade de disputa em leilão.</p>
-                   </div>
-                   <Link to="/compra-direta">
-                     <Button size="lg" className="bg-gold text-emerald-deep font-black uppercase italic tracking-widest h-16 px-8 rounded-2xl shadow-gold hover:scale-105 transition-transform">
-                       Acessar Catálogo
-                     </Button>
-                   </Link>
-                 </div>
-               </section>
-             )}
+              {sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu && (
+                <section className="container mx-auto px-4 py-16">
+                  <div className="rounded-3xl bg-emerald-deep/40 border border-gold/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                      <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">Compra Direta de Elite</h2>
+                      <p className="text-white/60 max-w-md">Acesse nosso catálogo exclusivo de venda direta e garanta seu animal sem a necessidade de disputa em leilão.</p>
+                    </div>
+                    <Link to="/compra-direta">
+                      <Button size="lg" className="bg-gold text-emerald-deep font-black uppercase italic tracking-widest h-16 px-8 rounded-2xl shadow-gold hover:scale-105 transition-transform">
+                        Acessar Catálogo
+                      </Button>
+                    </Link>
+                  </div>
+                </section>
+              )}
+              {sectionId === "sellers" && (
+                <div className="py-16">
+                  <SellerCarousel />
+                </div>
+              )}
           </ErrorBoundary>
         ))}
       </div>
@@ -371,7 +375,6 @@ function Home() {
         </div>
       </section>
 
-      <SellerCarousel />
     </div>
   );
 }

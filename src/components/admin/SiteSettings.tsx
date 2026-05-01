@@ -277,7 +277,7 @@
       }
     };
 
-   const moveSection = (index: number, direction: 'up' | 'down') => {
+    const moveSection = async (index: number, direction: 'up' | 'down') => {
      const newOrder = [...homepage.order];
      const newIndex = direction === 'up' ? index - 1 : index + 1;
      
@@ -287,7 +287,16 @@
      newOrder[index] = newOrder[newIndex];
      newOrder[newIndex] = temp;
      
-       setHomepage((prev: any) => ({ ...prev, order: newOrder }));
+        const updatedHomepage = { ...homepage, order: newOrder };
+        setHomepage(updatedHomepage);
+        
+        // Auto-save the new section order
+        try {
+          await supabase.from("site_settings").upsert({ key: "homepage_sections", value: updatedHomepage }, { onConflict: 'key' });
+          toast.success("Ordem das seções salva!");
+        } catch (err) {
+          console.error("Erro ao salvar ordem das seções:", err);
+        }
    };
  
    if (isLoading) {
@@ -637,12 +646,25 @@
                    <Reorder.Group 
                      axis="y" 
                      values={Array.from({ length: (homepage.hero_backgrounds || []).length }).map((_, i) => i)} 
-                     onReorder={(newOrder) => {
-                       const newBgs = newOrder.map(idx => (homepage.hero_backgrounds || [])[idx]);
-                       const newPhrases = newOrder.map(idx => (customTexts.hero_phrases || [])[idx]);
-                       setHomepage({...homepage, hero_backgrounds: newBgs});
-                       setCustomTexts({...customTexts, hero_phrases: newPhrases});
-                     }}
+                    onReorder={async (newOrder) => {
+                      const newBgs = newOrder.map(idx => (homepage.hero_backgrounds || [])[idx]);
+                      const newPhrases = newOrder.map(idx => (customTexts.hero_phrases || [])[idx]);
+                      
+                      const updatedHomepage = {...homepage, hero_backgrounds: newBgs};
+                      const updatedCustomTexts = {...customTexts, hero_phrases: newPhrases};
+                      
+                      setHomepage(updatedHomepage);
+                      setCustomTexts(updatedCustomTexts);
+                      
+                      // Persistir automaticamente após reordenar
+                      try {
+                        await supabase.from("site_settings").upsert({ key: "homepage_sections", value: updatedHomepage }, { onConflict: 'key' });
+                        await supabase.from("site_settings").upsert({ key: "custom_texts", value: updatedCustomTexts }, { onConflict: 'key' });
+                        toast.success("Ordem dos slides salva!");
+                      } catch (err) {
+                        console.error("Erro ao salvar ordem:", err);
+                      }
+                    }}
                      className="space-y-4"
                    >
                      {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
