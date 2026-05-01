@@ -1615,7 +1615,7 @@ export const Route = createFileRoute("/painel")({
                siteInfo={siteInfo}
                type="contrato"
              />
-            <PaymentDialog lot={lot} profile={profile} />
+            <PaymentDialog lot={lot} profile={profile} siteInfo={siteInfo} />
           </div>
         </div>
       </div>
