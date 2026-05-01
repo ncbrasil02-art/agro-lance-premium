@@ -39,6 +39,7 @@
   hero_backgrounds?: string[];
   hero_bg_opacity?: number;
   hero_bg_blur?: number;
+  mobile_mode_enabled?: boolean;
  }
  
   export interface CustomTexts {
