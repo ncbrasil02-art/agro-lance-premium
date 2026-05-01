@@ -1528,27 +1528,36 @@ export type Database = {
       webhook_events: {
         Row: {
           created_at: string
+          error_message: string | null
           event_type: string | null
           external_id: string
           gateway_name: string
           id: string
           payload: Json | null
+          processed_at: string | null
+          status: string | null
         }
         Insert: {
           created_at?: string
+          error_message?: string | null
           event_type?: string | null
           external_id: string
           gateway_name: string
           id?: string
           payload?: Json | null
+          processed_at?: string | null
+          status?: string | null
         }
         Update: {
           created_at?: string
+          error_message?: string | null
           event_type?: string | null
           external_id?: string
           gateway_name?: string
           id?: string
           payload?: Json | null
+          processed_at?: string | null
+          status?: string | null
         }
         Relationships: []
       }
