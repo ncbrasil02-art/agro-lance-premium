@@ -75,6 +75,8 @@
       hero_title: "",
       hero_subtitle: "",
       footer_text: "",
+      partners_title: "Nossos Parceiros",
+      partners_subtitle: "Vendedores",
       hero_phrases: [] as string[]
     });
    const [isSaving, setIsSaving] = useState(false);
@@ -875,6 +877,25 @@
                     onChange={e => setCustomTexts({...customTexts, hero_subtitle: e.target.value})} 
                   />
                 </div>
+
+                 <div className="grid sm:grid-cols-2 gap-4">
+                   <div className="space-y-2">
+                     <Label htmlFor="partners_title">Título da Seção de Parceiros</Label>
+                     <Input 
+                       id="partners_title" 
+                       value={customTexts.partners_title} 
+                       onChange={e => setCustomTexts({...customTexts, partners_title: e.target.value})} 
+                     />
+                   </div>
+                   <div className="space-y-2">
+                     <Label htmlFor="partners_subtitle">Subtítulo da Seção de Parceiros</Label>
+                     <Input 
+                       id="partners_subtitle" 
+                       value={customTexts.partners_subtitle} 
+                       onChange={e => setCustomTexts({...customTexts, partners_subtitle: e.target.value})} 
+                     />
+                   </div>
+                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="footer_text">Texto Institucional (Rodapé)</Label>
