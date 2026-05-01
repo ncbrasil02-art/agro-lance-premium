@@ -1,6 +1,7 @@
  import { validateImage, validateDocument } from "@/utils/upload-validation";
 import { calculateInstallments, getTotalInstallmentsCount, Installment } from "@/utils/payment-calculator";
-import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
+ import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
+ import { PixPaymentStatus } from "@/components/payment/PixPaymentStatus";
  
 function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
    const [gatewayConfig, setGatewayConfig] = useState<any>(null);
