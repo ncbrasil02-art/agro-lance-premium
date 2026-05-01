@@ -1,3 +1,11 @@
+  export interface ArticleSettings {
+    card_style: 'standard' | 'glass' | 'minimal' | 'modern' | 'traditional';
+    show_date: boolean;
+    show_category: boolean;
+    show_excerpt: boolean;
+    image_aspect_ratio: '16/9' | '4/3' | '1/1' | 'video';
+  }
+
   export interface AboutPageSettings {
     enabled: boolean;
     title: string;
@@ -52,10 +60,12 @@
     export function useSiteSettings(initialData?: { 
       siteInfo?: SiteInfo | null, 
       theme?: ThemeSettings | null, 
-      homepage?: HomepageSettings | null, 
-      customTexts?: CustomTexts | null, 
-      aboutPage?: AboutPageSettings | null 
+      homepage?: HomepageSettings | null,
+      customTexts?: CustomTexts | null,
+      aboutPage?: AboutPageSettings | null,
+      articleSettings?: ArticleSettings | null
     }) {
+      const [articleSettings, setArticleSettings] = useState<ArticleSettings | null>(initialData?.articleSettings || null);
       const [aboutPage, setAboutPage] = useState<AboutPageSettings | null>(initialData?.aboutPage || null);
       const [customTexts, setCustomTexts] = useState<CustomTexts | null>(initialData?.customTexts || null);
       const [siteInfo, setSiteInfo] = useState<SiteInfo | null>(initialData?.siteInfo || null);
@@ -95,12 +105,14 @@
           const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
           const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
           const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
+          const articleData = data.find(i => i.key === "article_settings")?.value as any as ArticleSettings;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
           if (homeSettings) setHomepage(homeSettings);
           if (textsSettings) setCustomTexts(textsSettings);
           if (aboutSettings) setAboutPage(aboutSettings);
+          if (articleData) setArticleSettings(articleData);
         } catch (error: any) {
           console.error("Error fetching site settings:", error);
         } finally {
@@ -128,6 +140,7 @@
               if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...(updated.value as any) } as any));
               if (updated.key === "about_page") setAboutPage(prev => ({ ...prev, ...(updated.value as any) } as any));
+              if (updated.key === "article_settings") setArticleSettings(prev => ({ ...prev, ...(updated.value as any) } as any));
             }
           )
           .subscribe((newStatus) => {
@@ -147,5 +160,5 @@
         initialPollInterval: 15000
       });
  
-    return { siteInfo, theme, homepage, customTexts, aboutPage, isLoading };
+    return { siteInfo, theme, homepage, customTexts, aboutPage, articleSettings, isLoading };
  }
