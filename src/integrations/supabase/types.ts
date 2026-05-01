@@ -760,6 +760,8 @@ export type Database = {
           buyer_id: string | null
           created_at: string | null
           due_date: string
+          external_reference: string | null
+          gateway_status: string | null
           id: string
           installment_number: number
           paid_at: string | null
@@ -774,6 +776,8 @@ export type Database = {
           buyer_id?: string | null
           created_at?: string | null
           due_date: string
+          external_reference?: string | null
+          gateway_status?: string | null
           id?: string
           installment_number: number
           paid_at?: string | null
@@ -788,6 +792,8 @@ export type Database = {
           buyer_id?: string | null
           created_at?: string | null
           due_date?: string
+          external_reference?: string | null
+          gateway_status?: string | null
           id?: string
           installment_number?: number
           paid_at?: string | null
