@@ -77,10 +77,28 @@
 
       const adminClient = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '')
 
-      const logNotification = async (type: string, title: string, message: string, email: string, status: string) => {
-        await adminClient.from('notification_logs').insert({ type, title, message, recipient_email: email, status })
+      const logNotification = async (type: string, title: string, message: string, email: string, status: string, error_details?: string) => {
+        await adminClient.from('notification_logs').insert({ type, title, message, recipient_email: email, status, error_details })
       }
- 
+
+      const isRateLimited = async (email: string, type: string) => {
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+        const { data, error } = await adminClient
+          .from('notification_logs')
+          .select('id')
+          .eq('recipient_email', email)
+          .eq('type', type)
+          .eq('status', 'sent')
+          .gt('created_at', fiveMinutesAgo)
+          .limit(1)
+        
+        if (error) {
+          console.error('Error checking rate limit:', error)
+          return false
+        }
+        return data && data.length > 0
+      }
+
       let email = userEmail;
       let phone = '';
       let profileData = null;
@@ -99,11 +117,22 @@
       }
 
      const resendKey = Deno.env.get('RESEND_API_KEY')
-      const sendEmail = async (to: string[], subject: string, html: string, from: string = 'Elite Leilões <contato@premiumagro.com.br>') => {
+      const sendEmail = async (to: string[], subject: string, html: string, from: string = 'Elite Leilões <contato@premiumagro.com.br>', notificationType?: string) => {
+        const targetType = notificationType || type;
+        
+        // Rate limit check
+        for (const recipient of to) {
+          if (await isRateLimited(recipient, targetType)) {
+            console.log(`Rate limited: ${targetType} to ${recipient}`)
+            await logNotification(targetType, subject, html, recipient, 'rate_limited')
+            return { success: false, reason: 'rate_limited' }
+          }
+        }
+
         if (!resendKey) {
           console.warn('RESEND_API_KEY not found. Logging instead of sending.')
-          await logNotification(type, subject, html, to.join(','), 'simulated_no_key')
-          return
+          await logNotification(targetType, subject, html, to.join(','), 'simulated_no_key')
+          return { success: false, reason: 'no_key' }
         }
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -111,9 +140,12 @@
           body: JSON.stringify({ from, to, subject, html }),
         })
         if (res.ok) {
-          await logNotification(type, subject, html, to.join(','), 'sent')
+          await logNotification(targetType, subject, html, to.join(','), 'sent')
+          return { success: true }
         } else {
-          await logNotification(type, subject, html, to.join(','), 'failed')
+          const errData = await res.text();
+          await logNotification(targetType, subject, html, to.join(','), 'failed', errData)
+          return { success: false, reason: 'api_error', details: errData }
         }
       }
 
