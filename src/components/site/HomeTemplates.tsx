@@ -236,11 +236,11 @@
              </Link>
            </div>
          </div>
-       )}
+        )}
       </div>
-     </section>
-     );
-   };
+    </section>
+    );
+  };
  
   export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
     const isMobileMode = homepageSettings?.mobile_mode_enabled;
