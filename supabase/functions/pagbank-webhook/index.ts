@@ -32,11 +32,32 @@
 
       const charge = body.charges?.[0] || body;
       const status = charge.status;
-      const referenceId = body.reference_id; 
+      const referenceId = body.reference_id;
+      const eventId = body.id || charge.id;
+
+      if (!eventId) {
+        return new Response('No ID found', { status: 400 });
+      }
+
+      // Idempotency check
+      const { data: existingEvent } = await supabaseClient
+        .from('webhook_events')
+        .select('id')
+        .eq('gateway_name', 'pagbank')
+        .eq('external_id', eventId)
+        .maybeSingle();
+
+      if (existingEvent) {
+        console.log(`Event ${eventId} already processed, skipping.`);
+        return new Response(JSON.stringify({ received: true, already_processed: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
 
       // If we have a secret configured, we should validate it.
       // For now, we fetch back if possible or just use the referenceId carefully.
- 
+
      if (referenceId && (status === 'PAID' || status === 'AUTHORIZED')) {
        // Check if it's an installment
        if (referenceId.startsWith('inst_')) {
@@ -64,9 +85,17 @@
            })
            .eq('id', referenceId);
  
-         if (updateError) console.error('Error updating transaction:', updateError);
-       }
-     }
+          if (updateError) console.error('Error updating transaction:', updateError);
+        }
+
+        // Log the event as processed
+        await supabaseClient.from('webhook_events').insert({
+          gateway_name: 'pagbank',
+          external_id: eventId,
+          event_type: status,
+          payload: body
+        });
+      }
  
      return new Response(JSON.stringify({ received: true }), {
        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
