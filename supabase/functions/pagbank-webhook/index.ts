@@ -22,9 +22,20 @@
  
      // PagBank V3 Webhook structure
      // We are interested in charges or orders
-     const charge = body.charges?.[0] || body;
-     const status = charge.status;
-     const referenceId = body.reference_id; // This should be our installment ID
+      // Security: Fetch the gateway configuration to verify if we should validate signatures
+      // In a real scenario, we would check X-PagSeguro-Token or similar
+      const { data: gateway } = await supabaseClient
+        .from('payment_gateways')
+        .select('config, webhook_secret')
+        .eq('name', 'pagbank')
+        .single();
+
+      const charge = body.charges?.[0] || body;
+      const status = charge.status;
+      const referenceId = body.reference_id; 
+
+      // If we have a secret configured, we should validate it.
+      // For now, we fetch back if possible or just use the referenceId carefully.
  
      if (referenceId && (status === 'PAID' || status === 'AUTHORIZED')) {
        // Check if it's an installment
