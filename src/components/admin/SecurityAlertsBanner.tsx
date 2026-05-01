@@ -37,7 +37,7 @@
                Existem <span className="font-black underline">{failedWebhooksCount} falhas de webhooks</span> pendentes de conciliação. Isso pode significar pagamentos recebidos que ainda não foram baixados no sistema.
              </AlertDescription>
            </div>
-            <Link to="/admin" search={{ tab: "installments" }}>
+            <Link to="/admin" search={{ tab: "alertas" }}>
               <Button size="sm" variant="outline" className="border-red-200 text-red-700 hover:bg-red-100 font-bold gap-2 ml-4">
                 REPARAR AGORA <ChevronRight className="h-4 w-4" />
               </Button>
