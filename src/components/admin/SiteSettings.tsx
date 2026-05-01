@@ -235,15 +235,44 @@ import { LotCard } from "../auctions/lot-card";
          .from('public_assets')
          .getPublicUrl(fileName);
  
-       setSiteInfo(prev => ({ ...prev, logo_url: publicUrl }));
-       toast.success("Logo enviado com sucesso!");
-     } catch (error: any) {
-       toast.error("Erro no upload do logo: " + error.message);
-     } finally {
-       setIsUploading(false);
-     }
-   };
- 
+        setSiteInfo(prev => ({ ...prev, logo_url: publicUrl }));
+        toast.success("Logo enviado com sucesso!");
+      } catch (error: any) {
+        toast.error("Erro no upload do logo: " + error.message);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    const handleSlideImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+      const file = e.target.files?.[0];
+      if (!file || !validateImage(file)) return;
+
+      setIsUploading(true);
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `slide-${index}-${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('public_assets')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('public_assets')
+          .getPublicUrl(fileName);
+
+        const newBgs = [...(homepage.hero_backgrounds || [])];
+        newBgs[index] = publicUrl;
+        setHomepage({ ...homepage, hero_backgrounds: newBgs });
+        toast.success("Imagem do slide enviada!");
+      } catch (error: any) {
+        toast.error("Erro no upload da imagem: " + error.message);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
    const moveSection = (index: number, direction: 'up' | 'down') => {
      const newOrder = [...homepage.order];
      const newIndex = direction === 'up' ? index - 1 : index + 1;
