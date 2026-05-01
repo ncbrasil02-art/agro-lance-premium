@@ -63,28 +63,33 @@ import { toast } from "sonner";
    ].filter(i => i.show);
 
   return (
-      <header className={cn(
-        "sticky top-0 z-50 border-b transition-all duration-300",
-        isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : 
-        isHome && isElite ? "bg-transparent border-transparent h-20" : 
-        "bg-background/80 backdrop-blur-xl border-border/60 h-16"
-      )}>
-       <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
-        <Link to="/" className="flex items-center gap-2 font-bold group">
-          {siteInfo?.logo_url ? (
-            <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
-          ) : (
-            <>
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
-                <Gavel className="h-5 w-5 text-emerald-deep" />
-              </span>
-              <span className="text-lg tracking-tight">
-                <span className="text-foreground">{siteInfo?.name?.split(' ')?.[0] || "Premium"}</span>
-                <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ') || "Agro"}</span>
-              </span>
-             </>
-           )}
-          </Link>
+     const isLoading = !siteInfo?.name;
+ 
+     return (
+       <header className={cn(
+         "sticky top-0 z-50 border-b transition-all duration-300",
+         isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : 
+         isHome && isElite ? "bg-transparent border-transparent h-20" : 
+         "bg-background/80 backdrop-blur-xl border-border/60 h-16"
+       )}>
+        <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
+         <Link to="/" className="flex items-center gap-2 font-bold group">
+           {isLoading ? (
+             <div className="h-10 w-40 bg-white/5 animate-pulse rounded-lg" />
+           ) : siteInfo?.logo_url ? (
+             <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
+           ) : (
+             <>
+               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
+                 <Gavel className="h-5 w-5 text-emerald-deep" />
+               </span>
+               <span className="text-lg tracking-tight">
+                 <span className="text-foreground">{siteInfo?.name?.split(' ')?.[0] || "Premium"}</span>
+                 <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ') || "Agro"}</span>
+               </span>
+              </>
+            )}
+           </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           {nav.map((item) => (
