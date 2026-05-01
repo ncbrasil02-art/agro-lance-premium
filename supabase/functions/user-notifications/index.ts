@@ -45,8 +45,7 @@
      )
  
       const authHeader = req.headers.get('Authorization')!;
-      const isServiceRole = authHeader.includes(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'never-match-this-default') || 
-                           authHeader.includes('PLACEHOLDER_SERVICE_ROLE_KEY');
+      const isServiceRole = authHeader.includes(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'never-match-this-default');
 
       let authUser = null;
       let profileRole = null;
