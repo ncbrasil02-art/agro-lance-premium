@@ -235,7 +235,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
             </div>
             {(announcement as any).link && (
               <Link to={(announcement as any).link} className="bg-emerald-deep text-gold px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">Saiba mais</Link>
-            )}
+   
           </div>
         </div>
       )}
@@ -275,7 +275,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                  false,
                  false,
                  false,
-               )}>
+      >
                  {templateId === 'model2' && (
                    <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
                      <OptimizedImage 
@@ -284,7 +284,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                        className="w-full h-full object-cover"
                      />
                    </div>
-                 )}
+        
                  <EventCarousel 
                    events={upcomingEvents} 
                    title="Próximos eventos" 
@@ -292,22 +292,22 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                    variant="model1"
                  />
                </div>
-             )}
+    
              {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
                <div className={cn(
                  "relative py-24",
                  false,
                  false,
                  false
-               )}>
-                 {templateId === 'model3' && (
+      >
+                  
                    <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
-                 )}
-                 {templateId === 'model3' && (
+        
+                  
                    <div className="absolute top-10 right-10 opacity-10 rotate-12">
                      <Gavel size={200} className="text-[#8b6b45]" />
                    </div>
-                 )}
+        
                  <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
                  
                  {/* Mobile Grid */}
@@ -319,23 +319,23 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                     </div>
                  </section>
                </div>
-             )}
+    
              {sectionId === "articles" && (activeSections as any)?.show_articles && (
                <div className={cn(
                  "relative py-24",
                  false,
-                 templateId === 'model3' && "bg-[#fdfbf7] border-t-8 border-[#8b6b45]/10",
-               )}>
+                 false,
+      >
                  <ArticleCarousel 
                    articles={articles} 
                    variant="model1" 
                    settings={articleSettings}
                  />
                </div>
-             )}
+    
             {sectionId === "articles" && directSales.length > 0 && (
               <HomeSaleLots directSales={directSales} />
-            )}
+   
             {sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu && (
               <section className="container mx-auto px-4 py-16">
                 <div className="rounded-3xl bg-emerald-deep/40 border border-gold/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -350,7 +350,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                   </Link>
                 </div>
               </section>
-            )}
+   
           </ErrorBoundary>
         ))}
       </div>
