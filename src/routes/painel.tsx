@@ -70,14 +70,40 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
      fetchData();
    }, [lot, profile.id]);
  
-   const handleUploadProof = async (installmentId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+   const handleUploadProof = async (inst: Installment, e: React.ChangeEvent<HTMLInputElement>) => {
      const file = e.target.files?.[0];
      if (!file) return;
  
-     setUploadingId(installmentId.toString());
+     setUploadingId(inst.installment_number.toString());
      try {
+        // First, ensure we have a transaction for this lot
+        let { data: transaction } = await supabase
+          .from("transactions")
+          .select("id")
+          .eq("lot_id", lot.id)
+          .eq("buyer_id", profile.id)
+          .single();
+        
+        if (!transaction) {
+          const { data: newTransaction, error: transError } = await supabase
+            .from("transactions")
+            .insert({
+              lot_id: lot.id,
+              buyer_id: profile.id,
+              seller_id: lot.seller_id || lot.animal?.seller_id,
+              final_price: lot.current_price,
+              payment_method: 'pix_manual',
+              payment_status: 'pending'
+            })
+            .select()
+            .single();
+          
+          if (transError) throw transError;
+          transaction = newTransaction;
+        }
+
        const fileExt = file.name.split('.').pop();
-       const fileName = `${profile.id}/proof-${lot.id}-${installmentId}-${Math.random()}.${fileExt}`;
+       const fileName = `${profile.id}/proof-${lot.id}-${inst.installment_number}-${Math.random()}.${fileExt}`;
        
        const { error: uploadError } = await supabase.storage
          .from('payment_proofs')
@@ -89,6 +115,26 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
          .from('payment_proofs')
          .getPublicUrl(fileName);
  
+        // Upsert installment record
+        const { error: instError } = await supabase
+          .from("installments")
+          .upsert({
+            transaction_id: transaction.id,
+            buyer_id: profile.id,
+            installment_number: inst.installment_number,
+            amount: inst.amount,
+            due_date: inst.due_date.toISOString(),
+            proof_url: publicUrl,
+            status: 'pending'
+          }, { onConflict: 'transaction_id,installment_number' });
+
+        if (instError) throw instError;
+
+        // Update local state to show status
+        setInstallments(prev => prev.map(i => 
+          i.installment_number === inst.installment_number ? { ...i, status: 'pending', proof_url: publicUrl } : i
+        ));
+
        toast.success("Comprovante enviado com sucesso! Aguarde a conferência.");
      } catch (error: any) {
        toast.error("Erro ao enviar comprovante: " + error.message);
