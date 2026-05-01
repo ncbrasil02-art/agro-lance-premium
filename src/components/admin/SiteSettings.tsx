@@ -348,112 +348,13 @@ import { LotCard } from "../auctions/lot-card";
 
     return (
       <Tabs defaultValue={initialTab} className="space-y-6">
-       <TabsList className="bg-muted/50 p-1">
+        <TabsList className="bg-muted/50 p-1">
           <TabsTrigger value="templates" className="gap-2">
             <Layout className="h-4 w-4" /> Modelos
           </TabsTrigger>
-         <TabsTrigger value="geral" className="gap-2">
-        <TabsContent value="templates" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Layout className="h-5 w-5 text-gold" /> Editor de Modelos
-              </CardTitle>
-              <CardDescription>Escolha o estilo visual que melhor representa sua marca e reordene as seções da página inicial.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <div className="grid md:grid-cols-3 gap-6">
-                {AVAILABLE_TEMPLATES.map((tmpl) => (
-                  <div 
-                    key={tmpl.id}
-                    className={cn(
-                      "group relative rounded-2xl overflow-hidden border-2 transition-all cursor-pointer hover:shadow-2xl",
-                      homepage.template_id === tmpl.id ? "border-gold shadow-gold/20" : "border-border hover:border-gold/30"
-                    )}
-                    onClick={() => setHomepage({...homepage, template_id: tmpl.id})}
-                  >
-                    <div className="aspect-[16/10] relative overflow-hidden">
-                      <img src={tmpl.image} alt={tmpl.name} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      {homepage.template_id === tmpl.id && (
-                        <div className="absolute top-3 right-3 bg-gold text-emerald-deep px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1 shadow-lg">
-                          <Check className="h-3 w-3" /> Ativo
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5 bg-card">
-                      <h3 className="text-lg font-black uppercase italic tracking-tighter mb-1">{tmpl.name}</h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed mb-4">{tmpl.description}</p>
-                      <Button 
-                        variant={homepage.template_id === tmpl.id ? "default" : "outline"}
-                        className={cn(
-                          "w-full font-black uppercase italic text-xs h-10 tracking-widest",
-                          homepage.template_id === tmpl.id ? "bg-gold text-emerald-deep" : "border-gold/20 text-gold"
-                        )}
-                      >
-                        {homepage.template_id === tmpl.id ? "Modelo Ativado" : "Selecionar Modelo"}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-4 pt-4 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <Label className="text-lg font-black uppercase italic tracking-tighter flex items-center gap-2">
-                    <ArrowUp className="h-4 w-4 text-gold" /> Reordenar Seções
-                  </Label>
-                  <Button 
-                    size="sm" 
-                    className="bg-gold text-emerald-deep font-black uppercase italic text-[10px] h-8 px-4"
-                    onClick={() => handleSave("homepage_sections", homepage)}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Save className="h-3 w-3 mr-2" />}
-                    Salvar Ordem
-                  </Button>
-                </div>
-                <p className="text-sm text-muted-foreground">Arraste as seções para definir em que ordem elas aparecem na página inicial.</p>
-                <div className="grid gap-3">
-                  {homepage.order.map((sectionId: string, idx: number) => (
-                    <div key={sectionId} className="flex items-center gap-3 p-4 bg-muted/30 border border-border rounded-xl group hover:bg-muted/50 transition-colors">
-                      <div className="flex flex-col gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-muted-foreground hover:text-gold"
-                          onClick={() => moveSection(idx, 'up')}
-                          disabled={idx === 0}
-                        >
-                          <ArrowUp className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-muted-foreground hover:text-gold"
-                          onClick={() => moveSection(idx, 'down')}
-                          disabled={idx === homepage.order.length - 1}
-                        >
-                          <ArrowDown className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-black uppercase italic text-sm tracking-tighter">{sectionLabels[sectionId] || sectionId}</h4>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Seção da Página Inicial</p>
-                      </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Badge variant="outline" className="text-[9px] uppercase tracking-tighter font-black">Posição #{idx + 1}</Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-           <Info className="h-4 w-4" /> Geral
-         </TabsTrigger>
+          <TabsTrigger value="geral" className="gap-2">
+            <Info className="h-4 w-4" /> Geral
+          </TabsTrigger>
          <TabsTrigger value="visual" className="gap-2">
            <Palette className="h-4 w-4" /> Visual
          </TabsTrigger>
