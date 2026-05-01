@@ -57,9 +57,23 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
            // Or just generate on the fly if not exists
            .order("installment_number", { ascending: true });
  
-         const formula = lot.payment_formula || lot.animal?.payment_formula || "1";
-         const calculated = calculateInstallments(lot.current_price, formula, new Date(lot.updated_at || lot.created_at));
-         setInstallments(calculated);
+          const formula = lot.payment_formula || lot.animal?.payment_formula || "1";
+          const calculated = calculateInstallments(lot.current_price, formula, new Date(lot.updated_at || lot.created_at));
+          
+          // Merge with DB data if exists
+          const merged: Installment[] = calculated.map(inst => {
+            const dbInst = existingInstallments?.find(ei => ei.installment_number === inst.installment_number);
+            if (dbInst) {
+              return {
+                ...inst,
+                status: dbInst.status || undefined,
+                proof_url: dbInst.proof_url || undefined
+              };
+            }
+            return inst;
+          });
+
+          setInstallments(merged);
        } catch (err) {
          console.error("Error fetching payment data:", err);
        } finally {
@@ -70,14 +84,40 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
      fetchData();
    }, [lot, profile.id]);
  
-   const handleUploadProof = async (installmentId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+   const handleUploadProof = async (inst: Installment, e: React.ChangeEvent<HTMLInputElement>) => {
      const file = e.target.files?.[0];
      if (!file) return;
  
-     setUploadingId(installmentId.toString());
+     setUploadingId(inst.installment_number.toString());
      try {
+        // First, ensure we have a transaction for this lot
+        let { data: transaction } = await supabase
+          .from("transactions")
+          .select("id")
+          .eq("lot_id", lot.id)
+          .eq("buyer_id", profile.id)
+          .single();
+        
+        if (!transaction) {
+          const { data: newTransaction, error: transError } = await supabase
+            .from("transactions")
+            .insert({
+              lot_id: lot.id,
+              buyer_id: profile.id,
+              seller_id: lot.seller_id || lot.animal?.seller_id,
+              final_price: lot.current_price,
+              payment_method: 'pix_manual',
+              payment_status: 'pending'
+            })
+            .select()
+            .single();
+          
+          if (transError) throw transError;
+          transaction = newTransaction;
+        }
+
        const fileExt = file.name.split('.').pop();
-       const fileName = `${profile.id}/proof-${lot.id}-${installmentId}-${Math.random()}.${fileExt}`;
+       const fileName = `${profile.id}/proof-${lot.id}-${inst.installment_number}-${Math.random()}.${fileExt}`;
        
        const { error: uploadError } = await supabase.storage
          .from('payment_proofs')
@@ -89,6 +129,26 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
          .from('payment_proofs')
          .getPublicUrl(fileName);
  
+        // Upsert installment record
+        const { error: instError } = await supabase
+          .from("installments")
+          .upsert({
+            transaction_id: transaction.id,
+            buyer_id: profile.id,
+            installment_number: inst.installment_number,
+            amount: inst.amount,
+            due_date: inst.due_date.toISOString(),
+            proof_url: publicUrl,
+            status: 'pending'
+          }, { onConflict: 'transaction_id,installment_number' });
+
+        if (instError) throw instError;
+
+        // Update local state to show status
+        setInstallments(prev => prev.map(i => 
+          i.installment_number === inst.installment_number ? { ...i, status: 'pending', proof_url: publicUrl } : i
+        ));
+
        toast.success("Comprovante enviado com sucesso! Aguarde a conferência.");
      } catch (error: any) {
        toast.error("Erro ao enviar comprovante: " + error.message);
@@ -170,7 +230,15 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                    </div>
                    <div>
                      <p className="text-sm font-bold text-gray-800">Vencimento: {inst.due_date.toLocaleDateString('pt-BR')}</p>
-                     <p className="text-[10px] text-gray-400">Status: Pendente</p>
+                      <p className="text-[10px] text-gray-400">
+                        Status: <span className={
+                          inst.status === 'paid' ? 'text-emerald-600 font-bold' : 
+                          inst.status === 'overdue' ? 'text-red-600 font-bold' : 
+                          'text-amber-600 font-bold'
+                        }>
+                          {inst.status === 'paid' ? 'Pago' : inst.status === 'overdue' ? 'Atrasado' : 'Pendente'}
+                        </span>
+                      </p>
                    </div>
                  </div>
                  <div className="flex items-center gap-4">
@@ -218,7 +286,7 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                              <Input 
                                type="file" 
                                accept="image/*,application/pdf"
-                               onChange={(e) => handleUploadProof(inst.installment_number, e)}
+                               onChange={(e) => handleUploadProof(inst, e)}
                                disabled={!!uploadingId}
                              />
                              {uploadingId === inst.installment_number.toString() && (

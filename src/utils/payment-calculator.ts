@@ -3,6 +3,8 @@ export interface Installment {
   installment_number: number;
   amount: number;
   due_date: Date;
+  status?: string;
+  proof_url?: string;
 }
 
 /**
