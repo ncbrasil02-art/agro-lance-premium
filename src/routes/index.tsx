@@ -11,6 +11,7 @@ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loade
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { logger } from "@/utils/logger";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/auctions/event-card";
@@ -233,30 +234,75 @@ function Home() {
         </div>
       )}
 
-      {liveEvents.length > 0 && (
-        <section className="container mx-auto px-4 py-16">
-          <div className="mb-8 flex items-end justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-live/30 bg-live/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-live">
-                <span className="h-1.5 w-1.5 rounded-full bg-live animate-pulse-live" /> Acontecendo agora
-              </div>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Eventos ao vivo</h2>
-            </div>
-            <Link to="/ao-vivo" className="hidden items-center gap-1 text-sm text-gold hover:underline md:inline-flex">
-              Ver todos <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {liveEvents.map((e: any) => <EventCard key={e.id} event={e} />)}
-          </div>
-        </section>
-      )}
-
       <div className="flex flex-col gap-0">
         {(activeSections.order).map((sectionId: string) => (
           <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
              {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
-               <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
+               <>
+                 <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
+                 {liveEvents.length > 0 && (
+                   <section className="container mx-auto px-4 -mt-10 mb-20 relative z-20">
+                     <motion.div 
+                       initial={{ opacity: 0, y: 40 }}
+                       whileInView={{ opacity: 1, y: 0 }}
+                       viewport={{ once: true }}
+                       className="group relative overflow-hidden rounded-[2.5rem] border border-live/30 bg-black/40 backdrop-blur-3xl"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-r from-live/10 via-transparent to-transparent opacity-50" />
+                       <div className="flex flex-col md:flex-row items-stretch min-h-[300px]">
+                         {/* Image Section */}
+                         <div className="relative w-full md:w-1/2 overflow-hidden">
+                           <OptimizedImage 
+                             src={liveEvents[0].cover} 
+                             alt={liveEvents[0].name}
+                             width={800}
+                             className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent via-transparent to-black/60" />
+                           <div className="absolute left-6 top-6">
+                             <div className="inline-flex items-center gap-2 rounded-full bg-live/90 backdrop-blur-md px-4 py-2 text-xs font-black text-white uppercase tracking-widest animate-pulse shadow-lg">
+                               <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                               Ao Vivo Agora
+                             </div>
+                           </div>
+                         </div>
+
+                         {/* Content Section */}
+                         <div className="flex-1 p-8 md:p-12 flex flex-col justify-center gap-6">
+                           <div>
+                             <h2 className="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter leading-none mb-4 group-hover:text-live transition-colors">
+                               {liveEvents[0].name}
+                             </h2>
+                             <p className="text-white/60 text-lg max-w-md italic font-medium">
+                               {liveEvents[0].description || "Participe agora do nosso leilão de elite em tempo real."}
+                             </p>
+                           </div>
+
+                           <div className="flex flex-wrap items-center gap-6">
+                             <div className="flex items-center gap-2 text-live">
+                               <Radio className="h-5 w-5 animate-pulse" />
+                               <span className="text-sm font-black uppercase tracking-widest">{liveEvents[0].viewers.toLocaleString()} assistindo</span>
+                             </div>
+                             <Link to="/ao-vivo" className="ml-auto md:ml-0">
+                               <Button size="lg" className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-widest h-16 px-10 rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:scale-105 transition-all">
+                                 ENTRAR NO LEILÃO
+                                 <ArrowRight className="ml-2 h-5 w-5" />
+                               </Button>
+                             </Link>
+                           </div>
+                         </div>
+                       </div>
+                     </motion.div>
+                     {liveEvents.length > 1 && (
+                       <div className="mt-8 flex justify-end">
+                         <Link to="/ao-vivo" className="flex items-center gap-2 text-gold hover:underline text-sm font-bold uppercase tracking-widest">
+                           Ver outros {liveEvents.length - 1} eventos ao vivo <ArrowRight className="h-4 w-4" />
+                         </Link>
+                       </div>
+                     )}
+                   </section>
+                 )}
+               </>
              )}
              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
                <div className="relative py-20 overflow-hidden">

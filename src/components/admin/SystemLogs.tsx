@@ -1,7 +1,7 @@
  import React, { useEffect, useState } from "react";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { supabase } from "@/integrations/supabase/client";
- import { AlertCircle, Terminal, Trash2, RefreshCcw } from "lucide-react";
+  import { AlertCircle, Terminal, Trash2, RefreshCcw, Zap } from "lucide-react";
  import { Button } from "@/components/ui/button";
  import { toast } from "sonner";
  import { format } from "date-fns";
@@ -9,9 +9,36 @@
  
  export function SystemLogs() {
    const [logs, setLogs] = useState<any[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
- 
-   const fetchLogs = async () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isReconciling, setIsReconciling] = useState(false);
+
+    const handleReconcile = async () => {
+      setIsReconciling(true);
+      const toastId = toast.loading("Reconciliando falhas do sistema...");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reconcile-failures`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) throw new Error("Falha na reconciliação");
+
+        const result = await response.json();
+        toast.success(`Reconciliação concluída! Webhooks: ${result.webhooks.succeeded}, Notificações: ${result.notifications.succeeded}, Boletas: ${result.installments.reconciled}`, { id: toastId });
+        fetchLogs();
+      } catch (error: any) {
+        console.error("Reconciliation error:", error);
+        toast.error("Erro ao reconciliar: " + error.message, { id: toastId });
+      } finally {
+        setIsReconciling(false);
+      }
+    };
+
+    const fetchLogs = async () => {
      setIsLoading(true);
      try {
        const { data, error } = await supabase
@@ -55,7 +82,17 @@
            <h2 className="text-2xl font-bold">Monitor de Falhas</h2>
            <p className="text-muted-foreground text-sm">Acompanhe erros críticos capturados pela blindagem do sistema.</p>
          </div>
-         <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-gold/50 text-gold hover:bg-gold/10" 
+              onClick={handleReconcile} 
+              disabled={isReconciling}
+            >
+              <Zap className={`mr-2 h-4 w-4 ${isReconciling ? 'animate-pulse' : ''}`} /> 
+              Reconciliar Falhas
+            </Button>
            <Button variant="outline" size="sm" onClick={fetchLogs} disabled={isLoading}>
              <RefreshCcw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar
            </Button>
