@@ -634,25 +634,43 @@
                     </Button>
                   </div>
 
-                  <div className="space-y-4">
-                    {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
-                      <Card key={idx} className="bg-muted/10 border-gold/10">
-                        <CardContent className="p-4 space-y-4">
+                   <Reorder.Group 
+                     axis="y" 
+                     values={homepage.hero_backgrounds || []} 
+                     onReorder={(newBgs) => {
+                       // Find the map of old index to new index
+                       const oldBgs = homepage.hero_backgrounds || [];
+                       const newPhrases = newBgs.map(bg => {
+                         const oldIdx = oldBgs.indexOf(bg);
+                         return customTexts.hero_phrases?.[oldIdx] || "";
+                       });
+                       setHomepage({...homepage, hero_backgrounds: newBgs});
+                       setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                     }}
+                     className="space-y-4"
+                   >
+                     {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
+                       <Reorder.Item key={url || idx} value={url}>
+                         <Card className="bg-muted/10 border-gold/10 cursor-default">
+                           <CardContent className="p-4 space-y-4">
                           <div className="flex justify-between items-center">
-                            <Badge variant="outline" className="text-gold border-gold/30 uppercase tracking-widest text-[10px]">Slide #{idx + 1}</Badge>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-destructive h-8 w-8"
-                              onClick={() => {
-                                const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
-                                const newPhrases = (customTexts.hero_phrases || []).filter((_: any, i: number) => i !== idx);
-                                setHomepage({...homepage, hero_backgrounds: newBgs});
-                                setCustomTexts({...customTexts, hero_phrases: newPhrases});
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                             <div className="flex items-center gap-2">
+                               <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                               <Badge variant="outline" className="text-gold border-gold/30 uppercase tracking-widest text-[10px]">Slide #{idx + 1}</Badge>
+                             </div>
+                             <Button 
+                               variant="ghost" 
+                               size="icon" 
+                               className="text-destructive h-8 w-8"
+                               onClick={() => {
+                                 const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
+                                 const newPhrases = (customTexts.hero_phrases || []).filter((_: any, i: number) => i !== idx);
+                                 setHomepage({...homepage, hero_backgrounds: newBgs});
+                                 setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                               }}
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
                           </div>
 
                           <div className="grid md:grid-cols-[150px_1fr] gap-4">
@@ -709,9 +727,11 @@
                             </div>
                           </div>
                         </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                         </CardContent>
+                       </Card>
+                      </Reorder.Item>
+                     ))}
+                   </Reorder.Group>
 
                   <Button 
                     className="w-full bg-gold-gradient text-emerald-deep font-black uppercase tracking-widest h-12 shadow-gold" 
