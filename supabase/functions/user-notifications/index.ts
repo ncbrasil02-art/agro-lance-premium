@@ -75,10 +75,11 @@
         throw new Error('Forbidden')
       }
 
-     const adminClient = createClient(
-       Deno.env.get('SUPABASE_URL') ?? '',
-       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-     )
+      const adminClient = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '')
+
+      const logNotification = async (type: string, title: string, message: string, email: string, status: string) => {
+        await adminClient.from('notification_logs').insert({ type, title, message, recipient_email: email, status })
+      }
  
       let email = userEmail;
       let phone = '';
@@ -98,23 +99,26 @@
       }
 
      const resendKey = Deno.env.get('RESEND_API_KEY')
-     if (!resendKey) {
-       console.warn('RESEND_API_KEY not found. Email not sent.')
-       return new Response(JSON.stringify({ success: true, message: 'Key missing' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-     }
-
-     if (type === 'user_approved' && email) {
-       await fetch('https://api.resend.com/emails', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
-         body: JSON.stringify({
-           from: 'Elite Leilões <contato@premiumagro.com.br>',
-           to: [email],
-           subject: 'Seu cadastro foi aprovado! 🚀',
-            html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Olá! Seu cadastro foi aprovado.</h2><p>Você já pode participar dos leilões.</p></div>`,
-          }),
+      const sendEmail = async (to: string[], subject: string, html: string, from: string = 'Elite Leilões <contato@premiumagro.com.br>') => {
+        if (!resendKey) {
+          console.warn('RESEND_API_KEY not found. Logging instead of sending.')
+          await logNotification(type, subject, html, to.join(','), 'simulated_no_key')
+          return
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
+          body: JSON.stringify({ from, to, subject, html }),
         })
-        
+        if (res.ok) {
+          await logNotification(type, subject, html, to.join(','), 'sent')
+        } else {
+          await logNotification(type, subject, html, to.join(','), 'failed')
+        }
+      }
+
+      if (type === 'user_approved' && email) {
+        await sendEmail([email], 'Seu cadastro foi aprovado! 🚀', `<div style="font-family: sans-serif; padding: 20px;"><h2>Olá! Seu cadastro foi aprovado.</h2><p>Você já pode participar dos leilões.</p></div>`)
         if (phone) {
           await sendWhatsApp(phone, `🚀 *Elite Leilões: Seu cadastro foi aprovado!*\n\nOlá! Seu cadastro foi aprovado com sucesso. Você já pode participar de todos os nossos leilões e realizar lances.\n\nBoas compras!`)
         }
