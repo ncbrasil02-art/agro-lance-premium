@@ -807,7 +807,7 @@ function LotDetail() {
                             <Stethoscope className="h-4 w-4" /> Registro de Vacinação
                           </h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                             {(typeof lot.animal.vaccination_records === 'string' ? lot.animal.vaccination_records.split(',').map(s => s.trim()).filter(Boolean) : lot.animal.vaccination_records).map((v: any, idx: number) => (
+                            {(typeof lot.animal.vaccination_records === 'string' ? lot.animal.vaccination_records.split(',').map((s: string) => s.trim()).filter(Boolean) : lot.animal.vaccination_records).map((v: any, idx: number) => (
                               <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
                                  <div className="flex items-center gap-3">
                                    <div className="h-7 w-7 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
