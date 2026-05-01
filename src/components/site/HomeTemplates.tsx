@@ -1,3 +1,285 @@
+
+export const EventsHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
+  const isMobileMode = homepageSettings?.mobile_mode_enabled;
+  return (
+    <section className={cn(
+      "relative min-h-[90vh] flex items-center bg-black text-white overflow-hidden",
+      isMobileMode && "min-h-[70vh] pt-10"
+    )}>
+      <div className="absolute inset-0 z-0">
+        <HeroBackground 
+          backgrounds={homepageSettings?.hero_backgrounds} 
+          opacity={30} 
+          blur={5} 
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black" />
+      </div>
+
+      <div className="container relative z-10 mx-auto px-4 py-20">
+        <div className="flex flex-col items-center text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-4 mb-8"
+          >
+            <div className="h-px w-12 bg-gold/50" />
+            <span className="text-gold uppercase tracking-[0.5em] font-black text-xs">Agenda de Eventos</span>
+            <div className="h-px w-12 bg-gold/50" />
+          </motion.div>
+
+          <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-8 leading-none max-w-4xl">
+            {customTexts?.hero_title || "Os Maiores Encontros da Genética Mundial"}
+          </h1>
+          
+          <p className="text-xl text-white/60 max-w-2xl font-medium italic mb-12">
+            {customTexts?.hero_subtitle || "Acompanhe nossa agenda completa e não perca nenhuma oportunidade de investimento."}
+          </p>
+        </div>
+
+        {nextEvent && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="grid lg:grid-cols-2 gap-8 items-stretch"
+          >
+            <div className="relative group overflow-hidden rounded-[3rem] border border-white/10 aspect-video lg:aspect-auto">
+              <OptimizedImage 
+                src={nextEvent.cover} 
+                alt={nextEvent.name} 
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-12 flex flex-col justify-end">
+                <Badge className="bg-gold text-black w-fit mb-4 uppercase font-black">Destaque</Badge>
+                <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-4 leading-none">{nextEvent.name}</h2>
+                <p className="text-white/70 font-medium mb-8 max-w-md">{nextEvent.description}</p>
+                <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
+                  <Button className="bg-white text-black font-black uppercase rounded-full h-14 px-8 hover:bg-gold transition-colors">
+                    Ver Detalhes do Evento
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-3xl rounded-[3rem] border border-white/10 p-12 flex flex-col justify-center gap-12">
+              <div className="space-y-4">
+                <span className="text-[10px] font-black text-gold uppercase tracking-[0.4em]">Contagem Regressiva</span>
+                <Countdown endsAt={nextEvent.date} variant="segmented" />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-8 py-12 border-y border-white/10">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">Cidade/UF</span>
+                  <div className="text-xl font-bold">{nextEvent.city} - {nextEvent.state}</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">Início</span>
+                  <div className="text-xl font-bold">{new Date(nextEvent.date).toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <Link to="/ao-vivo" className="flex-1">
+                  <Button className="w-full bg-gold-gradient text-emerald-deep font-black uppercase h-16 rounded-2xl shadow-gold hover:scale-105 transition-transform">
+                    <Radio className="mr-2 h-4 w-4" /> Ao Vivo
+                  </Button>
+                </Link>
+                <Link to="/eventos">
+                  <Button variant="outline" className="h-16 px-8 rounded-2xl border-white/20 hover:bg-white/10 font-black uppercase">
+                    Agenda Completa
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+export const NewsHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
+  const isMobileMode = homepageSettings?.mobile_mode_enabled;
+  return (
+    <section className={cn(
+      "relative min-h-[90vh] bg-[#fdfbf7] flex items-center overflow-hidden",
+      isMobileMode && "min-h-[70vh] pt-10"
+    )}>
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#f4f1ea] -z-0" />
+      <div className="absolute top-20 right-20 text-[20rem] font-black text-black/5 select-none pointer-events-none uppercase italic -rotate-90">
+        News
+      </div>
+
+      <div className="container relative z-10 mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-20">
+        <div className="lg:w-1/2 space-y-12">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            <Badge className="bg-black text-white px-4 py-1.5 rounded-none font-serif italic text-lg capitalize tracking-normal">
+              Editorial Agro
+            </Badge>
+            <h1 className="text-6xl md:text-8xl font-serif font-black leading-[0.9] text-[#1a1a1a]">
+              {customTexts?.hero_title || (
+                <>
+                  O Futuro do <br />
+                  <span className="italic text-[#8b6b45]">Agronegócio</span> <br />
+                  em Foco
+                </>
+              )}
+            </h1>
+            <p className="text-xl text-black/60 font-medium leading-relaxed max-w-lg border-l-2 border-[#8b6b45] pl-6">
+              {customTexts?.hero_subtitle || "Informação de qualidade, curadoria genética e as principais tendências que moldam o mercado rural brasileiro."}
+            </p>
+          </motion.div>
+
+          <div className="flex flex-wrap gap-6">
+            <Link to="/noticias">
+              <Button className="bg-[#1a1a1a] text-white rounded-none h-16 px-10 font-bold uppercase tracking-widest hover:bg-[#8b6b45] transition-colors">
+                Explorar Notícias
+              </Button>
+            </Link>
+            <Link to="/ao-vivo">
+              <Button variant="outline" className="border-black text-black rounded-none h-16 px-10 font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                TV Agro Online
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="lg:w-1/2 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="relative"
+          >
+            <div className="bg-white p-6 shadow-[40px_40px_80px_rgba(0,0,0,0.1)] relative z-10">
+              <div className="aspect-[4/5] overflow-hidden relative">
+                <HeroBackground backgrounds={homepageSettings?.hero_backgrounds} opacity={100} blur={0} />
+              </div>
+              <div className="pt-8 space-y-4">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-[#8b6b45]">
+                  <span>Capa da Semana</span>
+                  <span>{new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
+                </div>
+                <h3 className="text-2xl font-serif font-bold text-[#1a1a1a]">Transformação Digital: O novo capítulo da pecuária de corte no Brasil.</h3>
+              </div>
+            </div>
+            
+            {/* Floating decoration */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#8b6b45]/10 rounded-full blur-3xl -z-10" />
+            <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-gold/10 rounded-full blur-3xl -z-10" />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const CreativeHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
+  const isMobileMode = homepageSettings?.mobile_mode_enabled;
+  return (
+    <section className={cn(
+      "relative min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white overflow-hidden",
+      isMobileMode && "min-h-[80vh] pt-10"
+    )}>
+      {/* Interactive floating shapes */}
+      <div className="absolute inset-0 z-0 opacity-40">
+        {[...Array(12)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute border border-white/10 rounded-full"
+            style={{
+              width: Math.random() * 300 + 100,
+              height: Math.random() * 300 + 100,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 360],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: Math.random() * 20 + 20,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="container relative z-10 mx-auto px-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: "circOut" }}
+          className="relative inline-block"
+        >
+          <div className="absolute -inset-10 bg-gold/20 rounded-full blur-[100px] animate-pulse" />
+          <h1 className="text-7xl md:text-[14rem] font-black uppercase tracking-[-0.05em] leading-none mb-4 mix-blend-difference">
+            {customTexts?.hero_title || (
+              <>
+                PURE <br />
+                <span className="text-gold italic font-signature normal-case tracking-normal">Genetics</span>
+              </>
+            )}
+          </h1>
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="text-2xl text-white/50 max-w-3xl mx-auto font-light tracking-widest uppercase mb-16"
+        >
+          {customTexts?.hero_subtitle || "The ultimate intersection between art, technology and livestock excellence."}
+        </motion.p>
+
+        <div className="flex flex-col md:flex-row items-center justify-center gap-12">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Link to="/cadastro">
+              <Button size="lg" className="bg-white text-black font-black uppercase h-20 px-16 rounded-none text-xl tracking-[0.2em] shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+                Join The Elite
+              </Button>
+            </Link>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Link to="/ao-vivo">
+              <Button variant="ghost" className="h-20 px-16 font-black uppercase text-xl tracking-[0.2em] border border-white/20 rounded-none hover:bg-white hover:text-black">
+                Experience Live
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Floating Design Pieces */}
+      <motion.div 
+        animate={{ y: [0, -20, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-20 right-20 w-64 h-64 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center hidden lg:flex"
+      >
+        <div className="text-center">
+          <div className="text-5xl font-black text-gold mb-1">98%</div>
+          <div className="text-[10px] uppercase font-bold tracking-widest text-white/40">Success Rate</div>
+        </div>
+      </motion.div>
+
+      <motion.div 
+        animate={{ y: [0, 20, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute top-40 left-20 w-48 h-48 bg-gold/5 backdrop-blur-3xl border border-gold/10 rounded-full flex items-center justify-center hidden lg:flex"
+      >
+        <div className="text-center">
+          <Trophy className="h-12 w-12 text-gold mx-auto mb-2" />
+          <div className="text-[10px] uppercase font-bold tracking-widest text-white/40">Premium Class</div>
+        </div>
+      </motion.div>
+    </section>
+  );
+};
 import { useState, useEffect, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
