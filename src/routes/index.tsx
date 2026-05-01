@@ -84,10 +84,10 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const router = useRouter();
-  const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData();
+   const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData() as any;
   const context = Route.useRouteContext();
   const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
-  const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts, articleSettings } = useSiteSettings({
+   const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts, articleSettings, animations } = useSiteSettings({
     siteInfo: ctxSiteInfo, 
     theme: ctxTheme, 
     homepage: ctxHomepage 
@@ -202,12 +202,12 @@ function Home() {
 
   const featuredLots = mappedLots.slice(0, 6);
 
-  const stats = {
-    totalSold: 184500000,
-    totalAnimals: 12847,
-    totalUsers: 38420,
-    activeEvents: 14,
-  };
+   const siteStats = sectionsSettings?.stats || {
+     totalSold: 184500000,
+     totalAnimals: 12847,
+     totalUsers: 38420,
+     activeEvents: 14,
+   };
 
   return (
     <div className="relative min-h-screen transition-colors duration-700">
@@ -239,7 +239,7 @@ function Home() {
           <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
              {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
                <>
-                 <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
+                  <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={siteStats} homepageSettings={activeSections} />
                  {liveEvents.length > 0 && (
                    <section className="container mx-auto px-4 -mt-10 mb-20 relative z-20">
                      <motion.div 
