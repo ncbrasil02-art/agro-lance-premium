@@ -309,8 +309,9 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
   );
 }
 
-function LotDetail() {
-  const { lot: initialLot, initialBids, prevLotId, nextLotId } = Route.useLoaderData() as any;
+ function LotDetail() {
+   const { lot: initialLot, initialBids, prevLotId, nextLotId } = Route.useLoaderData() as any;
+   const { animations } = Route.useRouteContext();
   const { user, profile } = useAuth();
    const [lot, setLot] = useState(initialLot);
    const [viewIncremented, setViewIncremented] = useState(false);
@@ -1033,14 +1034,14 @@ function LotDetail() {
                          </div>
                        </div>
                      )}
-                     <Button 
-                       size="lg" 
-                       className={`w-full h-20 font-black text-2xl rounded-2xl ${!isBiddingOpen ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep'}`} 
-                       onClick={() => isBiddingOpen && placeBid(nextBid)}
-                       disabled={!isBiddingOpen}
-                     >
-                       {isSold ? 'LOTE ARREMATADO' : isPassed ? 'LOTE FINALIZADO' : !isBiddingOpen ? 'AGUARDANDO ABERTURA' : 'CONFIRMAR LANCE'}
-                     </Button>
+                      <Button 
+                        size="lg" 
+                        className={`w-full h-20 font-black text-2xl rounded-2xl transition-all duration-300 ${!isBiddingOpen ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep shadow-gold'} ${isBiddingOpen && (animations?.bid_button_pulse || lot.event?.is_live_interactive) ? 'animate-pulse scale-[1.02] shadow-[0_0_30px_rgba(212,175,55,0.4)]' : ''}`} 
+                        onClick={() => isBiddingOpen && placeBid(nextBid)}
+                        disabled={!isBiddingOpen}
+                      >
+                        {isSold ? 'LOTE ARREMATADO' : isPassed ? 'LOTE FINALIZADO' : !isBiddingOpen ? 'AGUARDANDO ABERTURA' : 'CONFIRMAR LANCE'}
+                      </Button>
                    <div className="grid grid-cols-2 gap-4">
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
