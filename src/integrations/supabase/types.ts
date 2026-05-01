@@ -1540,6 +1540,7 @@ export type Database = {
           payload: Json | null
           processed_at: string | null
           retry_count: number | null
+          scheduled_for: string | null
           status: string | null
         }
         Insert: {
@@ -1553,6 +1554,7 @@ export type Database = {
           payload?: Json | null
           processed_at?: string | null
           retry_count?: number | null
+          scheduled_for?: string | null
           status?: string | null
         }
         Update: {
@@ -1566,6 +1568,7 @@ export type Database = {
           payload?: Json | null
           processed_at?: string | null
           retry_count?: number | null
+          scheduled_for?: string | null
           status?: string | null
         }
         Relationships: []
@@ -1613,6 +1616,7 @@ export type Database = {
           }
       revert_sold_lot: { Args: { p_lot_id: string }; Returns: undefined }
       slugify: { Args: { "": string }; Returns: string }
+      trigger_webhook_retry_worker: { Args: never; Returns: undefined }
       unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
