@@ -1,4 +1,5 @@
  import { useState, useEffect, ReactNode } from "react";
+ import { cn } from "@/lib/utils";
  import { motion, AnimatePresence } from "framer-motion";
  import { Link } from "@tanstack/react-router";
  import { ArrowRight, Calendar, Radio, Sparkles, Bell, Trophy, Users, TrendingUp } from "lucide-react";
@@ -80,8 +81,13 @@
     );
   };
  
-  export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => (
-    <section className="relative overflow-hidden min-h-[85vh] flex items-center">
+   export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => {
+     const isMobileMode = homepageSettings?.mobile_mode_enabled;
+     return (
+       <section className={cn(
+         "relative overflow-hidden flex items-center",
+         isMobileMode ? "min-h-[60vh] pt-10" : "min-h-[85vh]"
+       )}>
       <HeroBackground 
         backgrounds={homepageSettings?.hero_backgrounds} 
         opacity={homepageSettings?.hero_bg_opacity ?? 50} 
@@ -90,7 +96,7 @@
       <div className="absolute inset-0 z-1 bg-gradient-to-r from-background via-background/80 to-transparent" />
       <div className="absolute inset-0 z-1 bg-gradient-to-t from-background via-transparent to-transparent" />
  
-      <div className="container relative z-10 mx-auto px-4 py-20">
+       <div className={cn("container relative z-10 mx-auto px-4 py-20", isMobileMode && "py-10")}>
        <div className="max-w-3xl">
          <Badge variant="outline" className="mb-6 bg-gold/10 text-gold border-gold/20 px-4 py-1.5 uppercase tracking-widest text-[10px] font-black animate-pulse">
            <Sparkles className="h-3 w-3 mr-2" />
