@@ -163,10 +163,10 @@
   export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
     const isMobileMode = homepageSettings?.mobile_mode_enabled;
     return (
-    <section className={cn(
-      "relative flex items-center justify-center overflow-hidden bg-background",
-      isMobileMode ? "min-h-[70vh] pt-10" : "min-h-[90vh]"
-    )}>
+      <section className={cn(
+        "relative flex items-center justify-center overflow-hidden bg-background",
+        isMobileMode ? "min-h-[70vh] pt-10" : "min-h-[90vh]"
+      )}>
       {homepageSettings?.hero_backgrounds?.length > 0 ? (
         <HeroBackground 
           backgrounds={homepageSettings?.hero_backgrounds} 
@@ -245,10 +245,10 @@
   export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
     const isMobileMode = homepageSettings?.mobile_mode_enabled;
     return (
-    <section className={cn(
-      "relative min-h-screen grid lg:grid-cols-2",
-      isMobileMode && "min-h-0 pt-6"
-    )}>
+      <section className={cn(
+        "relative min-h-screen grid lg:grid-cols-2",
+        isMobileMode && "min-h-0 pt-6"
+      )}>
      <div className="relative flex items-center p-8 md:p-20 bg-emerald-deep text-white overflow-hidden">
        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-3xl -mr-32 -mt-32" />
        <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl -ml-48 -mb-48" />
