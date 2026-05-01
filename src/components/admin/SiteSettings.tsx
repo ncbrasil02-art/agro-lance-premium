@@ -588,72 +588,138 @@ import { LotCard } from "../auctions/lot-card";
                 <CardTitle className="flex items-center gap-2">
                   <Wand2 className="h-5 w-5 text-gold" /> Banner de Destaque (Hero)
                 </CardTitle>
-                <CardDescription>Gerencie as imagens de fundo e a nitidez do topo da página</CardDescription>
+                <CardDescription>Gerencie os slides (imagem + frase) do topo da página</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Transparência do Fundo ({homepage.hero_bg_opacity ?? 50}%)</Label>
-                      <Input 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        value={homepage.hero_bg_opacity ?? 50} 
-                        onChange={e => setHomepage({...homepage, hero_bg_opacity: parseInt(e.target.value)})} 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Desfoque / Nitidez ({homepage.hero_bg_blur ?? 0}px)</Label>
-                      <Input 
-                        type="range" 
-                        min="0" 
-                        max="20" 
-                        value={homepage.hero_bg_blur ?? 0} 
-                        onChange={e => setHomepage({...homepage, hero_bg_blur: parseInt(e.target.value)})} 
-                      />
-                    </div>
+                <div className="grid sm:grid-cols-2 gap-6 pb-6 border-b">
+                  <div className="space-y-2">
+                    <Label>Transparência do Fundo ({homepage.hero_bg_opacity ?? 50}%)</Label>
+                    <Input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={homepage.hero_bg_opacity ?? 50} 
+                      onChange={e => setHomepage({...homepage, hero_bg_opacity: parseInt(e.target.value)})} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Desfoque / Nitidez ({homepage.hero_bg_blur ?? 0}px)</Label>
+                    <Input 
+                      type="range" 
+                      min="0" 
+                      max="20" 
+                      value={homepage.hero_bg_blur ?? 0} 
+                      onChange={e => setHomepage({...homepage, hero_bg_blur: parseInt(e.target.value)})} 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-lg font-black uppercase italic tracking-tighter">Gerenciar Slides</Label>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 border-gold/50 text-gold hover:bg-gold/10"
+                      onClick={() => {
+                        setHomepage({...homepage, hero_backgrounds: [...(homepage.hero_backgrounds || []), ""]});
+                        setCustomTexts({...customTexts, hero_phrases: [...(customTexts.hero_phrases || []), ""]});
+                      }}
+                    >
+                      <Plus className="h-4 w-4" /> Adicionar Novo Slide
+                    </Button>
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="flex justify-between items-center">
-                      Imagens de Fundo (Slider)
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="h-7 text-[10px]"
-                        onClick={() => setHomepage({...homepage, hero_backgrounds: [...(homepage.hero_backgrounds || []), ""]})}
-                      >
-                        <Plus className="h-3 w-3 mr-1" /> Adicionar Imagem
-                      </Button>
-                    </Label>
-                    <div className="space-y-2">
-                       {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
-                        <div key={idx} className="flex gap-2">
-                          <Input 
-                            placeholder="URL da imagem..." 
-                            value={url} 
-                            onChange={e => {
-                              const newBgs = [...(homepage.hero_backgrounds || [])];
-                              newBgs[idx] = e.target.value;
-                              setHomepage({...homepage, hero_backgrounds: newBgs});
-                            }} 
-                          />
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-destructive h-10 w-10 shrink-0"
-                            onClick={() => {
-                               const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
-                              setHomepage({...homepage, hero_backgrounds: newBgs});
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+                    {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
+                      <Card key={idx} className="bg-muted/10 border-gold/10">
+                        <CardContent className="p-4 space-y-4">
+                          <div className="flex justify-between items-center">
+                            <Badge variant="outline" className="text-gold border-gold/30 uppercase tracking-widest text-[10px]">Slide #{idx + 1}</Badge>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-destructive h-8 w-8"
+                              onClick={() => {
+                                const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
+                                const newPhrases = (customTexts.hero_phrases || []).filter((_: any, i: number) => i !== idx);
+                                setHomepage({...homepage, hero_backgrounds: newBgs});
+                                setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="grid md:grid-cols-[150px_1fr] gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-[10px] uppercase font-bold text-muted-foreground">Imagem</Label>
+                              <div className="relative group aspect-video rounded-lg overflow-hidden border border-gold/20 bg-muted/20">
+                                {url ? (
+                                  <OptimizedImage src={url} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                    <Upload className="h-6 w-6" />
+                                  </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <Label className="cursor-pointer bg-gold text-emerald-deep px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                    Upload
+                                    <Input 
+                                      type="file" 
+                                      className="hidden" 
+                                      accept="image/*" 
+                                      onChange={(e) => handleSlideImageUpload(e, idx)} 
+                                    />
+                                  </Label>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label className="text-[10px] uppercase font-bold text-muted-foreground">URL da Imagem (Opcional)</Label>
+                                <Input 
+                                  placeholder="https://..." 
+                                  value={url} 
+                                  onChange={e => {
+                                    const newBgs = [...(homepage.hero_backgrounds || [])];
+                                    newBgs[idx] = e.target.value;
+                                    setHomepage({...homepage, hero_backgrounds: newBgs});
+                                  }} 
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-[10px] uppercase font-bold text-muted-foreground">Frase do Slide</Label>
+                                <Input 
+                                  placeholder="Frase que aparecerá neste slide..." 
+                                  value={customTexts.hero_phrases?.[idx] || ""} 
+                                  onChange={e => {
+                                    const newPhrases = [...(customTexts.hero_phrases || [])];
+                                    // Ensure array is long enough
+                                    while(newPhrases.length <= idx) newPhrases.push("");
+                                    newPhrases[idx] = e.target.value;
+                                    setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                                  }} 
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
+
+                  <Button 
+                    className="w-full bg-gold-gradient text-emerald-deep font-black uppercase tracking-widest h-12 shadow-gold" 
+                    onClick={async () => {
+                      await handleSave("homepage_sections", homepage);
+                      await handleSave("custom_texts", customTexts);
+                    }}
+                    disabled={isSaving}
+                  >
+                    {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    <Save className="h-4 w-4 mr-2" /> Salvar Alterações dos Slides
+                  </Button>
                 </div>
               </CardContent>
             </Card>
