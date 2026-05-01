@@ -57,9 +57,23 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
            // Or just generate on the fly if not exists
            .order("installment_number", { ascending: true });
  
-         const formula = lot.payment_formula || lot.animal?.payment_formula || "1";
-         const calculated = calculateInstallments(lot.current_price, formula, new Date(lot.updated_at || lot.created_at));
-         setInstallments(calculated);
+          const formula = lot.payment_formula || lot.animal?.payment_formula || "1";
+          const calculated = calculateInstallments(lot.current_price, formula, new Date(lot.updated_at || lot.created_at));
+          
+          // Merge with DB data if exists
+          const merged = calculated.map(inst => {
+            const dbInst = existingInstallments?.find(ei => ei.installment_number === inst.installment_number);
+            if (dbInst) {
+              return {
+                ...inst,
+                status: dbInst.status,
+                proof_url: dbInst.proof_url
+              };
+            }
+            return inst;
+          });
+
+          setInstallments(merged);
        } catch (err) {
          console.error("Error fetching payment data:", err);
        } finally {
