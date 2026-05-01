@@ -145,10 +145,8 @@ import { LotCard } from "../auctions/lot-card";
       image_aspect_ratio: '16/9'
     });
 
-    const [lotCardSettings, setLotCardSettings] = useState({
-          const articleData = data.find(i => i.key === "article_settings")?.value;
-          if (articleData) setArticleSettings((prev: any) => ({ ...prev, ...(articleData as any) }));
-      media_mode: "gallery",
+     const [lotCardSettings, setLotCardSettings] = useState({
+       media_mode: "gallery",
       displayed_fields: [
         { key: "father", label: "Pai", enabled: true },
         { key: "mother", label: "Mãe", enabled: true },
@@ -183,8 +181,9 @@ import { LotCard } from "../auctions/lot-card";
           const seoData = data.find(i => i.key === "seo_settings")?.value;
          const palettes = data.find(i => i.key === "saved_palettes")?.value;
           const animData = data.find(i => i.key === "animations")?.value;
-           const lotCardData = data.find(i => i.key === "lot_card_settings")?.value;
- 
+            const lotCardData = data.find(i => i.key === "lot_card_settings")?.value;
+            const articleData = data.find(i => i.key === "article_settings")?.value;
+
          if (info) setSiteInfo((prev: any) => ({ ...prev, ...(info as any) }));
          if (themeData) setTheme((prev: any) => ({ ...prev, ...(themeData as any) }));
           if (homeData) setHomepage((prev: any) => ({ ...prev, ...(homeData as any) }));
@@ -192,9 +191,9 @@ import { LotCard } from "../auctions/lot-card";
           if (textsData) setCustomTexts((prev: any) => ({ ...prev, ...(textsData as any) }));
           if (seoData) setSeoSettings((prev: any) => ({ ...prev, ...(seoData as any) }));
          if (palettes && Array.isArray(palettes)) setSavedPalettes(palettes);
-         if (animData) setAnimations((prev: any) => ({ ...prev, ...(animData as any) }));
-         if (lotCardData) setLotCardSettings((prev: any) => ({ ...prev, ...(lotCardData as any) }));
-
+          if (animData) setAnimations((prev: any) => ({ ...prev, ...(animData as any) }));
+          if (lotCardData) setLotCardSettings((prev: any) => ({ ...prev, ...(lotCardData as any) }));
+          if (articleData) setArticleSettings((prev: any) => ({ ...prev, ...(articleData as any) }));
      } catch (error: any) {
        toast.error("Erro ao carregar configurações: " + error.message);
      } finally {
