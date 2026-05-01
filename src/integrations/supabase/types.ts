@@ -1107,6 +1107,7 @@ export type Database = {
           cpf: string | null
           created_at: string
           document_urls: string[] | null
+          email: string | null
           full_name: string | null
           id: string
           is_approved: boolean
@@ -1138,6 +1139,7 @@ export type Database = {
           cpf?: string | null
           created_at?: string
           document_urls?: string[] | null
+          email?: string | null
           full_name?: string | null
           id: string
           is_approved?: boolean
@@ -1169,6 +1171,7 @@ export type Database = {
           cpf?: string | null
           created_at?: string
           document_urls?: string[] | null
+          email?: string | null
           full_name?: string | null
           id?: string
           is_approved?: boolean
