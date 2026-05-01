@@ -1,5 +1,5 @@
  import { validateImage } from "@/utils/upload-validation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 
 export function SellerManagement() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSeller, setEditingSeller] = useState<any>(null);
    const [formData, setFormData] = useState({
@@ -200,22 +201,22 @@ export function SellerManagement() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <Input 
+                    <input 
                       type="file" 
                       accept="image/*" 
                       className="hidden" 
-                      id="seller-logo-upload" 
+                      ref={fileInputRef}
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file || !validateImage(file)) return;
                         const tid = toast.loading("Enviando logo...");
                         try {
                           const fileExt = file.name.split('.').pop();
-                          const fileName = `seller_${Math.random()}.${fileExt}`;
+                          const fileName = `seller_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
                           const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
                           if (error) throw error;
                           const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
-                          setFormData({ ...formData, logo_url: publicUrl });
+                          setFormData(prev => ({ ...prev, logo_url: publicUrl }));
                           toast.success("Logo enviado!");
                         } catch (error: any) {
                           toast.error("Erro no upload: " + error.message);
@@ -229,7 +230,7 @@ export function SellerManagement() {
                       variant="outline" 
                       size="sm" 
                       className="w-full h-10 border-dashed"
-                      onClick={() => document.getElementById('seller-logo-upload')?.click()}
+                      onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload className="mr-2 h-4 w-4" /> 
                       {formData.logo_url ? "Trocar Logotipo" : "Upload Logotipo"}
