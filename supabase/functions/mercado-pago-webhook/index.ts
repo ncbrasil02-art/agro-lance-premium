@@ -97,21 +97,31 @@
           processed_at: new Date().toISOString()
         }, { onConflict: 'gateway_name,external_id' });
 
-      } catch (err: any) {
-        console.error('Error processing webhook:', err);
-        // Log as failure
-        await supabaseClient.from('webhook_events').upsert({
-          gateway_name: 'mercado_pago',
-          external_id: eventId,
-          event_type: body.type || body.topic,
-          payload: body,
-          status: 'failed',
-          error_message: err.message,
-          processed_at: new Date().toISOString()
-        }, { onConflict: 'gateway_name,external_id' });
-        
-        return new Response(JSON.stringify({ error: err.message }), { status: 400 });
-      }
+       } catch (err: any) {
+         console.error('Error processing webhook:', err);
+         
+         // Calculate next retry (exponential backoff: 5m, 15m, 1h, 4h, 12h)
+         const retryDelays = [5, 15, 60, 240, 720];
+         const currentRetry = existingEvent?.retry_count || 0;
+         const nextDelay = retryDelays[Math.min(currentRetry, retryDelays.length - 1)];
+         const nextRetryAt = new Date(Date.now() + nextDelay * 60000).toISOString();
+ 
+         // Log as failure
+         await supabaseClient.from('webhook_events').upsert({
+           gateway_name: 'mercado_pago',
+           external_id: eventId,
+           event_type: body.type || body.topic,
+           payload: body,
+           status: 'failed',
+           error_message: err.message,
+           processed_at: new Date().toISOString(),
+           next_retry_at: nextRetryAt,
+           scheduled_for: nextRetryAt,
+           retry_count: currentRetry
+         }, { onConflict: 'gateway_name,external_id' });
+         
+         return new Response(JSON.stringify({ error: err.message }), { status: 400 });
+       }
  
      return new Response(JSON.stringify({ received: true }), {
        headers: { ...corsHeaders, 'Content-Type': 'application/json' },

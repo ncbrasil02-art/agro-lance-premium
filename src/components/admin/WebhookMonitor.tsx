@@ -9,6 +9,7 @@
  export function WebhookMonitor() {
    const [events, setEvents] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
+   const [activeTab, setActiveTab] = useState<'all' | 'queue' | 'failed'>('all');
    const [reprocessingId, setReprocessingId] = useState<string | null>(null);
    const [isAutoProcessing, setIsAutoProcessing] = useState(false);
  
@@ -19,9 +20,15 @@
    const fetchEvents = async () => {
      setIsLoading(true);
      try {
-       const { data, error } = await supabase
-         .from("webhook_events")
-         .select("*")
+       let query = supabase.from("webhook_events").select("*");
+       
+       if (activeTab === 'failed') {
+         query = query.eq('status', 'failed');
+       } else if (activeTab === 'queue') {
+         query = query.eq('status', 'failed').lt('retry_count', 5);
+       }
+ 
+       const { data, error } = await query
          .order("created_at", { ascending: false })
          .limit(50);
        
@@ -33,6 +40,10 @@
        setIsLoading(false);
      }
    };
+ 
+   useEffect(() => {
+     fetchEvents();
+   }, [activeTab]);
  
    const handleAutoReprocess = async () => {
      setIsAutoProcessing(true);
@@ -85,7 +96,29 @@
    return (
      <div className="space-y-4">
        <div className="flex justify-between items-center">
-         <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">Log de Webhooks (Recentes)</h3>
+         <div className="flex items-center gap-4">
+           <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">Log de Webhooks</h3>
+           <div className="flex bg-gray-100 p-1 rounded-lg gap-1">
+             <Button 
+               size="sm" 
+               variant={activeTab === 'all' ? 'default' : 'ghost'} 
+               className="h-7 text-[10px] font-bold px-3"
+               onClick={() => setActiveTab('all')}
+             >TODOS</Button>
+             <Button 
+               size="sm" 
+               variant={activeTab === 'queue' ? 'default' : 'ghost'} 
+               className="h-7 text-[10px] font-bold px-3"
+               onClick={() => setActiveTab('queue')}
+             >NA FILA</Button>
+             <Button 
+               size="sm" 
+               variant={activeTab === 'failed' ? 'default' : 'ghost'} 
+               className="h-7 text-[10px] font-bold px-3"
+               onClick={() => setActiveTab('failed')}
+             >FALHAS</Button>
+           </div>
+         </div>
          <div className="flex gap-2">
            <Button size="sm" variant="outline" onClick={fetchEvents} disabled={isLoading}>
              <RefreshCw className={`h-3 w-3 mr-2 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar
