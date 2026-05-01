@@ -53,7 +53,7 @@
        .eq('id', authUser.id)
        .single()
  
-      const { userId, type, data, userEmail, lotId } = await req.json()
+      const { userId, type, data, userEmail, lotId, title, message } = await req.json()
      
      // Permissions check: only admins can send notifications (except for certain types if allowed)
       if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
@@ -136,7 +136,35 @@
             html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`,
           }),
         });
-       } else if (type === 'outbid') {
+      } else if (type === 'security_alert' && resendKey) {
+        const { data: admins } = await adminClient.from('profiles').select('id').eq('role', 'admin');
+        if (admins) {
+          for (const admin of admins) {
+            const { data: { user: adminUser } } = await adminClient.auth.admin.getUserById(admin.id);
+            if (adminUser?.email) {
+              await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
+                body: JSON.stringify({
+                  from: 'Elite Leilões <seguranca@premiumagro.com.br>',
+                  to: [adminUser.email],
+                  subject: `⚠️ ALERTA DE SEGURANÇA: ${title || 'Atividade Suspeita'}`,
+                  html: `
+                    <div style="font-family: sans-serif; padding: 20px; border: 2px solid #dc2626; border-radius: 8px;">
+                      <h2 style="color: #dc2626;">Alerta de Segurança Crítico</h2>
+                      <p><strong>Evento:</strong> ${title}</p>
+                      <p><strong>Descrição:</strong> ${message}</p>
+                      <hr />
+                      <p style="font-size: 12px; color: #666;">Este é um e-mail automático do sistema de auditoria da Elite Leilões.</p>
+                      <a href="https://eliteleiloes.lovable.app/admin" style="display: inline-block; background: #dc2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">ACESSAR PAINEL</a>
+                    </div>
+                  `,
+                }),
+              });
+            }
+          }
+        }
+      } else if (type === 'outbid') {
          const { amount, lotNumber, animalName } = data;
 
          // WhatsApp Notification
