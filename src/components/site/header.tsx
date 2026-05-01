@@ -1,6 +1,3 @@
-      const isHome = router.state.location.pathname === "/";
-      const isElite = homepage?.template_id === "model1";
-
     import { useSiteSettings } from "@/hooks/useSiteSettings";
     import { cn } from "@/lib/utils";
    import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
@@ -51,7 +48,9 @@ import { toast } from "sonner";
        router.invalidate();
      });
  
-  const { user, profile, signOut } = useAuth();
+      const { user, profile, signOut } = useAuth();
+      const isHome = router.state.location.pathname === "/";
+      const isElite = homepage?.template_id === "model1";
   const [open, setOpen] = useState(false);
  
    const nav = [
