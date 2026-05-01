@@ -42,12 +42,12 @@
       // Idempotency check
       const { data: existingEvent } = await supabaseClient
         .from('webhook_events')
-        .select('id')
+        .select('id, status')
         .eq('gateway_name', 'pagbank')
         .eq('external_id', eventId)
         .maybeSingle();
 
-      if (existingEvent) {
+      if (existingEvent && existingEvent.status === 'processed') {
         console.log(`Event ${eventId} already processed, skipping.`);
         return new Response(JSON.stringify({ received: true, already_processed: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -58,43 +58,58 @@
       // If we have a secret configured, we should validate it.
       // For now, we fetch back if possible or just use the referenceId carefully.
 
-     if (referenceId && (status === 'PAID' || status === 'AUTHORIZED')) {
-       // Check if it's an installment
-       if (referenceId.startsWith('inst_')) {
-         const installmentId = referenceId.replace('inst_', '');
-         
-         const { error: updateError } = await supabaseClient
-           .from('installments')
-           .update({ 
-             status: 'paid',
-             paid_at: new Date().toISOString(),
-             gateway_status: status,
-             external_reference: charge.id
-           })
-           .eq('id', installmentId);
- 
-         if (updateError) console.error('Error updating installment:', updateError);
-       } else {
-         // Generic transaction
-         const { error: updateError } = await supabaseClient
-           .from('transactions')
-           .update({ 
-             payment_status: 'paid',
-             gateway_status: status,
-             gateway_reference: charge.id
-           })
-           .eq('id', referenceId);
- 
-          if (updateError) console.error('Error updating transaction:', updateError);
+      try {
+        if (referenceId && (status === 'PAID' || status === 'AUTHORIZED')) {
+          if (referenceId.startsWith('inst_')) {
+            const installmentId = referenceId.replace('inst_', '');
+            const { error: updateError } = await supabaseClient
+              .from('installments')
+              .update({ 
+                status: 'paid',
+                paid_at: new Date().toISOString(),
+                gateway_status: status,
+                external_reference: charge.id
+              })
+              .eq('id', installmentId);
+            if (updateError) throw updateError;
+          } else {
+            const { error: updateError } = await supabaseClient
+              .from('transactions')
+              .update({ 
+                payment_status: 'paid',
+                gateway_status: status,
+                gateway_reference: charge.id
+              })
+              .eq('id', referenceId);
+            if (updateError) throw updateError;
+          }
         }
 
-        // Log the event as processed
-        await supabaseClient.from('webhook_events').insert({
+        // Log as success
+        await supabaseClient.from('webhook_events').upsert({
           gateway_name: 'pagbank',
           external_id: eventId,
           event_type: status,
-          payload: body
-        });
+          payload: body,
+          status: 'processed',
+          error_message: null,
+          processed_at: new Date().toISOString()
+        }, { onConflict: 'gateway_name,external_id' });
+
+      } catch (err: any) {
+        console.error('Error processing PagBank webhook:', err);
+        // Log as failure
+        await supabaseClient.from('webhook_events').upsert({
+          gateway_name: 'pagbank',
+          external_id: eventId,
+          event_type: status,
+          payload: body,
+          status: 'failed',
+          error_message: err.message,
+          processed_at: new Date().toISOString()
+        }, { onConflict: 'gateway_name,external_id' });
+        
+        return new Response(JSON.stringify({ error: err.message }), { status: 400 });
       }
  
      return new Response(JSON.stringify({ received: true }), {
