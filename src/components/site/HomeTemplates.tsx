@@ -110,9 +110,9 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
               defaultTitle={
                 <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic">
                   {customTexts?.hero_title || (
-                    <div className="flex flex-col gap-0">
-                      <span className="text-gradient-gold font-signature normal-case text-7xl md:text-9xl -mb-4 block">{siteInfo?.name?.split(' ')?.[0]}</span>
-                      <span className="block">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}</span>
+                    <div className="flex flex-col gap-0 items-start">
+                      <span className="text-gradient-gold font-signature normal-case text-8xl md:text-[10rem] -mb-8 block drop-shadow-sm leading-none">{siteInfo?.name?.split(' ')?.[0]}</span>
+                      <span className="block pl-2 tracking-[-0.05em] uppercase font-black">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}</span>
                     </div>
                   )}
                 </h1>
