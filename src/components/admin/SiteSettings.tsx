@@ -13,8 +13,9 @@
  import { toast } from "sonner";
   import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper } from "lucide-react";
  import { BulkSeoAudit } from "./BulkSeoAudit";
-import { LotCard } from "../auctions/lot-card";
- 
+ import { LotCard } from "../auctions/lot-card";
+ import { OptimizedImage } from "@/components/ui/optimized-image";
+
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
      <div className="space-y-2">
