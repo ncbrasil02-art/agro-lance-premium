@@ -434,8 +434,8 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
  import {
-     User, Gavel, FileText, Receipt, CreditCard, Clock, Camera, QrCode,
-     ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
+    User, Gavel, FileText, Receipt, CreditCard, Clock, Camera, QrCode, Copy,
+    ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
      ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
      Pencil,
     CalendarDays, Scissors, Barcode, Landmark, Heart, TrendingUp,
