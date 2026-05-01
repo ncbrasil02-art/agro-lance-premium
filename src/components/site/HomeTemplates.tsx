@@ -242,9 +242,8 @@ export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings 
   );
 };
 
- export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => {
+export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
-  
   return (
     <section className={cn(
       "relative min-h-screen grid lg:grid-cols-2",
