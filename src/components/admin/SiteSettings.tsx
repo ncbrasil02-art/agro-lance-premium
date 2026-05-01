@@ -286,6 +286,27 @@ import { LotCard } from "../auctions/lot-card";
       description: 'Focado na tradição do campo com leitura clara e objetiva dos lotes.',
       image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80',
       color: 'brown'
+    },
+    {
+      id: 'model4',
+      name: 'Eventos Pro',
+      description: 'Design focado em agenda de eventos e contagem regressiva imersiva.',
+      image: 'https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80',
+      color: 'black'
+    },
+    {
+      id: 'model5',
+      name: 'Editorial / Notícias',
+      description: 'Estilo revista com foco em conteúdo, tipografia serifada e layout limpo.',
+      image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80',
+      color: 'stone'
+    },
+    {
+      id: 'model6',
+      name: 'Pure Design / Creative',
+      description: 'Focado em design puro, elementos flutuantes e micro-interações.',
+      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80',
+      color: 'gold'
     }
   ];
 

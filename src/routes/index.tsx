@@ -26,7 +26,7 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HomeSaleLots } from "@/components/site/HomeSaleLots";
-import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTemplates";
+import { EliteHero, ModernHero, TraditionalHero, EventsHero, NewsHero, CreativeHero } from "@/components/site/HomeTemplates";
 
     export const Route = createFileRoute("/")({
       head: ({ matches }) => {
@@ -221,20 +221,20 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
   return (
     <div className="relative">
       {/* Temporary Preview Switcher for the client to test models */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 scale-75 md:scale-100 origin-bottom-right">
-        <div className="bg-black/80 backdrop-blur-xl border border-gold/30 p-2 rounded-2xl shadow-2xl flex gap-2">
-          {['model1', 'model2', 'model3'].map((m) => (
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 scale-[0.6] md:scale-90 origin-bottom-right">
+        <div className="bg-black/80 backdrop-blur-2xl border border-gold/30 p-3 rounded-3xl shadow-2xl flex flex-wrap gap-2 max-w-[300px] justify-center">
+          {['model1', 'model2', 'model3', 'model4', 'model5', 'model6'].map((m) => (
             <Button 
               key={m}
               size="sm" 
               variant={templateId === m ? "default" : "outline"}
               className={cn(
-                "rounded-xl font-black uppercase text-[10px] h-10 px-4 transition-all",
-                templateId === m ? "bg-gold text-emerald-deep scale-105" : "border-gold/20 text-gold hover:bg-gold/10"
+                "rounded-xl font-black uppercase text-[10px] h-9 px-3 transition-all",
+                templateId === m ? "bg-gold text-emerald-deep scale-110 shadow-lg shadow-gold/20" : "border-gold/20 text-gold hover:bg-gold/10"
               )}
               onClick={() => setPreviewTemplate(m)}
             >
-              {m === 'model1' ? 'Elite' : m === 'model2' ? 'Modern' : 'Agro'}
+              {m === 'model1' ? 'Elite' : m === 'model2' ? 'Modern' : m === 'model3' ? 'Agro' : m === 'model4' ? 'Eventos' : m === 'model5' ? 'Notícias' : 'Design'}
             </Button>
           ))}
         </div>
@@ -272,6 +272,9 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
             {templateId === 'model1' && <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
             {templateId === 'model2' && <ModernHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
             {templateId === 'model3' && <TraditionalHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
+             {templateId === 'model4' && <EventsHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
+             {templateId === 'model5' && <NewsHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
+             {templateId === 'model6' && <CreativeHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
          </>
        )}
 
