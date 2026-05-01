@@ -96,9 +96,9 @@
          <div>
            <h4 className="mb-4 text-xs font-black uppercase tracking-widest text-gold/60">Contato</h4>
            <ul className="space-y-2 text-sm text-muted-foreground">
-             <li className="break-all">{siteInfo?.email || "contato@premiumagro.com.br"}</li>
-             <li>{siteInfo?.phone || "+55 11 4002-8922"}</li>
-             <li>Av. Paulista, 1000 — São Paulo/SP</li>
+              <li className="break-all">{siteInfo?.email || "contato@ncbrasil.com.br"}</li>
+              <li>{siteInfo?.phone || "(21) 99650-9905"}</li>
+              <li>Brasil</li>
            </ul>
          </div>
  
