@@ -122,39 +122,29 @@
         if (phone) {
           await sendWhatsApp(phone, `🚀 *Elite Leilões: Seu cadastro foi aprovado!*\n\nOlá! Seu cadastro foi aprovado com sucesso. Você já pode participar de todos os nossos leilões e realizar lances.\n\nBoas compras!`)
         }
-     } else if ((type === 'offer_received' || type === 'direct_sale_request') && resendKey) {
+      } else if (type === 'offer_received' || type === 'direct_sale_request') {
        const { amount, itemName, bidderName } = data;
        const { data: admins } = await adminClient.from('profiles').select('id').eq('role', 'admin');
        if (admins) {
          for (const admin of admins) {
            const { data: { user: adminUser } } = await adminClient.auth.admin.getUserById(admin.id);
-           if (adminUser?.email) {
-             await fetch('https://api.resend.com/emails', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
-               body: JSON.stringify({
-                 from: 'Elite Leilões <contato@premiumagro.com.br>',
-                 to: [adminUser.email],
-                 subject: type === 'offer_received' ? 'Nova Proposta Recebida! 💰' : 'Novo Interesse de Compra! 🛒',
-                 html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Novo interesse em: ${itemName}</h2><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p><p>Por: ${bidderName}</p></div>`,
-               }),
-             });
-           }
+            if (adminUser?.email) {
+              await sendEmail(
+                [adminUser.email], 
+                type === 'offer_received' ? 'Nova Proposta Recebida! 💰' : 'Novo Interesse de Compra! 🛒',
+                `<div style="font-family: sans-serif; padding: 20px;"><h2>Novo interesse em: ${itemName}</h2><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p><p>Por: ${bidderName}</p></div>`
+              )
+            }
          }
        }
-     } else if ((type === 'offer_status_update' || type === 'direct_sale_status_update') && email && resendKey) {
+      } else if ((type === 'offer_status_update' || type === 'direct_sale_status_update') && email) {
        const { amount, itemName, status } = data;
-       const statusLabel = status === 'approved' || status === 'confirmed' ? 'APROVADA/CONFIRMADA' : 'REJEITADA/CANCELADA';
-       await fetch('https://api.resend.com/emails', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
-         body: JSON.stringify({
-           from: 'Elite Leilões <contato@premiumagro.com.br>',
-           to: [email],
-           subject: `Sua solicitação foi ${statusLabel.toLowerCase()}!`,
-            html: `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`,
-          }),
-        });
+        const statusLabel = status === 'approved' || status === 'confirmed' ? 'APROVADA/CONFIRMADA' : 'REJEITADA/CANCELADA';
+        await sendEmail(
+          [email],
+          `Sua solicitação foi ${statusLabel.toLowerCase()}!`,
+          `<div style="font-family: sans-serif; padding: 20px;"><h2>Status atualizado para: ${itemName}</h2><p>Novo status: ${statusLabel}</p><p>Valor: R$ ${amount.toLocaleString('pt-BR')}</p></div>`
+        )
       } else if (type === 'security_alert' && resendKey) {
         const { data: admins } = await adminClient.from('profiles').select('id').eq('role', 'admin');
         if (admins) {
