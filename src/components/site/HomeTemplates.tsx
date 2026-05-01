@@ -155,7 +155,7 @@
            </div>
          </div>
        </div>
-     </div>
+      </div>
     </section>
     );
   };
@@ -237,9 +237,10 @@
            </div>
          </div>
        )}
-     </div>
+      </div>
     </section>
     );
+  };
   };
  
   export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
