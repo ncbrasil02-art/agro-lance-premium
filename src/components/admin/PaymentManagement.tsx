@@ -35,7 +35,12 @@
          .order("name");
        
        if (error) throw error;
-       setGateways(data || []);
+       const formattedData = (data || []).map(g => ({
+         ...g,
+         is_enabled: !!g.is_enabled,
+         config: g.config || {}
+       })) as PaymentGateway[];
+       setGateways(formattedData);
      } catch (error: any) {
        toast.error("Erro ao carregar gateways: " + error.message);
      } finally {
