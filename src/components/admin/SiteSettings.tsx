@@ -11,7 +11,8 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
-  import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper } from "lucide-react";
+ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper, GripVertical } from "lucide-react";
+ import { Reorder } from "framer-motion";
  import { BulkSeoAudit } from "./BulkSeoAudit";
  import { LotCard } from "../auctions/lot-card";
  import { OptimizedImage } from "@/components/ui/optimized-image";
