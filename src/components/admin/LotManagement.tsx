@@ -188,9 +188,10 @@ import {
            status: "active",
            allows_pre_bidding: true,
            is_featured: false,
-            payment_methods: "",
-            viewers: 0,
-            installment_count: 30
+             payment_methods: "PIX Manual",
+             viewers: 0,
+             installment_count: 30,
+             payment_formula: "2+2+3+30"
           });
        };
 
