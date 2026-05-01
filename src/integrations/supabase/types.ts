@@ -1087,6 +1087,7 @@ export type Database = {
           label: string
           name: string
           updated_at: string | null
+          webhook_secret: string | null
         }
         Insert: {
           config?: Json | null
@@ -1096,6 +1097,7 @@ export type Database = {
           label: string
           name: string
           updated_at?: string | null
+          webhook_secret?: string | null
         }
         Update: {
           config?: Json | null
@@ -1105,6 +1107,7 @@ export type Database = {
           label?: string
           name?: string
           updated_at?: string | null
+          webhook_secret?: string | null
         }
         Relationships: []
       }
