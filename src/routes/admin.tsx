@@ -19,7 +19,8 @@
   import { ContractManagement } from "@/components/admin/ContractManagement";
   import { TransactionManagement } from "@/components/admin/TransactionManagement";
  import { InstallmentManagement } from "@/components/admin/InstallmentManagement";
- import { SecurityAlertsBanner } from "@/components/admin/SecurityAlertsBanner";
+import { SecurityAlertsBanner } from "@/components/admin/SecurityAlertsBanner";
+import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
   import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
     LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
@@ -33,10 +34,11 @@
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
-    type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments";
+  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments" | "alertas";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
-   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
+    { id: "alertas", label: "Central de Alertas", icon: <ShieldAlert className="mr-2 h-4 w-4 text-red-600" /> },
    { id: "live", label: "Leilão ao Vivo", icon: <Zap className="mr-2 h-4 w-4" /> },
    { id: "events", label: "Eventos", icon: <Calendar className="mr-2 h-4 w-4" /> },
    { id: "lots", label: "Lotes", icon: <Gavel className="mr-2 h-4 w-4" /> },
@@ -362,7 +364,8 @@
              {activeTab === "rls_test" && <RLSSecurityTests />}
              {activeTab === "audit" && <AuditLogManagement />}
              {activeTab === "logs" && <SystemLogs />}
-                {activeTab === "installments" && <InstallmentManagement />}
+                 {activeTab === "installments" && <InstallmentManagement />}
+                 {activeTab === "alertas" && <SecurityAlerts />}
                 {activeTab === "transactions" && <TransactionManagement />}
                 {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
        </main>
