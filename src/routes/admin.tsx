@@ -166,7 +166,25 @@
   }
 
   if (!profile || profile.role !== "admin") {
-    return <Navigate to="/" />;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md text-center">
+          <ShieldCheck className="mx-auto h-16 w-16 text-gold mb-4" />
+          <h1 className="text-2xl font-bold text-foreground">Acesso Restrito</h1>
+          <p className="mt-2 text-muted-foreground">
+            Você não tem permissão para acessar esta área. Se você é um administrador, certifique-se de estar logado com a conta correta.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Link to="/login">
+              <Button className="w-full bg-gold text-emerald-deep font-bold">Ir para Login</Button>
+            </Link>
+            <Link to="/">
+              <Button variant="ghost" className="w-full">Voltar ao Início</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
    return (

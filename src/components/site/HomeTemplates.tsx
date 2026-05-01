@@ -103,20 +103,22 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
             A nova era dos leilões de elite
           </Badge>
           
-          <HeroPhrase 
-            phrases={customTexts?.hero_phrases} 
-            className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic mb-6"
-            defaultTitle={
-              <h1>
-                {customTexts?.hero_title || (
-                  <>
-                    <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.[0]}</span><br />
-                    {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
-                  </>
-                )}
-              </h1>
-            } 
-          />
+          <div className="mb-6">
+            <HeroPhrase 
+              phrases={customTexts?.hero_phrases} 
+              className="text-5xl md:text-7xl font-bold leading-tight tracking-tight uppercase italic"
+              defaultTitle={
+                <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic">
+                  {customTexts?.hero_title || (
+                    <div className="flex flex-col gap-0">
+                      <span className="text-gradient-gold font-signature normal-case text-7xl md:text-9xl -mb-4 block">{siteInfo?.name?.split(' ')?.[0]}</span>
+                      <span className="block">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}</span>
+                    </div>
+                  )}
+                </h1>
+              } 
+            />
+          </div>
           
           <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
             {customTexts?.hero_subtitle || "Curadoria genética de excelência e tecnologia de ponta para o agronegócio global."}
@@ -136,7 +138,7 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-10 mb-12">
             <div>
               <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Volume Negociado</div>
               <div className="text-2xl font-black">{formatBRL(stats.totalSold)}</div>
@@ -154,6 +156,32 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
               <div className="text-2xl font-black">{stats.activeEvents}</div>
             </div>
           </div>
+
+          {nextEvent && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="relative max-w-xl group cursor-pointer"
+            >
+              <div className="absolute -inset-1 bg-gradient-to-r from-gold/50 via-gold-bright to-gold/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-center justify-between gap-6">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Próxima Oportunidade</span>
+                  <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{nextEvent.name}</h3>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Inicia em</span>
+                  <Countdown endsAt={nextEvent.date} variant="segmented" />
+                </div>
+                <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
+                  <Button size="icon" className="h-12 w-12 rounded-xl bg-gold text-emerald-deep hover:scale-110 transition-transform">
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>
