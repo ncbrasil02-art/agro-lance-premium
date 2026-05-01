@@ -39,6 +39,7 @@ export type Database = {
           og_description: string | null
           og_image_url: string | null
           og_title: string | null
+          payment_formula: string | null
           pedigree_url: string | null
           photos: string[] | null
           registration_1cc: string | null
@@ -83,6 +84,7 @@ export type Database = {
           og_description?: string | null
           og_image_url?: string | null
           og_title?: string | null
+          payment_formula?: string | null
           pedigree_url?: string | null
           photos?: string[] | null
           registration_1cc?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           og_description?: string | null
           og_image_url?: string | null
           og_title?: string | null
+          payment_formula?: string | null
           pedigree_url?: string | null
           photos?: string[] | null
           registration_1cc?: string | null
@@ -751,6 +754,59 @@ export type Database = {
           },
         ]
       }
+      installments: {
+        Row: {
+          amount: number
+          buyer_id: string | null
+          created_at: string | null
+          due_date: string
+          id: string
+          installment_number: number
+          paid_at: string | null
+          payment_method: string | null
+          proof_url: string | null
+          status: string | null
+          transaction_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          buyer_id?: string | null
+          created_at?: string | null
+          due_date: string
+          id?: string
+          installment_number: number
+          paid_at?: string | null
+          payment_method?: string | null
+          proof_url?: string | null
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          buyer_id?: string | null
+          created_at?: string | null
+          due_date?: string
+          id?: string
+          installment_number?: number
+          paid_at?: string | null
+          payment_method?: string | null
+          proof_url?: string | null
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installments_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lots: {
         Row: {
           accepted_at: string | null
@@ -772,6 +828,7 @@ export type Database = {
           last_bid_user_agent: string | null
           live_timer_seconds: number | null
           lot_number: number
+          payment_formula: string | null
           payment_methods: string[] | null
           reserve_price: number | null
           safety_price: number | null
@@ -802,6 +859,7 @@ export type Database = {
           last_bid_user_agent?: string | null
           live_timer_seconds?: number | null
           lot_number: number
+          payment_formula?: string | null
           payment_methods?: string[] | null
           reserve_price?: number | null
           safety_price?: number | null
@@ -832,6 +890,7 @@ export type Database = {
           last_bid_user_agent?: string | null
           live_timer_seconds?: number | null
           lot_number?: number
+          payment_formula?: string | null
           payment_methods?: string[] | null
           reserve_price?: number | null
           safety_price?: number | null

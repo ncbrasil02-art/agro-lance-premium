@@ -120,8 +120,9 @@ import { RichResultsPreview } from "./RichResultsPreview";
             seo_title: "",
             seo_description: "",
             og_title: "",
-            og_description: "",
-            og_image_url: ""
+             og_description: "",
+             og_image_url: "",
+             payment_formula: "2+2+3+30"
      });
 
      const resetForm = () => {
@@ -175,8 +176,9 @@ import { RichResultsPreview } from "./RichResultsPreview";
             seo_title: "",
             seo_description: "",
             og_title: "",
-            og_description: "",
-            og_image_url: ""
+             og_description: "",
+             og_image_url: "",
+             payment_formula: "2+2+3+30"
        });
     };
 
@@ -231,8 +233,9 @@ import { RichResultsPreview } from "./RichResultsPreview";
            seo_title: animal.seo_title || "",
             seo_description: animal.seo_description || "",
             og_title: animal.og_title || "",
-            og_description: animal.og_description || "",
-            og_image_url: animal.og_image_url || ""
+             og_description: animal.og_description || "",
+             og_image_url: animal.og_image_url || "",
+             payment_formula: animal.payment_formula || "2+2+3+30"
        });
       setIsDialogOpen(true);
     };
@@ -304,9 +307,10 @@ import { RichResultsPreview } from "./RichResultsPreview";
                 accepts_offers: formData.accepts_offers,
                 sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
                 sale_status: formData.sale_status,
-                slug,
-                seo_title: formData.seo_title,
-                seo_description: formData.seo_description
+                 slug,
+                 seo_title: formData.seo_title,
+                 seo_description: formData.seo_description,
+                 payment_formula: formData.payment_formula
               })
              .eq("id", editingAnimal.id)
              .neq("sale_status", "sold");
@@ -364,9 +368,10 @@ import { RichResultsPreview } from "./RichResultsPreview";
               accepts_offers: formData.accepts_offers,
               sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
               sale_status: formData.sale_status,
-              slug,
-              seo_title: formData.seo_title,
-              seo_description: formData.seo_description
+               slug,
+               seo_title: formData.seo_title,
+               seo_description: formData.seo_description,
+               payment_formula: formData.payment_formula
            });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
@@ -837,9 +842,27 @@ import { RichResultsPreview } from "./RichResultsPreview";
                              <SelectItem value="sold">Vendido</SelectItem>
                            </SelectContent>
                          </Select>
-                       </div>
-                     </div>
-                   )}
+                        </div>
+                        <div className="grid gap-2 md:col-span-2">
+                          <Label htmlFor="formula">Fórmula de Pagamento</Label>
+                          <div className="flex gap-2">
+                            <Input 
+                              id="formula"
+                              value={formData.payment_formula} 
+                              onChange={(e) => setFormData({ ...formData, payment_formula: e.target.value })} 
+                              placeholder="Ex: 2+2+3+30"
+                              className="flex-1"
+                            />
+                            <div className="bg-muted px-3 py-2 rounded-md text-[10px] font-mono flex items-center">
+                              Total: {(formData.payment_formula?.split('+').length || 1) - 1 + (parseInt(formData.payment_formula?.split('+').pop() || '0') || 0)} parcelas
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground italic">
+                            Ex: 2+2+3+30 significa 2x no 1º mês, 2x no 2º, 3x no 3º e 30 parcelas simples.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </TabsContent>
 
                 <TabsContent value="registros" className="space-y-4 pt-4">

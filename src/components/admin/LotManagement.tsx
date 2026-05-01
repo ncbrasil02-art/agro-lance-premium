@@ -59,9 +59,10 @@ import {
          status: "active",
          allows_pre_bidding: true,
          is_featured: false,
-          payment_methods: "",
-          viewers: 0,
-          installment_count: 30
+           payment_methods: "PIX Manual",
+           viewers: 0,
+           installment_count: 30,
+           payment_formula: "2+2+3+30"
         });
 
        const fetchData = async () => {
@@ -187,9 +188,10 @@ import {
            status: "active",
            allows_pre_bidding: true,
            is_featured: false,
-            payment_methods: "",
-            viewers: 0,
-            installment_count: 30
+             payment_methods: "PIX Manual",
+             viewers: 0,
+             installment_count: 30,
+             payment_formula: "2+2+3+30"
           });
        };
 
@@ -204,9 +206,10 @@ import {
            status: lot.status || "active",
            allows_pre_bidding: lot.allows_pre_bidding !== false,
            is_featured: lot.is_featured || false,
-            payment_methods: lot.payment_methods?.join(", ") || "",
-            viewers: lot.viewers || 0,
-            installment_count: lot.installment_count || 30
+             payment_methods: lot.payment_methods?.join(", ") || "PIX Manual",
+             viewers: lot.viewers || 0,
+             installment_count: lot.installment_count || 30,
+             payment_formula: lot.payment_formula || "2+2+3+30"
           });
         setIsDialogOpen(true);
       };
@@ -358,7 +361,8 @@ import {
                  is_featured: formData.is_featured,
                  payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
                   viewers: formData.viewers,
-                  installment_count: formData.installment_count
+                  installment_count: formData.installment_count,
+                  payment_formula: formData.payment_formula
                 })
               .eq("id", editingLot.id);
             if (error) throw error;
@@ -377,6 +381,7 @@ import {
                payment_methods: formData.payment_methods ? formData.payment_methods.split(",").map(s => s.trim()).filter(Boolean) : [],
                 viewers: formData.viewers,
                 installment_count: formData.installment_count,
+                payment_formula: formData.payment_formula,
                 end_date: null // Lotes agora seguem a data de término do evento por padrão
               });
             if (error) throw error;
@@ -635,13 +640,22 @@ import {
                      />
                    </div>
                    <div className="grid gap-2">
-                     <Label htmlFor="installments">Qtd. Parcelas</Label>
-                     <Input 
-                       type="number"
-                       value={formData.installment_count} 
-                       onChange={(e) => setFormData({ ...formData, installment_count: parseInt(e.target.value) || 1 })} 
-                       placeholder="Ex: 30"
-                     />
+                     <Label htmlFor="formula">Fórmula de Pagamento</Label>
+                     <div className="flex gap-2">
+                       <Input 
+                         id="formula"
+                         value={formData.payment_formula} 
+                         onChange={(e) => setFormData({ ...formData, payment_formula: e.target.value })} 
+                         placeholder="Ex: 2+2+3+30"
+                         className="flex-1"
+                       />
+                       <div className="bg-muted px-3 py-2 rounded-md text-[10px] font-mono flex items-center">
+                         Total: {(formData.payment_formula?.split('+').length || 1) - 1 + (parseInt(formData.payment_formula?.split('+').pop() || '0') || 0)} parcelas
+                       </div>
+                     </div>
+                     <p className="text-[10px] text-muted-foreground italic">
+                       Ex: 2+2+3+30 significa 2x no 1º mês, 2x no 2º, 3x no 3º e 30 parcelas simples.
+                     </p>
                    </div>
                  </div>
                 <div className="grid grid-cols-2 gap-4 py-2">
