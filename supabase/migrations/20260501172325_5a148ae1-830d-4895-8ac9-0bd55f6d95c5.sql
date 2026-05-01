@@ -1,0 +1,1 @@
+SELECT public.fn_notify_admin_email('Teste com Bypass', 'Esta mensagem deve ser registrada agora.');
