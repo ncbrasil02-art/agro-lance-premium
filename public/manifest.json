@@ -1,0 +1,16 @@
+{
+  "name": "Premium Agro Leilões",
+  "short_name": "PremiumAgro",
+  "description": "A elite do agronegócio em tempo real.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#022C22",
+  "theme_color": "#D4AF37",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

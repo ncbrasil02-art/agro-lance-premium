@@ -76,10 +76,14 @@ function NotFoundComponent() {
      return {
        meta: [
          { charSet: "utf-8" },
-         { name: "viewport", content: "width=device-width, initial-scale=1" },
+          { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" },
+          { name: "apple-mobile-web-app-capable", content: "yes" },
+          { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
          ...tags.meta
        ],
         links: [
+           { rel: "manifest", href: "/manifest.json" },
+           { rel: "apple-touch-icon", href: "/favicon.ico" },
           { rel: "stylesheet", href: appCss },
           { rel: "preconnect", href: "https://fonts.googleapis.com" },
           { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
