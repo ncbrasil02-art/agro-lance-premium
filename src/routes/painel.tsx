@@ -1,11 +1,39 @@
  import { validateImage, validateDocument } from "@/utils/upload-validation";
- import { calculateInstallments, getTotalInstallmentsCount, Installment } from "@/utils/payment-calculator";
+import { calculateInstallments, getTotalInstallmentsCount, Installment } from "@/utils/payment-calculator";
+import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
  
- function PaymentDialog({ lot, profile }: { lot: any, profile: any }) {
+function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
    const [gatewayConfig, setGatewayConfig] = useState<any>(null);
    const [installments, setInstallments] = useState<Installment[]>([]);
    const [isLoading, setIsLoading] = useState(true);
-   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [showCarnet, setShowCarnet] = useState(false);
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const content = document.getElementById('printable-carnet-container')?.innerHTML;
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Carnê de Pagamento - Lote #${lot.lot_number}</title>
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          <style>
+            @media print {
+              body { margin: 0; padding: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          ${content}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
  
    useEffect(() => {
      const fetchData = async () => {
@@ -82,9 +110,40 @@
        </DialogTrigger>
        <DialogContent className="max-w-2xl bg-white p-0">
          <DialogHeader className="p-6 bg-emerald-deep text-white">
-           <DialogTitle className="text-xl flex items-center gap-2">
-             <Receipt className="h-6 w-6 text-gold" /> Carnê de Pagamento - Lote #{lot.lot_number}
-           </DialogTitle>
+            <div className="flex justify-between items-center w-full pr-8">
+              <DialogTitle className="text-xl flex items-center gap-2">
+                <Receipt className="h-6 w-6 text-gold" /> Carnê de Pagamento - Lote #{lot.lot_number}
+              </DialogTitle>
+              <div className="flex gap-2">
+                <Dialog open={showCarnet} onOpenChange={setShowCarnet}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold gap-2">
+                      <Printer className="h-4 w-4" /> IMPRIMIR CARNÊ
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-gray-100 p-0">
+                    <DialogHeader className="p-4 bg-emerald-deep text-white sticky top-0 z-10">
+                      <div className="flex justify-between items-center pr-8">
+                        <DialogTitle>Visualização do Carnê</DialogTitle>
+                        <Button onClick={handlePrint} className="bg-gold hover:bg-gold/90 text-emerald-deep font-bold gap-2">
+                          <Printer className="h-4 w-4" /> IMPRIMIR AGORA
+                        </Button>
+                      </div>
+                    </DialogHeader>
+                    <div id="printable-carnet-container">
+                      <CarnetGenerator 
+                        lot={lot} 
+                        installments={installments} 
+                        pixKey={pixKey} 
+                        pixQRCode={pixQRCode} 
+                        profile={profile}
+                        siteInfo={siteInfo}
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
          </DialogHeader>
          
          <div className="p-6 space-y-6">
