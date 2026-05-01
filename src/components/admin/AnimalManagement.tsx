@@ -842,9 +842,27 @@ import { RichResultsPreview } from "./RichResultsPreview";
                              <SelectItem value="sold">Vendido</SelectItem>
                            </SelectContent>
                          </Select>
-                       </div>
-                     </div>
-                   )}
+                        </div>
+                        <div className="grid gap-2 md:col-span-2">
+                          <Label htmlFor="formula">Fórmula de Pagamento</Label>
+                          <div className="flex gap-2">
+                            <Input 
+                              id="formula"
+                              value={formData.payment_formula} 
+                              onChange={(e) => setFormData({ ...formData, payment_formula: e.target.value })} 
+                              placeholder="Ex: 2+2+3+30"
+                              className="flex-1"
+                            />
+                            <div className="bg-muted px-3 py-2 rounded-md text-[10px] font-mono flex items-center">
+                              Total: {(formData.payment_formula?.split('+').length || 1) - 1 + (parseInt(formData.payment_formula?.split('+').pop() || '0') || 0)} parcelas
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground italic">
+                            Ex: 2+2+3+30 significa 2x no 1º mês, 2x no 2º, 3x no 3º e 30 parcelas simples.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </TabsContent>
 
                 <TabsContent value="registros" className="space-y-4 pt-4">
