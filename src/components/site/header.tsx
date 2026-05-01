@@ -1,4 +1,5 @@
-   import { useSiteSettings } from "@/hooks/useSiteSettings";
+    import { useSiteSettings } from "@/hooks/useSiteSettings";
+    import { cn } from "@/lib/utils";
    import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
    import { useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
@@ -22,10 +23,8 @@ import {
 import { toast } from "sonner";
    import { RefreshCw, Zap, ZapOff, WifiOff } from "lucide-react";
 
-     export function Header() {
-       const { siteInfo, homepage, aboutPage } = useSiteSettings();
-       const isMobileMode = homepage?.mobile_mode_enabled;
-      const router = useRouter();
+      export function Header() {
+       const router = useRouter();
       const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
  
       useEffect(() => {
@@ -42,7 +41,8 @@ import { toast } from "sonner";
       }, []);
  
      const { theme } = useTheme();
-    const { siteInfo, homepage, aboutPage } = useSiteSettings();
+     const { siteInfo, homepage, aboutPage } = useSiteSettings();
+     const isMobileMode = homepage?.mobile_mode_enabled;
  
      const { delaySeconds, isPolling } = useHomeRealtime(() => {
        router.invalidate();
