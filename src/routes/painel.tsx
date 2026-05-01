@@ -345,11 +345,11 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                                    }}
                                  />
                                  <div className="px-6 pb-6">
-                                   <Button variant="ghost" className="w-full text-[10px] text-muted-foreground uppercase hover:text-emerald-600" asChild>
-                                     <Link to={`/pagamento/${inst.id}`} target="_blank">
-                                       Abrir em tela cheia <ExternalLink className="ml-1 h-3 w-3" />
-                                     </Link>
-                                   </Button>
+                                    <Link to="/pagamento/$installmentId" params={{ installmentId: inst.id! }} target="_blank">
+                                      <Button variant="ghost" className="w-full text-[10px] text-muted-foreground uppercase hover:text-emerald-600">
+                                        Abrir em tela cheia <ExternalLink className="ml-1 h-3 w-3" />
+                                      </Button>
+                                    </Link>
                                  </div>
                                </div>
                              ) : (
