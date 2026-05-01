@@ -18,6 +18,7 @@
   import { OfferManagement } from "@/components/admin/OfferManagement";
   import { ContractManagement } from "@/components/admin/ContractManagement";
   import { TransactionManagement } from "@/components/admin/TransactionManagement";
+  import { InstallmentManagement } from "@/components/admin/InstallmentManagement";
   import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
     LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
@@ -31,7 +32,7 @@
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
-   type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions";
+    type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
@@ -44,6 +45,7 @@
     { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
     { id: "offers", label: "Ofertas/Propostas", icon: <MessageSquare className="mr-2 h-4 w-4" /> },
      { id: "contracts", label: "Contratos/Assinaturas", icon: <FileText className="mr-2 h-4 w-4" /> },
+      { id: "installments", label: "Boletas (Carnê)", icon: <FileText className="mr-2 h-4 w-4" /> },
      { id: "transactions", label: "Transações", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
     { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
    { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
@@ -358,6 +360,7 @@
              {activeTab === "rls_test" && <RLSSecurityTests />}
              {activeTab === "audit" && <AuditLogManagement />}
              {activeTab === "logs" && <SystemLogs />}
+                {activeTab === "installments" && <InstallmentManagement />}
                 {activeTab === "transactions" && <TransactionManagement />}
                 {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
        </main>
