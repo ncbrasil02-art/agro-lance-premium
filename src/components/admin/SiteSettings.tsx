@@ -277,7 +277,7 @@
       }
     };
 
-   const moveSection = (index: number, direction: 'up' | 'down') => {
+    const moveSection = async (index: number, direction: 'up' | 'down') => {
      const newOrder = [...homepage.order];
      const newIndex = direction === 'up' ? index - 1 : index + 1;
      
@@ -287,7 +287,16 @@
      newOrder[index] = newOrder[newIndex];
      newOrder[newIndex] = temp;
      
-       setHomepage((prev: any) => ({ ...prev, order: newOrder }));
+        const updatedHomepage = { ...homepage, order: newOrder };
+        setHomepage(updatedHomepage);
+        
+        // Auto-save the new section order
+        try {
+          await supabase.from("site_settings").upsert({ key: "homepage_sections", value: updatedHomepage }, { onConflict: 'key' });
+          toast.success("Ordem das seções salva!");
+        } catch (err) {
+          console.error("Erro ao salvar ordem das seções:", err);
+        }
    };
  
    if (isLoading) {
