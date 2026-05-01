@@ -160,7 +160,7 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
   );
 };
 
- export const ModernHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => {
+export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
   return (
     <section className={cn(
