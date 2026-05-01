@@ -22,6 +22,7 @@ import { Route as NoticiasIndexRouteImport } from './routes/noticias.index'
 import { Route as LotesIndexRouteImport } from './routes/lotes.index'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as CompraDiretaIndexRouteImport } from './routes/compra-direta.index'
+import { Route as PagamentoInstallmentIdRouteImport } from './routes/pagamento.$installmentId'
 import { Route as NoticiasSlugRouteImport } from './routes/noticias.$slug'
 import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
@@ -91,6 +92,11 @@ const CompraDiretaIndexRoute = CompraDiretaIndexRouteImport.update({
   path: '/compra-direta/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PagamentoInstallmentIdRoute = PagamentoInstallmentIdRouteImport.update({
+  id: '/pagamento/$installmentId',
+  path: '/pagamento/$installmentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NoticiasSlugRoute = NoticiasSlugRouteImport.update({
   id: '/noticias/$slug',
   path: '/noticias/$slug',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
+  '/pagamento/$installmentId': typeof PagamentoInstallmentIdRoute
   '/compra-direta/': typeof CompraDiretaIndexRoute
   '/eventos/': typeof EventosIndexRoute
   '/lotes/': typeof LotesIndexRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
+  '/pagamento/$installmentId': typeof PagamentoInstallmentIdRoute
   '/compra-direta': typeof CompraDiretaIndexRoute
   '/eventos': typeof EventosIndexRoute
   '/lotes': typeof LotesIndexRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
+  '/pagamento/$installmentId': typeof PagamentoInstallmentIdRoute
   '/compra-direta/': typeof CompraDiretaIndexRoute
   '/eventos/': typeof EventosIndexRoute
   '/lotes/': typeof LotesIndexRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
+    | '/pagamento/$installmentId'
     | '/compra-direta/'
     | '/eventos/'
     | '/lotes/'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
+    | '/pagamento/$installmentId'
     | '/compra-direta'
     | '/eventos'
     | '/lotes'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
+    | '/pagamento/$installmentId'
     | '/compra-direta/'
     | '/eventos/'
     | '/lotes/'
@@ -226,6 +238,7 @@ export interface RootRouteChildren {
   PainelRoute: typeof PainelRoute
   SobreRoute: typeof SobreRoute
   NoticiasSlugRoute: typeof NoticiasSlugRoute
+  PagamentoInstallmentIdRoute: typeof PagamentoInstallmentIdRoute
   CompraDiretaIndexRoute: typeof CompraDiretaIndexRoute
   NoticiasIndexRoute: typeof NoticiasIndexRoute
 }
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompraDiretaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pagamento/$installmentId': {
+      id: '/pagamento/$installmentId'
+      path: '/pagamento/$installmentId'
+      fullPath: '/pagamento/$installmentId'
+      preLoaderRoute: typeof PagamentoInstallmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/noticias/$slug': {
       id: '/noticias/$slug'
       path: '/noticias/$slug'
@@ -383,6 +403,7 @@ const rootRouteChildren: RootRouteChildren = {
   PainelRoute: PainelRoute,
   SobreRoute: SobreRoute,
   NoticiasSlugRoute: NoticiasSlugRoute,
+  PagamentoInstallmentIdRoute: PagamentoInstallmentIdRoute,
   CompraDiretaIndexRoute: CompraDiretaIndexRoute,
   NoticiasIndexRoute: NoticiasIndexRoute,
 }

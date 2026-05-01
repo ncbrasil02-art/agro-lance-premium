@@ -337,17 +337,21 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
 
                            <TabsContent value="auto" className="pt-4">
                              {inst.id ? (
-                               <PixPaymentStatus 
-                                 installmentId={inst.id} 
-                                 onSuccess={() => {
-                                   // Refresh the list to show paid status
-                                   const fetchData = async () => {
-                                     // This is a bit hacky, but we need to re-fetch
+                               <div className="space-y-4">
+                                 <PixPaymentStatus 
+                                   installmentId={inst.id} 
+                                   onSuccess={() => {
                                      window.location.reload();
-                                   };
-                                   fetchData();
-                                 }}
-                               />
+                                   }}
+                                 />
+                                 <div className="px-6 pb-6">
+                                   <Button variant="ghost" className="w-full text-[10px] text-muted-foreground uppercase hover:text-emerald-600" asChild>
+                                     <Link to={`/pagamento/${inst.id}`} target="_blank">
+                                       Abrir em tela cheia <ExternalLink className="ml-1 h-3 w-3" />
+                                     </Link>
+                                   </Button>
+                                 </div>
+                               </div>
                              ) : (
                                <div className="flex flex-col items-center gap-4 py-8">
                                  <div className="h-16 w-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
