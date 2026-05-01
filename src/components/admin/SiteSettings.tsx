@@ -135,7 +135,7 @@
       show_sale_menu: true,
       show_animated_slides: true,
        mobile_mode_enabled: false,
-       order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"],
+        order: ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles"],
        stats: {
          totalSold: 184500000,
          totalAnimals: 12847,
@@ -330,13 +330,14 @@
      }
    ];
 
-   const sectionLabels: Record<string, string> = {
-     banners: "Banners / Slides Animados",
-     upcoming_events: "Próximos Eventos",
-     featured_lots: "Lotes em Destaque",
-     sale_menu: "Menu de Vendas",
-     articles: "Artigos e Notícias"
-   };
+    const sectionLabels: Record<string, string> = {
+      banners: "Banners / Slides Animados",
+      live_now: "Eventos Ao Vivo Agora",
+      upcoming_events: "Próximos Eventos",
+      featured_lots: "Lotes em Destaque",
+      sale_menu: "Menu de Vendas",
+      articles: "Artigos e Notícias"
+    };
  
     const generatePalette = () => {
       const hexToRgb = (hex: string) => {
