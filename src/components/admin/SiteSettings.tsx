@@ -636,17 +636,17 @@
 
                    <Reorder.Group 
                      axis="y" 
-                     values={homepage.hero_backgrounds || []} 
+                     values={Array.from({ length: (homepage.hero_backgrounds || []).length }).map((_, i) => i)} 
                      onReorder={(newOrder) => {
-                       // Since we might have duplicate URLs, we need a better way to reorder.
-                       // For now, let's assume URLs are unique enough or use a more complex mapping.
-                       // Actually, Reorder.Group works on values. If values are not unique, it breaks.
-                       setHomepage({...homepage, hero_backgrounds: newOrder});
+                       const newBgs = newOrder.map(idx => (homepage.hero_backgrounds || [])[idx]);
+                       const newPhrases = newOrder.map(idx => (customTexts.hero_phrases || [])[idx]);
+                       setHomepage({...homepage, hero_backgrounds: newBgs});
+                       setCustomTexts({...customTexts, hero_phrases: newPhrases});
                      }}
                      className="space-y-4"
                    >
                      {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
-                       <Reorder.Item key={url + idx} value={url}>
+                       <Reorder.Item key={idx} value={idx}>
                          <Card className="bg-muted/10 border-gold/10 cursor-default">
                            <CardContent className="p-4 space-y-4">
                           <div className="flex justify-between items-center">
