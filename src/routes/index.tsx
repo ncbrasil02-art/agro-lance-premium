@@ -106,14 +106,10 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
    const baseTemplateId = (baseSettings as any)?.template_id || 'model1';
     const templateId = 'model1';
         
-   const activeSections = {
-     ...baseSettings,
-     order: (baseSettings as any).order || (
-       templateId === 'model2' ? ["featured_lots", "upcoming_events", "articles", "sale_menu"] : 
-       templateId === 'model3' ? ["upcoming_events", "articles", "featured_lots", "sale_menu"] : 
-       ["upcoming_events", "featured_lots", "sale_menu", "articles"]
-     )
-   };
+    const activeSections = {
+      ...baseSettings,
+      order: (baseSettings as any).order || ["upcoming_events", "featured_lots", "sale_menu", "articles"]
+    };
     const [now, setNow] = useState(Date.now());
 
       useEffect(() => {
