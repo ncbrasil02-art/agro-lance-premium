@@ -11,9 +11,10 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
- import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper, GripVertical } from "lucide-react";
+ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper, GripVertical, CreditCard } from "lucide-react";
  import { Reorder } from "framer-motion";
  import { BulkSeoAudit } from "./BulkSeoAudit";
+ import { PaymentManagement } from "./PaymentManagement";
  import { LotCard } from "../auctions/lot-card";
  import { OptimizedImage } from "@/components/ui/optimized-image";
 
@@ -410,11 +411,17 @@
           <TabsTrigger value="articles" className="gap-2">
              <Newspaper className="h-4 w-4" /> Artigos
            </TabsTrigger>
-           <TabsTrigger value="lots" className="gap-2">
-             <Star className="h-4 w-4" /> Lotes
-           </TabsTrigger>
+            <TabsTrigger value="lots" className="gap-2">
+              <Star className="h-4 w-4" /> Lotes
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="gap-2">
+              <CreditCard className="h-4 w-4" /> Pagamentos
+            </TabsTrigger>
          </TabsList>
-        <TabsContent value="articles" className="space-y-6">
+         <TabsContent value="payments" className="space-y-6">
+           <PaymentManagement />
+         </TabsContent>
+         <TabsContent value="articles" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
