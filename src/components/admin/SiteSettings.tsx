@@ -524,7 +524,7 @@ import { LotCard } from "../auctions/lot-card";
                    disabled={isSaving}
                  >
                    {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Save className="h-3 w-3 mr-2" />}
-                   Salvar Configuração
+                    Salvar Layout e Ordem
                  </Button>
                </div>
                <p className="text-sm text-muted-foreground">Arraste as seções para definir em que ordem elas aparecem na página inicial.</p>
