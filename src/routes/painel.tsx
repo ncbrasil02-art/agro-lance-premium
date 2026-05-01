@@ -209,8 +209,13 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
             due_date: inst.due_date.toISOString(),
             status: 'pending'
           }).select().single();
-        if (instError) throw instError;
-        dbInst = newInst;
+         if (instError) throw instError;
+         dbInst = newInst;
+ 
+         // Update state
+         setInstallments(prev => prev.map(i => 
+           i.installment_number === inst.installment_number ? { ...i, id: dbInst.id } : i
+         ));
       }
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
