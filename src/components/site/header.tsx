@@ -62,7 +62,7 @@ import { toast } from "sonner";
       { to: "/sobre", label: aboutPage?.title || "Sobre", show: aboutPage?.enabled !== false },
    ].filter(i => i.show);
 
-   const isLoading = !siteInfo?.name;
+    const isDataLoaded = siteInfo && Object.keys(siteInfo).length > 0;
  
    return (
      <header className={cn(
@@ -72,23 +72,23 @@ import { toast } from "sonner";
          "bg-background/80 backdrop-blur-xl border-border/60 h-16"
        )}>
         <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
-         <Link to="/" className="flex items-center gap-2 font-bold group">
-           {isLoading ? (
-             <div className="h-10 w-40 bg-white/5 animate-pulse rounded-lg" />
-           ) : siteInfo?.logo_url ? (
-             <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
-           ) : (
-             <>
-               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
-                 <Gavel className="h-5 w-5 text-emerald-deep" />
-               </span>
-               <span className="text-lg tracking-tight">
-                 <span className="text-foreground">{siteInfo?.name?.split(' ')?.[0] || "Premium"}</span>
-                 <span className="text-gradient-gold">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ') || "Agro"}</span>
-               </span>
-              </>
+          <Link to="/" className="flex items-center gap-2 font-bold group min-w-[150px]">
+            {!isDataLoaded ? (
+              <div className="h-8 w-32 bg-white/5 animate-pulse rounded-lg" />
+            ) : siteInfo.logo_url ? (
+              <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
+                  <Gavel className="h-5 w-5 text-emerald-deep" />
+                </span>
+                <span className="text-lg tracking-tight">
+                  <span className="text-foreground">{siteInfo.name?.split(' ')?.[0]}</span>
+                  <span className="text-gradient-gold">{siteInfo.name?.split(' ')?.slice(1)?.join(' ')}</span>
+                </span>
+              </div>
             )}
-           </Link>
+          </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           {nav.map((item) => (
