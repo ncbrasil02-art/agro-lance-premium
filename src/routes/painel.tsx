@@ -1,8 +1,77 @@
  import { validateImage, validateDocument } from "@/utils/upload-validation";
+ import { calculateInstallments, getTotalInstallmentsCount, Installment } from "@/utils/payment-calculator";
+ 
  function PaymentDialog({ lot, profile }: { lot: any, profile: any }) {
-   const installments = 30; // default
-   const installmentValue = lot.current_price / installments;
-   const pixKey = "00020101021226830014br.gov.bcb.pix0136..."; // Placeholder
+   const [gatewayConfig, setGatewayConfig] = useState<any>(null);
+   const [installments, setInstallments] = useState<Installment[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
+   const [uploadingId, setUploadingId] = useState<string | null>(null);
+ 
+   useEffect(() => {
+     const fetchData = async () => {
+       setIsLoading(true);
+       try {
+         // Fetch Pix Manual config
+         const { data: gateway } = await supabase
+           .from("payment_gateways")
+           .select("config")
+           .eq("name", "pix_manual")
+           .single();
+         
+         setGatewayConfig(gateway?.config || {});
+ 
+         // Check for existing installments in DB
+         const { data: existingInstallments } = await supabase
+           .from("installments")
+           .select("*")
+           .eq("buyer_id", profile.id)
+           // We'd ideally link to a transaction, but let's use a workaround for now
+           // Or just generate on the fly if not exists
+           .order("installment_number", { ascending: true });
+ 
+         const formula = lot.payment_formula || lot.animal?.payment_formula || "1";
+         const calculated = calculateInstallments(lot.current_price, formula, new Date(lot.updated_at || lot.created_at));
+         setInstallments(calculated);
+       } catch (err) {
+         console.error("Error fetching payment data:", err);
+       } finally {
+         setIsLoading(false);
+       }
+     };
+ 
+     fetchData();
+   }, [lot, profile.id]);
+ 
+   const handleUploadProof = async (installmentId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+     const file = e.target.files?.[0];
+     if (!file) return;
+ 
+     setUploadingId(installmentId.toString());
+     try {
+       const fileExt = file.name.split('.').pop();
+       const fileName = `${profile.id}/proof-${lot.id}-${installmentId}-${Math.random()}.${fileExt}`;
+       
+       const { error: uploadError } = await supabase.storage
+         .from('payment_proofs')
+         .upload(fileName, file);
+ 
+       if (uploadError) throw uploadError;
+ 
+       const { data: { publicUrl } } = supabase.storage
+         .from('payment_proofs')
+         .getPublicUrl(fileName);
+ 
+       toast.success("Comprovante enviado com sucesso! Aguarde a conferência.");
+     } catch (error: any) {
+       toast.error("Erro ao enviar comprovante: " + error.message);
+     } finally {
+       setUploadingId(null);
+     }
+   };
+ 
+   const pixKey = gatewayConfig?.pix_key || "Chave não configurada";
+   const pixQRCode = gatewayConfig?.pix_qr_code;
+   const instructions = gatewayConfig?.instructions || "Realize o pagamento e envie o comprovante.";
  
    return (
      <Dialog>
