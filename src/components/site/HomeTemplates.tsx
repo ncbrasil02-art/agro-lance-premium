@@ -635,10 +635,17 @@ export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSett
       "relative min-h-screen lg:grid lg:grid-cols-2 bg-emerald-deep overflow-hidden",
       isMobileMode && "min-h-0 pt-6"
     )}>
-      {/* Floating abstract patterns for "Agro" feel */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-      </div>
+       {/* Floating abstract patterns and objects for "Agro" feel */}
+       <div className="absolute inset-0 opacity-10 pointer-events-none z-0">
+         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
+         <div className="absolute top-20 right-20 rotate-12 opacity-20">
+           <Gavel size={300} className="text-gold" />
+         </div>
+         <div className="absolute bottom-20 left-20 -rotate-12 opacity-20">
+           <Wheat size={400} className="text-white" />
+         </div>
+       </div>
+       <FloatingElements />
 
       <div className="relative flex items-center p-8 md:p-24 text-white">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px] pointer-events-none" />
