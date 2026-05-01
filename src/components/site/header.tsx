@@ -1,3 +1,6 @@
+      const isHome = router.state.location.pathname === "/";
+      const isElite = homepage?.template_id === "model1";
+
     import { useSiteSettings } from "@/hooks/useSiteSettings";
     import { cn } from "@/lib/utils";
    import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
@@ -61,10 +64,12 @@ import { toast } from "sonner";
    ].filter(i => i.show);
 
   return (
-     <header className={cn(
-       "sticky top-0 z-50 border-b border-border/60 transition-all duration-300",
-       isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : "bg-background/80 backdrop-blur-xl h-16"
-     )}>
+      <header className={cn(
+        "sticky top-0 z-50 border-b transition-all duration-300",
+        isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : 
+        isHome && isElite ? "bg-transparent border-transparent h-20" : 
+        "bg-background/80 backdrop-blur-xl border-border/60 h-16"
+      )}>
        <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
         <Link to="/" className="flex items-center gap-2 font-bold group">
           {siteInfo?.logo_url ? (
