@@ -139,6 +139,23 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-10 mb-12">
+            <div>
+              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Volume Negociado</div>
+              <div className="text-2xl font-black">{formatBRL(stats.totalSold)}</div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Animais Registrados</div>
+              <div className="text-2xl font-black">{stats.totalAnimals.toLocaleString()}</div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Base de Investidores</div>
+              <div className="text-2xl font-black">{stats.totalUsers.toLocaleString()}</div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Eventos Ativos</div>
+              <div className="text-2xl font-black">{stats.activeEvents}</div>
+            </div>
+          </div>
 
           {nextEvent && (
             <motion.div 
@@ -165,23 +182,6 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
               </div>
             </motion.div>
           )}
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Volume Negociado</div>
-              <div className="text-2xl font-black">{formatBRL(stats.totalSold)}</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Animais Registrados</div>
-              <div className="text-2xl font-black">{stats.totalAnimals.toLocaleString()}</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Base de Investidores</div>
-              <div className="text-2xl font-black">{stats.totalUsers.toLocaleString()}</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Eventos Ativos</div>
-              <div className="text-2xl font-black">{stats.activeEvents}</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
