@@ -190,24 +190,34 @@
                      )}
  
                      {gateway.name === 'pix_manual' && (
-                       <>
-                         <div className="space-y-2">
-                           <Label className="text-xs font-bold uppercase">Chave PIX</Label>
-                           <Input 
-                             placeholder="CPF, E-mail ou Chave Aleatória" 
-                             value={gateway.config.pix_key || ''} 
-                             onChange={(e) => handleConfigChange(gateway.id, 'pix_key', e.target.value)}
-                           />
-                         </div>
-                         <div className="space-y-2">
-                           <Label className="text-xs font-bold uppercase">Instruções de Pagamento</Label>
-                           <Input 
-                             placeholder="Ex: Enviar comprovante para (11) 99999-9999" 
-                             value={gateway.config.instructions || ''} 
-                             onChange={(e) => handleConfigChange(gateway.id, 'instructions', e.target.value)}
-                           />
-                         </div>
-                       </>
+                        <>
+                          <div className="grid sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-xs font-bold uppercase">Chave PIX</Label>
+                              <Input 
+                                placeholder="CPF, E-mail ou Chave Aleatória" 
+                                value={gateway.config.pix_key || ''} 
+                                onChange={(e) => handleConfigChange(gateway.id, 'pix_key', e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs font-bold uppercase">QR Code (Texto/Copia e Cola)</Label>
+                              <Input 
+                                placeholder="00020126..." 
+                                value={gateway.config.pix_qr_code || ''} 
+                                onChange={(e) => handleConfigChange(gateway.id, 'pix_qr_code', e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold uppercase">Instruções de Pagamento</Label>
+                            <Input 
+                              placeholder="Ex: Enviar comprovante para (11) 99999-9999" 
+                              value={gateway.config.instructions || ''} 
+                              onChange={(e) => handleConfigChange(gateway.id, 'instructions', e.target.value)}
+                            />
+                          </div>
+                        </>
                      )}
  
                      <div className="pt-4 flex justify-end">
