@@ -18,7 +18,17 @@
    category?: { name: string | null } | null
  }
 
-  export function ArticleCarousel({ articles, variant = 'model1' }: { articles: Article[], variant?: string }) {
+   import { ArticleSettings } from "@/hooks/useSiteSettings";
+
+   export function ArticleCarousel({ 
+     articles, 
+     variant = 'model1',
+     settings 
+   }: { 
+     articles: Article[], 
+     variant?: string,
+     settings?: ArticleSettings | null
+   }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
      align: "start",
      loop: true,
@@ -34,8 +44,10 @@
 
    if (!articles || articles.length === 0) return null
 
-    const isModern = variant === 'model2';
-    const isTraditional = variant === 'model3';
+     const isModern = (settings?.card_style === 'modern') || (!settings?.card_style && variant === 'model2');
+     const isTraditional = (settings?.card_style === 'traditional') || (!settings?.card_style && variant === 'model3');
+     const isGlass = settings?.card_style === 'glass';
+     const isMinimal = settings?.card_style === 'minimal';
 
     return (
       <section className={cn(
@@ -81,20 +93,27 @@
            <div className="flex -ml-4">
              {articles.map((article) => (
                <div key={article.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] pl-4">
-                  <div className={cn(
-                    "group h-full flex flex-col overflow-hidden transition-all",
-                    variant === 'model1' ? "rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:border-gold/30 hover:bg-white/10" :
-                    isModern ? "rounded-none border-b border-border bg-transparent hover:bg-muted/50 shadow-none" :
-                    isTraditional ? "rounded-none border-l-4 border-gold bg-emerald-deep shadow-2xl" :
-                    "rounded-3xl border border-border bg-card shadow-sm hover:shadow-xl"
-                  )}>
-                   <div className="relative aspect-[16/9] overflow-hidden">
+                   <div className={cn(
+                     "group h-full flex flex-col overflow-hidden transition-all",
+                     isGlass ? "rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:border-gold/30 hover:bg-white/10" :
+                     isModern ? "rounded-none border-b border-border bg-transparent hover:bg-muted/50 shadow-none" :
+                     isTraditional ? "rounded-none border-l-4 border-gold bg-emerald-deep shadow-2xl" :
+                     isMinimal ? "rounded-lg border-none bg-transparent hover:bg-muted/30" :
+                     variant === 'model1' ? "rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:border-gold/30 hover:bg-white/10" :
+                     "rounded-3xl border border-border bg-card shadow-sm hover:shadow-xl"
+                   )}>
+                    <div className={cn(
+                      "relative overflow-hidden",
+                      settings?.image_aspect_ratio === '4/3' ? "aspect-[4/3]" :
+                      settings?.image_aspect_ratio === '1/1' ? "aspect-square" :
+                      "aspect-[16/9]"
+                    )}>
                      <OptimizedImage
                        src={article.featured_image || "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"}
                        alt={article.title}
                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                      />
-                     {article.category?.name && (
+                      {article.category?.name && settings?.show_category !== false && (
                        <div className="absolute left-4 top-4 rounded-full bg-gold/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-deep">
                          {article.category.name}
                        </div>
@@ -102,33 +121,37 @@
                    </div>
                    
                     <div className={cn("flex flex-1 flex-col p-6", isModern && "px-0", isTraditional && "text-white")}>
-                     <div className="mb-3 flex items-center gap-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-                       <div className="flex items-center gap-1">
-                         <Calendar className="h-3 w-3 text-gold" />
-                          {(() => {
-                            if (!article.published_at) return "--";
-                            try {
-                              const d = new Date(article.published_at);
-                              if (isNaN(d.getTime())) return "--";
-                              return format(d, "dd 'de' MMMM", { locale: ptBR });
-                            } catch (e) {
-                              return "--";
-                            }
-                          })()}
-                       </div>
-                       <div className="flex items-center gap-1">
-                         <MessageSquare className="h-3 w-3 text-gold" />
-                         Blog Elite
-                       </div>
-                     </div>
+                      {settings?.show_date !== false && (
+                        <div className="mb-3 flex items-center gap-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3 text-gold" />
+                             {(() => {
+                               if (!article.published_at) return "--";
+                               try {
+                                 const d = new Date(article.published_at);
+                                 if (isNaN(d.getTime())) return "--";
+                                 return format(d, "dd 'de' MMMM", { locale: ptBR });
+                               } catch (e) {
+                                 return "--";
+                               }
+                             })()}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MessageSquare className="h-3 w-3 text-gold" />
+                            Blog Elite
+                          </div>
+                        </div>
+                      )}
                      
                      <h3 className="mb-2 text-xl font-bold text-white line-clamp-2 leading-tight group-hover:text-gold transition-colors">
                        {article.title}
                      </h3>
                      
-                     <p className="mb-6 text-sm text-muted-foreground line-clamp-3">
-                       {article.excerpt}
-                     </p>
+                      {settings?.show_excerpt !== false && (
+                        <p className="mb-6 text-sm text-muted-foreground line-clamp-3">
+                          {article.excerpt}
+                        </p>
+                      )}
                      
                      <div className="mt-auto flex items-center justify-between">
                        <Link
