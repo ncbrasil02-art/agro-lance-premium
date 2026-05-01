@@ -62,11 +62,10 @@ import { toast } from "sonner";
       { to: "/sobre", label: aboutPage?.title || "Sobre", show: aboutPage?.enabled !== false },
    ].filter(i => i.show);
 
-  return (
-     const isLoading = !siteInfo?.name;
+   const isLoading = !siteInfo?.name;
  
-     return (
-       <header className={cn(
+   return (
+     <header className={cn(
          "sticky top-0 z-50 border-b transition-all duration-300",
          isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : 
          isHome && isElite ? "bg-transparent border-transparent h-20" : 
