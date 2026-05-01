@@ -13,6 +13,7 @@ export function SellerCarousel() {
         .from("sellers")
         .select("*")
         .not("logo_url", "is", null)
+        .neq("logo_url", "")
         .limit(20);
       if (data) setSellers(data);
     };
