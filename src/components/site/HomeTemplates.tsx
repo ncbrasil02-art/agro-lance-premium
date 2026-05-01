@@ -144,50 +144,59 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-10 mb-12">
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Volume Negociado</div>
-              <div className="text-2xl font-black">{formatBRL(stats.totalSold)}</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Animais Registrados</div>
-              <div className="text-2xl font-black">{stats.totalAnimals.toLocaleString()}</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Base de Investidores</div>
-              <div className="text-2xl font-black">{stats.totalUsers.toLocaleString()}</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1">Eventos Ativos</div>
-              <div className="text-2xl font-black">{stats.activeEvents}</div>
+          <div className="flex flex-col gap-12">
+            {nextEvent && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                className="relative max-w-2xl group"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-r from-gold/40 via-gold-bright/60 to-gold/40 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 p-1 rounded-[2.1rem] shadow-2xl">
+                  <div className="bg-background/40 rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                      <Badge className="bg-gold/20 text-gold border-gold/30 mb-3 px-3 py-1 text-[10px] font-black uppercase tracking-widest animate-pulse">Próximo Evento</Badge>
+                      <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter text-white leading-none mb-1">{nextEvent.name}</h3>
+                      <div className="flex items-center gap-2 text-gold/60 text-[10px] font-bold uppercase tracking-widest">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(nextEvent.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Inicia em</span>
+                      <Countdown endsAt={nextEvent.date} variant="segmented" />
+                    </div>
+                    <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
+                      <Button size="lg" className="bg-gold-gradient text-emerald-deep font-black uppercase tracking-widest h-16 px-8 rounded-2xl shadow-gold hover:scale-105 transition-transform">
+                        PARTICIPAR
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-12 max-w-4xl">
+              <div>
+                <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">Volume Negociado</div>
+                <div className="text-2xl font-black tracking-tighter">{formatBRL(stats.totalSold)}</div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">Animais Registrados</div>
+                <div className="text-2xl font-black tracking-tighter">{stats.totalAnimals.toLocaleString()}</div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">Base de Investidores</div>
+                <div className="text-2xl font-black tracking-tighter">{stats.totalUsers.toLocaleString()}</div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">Eventos Ativos</div>
+                <div className="text-2xl font-black tracking-tighter">{stats.activeEvents}</div>
+              </div>
             </div>
           </div>
-
-          {nextEvent && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="relative max-w-xl group cursor-pointer"
-            >
-              <div className="absolute -inset-1 bg-gradient-to-r from-gold/50 via-gold-bright to-gold/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-center justify-between gap-6">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Próxima Oportunidade</span>
-                  <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{nextEvent.name}</h3>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Inicia em</span>
-                  <Countdown endsAt={nextEvent.date} variant="segmented" />
-                </div>
-                <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
-                  <Button size="icon" className="h-12 w-12 rounded-xl bg-gold text-emerald-deep hover:scale-110 transition-transform">
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          )}
         </div>
       </div>
     </section>
