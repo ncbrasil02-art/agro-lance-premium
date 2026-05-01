@@ -208,18 +208,42 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
   );
 };
 
-export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
+export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings, stats }: HeroProps) => {
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
   return (
     <section className={cn(
       "relative flex items-center justify-center overflow-hidden bg-background",
-      isMobileMode ? "min-h-[70vh] pt-10" : "min-h-[90vh]"
+      isMobileMode ? "min-h-[75vh] pt-10" : "min-h-[95vh]"
     )}>
+      <div className="absolute inset-0 z-0 opacity-20 overflow-hidden">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute bg-gold/10 rounded-full blur-[100px]"
+            style={{
+              width: Math.random() * 400 + 200,
+              height: Math.random() * 400 + 200,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              x: [0, 50, -50, 0],
+              y: [0, -50, 50, 0],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
       {homepageSettings?.hero_backgrounds?.length > 0 ? (
         <HeroBackground 
           backgrounds={homepageSettings?.hero_backgrounds} 
-          opacity={homepageSettings?.hero_bg_opacity ?? 10} 
-          blur={homepageSettings?.hero_bg_blur ?? 0} 
+          opacity={homepageSettings?.hero_bg_opacity ?? 15} 
+          blur={homepageSettings?.hero_bg_blur ?? 2} 
         />
       ) : (
         <div className="absolute inset-0 opacity-10">
@@ -227,63 +251,91 @@ export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings 
         </div>
       )}
       
-      <div className="container relative mx-auto px-4 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-deep/5 border border-emerald-deep/10 text-emerald-deep text-[10px] font-bold uppercase tracking-widest mb-8">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-deep animate-ping" />
-          Plataforma de Investimento Genético
-        </div>
+      <div className="container relative z-10 mx-auto px-4 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-deep/5 border border-emerald-deep/20 text-emerald-deep text-[10px] font-black uppercase tracking-[0.3em] mb-12 backdrop-blur-md"
+        >
+          <div className="w-2 h-2 rounded-full bg-emerald-deep animate-pulse" />
+          Plataforma de Investimento Genético 4.0
+        </motion.div>
 
         <HeroPhrase 
           phrases={customTexts?.hero_phrases} 
-          className="text-5xl md:text-9xl font-black tracking-tighter uppercase mb-8 leading-[0.9]"
+          className="text-6xl md:text-[10rem] font-black tracking-tighter uppercase mb-10 leading-[0.85] text-gradient-gold-modern"
           defaultTitle={
-            <h1>
+            <motion.h1 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="drop-shadow-2xl"
+            >
               {customTexts?.hero_title || (
                 <>
                   REVOLUCIONANDO O <br />
-                  <span className="text-gradient-gold">AGRONEGÓCIO</span>
+                  <span className="text-gradient-gold italic">AGRONEGÓCIO</span>
                 </>
               )}
-            </h1>
+            </motion.h1>
           }
         />
 
-        <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-12 font-medium">
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="max-w-2xl mx-auto text-lg md:text-2xl text-muted-foreground mb-16 font-medium leading-relaxed"
+        >
           {customTexts?.hero_subtitle || "A mais avançada experiência de leilões digitais com lances em tempo real e segurança inabalável."}
-        </p>
+        </motion.p>
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-20">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-24">
           <Link to="/cadastro" className="w-full md:w-auto">
-            <Button size="lg" className="w-full md:w-auto bg-emerald-deep text-white h-14 px-10 rounded-full font-bold uppercase tracking-widest">
+            <Button size="lg" className="w-full md:w-auto bg-emerald-deep text-white h-16 px-12 rounded-full font-black uppercase tracking-widest shadow-2xl hover:shadow-emerald-deep/40 transition-all hover:scale-105">
               Começar agora
             </Button>
           </Link>
           <Link to="/ao-vivo" className="w-full md:w-auto">
-            <Button size="lg" variant="ghost" className="w-full md:w-auto h-14 px-10 rounded-full font-bold uppercase tracking-widest border border-border">
-              <Radio className="mr-2 h-4 w-4 text-live" />
+            <Button size="lg" variant="ghost" className="w-full md:w-auto h-16 px-12 rounded-full font-black uppercase tracking-widest border border-emerald-deep/20 hover:bg-emerald-deep/5 text-emerald-deep backdrop-blur-sm">
+              <Radio className="mr-2 h-5 w-5 text-live" />
               Ver Live
             </Button>
           </Link>
         </div>
 
         {nextEvent && (
-          <div className="max-w-4xl mx-auto p-1 bg-gradient-to-r from-gold/40 via-gold-bright to-gold/40 rounded-[2rem] shadow-2xl">
-            <div className="bg-background rounded-[1.9rem] p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="text-left">
-                <div className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-2">Próxima Oportunidade</div>
-                <h3 className="text-2xl font-black uppercase italic tracking-tighter">{nextEvent.name}</h3>
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="max-w-5xl mx-auto group"
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-gold via-emerald-deep to-gold rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+            <div className="relative bg-background/80 backdrop-blur-3xl rounded-[2.8rem] p-1 border border-white/20 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]">
+              <div className="bg-background/40 rounded-[2.7rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-12">
+                <div className="text-left flex-1">
+                  <Badge variant="outline" className="border-gold/30 text-gold uppercase tracking-[0.4em] font-black text-[10px] mb-4">Próxima Oportunidade</Badge>
+                  <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-none">{nextEvent.name}</h3>
+                  <div className="mt-4 flex items-center gap-4 text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
+                    <Calendar className="h-4 w-4 text-gold" />
+                    {new Date(nextEvent.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-4 px-8 border-x border-border/50">
+                  <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">O leilão inicia em</div>
+                  <Countdown endsAt={nextEvent.date} variant="segmented" />
+                </div>
+                <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
+                  <Button className="bg-gold-gradient text-emerald-deep font-black uppercase italic tracking-tighter rounded-2xl h-16 px-10 shadow-gold hover:scale-105 transition-transform">
+                    Ver Lotes
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
-              <div className="flex flex-col items-center">
-                <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-3">O leilão inicia em</div>
-                <Countdown endsAt={nextEvent.date} variant="segmented" />
-              </div>
-              <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
-                <Button className="bg-gold text-emerald-deep font-black uppercase rounded-xl h-12 px-8">
-                  Ver Lotes
-                </Button>
-              </Link>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>
