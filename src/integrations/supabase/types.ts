@@ -1013,6 +1013,36 @@ export type Database = {
           },
         ]
       }
+      payment_gateways: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          label: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          label: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          label?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string | null
@@ -1345,10 +1375,15 @@ export type Database = {
         Row: {
           buyer_commission: number
           buyer_id: string
+          checkout_url: string | null
           created_at: string
           final_price: number
+          gateway_reference: string | null
+          gateway_status: string | null
           id: string
           lot_id: string
+          payment_gateway_id: string | null
+          payment_method: string | null
           payment_status: string | null
           seller_commission: number
           seller_id: string | null
@@ -1358,10 +1393,15 @@ export type Database = {
         Insert: {
           buyer_commission?: number
           buyer_id: string
+          checkout_url?: string | null
           created_at?: string
           final_price: number
+          gateway_reference?: string | null
+          gateway_status?: string | null
           id?: string
           lot_id: string
+          payment_gateway_id?: string | null
+          payment_method?: string | null
           payment_status?: string | null
           seller_commission?: number
           seller_id?: string | null
@@ -1371,10 +1411,15 @@ export type Database = {
         Update: {
           buyer_commission?: number
           buyer_id?: string
+          checkout_url?: string | null
           created_at?: string
           final_price?: number
+          gateway_reference?: string | null
+          gateway_status?: string | null
           id?: string
           lot_id?: string
+          payment_gateway_id?: string | null
+          payment_method?: string | null
           payment_status?: string | null
           seller_commission?: number
           seller_id?: string | null
@@ -1394,6 +1439,13 @@ export type Database = {
             columns: ["lot_id"]
             isOneToOne: true
             referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_payment_gateway_id_fkey"
+            columns: ["payment_gateway_id"]
+            isOneToOne: false
+            referencedRelation: "payment_gateways"
             referencedColumns: ["id"]
           },
           {
