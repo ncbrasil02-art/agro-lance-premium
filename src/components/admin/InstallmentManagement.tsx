@@ -4,7 +4,14 @@
  import { Button } from "@/components/ui/button";
  import { Badge } from "@/components/ui/badge";
  import { toast } from "sonner";
- import { Loader2, Search, Filter, ExternalLink, CheckCircle, XCircle, FileText, User } from "lucide-react";
+ import { Loader2, Search, Filter, ExternalLink, CheckCircle, XCircle, FileText, User, Calendar, Printer, Save, Edit2 } from "lucide-react";
+ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+ import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
+   const [editingId, setEditingId] = useState<string | null>(null);
+   const [newDueDate, setNewDueDate] = useState("");
+   const [selectedCarnet, setSelectedCarnet] = useState<any>(null);
+   const [siteInfo, setSiteInfo] = useState<any>(null);
+     fetchSiteInfo();
  import { Input } from "@/components/ui/input";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
  import { formatBRL } from "@/utils/format";
@@ -19,16 +26,70 @@
      fetchInstallments();
    }, []);
  
+   const fetchSiteInfo = async () => {
+     const { data } = await supabase.from("site_settings").select("*").single();
+     setSiteInfo(data);
+   };
+ 
    const fetchInstallments = async () => {
      setIsLoading(true);
      try {
        const { data, error } = await supabase
          .from("installments")
-         .select(`
-           *,
-           buyer:profiles!buyer_id(full_name, email)
-         `)
+         .select(`*, buyer:profiles!buyer_id(full_name, email, cpf), transaction:transactions(*, lot:lots(*, animal:animals(*)))`)
          .order("due_date", { ascending: true });
+   const handleDueDateUpdate = async (id: string) => {
+     try {
+       const { error } = await supabase
+         .from("installments")
+         .update({ due_date: new Date(newDueDate).toISOString() })
+         .eq("id", id);
+       
+       if (error) throw error;
+       
+       setInstallments(prev => prev.map(inst => 
+         inst.id === id ? { ...inst, due_date: new Date(newDueDate).toISOString() } : inst
+       ));
+       setEditingId(null);
+       toast.success("Vencimento atualizado!");
+     } catch (error: any) {
+       toast.error("Erro ao atualizar vencimento: " + error.message);
+     }
+   };
+ 
+   const handlePrintCarnet = (inst: any) => {
+     // Filter all installments for this transaction to generate a full carnet
+     const lotInstallments = installments
+       .filter(i => i.transaction_id === inst.transaction_id)
+       .map(i => ({
+         ...i,
+         due_date: new Date(i.due_date)
+       }));
+     
+     setSelectedCarnet({
+       lot: inst.transaction?.lot,
+       installments: lotInstallments,
+       profile: inst.buyer
+     });
+   };
+ 
+   const handleActualPrint = () => {
+     const printWindow = window.open('', '_blank');
+     if (!printWindow) return;
+     const content = document.getElementById('admin-printable-carnet')?.innerHTML;
+     printWindow.document.write(`
+       <html>
+         <head>
+           <title>Reimpressão de Carnê</title>
+           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+           <style>@media print { body { margin: 0; padding: 0; } .no-print { display: none; } }</style>
+         </head>
+         <body onload="window.print(); window.close();">${content}</body>
+       </html>
+     `);
+     printWindow.document.close();
+   };
+ 
        
        if (error) throw error;
        setInstallments(data || []);
@@ -135,7 +196,29 @@
                {filteredInstallments.map((inst) => (
                  <TableRow key={inst.id}>
                    <TableCell className="text-xs font-mono">
-                     {new Date(inst.due_date).toLocaleDateString('pt-BR')}
+                     {editingId === inst.id ? (
+                       <div className="flex items-center gap-1">
+                         <Input 
+                           type="date" 
+                           className="h-7 text-[10px] w-32" 
+                           value={newDueDate} 
+                           onChange={(e) => setNewDueDate(e.target.value)}
+                         />
+                         <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDueDateUpdate(inst.id)}>
+                           <Save className="h-3 w-3" />
+                         </Button>
+                       </div>
+                     ) : (
+                       <div className="flex items-center gap-2">
+                         {new Date(inst.due_date).toLocaleDateString('pt-BR')}
+                         <Button size="sm" variant="ghost" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100" onClick={() => {
+                           setEditingId(inst.id);
+                           setNewDueDate(new Date(inst.due_date).toISOString().split('T')[0]);
+                         }}>
+                           <Edit2 className="h-3 w-3" />
+                         </Button>
+                       </div>
+                     )}
                    </TableCell>
                    <TableCell>
                      <div className="flex items-center gap-2">
@@ -166,6 +249,40 @@
                    <TableCell>{getStatusBadge(inst.status)}</TableCell>
                    <TableCell className="text-right">
                      <div className="flex justify-end gap-1">
+                       <Dialog>
+                         <DialogTrigger asChild>
+                           <Button 
+                             size="sm" 
+                             variant="outline" 
+                             className="h-8 w-8 p-0"
+                             onClick={() => handlePrintCarnet(inst)}
+                             title="Reimprimir Carnê"
+                           >
+                             <Printer className="h-4 w-4" />
+                           </Button>
+                         </DialogTrigger>
+                         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                           <DialogHeader>
+                             <div className="flex justify-between items-center pr-8">
+                               <DialogTitle>Reimpressão de Carnê</DialogTitle>
+                               <Button onClick={handleActualPrint} className="bg-gold text-emerald-deep font-bold gap-2">
+                                 <Printer className="h-4 w-4" /> IMPRIMIR AGORA
+                               </Button>
+                             </div>
+                           </DialogHeader>
+                           <div id="admin-printable-carnet">
+                             {selectedCarnet && (
+                               <CarnetGenerator 
+                                 lot={selectedCarnet.lot}
+                                 installments={selectedCarnet.installments}
+                                 profile={selectedCarnet.profile}
+                                 siteInfo={siteInfo}
+                                 pixKey="Ver painel" // Simplified
+                               />
+                             )}
+                           </div>
+                         </DialogContent>
+                       </Dialog>
                        {inst.status !== 'paid' && (
                          <Button 
                            size="sm" 
