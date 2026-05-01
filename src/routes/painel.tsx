@@ -61,13 +61,13 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
           const calculated = calculateInstallments(lot.current_price, formula, new Date(lot.updated_at || lot.created_at));
           
           // Merge with DB data if exists
-          const merged = calculated.map(inst => {
+          const merged: Installment[] = calculated.map(inst => {
             const dbInst = existingInstallments?.find(ei => ei.installment_number === inst.installment_number);
             if (dbInst) {
               return {
                 ...inst,
-                status: dbInst.status,
-                proof_url: dbInst.proof_url
+                status: dbInst.status || undefined,
+                proof_url: dbInst.proof_url || undefined
               };
             }
             return inst;
