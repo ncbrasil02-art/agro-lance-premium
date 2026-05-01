@@ -11,7 +11,8 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
-  import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper } from "lucide-react";
+ import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper, GripVertical } from "lucide-react";
+ import { Reorder } from "framer-motion";
  import { BulkSeoAudit } from "./BulkSeoAudit";
  import { LotCard } from "../auctions/lot-card";
  import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -398,9 +399,12 @@
             <ShieldCheck className="h-4 w-4" /> Auditoria SEO
           </TabsTrigger>
           <TabsTrigger value="articles" className="gap-2">
-            <Newspaper className="h-4 w-4" /> Artigos
-          </TabsTrigger>
-          <TabsTrigger value="lots" className="gap-2">
+             <Newspaper className="h-4 w-4" /> Artigos
+           </TabsTrigger>
+           <TabsTrigger value="lots" className="gap-2">
+             <Star className="h-4 w-4" /> Lotes
+           </TabsTrigger>
+         </TabsList>
         <TabsContent value="articles" className="space-y-6">
           <Card>
             <CardHeader>
@@ -481,9 +485,6 @@
           </Card>
         </TabsContent>
 
-           <Star className="h-4 w-4" /> Card do Lote
-         </TabsTrigger>
-       </TabsList>
 
        <TabsContent value="templates" className="space-y-6">
          <Card>
@@ -633,25 +634,39 @@
                     </Button>
                   </div>
 
-                  <div className="space-y-4">
-                    {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
-                      <Card key={idx} className="bg-muted/10 border-gold/10">
-                        <CardContent className="p-4 space-y-4">
+                   <Reorder.Group 
+                     axis="y" 
+                     values={Array.from({ length: (homepage.hero_backgrounds || []).length }).map((_, i) => i)} 
+                     onReorder={(newOrder) => {
+                       const newBgs = newOrder.map(idx => (homepage.hero_backgrounds || [])[idx]);
+                       const newPhrases = newOrder.map(idx => (customTexts.hero_phrases || [])[idx]);
+                       setHomepage({...homepage, hero_backgrounds: newBgs});
+                       setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                     }}
+                     className="space-y-4"
+                   >
+                     {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
+                       <Reorder.Item key={idx} value={idx}>
+                         <Card className="bg-muted/10 border-gold/10 cursor-default">
+                           <CardContent className="p-4 space-y-4">
                           <div className="flex justify-between items-center">
-                            <Badge variant="outline" className="text-gold border-gold/30 uppercase tracking-widest text-[10px]">Slide #{idx + 1}</Badge>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-destructive h-8 w-8"
-                              onClick={() => {
-                                const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
-                                const newPhrases = (customTexts.hero_phrases || []).filter((_: any, i: number) => i !== idx);
-                                setHomepage({...homepage, hero_backgrounds: newBgs});
-                                setCustomTexts({...customTexts, hero_phrases: newPhrases});
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                             <div className="flex items-center gap-2">
+                               <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                               <Badge variant="outline" className="text-gold border-gold/30 uppercase tracking-widest text-[10px]">Slide #{idx + 1}</Badge>
+                             </div>
+                             <Button 
+                               variant="ghost" 
+                               size="icon" 
+                               className="text-destructive h-8 w-8"
+                               onClick={() => {
+                                 const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
+                                 const newPhrases = (customTexts.hero_phrases || []).filter((_: any, i: number) => i !== idx);
+                                 setHomepage({...homepage, hero_backgrounds: newBgs});
+                                 setCustomTexts({...customTexts, hero_phrases: newPhrases});
+                               }}
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
                           </div>
 
                           <div className="grid md:grid-cols-[150px_1fr] gap-4">
@@ -707,10 +722,11 @@
                               </div>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                         </CardContent>
+                       </Card>
+                      </Reorder.Item>
+                     ))}
+                   </Reorder.Group>
 
                   <Button 
                     className="w-full bg-gold-gradient text-emerald-deep font-black uppercase tracking-widest h-12 shadow-gold" 
