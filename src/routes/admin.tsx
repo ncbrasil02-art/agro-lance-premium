@@ -22,9 +22,9 @@
 import { SecurityAlertsBanner } from "@/components/admin/SecurityAlertsBanner";
 import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
   import { 
-   Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
-    LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
-    ClipboardList, ShoppingCart, ShieldCheck, Newspaper, Info,
+    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
+     LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
+     ClipboardList, ShoppingCart, ShieldCheck, ShieldAlert, Newspaper, Info,
     MessageSquare, FileText
  } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
