@@ -4,7 +4,7 @@
  import { Button } from "@/components/ui/button";
  import { Badge } from "@/components/ui/badge";
  import { toast } from "sonner";
- import { Loader2, Search, Filter, ExternalLink, CheckCircle, XCircle, FileText, User, Calendar, Printer, Save, Edit2 } from "lucide-react";
+ import { Loader2, Search, Filter, ExternalLink, CheckCircle, XCircle, FileText, User, Calendar, Printer, Save, Edit2, RefreshCw } from "lucide-react";
  import { Input } from "@/components/ui/input";
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
  import { formatBRL } from "@/utils/format";
@@ -20,6 +20,7 @@
    const [newDueDate, setNewDueDate] = useState("");
    const [selectedCarnet, setSelectedCarnet] = useState<any>(null);
    const [siteInfo, setSiteInfo] = useState<any>(null);
+   const [isReconciling, setIsReconciling] = useState(false);
  
    useEffect(() => {
      fetchInstallments();
@@ -45,6 +46,22 @@
        toast.error("Erro ao carregar parcelas: " + error.message);
      } finally {
        setIsLoading(false);
+     }
+   };
+ 
+   const handleReconciliation = async () => {
+     setIsReconciling(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('reconcile-payments');
+       
+       if (error) throw error;
+       
+       toast.success(`Reconciliação concluída! ${data.updated} parcelas atualizadas.`);
+       fetchInstallments();
+     } catch (error: any) {
+       toast.error("Erro na reconciliação: " + error.message);
+     } finally {
+       setIsReconciling(false);
      }
    };
  
@@ -168,8 +185,17 @@
                <option value="overdue">Atrasados</option>
              </select>
              <Button variant="outline" size="icon" onClick={fetchInstallments}>
-               <Filter className="h-4 w-4" />
-             </Button>
+                <Filter className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="default" 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2" 
+                onClick={handleReconciliation}
+                disabled={isReconciling}
+              >
+                {isReconciling ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                RECONCILIAR
+              </Button>
            </div>
          </div>
        </CardHeader>
