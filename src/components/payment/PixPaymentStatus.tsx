@@ -108,9 +108,9 @@
      );
    }
  
-   return (
-     <div className="flex flex-col items-center p-6 gap-6">
-       {!pixData && !installment?.external_reference ? (
+    return (
+      <div className="flex flex-col items-center p-6 gap-6 bg-white dark:bg-emerald-950 rounded-3xl">
+        {!pixData && !installment?.external_reference ? (
          <div className="w-full space-y-4">
            <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 flex gap-3">
              <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />

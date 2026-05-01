@@ -104,11 +104,11 @@ export function CarnetGenerator({ lot, installments, pixKey, pixQRCode, profile,
                       </div>
                     </div>
 
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-[7px] font-bold text-gray-400 uppercase italic mb-1">Instruções de Pagamento</p>
-                      <p className="text-[9px] text-gray-600 leading-tight">
-                        Realize o pagamento através do QR Code ao lado ou utilize a chave PIX: <span className="font-bold font-mono">{pixKey}</span>. 
-                        Após o pagamento, anexe o comprovante no painel do cliente para a devida baixa.
+                    <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100 shadow-inner">
+                      <p className="text-[8px] font-black text-emerald-800 uppercase italic mb-2 tracking-widest">Instruções de Pagamento</p>
+                      <p className="text-[10px] text-emerald-900 leading-relaxed font-medium">
+                        Realize o pagamento através do QR Code ao lado ou utilize a chave PIX: <span className="font-black font-mono text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200">{pixKey}</span>. 
+                        <br /><span className="text-[9px] mt-1 block font-bold text-emerald-600/80 uppercase">Após o pagamento, anexe o comprovante no painel do cliente para a devida baixa.</span>
                       </p>
                     </div>
                   </div>
