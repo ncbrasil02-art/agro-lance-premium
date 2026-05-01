@@ -238,53 +238,8 @@ export function SellerManagement() {
                              <div className="h-10 w-10 rounded bg-muted flex items-center justify-center"><ImageIcon className="h-4 w-4 text-muted-foreground/30" /></div>
                            )}
                          </TableCell>
-                         <TableCell className="font-medium">{seller.name}</TableCell>
-               <div className="grid gap-2">
-                 <Label>Logotipo do Vendedor</Label>
-                 <div className="flex items-center gap-4">
-                   {formData.logo_url ? (
-                     <img src={formData.logo_url} alt="Logo" className="h-16 w-16 rounded object-contain border bg-white" />
-                   ) : (
-                     <div className="h-16 w-16 rounded bg-muted border border-dashed flex items-center justify-center">
-                       <ImageIcon className="h-6 w-6 text-muted-foreground/20" />
-                     </div>
-                   )}
-                   <div className="flex-1">
-                     <Input 
-                       type="file" 
-                       accept="image/*" 
-                       className="hidden" 
-                       id="seller-logo-upload" 
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file || !validateImage(file)) return;
-                          const tid = toast.loading("Enviando logo...");
-                          const fileExt = file.name.split('.').pop();
-                          const fileName = `seller_${Math.random()}.${fileExt}`;
-                          const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
-                          if (error) toast.error("Erro: " + error.message);
-                          else {
-                            const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
-                            setFormData({ ...formData, logo_url: publicUrl });
-                            toast.success("Logo enviado!");
-                          }
-                          toast.dismiss(tid);
-                        }}
-                     />
-                     <Button 
-                       type="button" 
-                       variant="outline" 
-                       size="sm" 
-                       className="w-full h-10 border-dashed"
-                       onClick={() => document.getElementById('seller-logo-upload')?.click()}
-                     >
-                       <Upload className="mr-2 h-4 w-4" /> 
-                       {formData.logo_url ? "Trocar Logotipo" : "Upload Logotipo"}
-                     </Button>
-                   </div>
-                 </div>
-               </div>
-                        <TableCell>{seller.location || "--"}</TableCell>
+                          <TableCell className="font-medium">{seller.name}</TableCell>
+                          <TableCell>{seller.location || "--"}</TableCell>
                         <TableCell>
                           <div className="text-xs">
                             {seller.email && <div>{seller.email}</div>}
