@@ -10,6 +10,8 @@
  import { formatBRL } from "@/utils/format";
  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
  import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
+ import { WebhookMonitor } from "./WebhookMonitor";
+ import { AlertTriangle } from "lucide-react";
  
  export function InstallmentManagement() {
    const [installments, setInstallments] = useState<any[]>([]);
@@ -20,6 +22,7 @@
    const [newDueDate, setNewDueDate] = useState("");
    const [selectedCarnet, setSelectedCarnet] = useState<any>(null);
    const [siteInfo, setSiteInfo] = useState<any>(null);
+   const [showWebhooks, setShowWebhooks] = useState(false);
    const [isReconciling, setIsReconciling] = useState(false);
  
    useEffect(() => {
@@ -212,12 +215,20 @@
                <option value="paid">Pagos</option>
                <option value="overdue">Atrasados</option>
              </select>
-             <Button variant="outline" size="icon" onClick={fetchInstallments}>
+              <Button variant="outline" size="icon" onClick={fetchInstallments}>
                 <Filter className="h-4 w-4" />
               </Button>
               <Button 
+                variant="outline" 
+                onClick={() => setShowWebhooks(!showWebhooks)} 
+                className="gap-2 text-[10px] font-bold h-9"
+              >
+                {showWebhooks ? <CheckCircle className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
+                {showWebhooks ? "FECHAR MONITOR" : "MONITOR WEBHOOKS"}
+              </Button>
+              <Button 
                 variant="default" 
-                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2" 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-9" 
                 onClick={handleReconciliation}
                 disabled={isReconciling}
               >
@@ -227,8 +238,10 @@
            </div>
          </div>
        </CardHeader>
-       <CardContent>
-         {isLoading ? (
+        <CardContent className="space-y-6">
+          {showWebhooks && <WebhookMonitor />}
+          
+          {isLoading ? (
            <div className="flex justify-center p-12">
              <Loader2 className="h-8 w-8 animate-spin text-gold" />
            </div>
