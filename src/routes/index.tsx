@@ -104,7 +104,7 @@ function Home() {
   
   const activeSections = {
     ...baseSettings,
-    order: (baseSettings as any).order || ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"]
+    order: (baseSettings as any).order || ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"]
   };
 
   useEffect(() => {
