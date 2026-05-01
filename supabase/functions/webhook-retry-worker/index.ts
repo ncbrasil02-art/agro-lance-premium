@@ -28,13 +28,14 @@
      const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', user.id).single()
      if (profile?.role !== 'admin') return new Response('Forbidden', { status: 403 })
  
-     // 2. Fetch failed events that haven't exceeded retry limit
+     // 2. Fetch failed events that are scheduled for retry now or in the past
      const { data: failedEvents, error: fetchError } = await supabaseClient
        .from('webhook_events')
        .select('*')
        .eq('status', 'failed')
        .lt('retry_count', 5)
-       .order('created_at', { ascending: true })
+       .lte('scheduled_for', new Date().toISOString())
+       .order('scheduled_for', { ascending: true })
        .limit(20)
  
      if (fetchError) throw fetchError
