@@ -389,13 +389,13 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                               </div>
                               <div className="space-y-4 w-full">
                                 <div className="space-y-2">
-                                  <p className="text-xs text-gray-500 font-medium">Chave PIX:</p>
-                                  <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100 flex justify-between items-center" onClick={() => {
+                                   <p className="text-sm text-emerald-900 font-bold">Chave PIX:</p>
+                                   <div className="p-4 bg-emerald-50 rounded-xl font-mono text-sm break-all border-2 border-emerald-100 text-emerald-900 text-left cursor-pointer hover:bg-emerald-100 transition-colors flex justify-between items-center group" onClick={() => {
                                     navigator.clipboard.writeText(pixKey);
                                     toast.success("Chave PIX copiada!");
                                   }}>
-                                    <span className="truncate mr-2">{pixKey}</span>
-                                    <Upload className="h-3 w-3 shrink-0 rotate-90" />
+                                     <span className="font-bold">{pixKey}</span>
+                                     <Copy className="h-4 w-4 shrink-0 text-emerald-600 group-hover:scale-110 transition-transform" />
                                   </div>
                                 </div>
                                 <div className="space-y-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
