@@ -15,6 +15,8 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   fallbackSrc?: string;
   category?: keyof typeof IMAGE_FALLBACKS;
   priority?: "high" | "medium" | "low";
+  disablePlaceholder?: boolean;
+  objectFit?: "cover" | "contain";
 }
 
 export function OptimizedImage({
@@ -29,6 +31,8 @@ export function OptimizedImage({
   fallbackSrc,
   category = "default",
   priority = "medium",
+  disablePlaceholder = false,
+  objectFit = "cover",
   ...props
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
@@ -85,7 +89,8 @@ export function OptimizedImage({
   return (
     <div 
       className={cn(
-        "relative overflow-hidden bg-muted", 
+        "relative overflow-hidden",
+        !disablePlaceholder && "bg-muted",
         aspectRatios[aspectRatio as keyof typeof aspectRatios],
         className
       )}
@@ -102,8 +107,10 @@ export function OptimizedImage({
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          "h-full w-full object-cover transition-all duration-500",
-          isLoading ? "scale-105 blur-lg" : "scale-100 blur-0",
+          "h-full w-full transition-all duration-500",
+          objectFit === "cover" ? "object-cover" : "object-contain",
+          isLoading && !disablePlaceholder ? "scale-105 blur-lg" : "scale-100 blur-0",
+          isLoading && disablePlaceholder ? "opacity-0" : "opacity-100",
           className
         )}
         {...props}
