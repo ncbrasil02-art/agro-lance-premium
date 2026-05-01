@@ -2,7 +2,7 @@ import React from "react";
 import { Installment } from "@/utils/payment-calculator";
 import { formatBRL } from "@/utils/format";
 import { QRCodeSVG } from "qrcode.react";
-import { Receipt, Scissors } from "lucide-center";
+import { Receipt, Scissors } from "lucide-react";
 
 interface CarnetGeneratorProps {
   lot: any;
