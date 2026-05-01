@@ -22,12 +22,29 @@
  
      // Notification types: payment, plan, subscription, etc.
      // We are interested in 'payment'
-     if (body.type === 'payment' || body.topic === 'payment') {
-       const paymentId = body.data?.id || body.id;
-       
-       if (!paymentId) {
-         return new Response('No payment ID found', { status: 400 });
-       }
+      const eventId = body.id?.toString() || body.data?.id?.toString();
+      if (!eventId) {
+        return new Response('No ID found', { status: 400 });
+      }
+
+      // Idempotency check: Check if we already processed this event
+      const { data: existingEvent } = await supabaseClient
+        .from('webhook_events')
+        .select('id')
+        .eq('gateway_name', 'mercado_pago')
+        .eq('external_id', eventId)
+        .maybeSingle();
+
+      if (existingEvent) {
+        console.log(`Event ${eventId} already processed, skipping.`);
+        return new Response(JSON.stringify({ received: true, already_processed: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
+
+      if (body.type === 'payment' || body.topic === 'payment') {
+        const paymentId = body.data?.id || body.id;
  
        // 1. Fetch MP config from DB
        const { data: gateway } = await supabaseClient
@@ -107,9 +124,18 @@
            })
            .eq('external_reference', paymentId.toString());
  
-         if (updateError) console.error('Error updating installment by reference:', updateError);
-       }
-     }
+            if (updateError) console.error('Error updating installment by reference:', updateError);
+          }
+        }
+
+        // Log the event as processed
+        await supabaseClient.from('webhook_events').insert({
+          gateway_name: 'mercado_pago',
+          external_id: eventId,
+          event_type: body.type || body.topic,
+          payload: body
+        });
+      }
  
      return new Response(JSON.stringify({ received: true }), {
        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
