@@ -87,7 +87,7 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
        const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData();
         const context = Route.useRouteContext();
         const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
-         const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts } = useSiteSettings({ 
+          const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts, articleSettings } = useSiteSettings({
           siteInfo: ctxSiteInfo, 
           theme: ctxTheme, 
           homepage: ctxHomepage 
@@ -321,7 +321,11 @@ import { EliteHero, ModernHero, TraditionalHero } from "@/components/site/HomeTe
               </>
             )}
             {sectionId === "articles" && (activeSections as any)?.show_articles && (
-              <ArticleCarousel articles={articles} variant={templateId} />
+              <ArticleCarousel 
+                articles={articles} 
+                variant={templateId} 
+                settings={articleSettings}
+              />
             )}
             {sectionId === "articles" && directSales.length > 0 && (
               <HomeSaleLots directSales={directSales} />
