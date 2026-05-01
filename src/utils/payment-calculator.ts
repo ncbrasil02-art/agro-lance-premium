@@ -1,11 +1,12 @@
 
-export interface Installment {
-  installment_number: number;
-  amount: number;
-  due_date: Date;
-  status?: string;
-  proof_url?: string;
-}
+ export interface Installment {
+   id?: string;
+   installment_number: number;
+   amount: number;
+   due_date: Date;
+   status?: string;
+   proof_url?: string;
+ }
 
 /**
  * Parses a formula like "2+2+3+30" and generates installments.

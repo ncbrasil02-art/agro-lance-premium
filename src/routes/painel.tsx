@@ -1,6 +1,7 @@
  import { validateImage, validateDocument } from "@/utils/upload-validation";
 import { calculateInstallments, getTotalInstallmentsCount, Installment } from "@/utils/payment-calculator";
-import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
+ import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
+ import { PixPaymentStatus } from "@/components/payment/PixPaymentStatus";
  
 function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
    const [gatewayConfig, setGatewayConfig] = useState<any>(null);
@@ -67,8 +68,9 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
             if (dbInst) {
               return {
                 ...inst,
-                status: dbInst.status || undefined,
-                proof_url: dbInst.proof_url || undefined
+                 id: dbInst.id,
+                 status: dbInst.status || undefined,
+                 proof_url: dbInst.proof_url || undefined
               };
             }
             return inst;
@@ -207,8 +209,15 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
             due_date: inst.due_date.toISOString(),
             status: 'pending'
           }).select().single();
-        if (instError) throw instError;
-        dbInst = newInst;
+         if (instError) throw instError;
+         dbInst = newInst;
+ 
+         // Update state
+         if (dbInst) {
+           setInstallments(prev => prev.map(i => 
+             i.installment_number === inst.installment_number ? { ...i, id: dbInst!.id } : i
+           ));
+         }
       }
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
@@ -326,39 +335,43 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                             <TabsTrigger value="manual" className="text-[10px] font-bold">PIX MANUAL / BOLETA</TabsTrigger>
                           </TabsList>
 
-                          <TabsContent value="auto" className="space-y-4 pt-4">
-                            <div className="flex flex-col items-center gap-4">
-                              {!autoPixData ? (
-                                <Button 
-                                  className="w-full bg-emerald-600 font-bold h-12" 
-                                  onClick={() => generateAutoPix(inst)}
-                                  disabled={isGeneratingAutoPix}
-                                >
-                                  {isGeneratingAutoPix ? <Loader2 className="animate-spin mr-2" /> : <QrCode className="mr-2" />}
-                                  GERAR PIX PARA PAGAMENTO
-                                </Button>
-                              ) : (
-                                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center w-full">
-                                  <div className="p-2 bg-white rounded-lg border">
-                                    <img src={`data:image/png;base64,${autoPixData.qr_code_base64}`} alt="QR Code PIX" className="w-48 h-48" />
-                                  </div>
-                                  <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold text-center">
-                                    O status será atualizado automaticamente após o pagamento.
-                                  </p>
-                                  <Button 
-                                    variant="outline" 
-                                    className="mt-4 w-full text-xs font-bold font-mono truncate"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(autoPixData.qr_code || '');
-                                      toast.success("Código PIX copiado!");
-                                    }}
-                                  >
-                                    COPIAR CÓDIGO PIX
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          </TabsContent>
+                           <TabsContent value="auto" className="pt-4">
+                             {inst.id ? (
+                               <div className="space-y-4">
+                                 <PixPaymentStatus 
+                                   installmentId={inst.id} 
+                                   onSuccess={() => {
+                                     window.location.reload();
+                                   }}
+                                 />
+                                 <div className="px-6 pb-6">
+                                   <Button variant="ghost" className="w-full text-[10px] text-muted-foreground uppercase hover:text-emerald-600" asChild>
+                                     <Link to={`/pagamento/${inst.id}`} target="_blank">
+                                       Abrir em tela cheia <ExternalLink className="ml-1 h-3 w-3" />
+                                     </Link>
+                                   </Button>
+                                 </div>
+                               </div>
+                             ) : (
+                               <div className="flex flex-col items-center gap-4 py-8">
+                                 <div className="h-16 w-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                   <Landmark className="h-8 w-8" />
+                                 </div>
+                                 <div className="text-center">
+                                   <p className="text-sm font-bold text-emerald-900">Configurar Pagamento Automático</p>
+                                   <p className="text-xs text-gray-500">Clique abaixo para gerar seu código PIX.</p>
+                                 </div>
+                                 <Button 
+                                   className="w-full bg-emerald-600 font-bold h-12" 
+                                   onClick={() => generateAutoPix(inst)}
+                                   disabled={isGeneratingAutoPix}
+                                 >
+                                   {isGeneratingAutoPix ? <Loader2 className="animate-spin mr-2" /> : <QrCode className="mr-2" />}
+                                   INICIAR PAGAMENTO PIX
+                                 </Button>
+                               </div>
+                             )}
+                           </TabsContent>
 
                           <TabsContent value="manual" className="space-y-4 pt-4">
                             <div className="flex flex-col items-center gap-4">
