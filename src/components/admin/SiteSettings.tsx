@@ -485,9 +485,6 @@
           </Card>
         </TabsContent>
 
-           <Star className="h-4 w-4" /> Card do Lote
-         </TabsTrigger>
-       </TabsList>
 
        <TabsContent value="templates" className="space-y-6">
          <Card>
