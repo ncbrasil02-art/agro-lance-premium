@@ -18,7 +18,8 @@
   import { OfferManagement } from "@/components/admin/OfferManagement";
   import { ContractManagement } from "@/components/admin/ContractManagement";
   import { TransactionManagement } from "@/components/admin/TransactionManagement";
-  import { InstallmentManagement } from "@/components/admin/InstallmentManagement";
+ import { InstallmentManagement } from "@/components/admin/InstallmentManagement";
+ import { SecurityAlertsBanner } from "@/components/admin/SecurityAlertsBanner";
   import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
     LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
@@ -225,8 +226,9 @@
         />
       </aside>
 
-      <main className="flex-1 p-4 md:p-8 pb-16">
-        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:mb-8">
+       <main className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto">
+         <SecurityAlertsBanner />
+         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:mb-8">
           <div>
             <h1 className="text-2xl font-bold md:text-3xl">Painel Administrativo</h1>
             <p className="text-sm text-muted-foreground md:text-base">Bem-vindo de volta, {profile?.full_name}</p>

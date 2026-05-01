@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Check, Loader2, MessageSquare } from "lucide-react";
+ import { Bell, Check, Loader2, MessageSquare, ShieldAlert, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -81,26 +81,41 @@ export function NotificationBell({ userId }: { userId: string }) {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` },
-        (payload) => {
-          setNotifications(prev => [payload.new, ...prev].slice(0, 10));
-          setUnreadCount(prev => prev + 1);
-          // Tocar som de alerta global
-          try {
-            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
-            audio.volume = 0.4;
-            audio.play();
-          } catch (e) {
-            console.error("Erro ao tocar som:", e);
-          }
-
-          toast.info(payload.new.title, {
-            description: payload.new.message,
-            action: payload.new.link ? {
-              label: "VER",
-              onClick: () => window.location.href = payload.new.link
-            } : undefined
-          });
-        }
+         (payload) => {
+           setNotifications(prev => [payload.new, ...prev].slice(0, 10));
+           setUnreadCount(prev => prev + 1);
+           
+           // Tocar som de alerta global - Som mais urgente para segurança
+           try {
+             const soundUrl = payload.new.type === 'security' 
+               ? "https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3" // Siren/Alarm
+               : "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
+             const audio = new Audio(soundUrl);
+             audio.volume = 0.4;
+             audio.play();
+           } catch (e) {
+             console.error("Erro ao tocar som:", e);
+           }
+ 
+           if (payload.new.type === 'security') {
+             toast.error(payload.new.title, {
+               description: payload.new.message,
+               duration: 8000,
+               action: payload.new.link ? {
+                 label: "VER",
+                 onClick: () => window.location.href = payload.new.link
+               } : undefined
+             });
+           } else {
+             toast.info(payload.new.title, {
+               description: payload.new.message,
+               action: payload.new.link ? {
+                 label: "VER",
+                 onClick: () => window.location.href = payload.new.link
+               } : undefined
+             });
+           }
+         }
       )
       .subscribe();
 
@@ -147,17 +162,29 @@ export function NotificationBell({ userId }: { userId: string }) {
             </div>
           ) : (
             <div className="divide-y divide-border/20">
-              {notifications.map((n) => (
-                <DropdownMenuItem 
-                  key={n.id} 
-                  className={`flex flex-col items-start gap-1 p-4 cursor-pointer focus:bg-secondary/50 ${!n.is_read ? 'bg-gold/5 border-l-4 border-l-gold' : ''}`}
-                  onClick={() => markAsRead(n.id)}
-                >
-                  <div className="flex w-full items-start justify-between gap-2">
-                    <span className="font-bold text-sm leading-tight text-foreground">{n.title}</span>
-                    {!n.is_read && <div className="h-2 w-2 rounded-full bg-gold shrink-0 mt-1" />}
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{n.message}</p>
+               {notifications.map((n) => (
+                 <DropdownMenuItem 
+                   key={n.id} 
+                   className={`flex flex-col items-start gap-1 p-4 cursor-pointer focus:bg-secondary/50 
+                     ${!n.is_read ? (n.type === 'security' ? 'bg-red-50 border-l-4 border-l-red-500' : 'bg-gold/5 border-l-4 border-l-gold') : ''}`}
+                   onClick={() => markAsRead(n.id)}
+                 >
+                   <div className="flex w-full items-start justify-between gap-2">
+                     <div className="flex items-center gap-2">
+                       {n.type === 'security' ? (
+                         <ShieldAlert className="h-3 w-3 text-red-500" />
+                       ) : (
+                         <Info className="h-3 w-3 text-gold" />
+                       )}
+                       <span className={`font-bold text-sm leading-tight ${n.type === 'security' ? 'text-red-700' : 'text-foreground'}`}>
+                         {n.title}
+                       </span>
+                     </div>
+                     {!n.is_read && <div className={`h-2 w-2 rounded-full shrink-0 mt-1 ${n.type === 'security' ? 'bg-red-500' : 'bg-gold'}`} />}
+                   </div>
+                   <p className={`text-xs leading-relaxed ${n.type === 'security' ? 'text-red-600 font-medium' : 'text-muted-foreground'}`}>
+                     {n.message}
+                   </p>
                   <div className="flex w-full items-center justify-between mt-2">
                     <span className="text-[10px] text-muted-foreground font-medium">
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}
