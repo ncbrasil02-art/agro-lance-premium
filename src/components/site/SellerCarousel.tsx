@@ -1,11 +1,13 @@
  import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 
 export function SellerCarousel() {
   const [sellers, setSellers] = useState<any[]>([]);
+  const [logoFit, setLogoFit] = useState<'cover' | 'contain'>('contain');
    const [customTexts, setCustomTexts] = useState({
      partners_title: "Nossos Parceiros",
      partners_subtitle: "Vendedores"
@@ -21,19 +23,25 @@ export function SellerCarousel() {
          .limit(20);
        if (sellersData) setSellers(sellersData);
  
-       const { data: settingsData } = await supabase
-         .from("site_settings")
-         .select("value")
-         .eq("key", "custom_texts")
-         .single();
-       
-       if (settingsData?.value) {
-         const val = settingsData.value as any;
-         setCustomTexts({
-           partners_title: val.partners_title || "Nossos Parceiros",
-           partners_subtitle: val.partners_subtitle || "Vendedores"
-         });
-       }
+        const { data: settingsData } = await supabase
+          .from("site_settings")
+          .select("key, value");
+          
+        if (settingsData) {
+          const texts = settingsData.find(s => s.key === "custom_texts")?.value as any;
+          const home = settingsData.find(s => s.key === "homepage_sections")?.value as any;
+          
+          if (texts) {
+            setCustomTexts({
+              partners_title: texts.partners_title || "Nossos Parceiros",
+              partners_subtitle: texts.partners_subtitle || "Vendedores"
+            });
+          }
+          
+          if (home?.partners_logo_fit) {
+            setLogoFit(home.partners_logo_fit);
+          }
+        }
      };
      fetchData();
   }, []);
@@ -71,17 +79,21 @@ export function SellerCarousel() {
           {[...sellers, ...sellers].map((seller, idx) => (
             <motion.div
               key={`${seller.id}-${idx}`}
-               className="inline-block w-48 h-28 shrink-0"
+               className="inline-block w-40 h-40 md:w-48 md:h-48 shrink-0"
               whileHover={{ scale: 1.05 }}
             >
-               <div className="w-full h-full bg-[#111] border border-white/5 rounded-xl p-6 flex items-center justify-center shadow-2xl hover:border-gold/20 transition-all duration-500 group">
+               <div className="w-full h-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center shadow-2xl hover:border-gold/40 transition-all duration-500 group">
                 <OptimizedImage
                   src={seller.logo_url}
                   alt={seller.name}
-                   className="max-w-full max-h-full"
-                   width={192}
+                   className={cn(
+                     "w-full h-full transition-transform duration-700",
+                     logoFit === 'contain' ? "p-4 object-contain" : "object-cover group-hover:scale-110"
+                   )}
+                   width={256}
+                   height={256}
                    disablePlaceholder={true}
-                   objectFit="contain"
+                   objectFit={logoFit}
                 />
               </div>
             </motion.div>

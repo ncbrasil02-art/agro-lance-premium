@@ -555,7 +555,31 @@
                     Salvar Layout e Ordem
                  </Button>
                </div>
-               <p className="text-sm text-muted-foreground">Arraste as seções para definir em que ordem elas aparecem na página inicial.</p>
+                <p className="text-sm text-muted-foreground mb-4">Arraste as seções para definir em que ordem elas aparecem na página inicial.</p>
+                
+                <div className="p-4 bg-muted/20 border border-gold/10 rounded-xl space-y-3 mb-6">
+                  <Label className="text-xs font-black uppercase tracking-widest text-gold">Ajuste dos Logotipos dos Parceiros</Label>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={homepage.partners_logo_fit === 'contain' || !homepage.partners_logo_fit ? "default" : "outline"}
+                      className={cn("flex-1 uppercase font-black italic text-[10px] h-9 tracking-widest", (homepage.partners_logo_fit === 'contain' || !homepage.partners_logo_fit) && "bg-gold text-emerald-deep")}
+                      onClick={() => setHomepage({...homepage, partners_logo_fit: 'contain'})}
+                    >
+                      Ajustar (Contain)
+                    </Button>
+                    <Button 
+                      variant={homepage.partners_logo_fit === 'cover' ? "default" : "outline"}
+                      className={cn("flex-1 uppercase font-black italic text-[10px] h-9 tracking-widest", homepage.partners_logo_fit === 'cover' && "bg-gold text-emerald-deep")}
+                      onClick={() => setHomepage({...homepage, partners_logo_fit: 'cover'})}
+                    >
+                      Preencher (Cover)
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                    {homepage.partners_logo_fit === 'cover' ? "Preenche todo o quadrado (pode cortar bordas)" : "Mostra a imagem inteira dentro do quadrado"}
+                  </p>
+                </div>
+
                <div className="grid gap-3">
                  {(homepage.order || []).map((sectionId: string, idx: number) => (
                    <div key={sectionId} className="flex items-center gap-3 p-4 bg-muted/30 border border-border rounded-xl group hover:bg-muted/50 transition-colors">
@@ -934,6 +958,7 @@
                      />
                    </div>
                  </div>
+
 
                 <div className="space-y-2">
                   <Label htmlFor="footer_text">Texto Institucional (Rodapé)</Label>
