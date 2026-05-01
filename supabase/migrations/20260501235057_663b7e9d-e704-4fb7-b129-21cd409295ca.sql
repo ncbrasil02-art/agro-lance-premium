@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can insert db errors" ON public.db_errors FOR INSERT WITH CHECK (true);
