@@ -229,7 +229,7 @@ export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings 
                 <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-3">O leilão inicia em</div>
                 <Countdown endsAt={nextEvent.date} variant="segmented" />
               </div>
-              <Link to="/eventos/" params={{ eventSlug: nextEvent.slug }}>
+              <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
                 <Button className="bg-gold text-emerald-deep font-black uppercase rounded-xl h-12 px-8">
                   Ver Lotes
                 </Button>
@@ -318,7 +318,7 @@ export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSett
                   {new Date(nextEvent.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </div>
               </div>
-              <Link to="/eventos/" params={{ eventSlug: nextEvent.slug }}>
+              <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
                 <Button size="icon" className="h-14 w-14 rounded-full bg-gold text-emerald-deep hover:scale-110 transition-transform">
                   <ArrowRight className="h-6 w-6" />
                 </Button>
