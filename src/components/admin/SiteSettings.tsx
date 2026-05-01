@@ -1,4 +1,6 @@
  import { validateImage } from "@/utils/upload-validation";
+ import { cn } from "@/lib/utils";
+ import { Badge } from "@/components/ui/badge";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Button } from "@/components/ui/button";
@@ -243,7 +245,7 @@ import { LotCard } from "../auctions/lot-card";
      newOrder[index] = newOrder[newIndex];
      newOrder[newIndex] = temp;
      
-     setHomepage(prev => ({ ...prev, order: newOrder }));
+       setHomepage((prev: any) => ({ ...prev, order: newOrder }));
    };
  
    if (isLoading) {
@@ -519,7 +521,7 @@ import { LotCard } from "../auctions/lot-card";
                       </Button>
                     </Label>
                     <div className="space-y-2">
-                      {(homepage.hero_backgrounds || []).map((url, idx) => (
+                       {(homepage.hero_backgrounds || []).map((url: string, idx: number) => (
                         <div key={idx} className="flex gap-2">
                           <Input 
                             placeholder="URL da imagem..." 
@@ -535,7 +537,7 @@ import { LotCard } from "../auctions/lot-card";
                             size="icon" 
                             className="text-destructive h-10 w-10 shrink-0"
                             onClick={() => {
-                              const newBgs = homepage.hero_backgrounds.filter((_, i) => i !== idx);
+                               const newBgs = (homepage.hero_backgrounds || []).filter((_: any, i: number) => i !== idx);
                               setHomepage({...homepage, hero_backgrounds: newBgs});
                             }}
                           >
@@ -1116,7 +1118,7 @@ import { LotCard } from "../auctions/lot-card";
                <div className="space-y-4 border rounded-xl p-4">
                  <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Ordem das Seções</h4>
                  <div className="space-y-2">
-                   {homepage.order.map((section, idx) => (
+                    {homepage.order.map((section: string, idx: number) => (
                      <div key={section} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
                        <span className="text-sm font-medium">{sectionLabels[section] || section}</span>
                        <div className="flex gap-1">
