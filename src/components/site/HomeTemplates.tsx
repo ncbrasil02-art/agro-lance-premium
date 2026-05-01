@@ -57,31 +57,50 @@ const HeroSlider = ({
           transition={{ duration: 1.5, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          <motion.div
-            initial={{ scale: 1.05 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 6, ease: "linear" }}
-            className="absolute inset-0"
-            style={{ opacity: opacity / 100, filter: `blur(${blur}px)` }}
-          >
-            <OptimizedImage 
-              src={currentImage} 
-              alt="Hero Background" 
-              width={1920} 
-              className="h-full w-full object-cover" 
-            />
-          </motion.div>
+           <div className="absolute inset-0 overflow-hidden">
+             <motion.div
+               initial={{ scale: 1.15, x: index % 2 === 0 ? -20 : 20 }}
+               animate={{ scale: 1, x: 0 }}
+               transition={{ duration: 7, ease: "easeOut" }}
+               className="absolute inset-0"
+               style={{ opacity: opacity / 100, filter: `blur(${blur}px)` }}
+             >
+               <OptimizedImage 
+                 src={currentImage} 
+                 alt="Hero Background" 
+                 width={1920} 
+                 className="h-full w-full object-cover" 
+               />
+             </motion.div>
+             {/* Elegant Overlay Sweep */}
+             <motion.div 
+               initial={{ x: "-100%" }}
+               animate={{ x: "100%" }}
+               transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
+               className="absolute inset-0 z-10 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
+             />
+           </div>
           
           {currentPhrase && (
-            <div className={cn("absolute inset-0 z-20 flex items-center px-4 md:px-20 pt-40 md:pt-0", className)}>
+            <div className={cn("absolute inset-0 z-20 flex items-center px-4 md:px-20 pt-40 md:pt-0 pointer-events-none", className)}>
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -40, filter: "blur(10px)" }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="text-4xl md:text-6xl font-light tracking-[0.2em] uppercase text-gold/80 max-w-4xl drop-shadow-2xl"
+                className="text-4xl md:text-7xl font-extralight tracking-[0.25em] uppercase text-white/90 max-w-5xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] leading-tight italic"
               >
-                {currentPhrase}
+                {currentPhrase.split(" ").map((word, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }}
+                    className={cn(i % 3 === 0 ? "text-gold/90" : "text-white/90")}
+                  >
+                    {word}{" "}
+                  </motion.span>
+                ))}
               </motion.div>
             </div>
           )}
@@ -116,19 +135,34 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
             A nova era dos leilões de elite
           </Badge>
           
-          <div className="mb-8 min-h-[140px] md:min-h-[200px]">
-            <h1 className="text-6xl md:text-9xl font-black leading-none tracking-tighter uppercase italic drop-shadow-2xl">
+           <div className="mb-8 min-h-[140px] md:min-h-[250px]">
+             <motion.h1 
+               initial={{ opacity: 0, scale: 0.9 }}
+               animate={{ opacity: 1, scale: 1 }}
+               transition={{ duration: 1, ease: "easeOut" }}
+               className="text-6xl md:text-9xl font-black leading-none tracking-tighter uppercase italic drop-shadow-2xl"
+             >
               {customTexts?.hero_title || (
                 <div className="flex flex-col gap-0 items-start">
-                  <span className="text-gradient-gold font-signature normal-case text-8xl md:text-[11rem] -mb-10 block drop-shadow-xl leading-none">
-                    {siteInfo?.name?.split(' ')?.[0]}
-                  </span>
-                  <span className="block pl-4 tracking-[-0.05em] uppercase font-black text-foreground">
-                    {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
-                  </span>
+                   <motion.span 
+                     initial={{ x: -50, opacity: 0 }}
+                     animate={{ x: 0, opacity: 1 }}
+                     transition={{ delay: 0.2, duration: 0.8 }}
+                     className="text-gradient-gold font-signature normal-case text-8xl md:text-[11rem] -mb-10 block drop-shadow-xl leading-none"
+                   >
+                     {siteInfo?.name?.split(' ')?.[0]}
+                   </motion.span>
+                   <motion.span 
+                     initial={{ x: 50, opacity: 0 }}
+                     animate={{ x: 0, opacity: 1 }}
+                     transition={{ delay: 0.4, duration: 0.8 }}
+                     className="block pl-4 tracking-[-0.05em] uppercase font-black text-foreground"
+                   >
+                     {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
+                   </motion.span>
                 </div>
               )}
-            </h1>
+             </motion.h1>
           </div>
           
           <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
