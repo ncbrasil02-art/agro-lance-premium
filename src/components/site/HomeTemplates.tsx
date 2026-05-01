@@ -284,7 +284,8 @@ import { useState, useEffect, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Radio, Sparkles, Bell, Trophy, Users, TrendingUp } from "lucide-react";
+ import { ArrowRight, Calendar, Radio, Sparkles, Bell, Trophy, Users, TrendingUp, Gavel, Wheat } from "lucide-react";
+ import { FloatingElements } from "./FloatingElements";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Countdown } from "@/components/auctions/countdown";
@@ -419,16 +420,11 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                 Assista Agora
               </Button>
             </Link>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/eventos">
-                <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold/20 hover:border-gold font-black uppercase tracking-wider h-14 transition-all shadow-lg hover:shadow-gold/20">
-                  Catálogo Completo
-                </Button>
-              </Link>
-            </motion.div>
+             <Link to="/eventos">
+               <Button size="lg" variant="outline" className="border-gold text-gold hover:bg-gold hover:text-emerald-deep font-black uppercase tracking-widest h-14 px-8 rounded-none transition-all duration-300">
+                 Catálogo Completo
+               </Button>
+             </Link>
           </div>
 
           <div className="flex flex-col gap-12">
@@ -490,13 +486,21 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
   );
 };
 
-export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings, stats }: HeroProps) => {
-  const isMobileMode = homepageSettings?.mobile_mode_enabled;
-  return (
-    <section className={cn(
-      "relative flex items-center justify-center overflow-hidden bg-background",
-      isMobileMode ? "min-h-[75vh] pt-10" : "min-h-[95vh]"
-    )}>
+ export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings, stats }: HeroProps) => {
+   const isMobileMode = homepageSettings?.mobile_mode_enabled;
+   return (
+     <section className={cn(
+       "relative flex items-center justify-center overflow-hidden bg-black text-white",
+       isMobileMode ? "min-h-[75vh] pt-10" : "min-h-[95vh]"
+     )}>
+       <div className="absolute inset-0 opacity-40 z-0">
+         <OptimizedImage 
+           src="https://images.unsplash.com/photo-1545464197-89725f02c611?auto=format&fit=crop&q=80" 
+           alt="Agro cattle" 
+           className="w-full h-full object-cover grayscale" 
+         />
+         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black" />
+       </div>
       <div className="absolute inset-0 z-0 opacity-20 overflow-hidden">
         {[...Array(6)].map((_, i) => (
           <motion.div
@@ -631,10 +635,17 @@ export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSett
       "relative min-h-screen lg:grid lg:grid-cols-2 bg-emerald-deep overflow-hidden",
       isMobileMode && "min-h-0 pt-6"
     )}>
-      {/* Floating abstract patterns for "Agro" feel */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-      </div>
+       {/* Floating abstract patterns and objects for "Agro" feel */}
+       <div className="absolute inset-0 opacity-10 pointer-events-none z-0">
+         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
+         <div className="absolute top-20 right-20 rotate-12 opacity-20">
+           <Gavel size={300} className="text-gold" />
+         </div>
+         <div className="absolute bottom-20 left-20 -rotate-12 opacity-20">
+           <Wheat size={400} className="text-white" />
+         </div>
+       </div>
+       <FloatingElements />
 
       <div className="relative flex items-center p-8 md:p-24 text-white">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px] pointer-events-none" />

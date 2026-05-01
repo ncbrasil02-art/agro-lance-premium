@@ -6,7 +6,7 @@ import { generateMetaTags } from "@/utils/seo";
  import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
    import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
    import { PAGE_LIMITS } from "@/config/limits";
- import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2, ShoppingCart } from "lucide-react";
+ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2, ShoppingCart, Gavel } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
 import { useEffect, useState } from "react";
@@ -26,7 +26,8 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HomeSaleLots } from "@/components/site/HomeSaleLots";
-import { EliteHero, ModernHero, TraditionalHero, EventsHero, NewsHero, CreativeHero } from "@/components/site/HomeTemplates";
+ import { EliteHero, ModernHero, TraditionalHero, EventsHero, NewsHero, CreativeHero } from "@/components/site/HomeTemplates";
+ import { FloatingElements } from "@/components/site/FloatingElements";
 
     export const Route = createFileRoute("/")({
       head: ({ matches }) => {
@@ -218,8 +219,16 @@ import { EliteHero, ModernHero, TraditionalHero, EventsHero, NewsHero, CreativeH
      activeEvents: 14,
    };
 
-  return (
-    <div className="relative">
+   return (
+     <div className={cn(
+       "relative min-h-screen transition-colors duration-700",
+       templateId === 'model3' && "bg-[#f4f1ea] font-serif text-[#1a1a1a]",
+       templateId === 'model2' && "bg-black text-white",
+       templateId === 'model4' && "bg-[#0a0f0a]",
+       templateId === 'model5' && "bg-[#fdfbf7]",
+       templateId === 'model6' && "bg-[#050505]"
+     )}>
+       {templateId !== 'model1' && <FloatingElements />}
       {/* Temporary Preview Switcher for the client to test models */}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 scale-[0.6] md:scale-90 origin-bottom-right">
         <div className="bg-black/80 backdrop-blur-2xl border border-gold/30 p-3 rounded-3xl shadow-2xl flex flex-wrap gap-2 max-w-[300px] justify-center">
@@ -302,34 +311,70 @@ import { EliteHero, ModernHero, TraditionalHero, EventsHero, NewsHero, CreativeH
       <div className="flex flex-col gap-0">
         {((activeSections as any)?.order || ["upcoming_events", "featured_lots", "sale_menu", "articles"]).map((sectionId: string) => (
           <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
-            {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
-              <EventCarousel 
-                events={upcomingEvents} 
-                title="Próximos eventos" 
-                subtitle="Reserve sua agenda e participe das maiores oportunidades."
-                variant={templateId}
-              />
-            )}
-            {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-              <>
-                <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
-                {/* Mobile/Alternative Grid for "chamativo" feel */}
-                <section className="container mx-auto px-4 py-8 lg:hidden">
-                   <div className="grid gap-6 sm:grid-cols-2">
-                      {mappedLots.slice(0, 4).map((lot: any) => (
-                         <LotCard key={lot.id} lot={lot} />
-                      ))}
+             {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
+               <div className={cn(
+                 "relative py-20 overflow-hidden",
+                 templateId === 'model3' && "border-y border-[#8b6b45]/20",
+                 templateId === 'model4' && "bg-gradient-to-b from-black/50 to-transparent",
+                 templateId === 'model5' && "bg-white",
+               )}>
+                 {templateId === 'model2' && (
+                   <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+                     <OptimizedImage 
+                       src="https://images.unsplash.com/photo-1545464197-89725f02c611?auto=format&fit=crop&q=80" 
+                       alt="Agro background"
+                       className="w-full h-full object-cover"
+                     />
                    </div>
-                </section>
-              </>
-            )}
-            {sectionId === "articles" && (activeSections as any)?.show_articles && (
-              <ArticleCarousel 
-                articles={articles} 
-                variant={templateId} 
-                settings={articleSettings}
-              />
-            )}
+                 )}
+                 <EventCarousel 
+                   events={upcomingEvents} 
+                   title={templateId === 'model3' ? "Agenda de Leilões" : "Próximos eventos"} 
+                   subtitle={templateId === 'model3' ? "Acompanhe os principais pregões e negociações do campo." : "Reserve sua agenda e participe das maiores oportunidades."}
+                   variant={templateId}
+                 />
+               </div>
+             )}
+             {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
+               <div className={cn(
+                 "relative py-24",
+                 templateId === 'model2' && "bg-zinc-950",
+                 templateId === 'model3' && "bg-emerald-deep text-white py-32",
+                 templateId === 'model6' && "bg-black"
+               )}>
+                 {templateId === 'model3' && (
+                   <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
+                 )}
+                 {templateId === 'model3' && (
+                   <div className="absolute top-10 right-10 opacity-10 rotate-12">
+                     <Gavel size={200} className="text-[#8b6b45]" />
+                   </div>
+                 )}
+                 <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
+                 
+                 {/* Mobile Grid */}
+                 <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
+                    <div className="grid gap-6 sm:grid-cols-2">
+                       {mappedLots.slice(0, 4).map((lot: any) => (
+                          <LotCard key={lot.id} lot={lot} />
+                       ))}
+                    </div>
+                 </section>
+               </div>
+             )}
+             {sectionId === "articles" && (activeSections as any)?.show_articles && (
+               <div className={cn(
+                 "relative py-24",
+                 templateId === 'model5' && "bg-white",
+                 templateId === 'model3' && "bg-[#fdfbf7] border-t-8 border-[#8b6b45]/10",
+               )}>
+                 <ArticleCarousel 
+                   articles={articles} 
+                   variant={templateId} 
+                   settings={articleSettings}
+                 />
+               </div>
+             )}
             {sectionId === "articles" && directSales.length > 0 && (
               <HomeSaleLots directSales={directSales} />
             )}
