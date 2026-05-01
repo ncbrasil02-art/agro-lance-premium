@@ -213,9 +213,11 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
          dbInst = newInst;
  
          // Update state
-         setInstallments(prev => prev.map(i => 
-           i.installment_number === inst.installment_number ? { ...i, id: dbInst.id } : i
-         ));
+         if (dbInst) {
+           setInstallments(prev => prev.map(i => 
+             i.installment_number === inst.installment_number ? { ...i, id: dbInst!.id } : i
+           ));
+         }
       }
 
       const { data, error } = await supabase.functions.invoke('create-pix-payment', {
