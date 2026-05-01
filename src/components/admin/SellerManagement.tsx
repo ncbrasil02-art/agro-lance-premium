@@ -82,7 +82,7 @@ export function SellerManagement() {
     }
 
     try {
-      const slug = editingSeller ? formData.slug : `${generateSlug(formData.name)}-${Math.floor(Math.random() * 1000)}`;
+      const slug = editingSeller ? editingSeller.slug : `${generateSlug(formData.name)}-${Math.floor(Math.random() * 1000)}`;
       const dataToSave = { 
         ...formData, 
         slug,
