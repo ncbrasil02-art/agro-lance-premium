@@ -38,8 +38,6 @@ export function SellerCarousel() {
      fetchData();
   }, []);
 
-  if (sellers.length === 0) return null;
-
    // Função para separar a última palavra para o gradiente
    const splitText = (text: string) => {
      const words = text.split(" ");
@@ -47,9 +45,11 @@ export function SellerCarousel() {
      const last = words.pop();
      return { main: words.join(" "), last };
    };
- 
+
    const subtitleParts = useMemo(() => splitText(customTexts.partners_subtitle), [customTexts.partners_subtitle]);
- 
+
+   if (sellers.length === 0) return null;
+
   return (
     <section className="container mx-auto px-4 py-20">
       <div className="text-center mb-12">
