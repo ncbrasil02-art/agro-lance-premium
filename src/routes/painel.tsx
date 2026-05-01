@@ -68,8 +68,9 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
             if (dbInst) {
               return {
                 ...inst,
-                status: dbInst.status || undefined,
-                proof_url: dbInst.proof_url || undefined
+                 id: dbInst.id,
+                 status: dbInst.status || undefined,
+                 proof_url: dbInst.proof_url || undefined
               };
             }
             return inst;
