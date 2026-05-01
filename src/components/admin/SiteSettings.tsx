@@ -265,50 +265,15 @@ import { LotCard } from "../auctions/lot-card";
      );
    }
  
-  const AVAILABLE_TEMPLATES = [
-    {
-      id: 'model1',
-      name: 'Elite',
-      description: 'Design sofisticado com foco em imagens de alta qualidade e tipografia elegante.',
-      image: 'https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80',
-      color: 'gold'
-    },
-    {
-      id: 'model2',
-      name: 'Moderno',
-      description: 'Minimalista e focado em conversão, com contagem regressiva em destaque.',
-      image: 'https://images.unsplash.com/photo-1495107336059-ed2587052945?auto=format&fit=crop&q=80',
-      color: 'emerald'
-    },
-    {
-      id: 'model3',
-      name: 'Agro / Tradicional',
-      description: 'Focado na tradição do campo com leitura clara e objetiva dos lotes.',
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80',
-      color: 'brown'
-    },
-    {
-      id: 'model4',
-      name: 'Eventos Pro',
-      description: 'Design focado em agenda de eventos e contagem regressiva imersiva.',
-      image: 'https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80',
-      color: 'black'
-    },
-    {
-      id: 'model5',
-      name: 'Editorial / Notícias',
-      description: 'Estilo revista com foco em conteúdo, tipografia serifada e layout limpo.',
-      image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80',
-      color: 'stone'
-    },
-    {
-      id: 'model6',
-      name: 'Pure Design / Creative',
-      description: 'Focado em design puro, elementos flutuantes e micro-interações.',
-      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80',
-      color: 'gold'
-    }
-  ];
+   const AVAILABLE_TEMPLATES = [
+     {
+       id: 'model1',
+       name: 'Elite',
+       description: 'O design padrão e sofisticado do seu site.',
+       image: 'https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80',
+       color: 'gold'
+     }
+   ];
 
    const sectionLabels: Record<string, string> = {
      banners: "Banners / Slides Animados",
