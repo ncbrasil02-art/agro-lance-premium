@@ -1525,6 +1525,33 @@ export type Database = {
           },
         ]
       }
+      webhook_events: {
+        Row: {
+          created_at: string
+          event_type: string | null
+          external_id: string
+          gateway_name: string
+          id: string
+          payload: Json | null
+        }
+        Insert: {
+          created_at?: string
+          event_type?: string | null
+          external_id: string
+          gateway_name: string
+          id?: string
+          payload?: Json | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string | null
+          external_id?: string
+          gateway_name?: string
+          id?: string
+          payload?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
