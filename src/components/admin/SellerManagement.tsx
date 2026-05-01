@@ -82,7 +82,11 @@ export function SellerManagement() {
 
     try {
       const slug = generateSlug(formData.name);
-      const dataToSave = { ...formData, slug };
+      const dataToSave = { 
+        ...formData, 
+        slug,
+        logo_url: formData.logo_url || null 
+      };
       
       if (editingSeller) {
         const { error } = await supabase
