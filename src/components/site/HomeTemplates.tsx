@@ -346,85 +346,120 @@ export const TraditionalHero = ({ siteInfo, nextEvent, customTexts, homepageSett
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
   return (
     <section className={cn(
-      "relative min-h-screen grid lg:grid-cols-2",
+      "relative min-h-screen lg:grid lg:grid-cols-2 bg-emerald-deep overflow-hidden",
       isMobileMode && "min-h-0 pt-6"
     )}>
-      <div className="relative flex items-center p-8 md:p-20 bg-emerald-deep text-white overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-3xl -mr-32 -mt-32" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl -ml-48 -mb-48" />
+      {/* Floating abstract patterns for "Agro" feel */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+      </div>
+
+      <div className="relative flex items-center p-8 md:p-24 text-white">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px] pointer-events-none" />
         
-        <div className="relative z-10">
-          <img 
+        <motion.div 
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1 }}
+          className="relative z-10 w-full"
+        >
+          <motion.img 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
             src={siteInfo?.logo_url || "https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png"} 
             alt="Logo" 
-            className="h-16 object-contain mb-12 invert brightness-0"
+            className="h-20 object-contain mb-16 invert brightness-0 grayscale"
           />
           
           <HeroPhrase 
             phrases={customTexts?.hero_phrases} 
-            className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] mb-8"
+            className="text-7xl md:text-[9rem] font-black tracking-tighter uppercase leading-[0.8] mb-12"
             defaultTitle={
-              <h1>
+              <h1 className="drop-shadow-2xl">
                 {customTexts?.hero_title || (
                   <>
                     TRADIÇÃO <br />
-                    <span className="text-gold">E RESULTADO</span>
+                    <span className="text-gold italic font-serif normal-case tracking-normal">e Resultado</span>
                   </>
                 )}
               </h1>
             }
           />
           
-          <p className="text-xl text-emerald-bright/80 max-w-md mb-12 leading-relaxed font-medium">
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-2xl text-white/70 max-w-lg mb-16 leading-relaxed font-medium italic border-l-4 border-gold pl-8"
+          >
             {customTexts?.hero_subtitle || "Unindo o campo à tecnologia com a confiança de quem entende de genética animal."}
-          </p>
+          </motion.p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-6">
             <Link to="/ao-vivo">
-              <Button className="bg-gold text-emerald-deep h-14 px-8 font-black uppercase tracking-widest hover:bg-gold-bright">
+              <Button className="bg-gold text-emerald-deep h-16 px-12 font-black uppercase tracking-[0.2em] italic rounded-none hover:bg-white transition-colors shadow-2xl">
+                <Radio className="mr-2 h-5 w-5 animate-pulse" />
                 Acompanhar ao vivo
               </Button>
             </Link>
             <EventRequestDialog />
           </div>
-        </div>
+        </motion.div>
       </div>
       
-      <div className="relative min-h-[400px] lg:min-h-full overflow-hidden">
-        {homepageSettings?.hero_backgrounds?.length > 0 ? (
-          <HeroBackground 
-            backgrounds={homepageSettings?.hero_backgrounds} 
-            opacity={homepageSettings?.hero_bg_opacity ?? 100} 
-            blur={homepageSettings?.hero_bg_blur ?? 0} 
-          />
-        ) : (
-          <OptimizedImage 
-            src="https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80" 
-            alt="Farm" 
-            width={1200} 
-            className="h-full w-full object-cover" 
-          />
-        )}
-        <div className="absolute inset-0 z-1 bg-emerald-deep/20" />
+      <div className="relative min-h-[500px] lg:min-h-full overflow-hidden group">
+        <motion.div
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5 }}
+          className="h-full w-full"
+        >
+          {homepageSettings?.hero_backgrounds?.length > 0 ? (
+            <HeroBackground 
+              backgrounds={homepageSettings?.hero_backgrounds} 
+              opacity={homepageSettings?.hero_bg_opacity ?? 100} 
+              blur={homepageSettings?.hero_bg_blur ?? 0} 
+            />
+          ) : (
+            <OptimizedImage 
+              src="https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80" 
+              alt="Farm" 
+              width={1200} 
+              className="h-full w-full object-cover brightness-75 group-hover:scale-105 transition-transform duration-[3s]" 
+            />
+          )}
+        </motion.div>
+        
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-deep via-transparent to-transparent z-1" />
+        <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/80 via-transparent to-transparent z-1" />
         
         {nextEvent && (
-          <div className="absolute bottom-10 left-10 right-10 bg-white/95 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border-l-8 border-gold">
-            <div className="flex items-center justify-between gap-6">
-              <div>
-                <Badge className="bg-emerald-deep text-white mb-2">Próximo Leilão</Badge>
-                <h3 className="text-2xl font-black text-emerald-deep uppercase tracking-tight">{nextEvent.name}</h3>
-                <div className="flex items-center gap-2 mt-2 text-muted-foreground text-sm font-bold">
+          <motion.div 
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 1 }}
+            className="absolute bottom-12 left-12 right-12 bg-white/10 backdrop-blur-2xl p-1 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] border border-white/20"
+          >
+            <div className="bg-white p-10 rounded-[1.8rem] flex items-center justify-between gap-8">
+              <div className="flex-1">
+                <Badge className="bg-emerald-deep text-white mb-4 rounded-none font-black uppercase tracking-widest px-4">Próximo Leilão</Badge>
+                <h3 className="text-4xl font-black text-emerald-deep uppercase tracking-tighter leading-none">{nextEvent.name}</h3>
+                <div className="flex items-center gap-4 mt-4 text-emerald-deep/60 text-xs font-black uppercase tracking-widest">
                   <Calendar className="h-4 w-4" />
                   {new Date(nextEvent.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </div>
               </div>
+              <div className="hidden md:flex flex-col items-end gap-2 pr-8 border-r border-emerald-deep/10">
+                <span className="text-[10px] font-black text-emerald-deep/40 uppercase tracking-[0.3em]">Cronômetro</span>
+                <Countdown endsAt={nextEvent.date} variant="segmented" />
+              </div>
               <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
-                <Button size="icon" className="h-14 w-14 rounded-full bg-gold text-emerald-deep hover:scale-110 transition-transform">
-                  <ArrowRight className="h-6 w-6" />
+                <Button size="icon" className="h-20 w-20 rounded-full bg-gold text-emerald-deep hover:bg-emerald-deep hover:text-white transition-all hover:scale-110 shadow-xl">
+                  <ArrowRight className="h-8 w-8" />
                 </Button>
               </Link>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>
