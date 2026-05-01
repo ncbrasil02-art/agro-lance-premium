@@ -127,6 +127,7 @@ import { LotCard } from "../auctions/lot-card";
       show_featured_lots: true,
       show_sale_menu: true,
       show_animated_slides: true,
+      mobile_mode_enabled: false,
       order: ["banners", "upcoming_events", "featured_lots", "sale_menu", "articles"],
       hero_backgrounds: [] as string[],
       hero_bg_opacity: 50,
@@ -972,6 +973,17 @@ import { LotCard } from "../auctions/lot-card";
                      onCheckedChange={v => setHomepage({...homepage, show_articles: v})} 
                    />
                  </div>
+                  <div className="flex items-center justify-between pt-4 border-t border-dashed">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="mobile_mode" className="text-gold font-bold">Modo Mobile Nativo (PWA)</Label>
+                      <p className="text-[10px] text-muted-foreground">Otimiza a interface para parecer um aplicativo móvel instalado.</p>
+                    </div>
+                    <Switch 
+                      id="mobile_mode" 
+                      checked={homepage.mobile_mode_enabled} 
+                      onCheckedChange={v => setHomepage({...homepage, mobile_mode_enabled: v})} 
+                    />
+                  </div>
                </div>
  
                <div className="space-y-4 border rounded-xl p-4">
