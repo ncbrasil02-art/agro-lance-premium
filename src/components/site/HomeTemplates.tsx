@@ -485,13 +485,21 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
   );
 };
 
-export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings, stats }: HeroProps) => {
-  const isMobileMode = homepageSettings?.mobile_mode_enabled;
-  return (
-    <section className={cn(
-      "relative flex items-center justify-center overflow-hidden bg-background",
-      isMobileMode ? "min-h-[75vh] pt-10" : "min-h-[95vh]"
-    )}>
+ export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings, stats }: HeroProps) => {
+   const isMobileMode = homepageSettings?.mobile_mode_enabled;
+   return (
+     <section className={cn(
+       "relative flex items-center justify-center overflow-hidden bg-black text-white",
+       isMobileMode ? "min-h-[75vh] pt-10" : "min-h-[95vh]"
+     )}>
+       <div className="absolute inset-0 opacity-40 z-0">
+         <OptimizedImage 
+           src="https://images.unsplash.com/photo-1545464197-89725f02c611?auto=format&fit=crop&q=80" 
+           alt="Agro cattle" 
+           className="w-full h-full object-cover grayscale" 
+         />
+         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black" />
+       </div>
       <div className="absolute inset-0 z-0 opacity-20 overflow-hidden">
         {[...Array(6)].map((_, i) => (
           <motion.div
