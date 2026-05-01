@@ -185,7 +185,7 @@
  }
 import { createFileRoute, Link } from "@tanstack/react-router";
  import {
-     User, Gavel, FileText, Receipt, CreditCard, Clock, Camera,
+     User, Gavel, FileText, Receipt, CreditCard, Clock, Camera, QrCode,
      ChevronRight, BadgeCheck, Download, ExternalLink, Upload,
      ShieldCheck, AlertCircle, Info, Printer, MessageSquare, Image,
      Pencil,
