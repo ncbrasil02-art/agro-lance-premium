@@ -1,0 +1,2 @@
+INSERT INTO public.webhook_events (gateway_name, external_id, status, error_message) 
+VALUES ('Test Gateway', 'test_failure_' || now(), 'failed', 'Este é um teste final para validar a notificação dos admins.');
