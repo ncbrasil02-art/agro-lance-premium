@@ -93,59 +93,90 @@
                <p className="text-[10px] font-bold uppercase text-gray-400 mb-1">Total do Arremate</p>
                <p className="text-2xl font-black text-emerald-deep">{formatBRL(lot.current_price)}</p>
              </div>
-             <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-right">
+             <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-right overflow-hidden">
                <p className="text-[10px] font-bold uppercase text-gray-400 mb-1">Parcelamento</p>
-               <p className="text-xl font-bold text-gray-800">{installments}x {formatBRL(installmentValue)}</p>
+               <p className="text-xl font-bold text-gray-800 truncate">
+                 {installments.length} Parcelas (Fórmula: {lot.payment_formula || "1"})
+               </p>
              </div>
            </div>
  
            <div className="space-y-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
              <h4 className="text-xs font-black uppercase tracking-widest text-emerald-deep">Mensalidades (Boletas)</h4>
-             {[...Array(installments)].map((_, i) => {
-               const dueDate = new Date(lot.updated_at);
-               dueDate.setMonth(dueDate.getMonth() + i + 1);
-               return (
-                 <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-white hover:border-emerald-200 transition-colors">
-                   <div className="flex items-center gap-4">
-                     <div className="h-10 w-10 rounded-full bg-emerald-deep/5 flex items-center justify-center font-bold text-emerald-deep text-xs"> {String(i + 1).padStart(2, '0')} </div>
-                     <div>
-                       <p className="text-sm font-bold text-gray-800">Vencimento: {dueDate.toLocaleDateString('pt-BR')}</p>
-                       <p className="text-[10px] text-gray-400">Status: Pendente</p>
-                     </div>
+             {installments.map((inst, i) => (
+               <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-white hover:border-emerald-200 transition-colors">
+                 <div className="flex items-center gap-4">
+                   <div className="h-10 w-10 rounded-full bg-emerald-deep/5 flex items-center justify-center font-bold text-emerald-deep text-xs"> 
+                     {String(inst.installment_number).padStart(2, '0')} 
                    </div>
-                   <div className="flex items-center gap-4">
-                     <p className="font-bold text-emerald-600">{formatBRL(installmentValue)}</p>
-                     <Dialog>
-                       <DialogTrigger asChild>
-                         <Button size="sm" variant="outline" className="h-8 text-[10px] font-bold border-gold text-gold hover:bg-gold hover:text-white">PAGAR COM PIX</Button>
-                       </DialogTrigger>
-                       <DialogContent className="max-w-sm bg-white p-6 text-center">
-                         <DialogHeader>
-                           <DialogTitle className="text-center text-emerald-deep">Pagamento via PIX</DialogTitle>
-                         </DialogHeader>
-                         <div className="flex flex-col items-center gap-4 mt-4">
-                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                             <div className="h-48 w-48 bg-gray-200 flex items-center justify-center">
-                               <BadgeCheck className="h-12 w-12 text-emerald-deep/20" />
+                   <div>
+                     <p className="text-sm font-bold text-gray-800">Vencimento: {inst.due_date.toLocaleDateString('pt-BR')}</p>
+                     <p className="text-[10px] text-gray-400">Status: Pendente</p>
+                   </div>
+                 </div>
+                 <div className="flex items-center gap-4">
+                   <p className="font-bold text-emerald-600">{formatBRL(inst.amount)}</p>
+                   <Dialog>
+                     <DialogTrigger asChild>
+                       <Button size="sm" variant="outline" className="h-8 text-[10px] font-bold border-gold text-gold hover:bg-gold hover:text-white">PAGAR</Button>
+                     </DialogTrigger>
+                     <DialogContent className="max-w-md bg-white p-6">
+                       <DialogHeader>
+                         <DialogTitle className="text-center text-emerald-deep">Pagamento da Parcela {inst.installment_number}</DialogTitle>
+                       </DialogHeader>
+                       <div className="flex flex-col items-center gap-4 mt-4">
+                         <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center">
+                           {pixQRCode ? (
+                             <div className="p-2 bg-white rounded-lg border">
+                               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixQRCode)}`} alt="QR Code PIX" />
                              </div>
-                           </div>
-                           <div className="space-y-2 w-full">
-                             <p className="text-xs text-gray-500 font-medium">Copie e cole a chave abaixo no seu banco:</p>
-                             <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100" onClick={() => {
+                           ) : (
+                             <div className="h-40 w-40 bg-gray-200 flex items-center justify-center rounded-lg">
+                               <QrCode className="h-12 w-12 text-emerald-deep/20" />
+                             </div>
+                           )}
+                           <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold">Escaneie o QR Code acima</p>
+                         </div>
+                         <div className="space-y-4 w-full">
+                           <div className="space-y-2">
+                             <p className="text-xs text-gray-500 font-medium">Chave PIX:</p>
+                             <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100 flex justify-between items-center" onClick={() => {
                                navigator.clipboard.writeText(pixKey);
                                toast.success("Chave PIX copiada!");
                              }}>
-                               {pixKey}
+                               <span className="truncate mr-2">{pixKey}</span>
+                               <Upload className="h-3 w-3 shrink-0 rotate-90" />
                              </div>
-                             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold mt-4" onClick={() => toast.info("Aguardando confirmação do banco...")}>JÁ REALIZEI O PAGAMENTO</Button>
                            </div>
+
+                           <div className="space-y-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                             <p className="text-[10px] font-bold text-amber-800 uppercase">Instruções:</p>
+                             <p className="text-xs text-amber-700">{instructions}</p>
+                           </div>
+
+                           <div className="space-y-2 pt-2">
+                             <Label className="text-xs font-bold uppercase">Enviar Comprovante</Label>
+                             <Input 
+                               type="file" 
+                               accept="image/*,application/pdf"
+                               onChange={(e) => handleUploadProof(inst.installment_number, e)}
+                               disabled={!!uploadingId}
+                             />
+                             {uploadingId === inst.installment_number.toString() && (
+                               <div className="flex items-center gap-2 text-[10px] text-emerald-600">
+                                 <Loader2 className="h-3 w-3 animate-spin" /> Enviando...
+                               </div>
+                             )}
+                           </div>
+                           
+                           <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold" onClick={() => toast.info("O comprovante foi enviado e está em análise.")}>JÁ REALIZEI O PAGAMENTO</Button>
                          </div>
-                       </DialogContent>
-                     </Dialog>
-                   </div>
+                       </div>
+                     </DialogContent>
+                   </Dialog>
                  </div>
-               );
-             })}
+               </div>
+             ))}
            </div>
          </div>
        </DialogContent>
