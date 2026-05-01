@@ -1,0 +1,36 @@
+-- Function to notify user on installment payment confirmation and admin on proof upload
+CREATE OR REPLACE FUNCTION public.handle_installment_payment_notification()
+RETURNS TRIGGER AS $$
+DECLARE
+  admin_id UUID;
+BEGIN
+  -- Notify user when installment is marked as paid
+  IF (NEW.status = 'paid' AND (OLD.status IS NULL OR OLD.status != 'paid')) THEN
+    INSERT INTO public.notifications (user_id, title, message, link)
+    VALUES (
+      NEW.buyer_id,
+      'Pagamento Confirmado',
+      'O pagamento da sua parcela ' || NEW.installment_number || ' foi confirmado com sucesso. Obrigado!',
+      '/painel'
+    );
+  END IF;
+  
+  -- Notify admins when a proof is uploaded/updated
+  IF (NEW.proof_url IS NOT NULL AND (OLD.proof_url IS NULL OR NEW.proof_url != OLD.proof_url)) THEN
+    -- Find admins to notify
+    INSERT INTO public.notifications (user_id, title, message, link)
+    SELECT id, 'Novo Comprovante Recebido', 'Um novo comprovante de pagamento foi enviado para conferência (Parcela ' || NEW.installment_number || ').', '/admin?tab=transactions'
+    FROM public.profiles
+    WHERE role = 'admin';
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger for installment notifications
+DROP TRIGGER IF EXISTS on_installment_update ON public.installments;
+CREATE TRIGGER on_installment_update
+AFTER UPDATE ON public.installments
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_installment_payment_notification();
