@@ -120,8 +120,9 @@ import { RichResultsPreview } from "./RichResultsPreview";
             seo_title: "",
             seo_description: "",
             og_title: "",
-            og_description: "",
-            og_image_url: ""
+             og_description: "",
+             og_image_url: "",
+             payment_formula: "2+2+3+30"
      });
 
      const resetForm = () => {
@@ -175,8 +176,9 @@ import { RichResultsPreview } from "./RichResultsPreview";
             seo_title: "",
             seo_description: "",
             og_title: "",
-            og_description: "",
-            og_image_url: ""
+             og_description: "",
+             og_image_url: "",
+             payment_formula: "2+2+3+30"
        });
     };
 
@@ -231,8 +233,9 @@ import { RichResultsPreview } from "./RichResultsPreview";
            seo_title: animal.seo_title || "",
             seo_description: animal.seo_description || "",
             og_title: animal.og_title || "",
-            og_description: animal.og_description || "",
-            og_image_url: animal.og_image_url || ""
+             og_description: animal.og_description || "",
+             og_image_url: animal.og_image_url || "",
+             payment_formula: animal.payment_formula || "2+2+3+30"
        });
       setIsDialogOpen(true);
     };
@@ -304,9 +307,10 @@ import { RichResultsPreview } from "./RichResultsPreview";
                 accepts_offers: formData.accepts_offers,
                 sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
                 sale_status: formData.sale_status,
-                slug,
-                seo_title: formData.seo_title,
-                seo_description: formData.seo_description
+                 slug,
+                 seo_title: formData.seo_title,
+                 seo_description: formData.seo_description,
+                 payment_formula: formData.payment_formula
               })
              .eq("id", editingAnimal.id)
              .neq("sale_status", "sold");
@@ -364,9 +368,10 @@ import { RichResultsPreview } from "./RichResultsPreview";
               accepts_offers: formData.accepts_offers,
               sale_price: formData.sale_price ? parseFloat(formData.sale_price as string) : null,
               sale_status: formData.sale_status,
-              slug,
-              seo_title: formData.seo_title,
-              seo_description: formData.seo_description
+               slug,
+               seo_title: formData.seo_title,
+               seo_description: formData.seo_description,
+               payment_formula: formData.payment_formula
            });
           if (error) throw error;
           toast.success("Animal cadastrado com sucesso");
