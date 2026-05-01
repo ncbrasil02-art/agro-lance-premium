@@ -1424,14 +1424,103 @@
                </div>
              </div>
  
-             <Button 
-               className="bg-gold text-emerald-deep font-bold" 
-               onClick={() => handleSave("homepage_sections", homepage)}
-               disabled={isSaving}
-             >
-               {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-               Salvar Configuração de Página
-             </Button>
+              <section className="space-y-4 border rounded-xl p-6 bg-muted/5 mt-8">
+                <h4 className="font-bold text-sm uppercase tracking-wider text-gold flex items-center gap-2">
+                  <Zap className="h-4 w-4" /> Estatísticas em Destaque
+                </h4>
+                <p className="text-xs text-muted-foreground mb-4">Esses dados aparecem na página inicial e podem ser editados livremente.</p>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Volume Negociado</Label>
+                    <Input 
+                      type="number"
+                      value={homepage.stats?.totalSold || 0}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, totalSold: parseInt(e.target.value) || 0 }
+                      })}
+                    />
+                    <Input 
+                      placeholder="Rótulo"
+                      value={homepage.stats?.labels?.totalSold || ""}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, labels: { ...homepage.stats.labels, totalSold: e.target.value } }
+                      })}
+                      className="text-[10px] h-8"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Animais Registrados</Label>
+                    <Input 
+                      type="number"
+                      value={homepage.stats?.totalAnimals || 0}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, totalAnimals: parseInt(e.target.value) || 0 }
+                      })}
+                    />
+                    <Input 
+                      placeholder="Rótulo"
+                      value={homepage.stats?.labels?.totalAnimals || ""}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, labels: { ...homepage.stats.labels, totalAnimals: e.target.value } }
+                      })}
+                      className="text-[10px] h-8"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Base de Investidores</Label>
+                    <Input 
+                      type="number"
+                      value={homepage.stats?.totalUsers || 0}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, totalUsers: parseInt(e.target.value) || 0 }
+                      })}
+                    />
+                    <Input 
+                      placeholder="Rótulo"
+                      value={homepage.stats?.labels?.totalUsers || ""}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, labels: { ...homepage.stats.labels, totalUsers: e.target.value } }
+                      })}
+                      className="text-[10px] h-8"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Eventos Ativos</Label>
+                    <Input 
+                      type="number"
+                      value={homepage.stats?.activeEvents || 0}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, activeEvents: parseInt(e.target.value) || 0 }
+                      })}
+                    />
+                    <Input 
+                      placeholder="Rótulo"
+                      value={homepage.stats?.labels?.activeEvents || ""}
+                      onChange={e => setHomepage({
+                        ...homepage, 
+                        stats: { ...homepage.stats, labels: { ...homepage.stats.labels, activeEvents: e.target.value } }
+                      })}
+                      className="text-[10px] h-8"
+                    />
+                  </div>
+                </div>
+
+                <Button 
+                  className="bg-gold text-emerald-deep font-bold mt-6 w-full sm:w-auto" 
+                  onClick={() => handleSave("homepage_sections", homepage)}
+                  disabled={isSaving}
+                >
+                  {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Salvar Configuração e Estatísticas
+                </Button>
+              </section>
            </CardContent>
          </Card>
         </TabsContent>
