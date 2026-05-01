@@ -10,6 +10,7 @@
    const [events, setEvents] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [reprocessingId, setReprocessingId] = useState<string | null>(null);
+   const [isAutoProcessing, setIsAutoProcessing] = useState(false);
  
    useEffect(() => {
      fetchEvents();
@@ -30,6 +31,22 @@
        toast.error("Erro ao carregar eventos: " + error.message);
      } finally {
        setIsLoading(false);
+     }
+   };
+ 
+   const handleAutoReprocess = async () => {
+     setIsAutoProcessing(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('webhook-retry-worker');
+       
+       if (error) throw error;
+       
+       toast.success(`Reprocessamento em massa concluído! ${data.succeeded} sucessos, ${data.failed} falhas.`);
+       fetchEvents();
+     } catch (error: any) {
+       toast.error("Erro no processamento em massa: " + error.message);
+     } finally {
+       setIsAutoProcessing(false);
      }
    };
  
@@ -69,9 +86,15 @@
      <div className="space-y-4">
        <div className="flex justify-between items-center">
          <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">Log de Webhooks (Recentes)</h3>
-         <Button size="sm" variant="outline" onClick={fetchEvents} disabled={isLoading}>
-           <RefreshCw className={`h-3 w-3 mr-2 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar
-         </Button>
+         <div className="flex gap-2">
+           <Button size="sm" variant="outline" onClick={fetchEvents} disabled={isLoading}>
+             <RefreshCw className={`h-3 w-3 mr-2 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar
+           </Button>
+           <Button size="sm" variant="default" className="bg-amber-600 hover:bg-amber-700 text-white gap-2" onClick={handleAutoReprocess} disabled={isAutoProcessing}>
+             {isAutoProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+             REPROCESSAR TODAS FALHAS
+           </Button>
+         </div>
        </div>
  
        <div className="border rounded-lg overflow-hidden bg-white">
