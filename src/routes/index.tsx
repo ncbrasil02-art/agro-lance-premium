@@ -279,10 +279,12 @@ function Home() {
                            </div>
 
                            <div className="flex flex-wrap items-center gap-6">
-                             <div className="flex items-center gap-2 text-live">
-                               <Radio className="h-5 w-5 animate-pulse" />
-                               <span className="text-sm font-black uppercase tracking-widest">{liveEvents[0].viewers.toLocaleString()} assistindo</span>
-                             </div>
+               <div className="flex items-center gap-2 text-live group/viewers">
+                 <Radio className="h-5 w-5 animate-pulse" />
+                 <span className="text-sm font-black uppercase tracking-widest">
+                   {Math.max(1, liveEvents[0].viewers + (Math.floor(Math.random() * 3) - 1)).toLocaleString()} assistindo
+                 </span>
+               </div>
                              <Link to="/ao-vivo" className="ml-auto md:ml-0">
                                <Button size="lg" className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-widest h-16 px-10 rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:scale-105 transition-all">
                                  ENTRAR NO LEILÃO

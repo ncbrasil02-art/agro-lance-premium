@@ -1,7 +1,13 @@
  import { useEffect, useState } from "react";
  import { cn } from "@/lib/utils";
 
- export function Countdown({ endsAt, className, variant = "default" }: { endsAt: string; className?: string; variant?: "default" | "segmented" }) {
+ export function Countdown({ endsAt, className, variant = "default", onEnd }: { endsAt: string; className?: string; variant?: "default" | "segmented", onEnd?: () => void }) {
+   useEffect(() => {
+     if (mounted && diff <= 0 && onEnd) {
+       onEnd();
+     }
+   }, [diff, mounted, onEnd]);
+ 
    const [mounted, setMounted] = useState(false);
    const [now, setNow] = useState(0);
  
