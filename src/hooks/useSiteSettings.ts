@@ -48,6 +48,7 @@
   hero_bg_opacity?: number;
   hero_bg_blur?: number;
   mobile_mode_enabled?: boolean;
+  partners_logo_fit?: 'cover' | 'contain';
  }
  
   export interface CustomTexts {
