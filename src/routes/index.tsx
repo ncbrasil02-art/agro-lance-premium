@@ -292,16 +292,19 @@ function Home() {
                            </div>
                          </div>
                          
-                         <Button 
-                           size="lg" 
-                           className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-widest h-16 px-10 rounded-2xl shadow-live hover:scale-105 transition-all w-full md:w-auto"
-                           asChild
+                         <Link 
+                           to="/eventos/$eventSlug" 
+                           params={{ eventSlug: liveEvents[0].slug }}
+                           className="w-full md:w-auto"
                          >
-                           <Link to={`/eventos/${liveEvents[0].slug}`}>
+                           <Button 
+                             size="lg" 
+                             className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-widest h-16 px-10 rounded-2xl shadow-live hover:scale-105 transition-all w-full"
+                           >
                              ENTRAR NO LEILÃO
                              <ArrowRight className="ml-2 h-5 w-5" />
-                           </Link>
-                         </Button>
+                           </Button>
+                         </Link>
                        </div>
                      </div>
                    </div>
