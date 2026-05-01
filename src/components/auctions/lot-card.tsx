@@ -131,7 +131,7 @@ export function LotCard({ lot, settings: propSettings }: {
                 alt={lot?.name || "Animal"} 
                  width={800}
                  aspectRatio="landscape"
-                category={lot?.breed?.toLowerCase().includes("milha") || lot?.breed?.toLowerCase().includes("mangalarga") ? "horse" : "cattle"}
+                category={lot?.breed?.toLowerCase()?.includes("milha") || lot?.breed?.toLowerCase()?.includes("mangalarga") ? "horse" : "cattle"}
                 className="transition-smooth group-hover:scale-105 h-full w-full object-cover" 
               />
               

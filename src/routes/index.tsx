@@ -202,12 +202,19 @@ function Home() {
 
   const featuredLots = mappedLots.slice(0, 6);
 
-   const siteStats = sectionsSettings?.stats || {
-     totalSold: 184500000,
-     totalAnimals: 12847,
-     totalUsers: 38420,
-     activeEvents: 14,
-   };
+    const siteStats = {
+      totalSold: 184500000,
+      totalAnimals: 12847,
+      totalUsers: 38420,
+      activeEvents: 14,
+      labels: {
+        totalSold: "Volume Negociado",
+        totalAnimals: "Animais Registrados",
+        totalUsers: "Base de Investidores",
+        activeEvents: "Eventos Ativos"
+      },
+      ...(sectionsSettings?.stats || {})
+    };
 
   return (
     <div className="relative min-h-screen transition-colors duration-700">
