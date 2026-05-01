@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Header } from "./header";
 import { Footer } from "./footer";
  import { BottomNav } from "./bottom-nav";
+import { FloatingElements } from "./FloatingElements";
 
 export function SiteShell({ children }: { children: ReactNode }) {
    const location = useLocation();
@@ -13,7 +14,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
    }
  
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col relative overflow-hidden">
+      <FloatingElements />
       <Header />
         <main className="flex-1 pb-16 md:pb-0 overflow-x-hidden">{children}</main>
       <Footer />
