@@ -4,6 +4,7 @@ import { CarnetGenerator } from "@/components/payment/CarnetGenerator";
  
 function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, siteInfo: any }) {
    const [gatewayConfig, setGatewayConfig] = useState<any>(null);
+  const [gateways, setGateways] = useState<any[]>([]);
    const [installments, setInstallments] = useState<Installment[]>([]);
    const [isLoading, setIsLoading] = useState(true);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
@@ -40,13 +41,13 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
        setIsLoading(true);
        try {
          // Fetch Pix Manual config
-         const { data: gateway } = await supabase
-           .from("payment_gateways")
-           .select("config")
-           .eq("name", "pix_manual")
-           .single();
-         
-         setGatewayConfig(gateway?.config || {});
+          const { data: gatewayData } = await supabase
+            .from("payment_gateways")
+            .select("*");
+          
+          setGateways(gatewayData || []);
+          const manualPix = gatewayData?.find(g => g.name === 'pix_manual');
+          setGatewayConfig(manualPix?.config || {});
  
          // Check for existing installments in DB
          const { data: existingInstallments } = await supabase
@@ -157,6 +158,72 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
      }
    };
  
+  const [autoPixData, setAutoPixData] = useState<{ qr_code?: string, qr_code_base64?: string } | null>(null);
+  const [isGeneratingAutoPix, setIsGeneratingAutoPix] = useState(false);
+
+  const generateAutoPix = async (inst: Installment) => {
+    setIsGeneratingAutoPix(true);
+    try {
+      // Ensure installment exists in DB first
+      let { data: dbInst } = await supabase
+        .from('installments')
+        .select('id')
+        .eq('buyer_id', profile.id)
+        .eq('installment_number', inst.installment_number)
+        .single();
+
+      if (!dbInst) {
+        // Create transaction and installment if they don't exist
+        let { data: transaction } = await supabase
+          .from("transactions")
+          .select("id")
+          .eq("lot_id", lot.id)
+          .eq("buyer_id", profile.id)
+          .single();
+
+        if (!transaction) {
+          const { data: newTransaction, error: transError } = await supabase
+            .from("transactions")
+            .insert({
+              lot_id: lot.id,
+              buyer_id: profile.id,
+              seller_id: lot.seller_id || lot.animal?.seller_id,
+              final_price: lot.current_price,
+              payment_method: 'mercado_pago',
+              payment_status: 'pending'
+            })
+            .select().single();
+          if (transError) throw transError;
+          transaction = newTransaction;
+        }
+
+        const { data: newInst, error: instError } = await supabase
+          .from("installments")
+          .insert({
+            transaction_id: transaction.id,
+            buyer_id: profile.id,
+            installment_number: inst.installment_number,
+            amount: inst.amount,
+            due_date: inst.due_date.toISOString(),
+            status: 'pending'
+          }).select().single();
+        if (instError) throw instError;
+        dbInst = newInst;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-pix-payment', {
+        body: { installmentId: dbInst.id, gatewayName: 'mercado_pago' }
+      });
+
+      if (error) throw error;
+      setAutoPixData(data);
+    } catch (err: any) {
+      toast.error("Erro ao gerar PIX: " + err.message);
+    } finally {
+      setIsGeneratingAutoPix(false);
+    }
+  };
+
    const pixKey = gatewayConfig?.pix_key || "Chave não configurada";
    const pixQRCode = gatewayConfig?.pix_qr_code;
    const instructions = gatewayConfig?.instructions || "Realize o pagamento e envie o comprovante.";
@@ -251,54 +318,96 @@ function PaymentDialog({ lot, profile, siteInfo }: { lot: any, profile: any, sit
                        <DialogHeader>
                          <DialogTitle className="text-center text-emerald-deep">Pagamento da Parcela {inst.installment_number}</DialogTitle>
                        </DialogHeader>
-                       <div className="flex flex-col items-center gap-4 mt-4">
-                         <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center">
-                           {pixQRCode ? (
-                             <div className="p-2 bg-white rounded-lg border">
-                               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixQRCode)}`} alt="QR Code PIX" />
-                             </div>
-                           ) : (
-                             <div className="h-40 w-40 bg-gray-200 flex items-center justify-center rounded-lg">
-                               <QrCode className="h-12 w-12 text-emerald-deep/20" />
-                             </div>
-                           )}
-                           <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold">Escaneie o QR Code acima</p>
-                         </div>
-                         <div className="space-y-4 w-full">
-                           <div className="space-y-2">
-                             <p className="text-xs text-gray-500 font-medium">Chave PIX:</p>
-                             <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100 flex justify-between items-center" onClick={() => {
-                               navigator.clipboard.writeText(pixKey);
-                               toast.success("Chave PIX copiada!");
-                             }}>
-                               <span className="truncate mr-2">{pixKey}</span>
-                               <Upload className="h-3 w-3 shrink-0 rotate-90" />
-                             </div>
-                           </div>
+                        <Tabs defaultValue={gateways.find(g => g.name === 'mercado_pago' && g.is_enabled) ? "auto" : "manual"} className="w-full mt-4">
+                          <TabsList className="grid w-full grid-cols-2">
+                            {gateways.find(g => g.name === 'mercado_pago' && g.is_enabled) && (
+                              <TabsTrigger value="auto" className="text-[10px] font-bold">PIX AUTOMÁTICO</TabsTrigger>
+                            )}
+                            <TabsTrigger value="manual" className="text-[10px] font-bold">PIX MANUAL / BOLETA</TabsTrigger>
+                          </TabsList>
 
-                           <div className="space-y-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                             <p className="text-[10px] font-bold text-amber-800 uppercase">Instruções:</p>
-                             <p className="text-xs text-amber-700">{instructions}</p>
-                           </div>
+                          <TabsContent value="auto" className="space-y-4 pt-4">
+                            <div className="flex flex-col items-center gap-4">
+                              {!autoPixData ? (
+                                <Button 
+                                  className="w-full bg-emerald-600 font-bold h-12" 
+                                  onClick={() => generateAutoPix(inst)}
+                                  disabled={isGeneratingAutoPix}
+                                >
+                                  {isGeneratingAutoPix ? <Loader2 className="animate-spin mr-2" /> : <QrCode className="mr-2" />}
+                                  GERAR PIX PARA PAGAMENTO
+                                </Button>
+                              ) : (
+                                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center w-full">
+                                  <div className="p-2 bg-white rounded-lg border">
+                                    <img src={`data:image/png;base64,${autoPixData.qr_code_base64}`} alt="QR Code PIX" className="w-48 h-48" />
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold text-center">
+                                    O status será atualizado automaticamente após o pagamento.
+                                  </p>
+                                  <Button 
+                                    variant="outline" 
+                                    className="mt-4 w-full text-xs font-bold font-mono truncate"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(autoPixData.qr_code || '');
+                                      toast.success("Código PIX copiado!");
+                                    }}
+                                  >
+                                    COPIAR CÓDIGO PIX
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </TabsContent>
 
-                           <div className="space-y-2 pt-2">
-                             <Label className="text-xs font-bold uppercase">Enviar Comprovante</Label>
-                             <Input 
-                               type="file" 
-                               accept="image/*,application/pdf"
-                               onChange={(e) => handleUploadProof(inst, e)}
-                               disabled={!!uploadingId}
-                             />
-                             {uploadingId === inst.installment_number.toString() && (
-                               <div className="flex items-center gap-2 text-[10px] text-emerald-600">
-                                 <Loader2 className="h-3 w-3 animate-spin" /> Enviando...
-                               </div>
-                             )}
-                           </div>
-                           
-                           <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold" onClick={() => toast.info("O comprovante foi enviado e está em análise.")}>JÁ REALIZEI O PAGAMENTO</Button>
-                         </div>
-                       </div>
+                          <TabsContent value="manual" className="space-y-4 pt-4">
+                            <div className="flex flex-col items-center gap-4">
+                              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center w-full">
+                                {pixQRCode ? (
+                                  <div className="p-2 bg-white rounded-lg border">
+                                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixQRCode)}`} alt="QR Code PIX" />
+                                  </div>
+                                ) : (
+                                  <div className="h-40 w-40 bg-gray-200 flex items-center justify-center rounded-lg">
+                                    <QrCode className="h-12 w-12 text-emerald-deep/20" />
+                                  </div>
+                                )}
+                                <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold">Escaneie o QR Code acima</p>
+                              </div>
+                              <div className="space-y-4 w-full">
+                                <div className="space-y-2">
+                                  <p className="text-xs text-gray-500 font-medium">Chave PIX:</p>
+                                  <div className="p-3 bg-gray-50 rounded font-mono text-[10px] break-all border text-left cursor-pointer hover:bg-gray-100 flex justify-between items-center" onClick={() => {
+                                    navigator.clipboard.writeText(pixKey);
+                                    toast.success("Chave PIX copiada!");
+                                  }}>
+                                    <span className="truncate mr-2">{pixKey}</span>
+                                    <Upload className="h-3 w-3 shrink-0 rotate-90" />
+                                  </div>
+                                </div>
+                                <div className="space-y-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                                  <p className="text-[10px] font-bold text-amber-800 uppercase">Instruções:</p>
+                                  <p className="text-xs text-amber-700">{instructions}</p>
+                                </div>
+                                <div className="space-y-2 pt-2">
+                                  <Label className="text-xs font-bold uppercase">Enviar Comprovante</Label>
+                                  <Input 
+                                    type="file" 
+                                    accept="image/*,application/pdf"
+                                    onChange={(e) => handleUploadProof(inst, e)}
+                                    disabled={!!uploadingId}
+                                  />
+                                  {uploadingId === inst.installment_number.toString() && (
+                                    <div className="flex items-center gap-2 text-[10px] text-emerald-600">
+                                      <Loader2 className="h-3 w-3 animate-spin" /> Enviando...
+                                    </div>
+                                  )}
+                                </div>
+                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold uppercase text-[10px]" onClick={() => toast.info("O comprovante foi enviado e está em análise.")}>JÁ REALIZEI O PAGAMENTO</Button>
+                              </div>
+                            </div>
+                          </TabsContent>
+                        </Tabs>
                      </DialogContent>
                    </Dialog>
                  </div>
