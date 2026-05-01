@@ -399,9 +399,12 @@
             <ShieldCheck className="h-4 w-4" /> Auditoria SEO
           </TabsTrigger>
           <TabsTrigger value="articles" className="gap-2">
-            <Newspaper className="h-4 w-4" /> Artigos
-          </TabsTrigger>
-          <TabsTrigger value="lots" className="gap-2">
+             <Newspaper className="h-4 w-4" /> Artigos
+           </TabsTrigger>
+           <TabsTrigger value="lots" className="gap-2">
+             <Star className="h-4 w-4" /> Lotes
+           </TabsTrigger>
+         </TabsList>
         <TabsContent value="articles" className="space-y-6">
           <Card>
             <CardHeader>
