@@ -6,7 +6,7 @@ import { generateMetaTags } from "@/utils/seo";
  import { FeaturedLotsCarousel } from "@/components/site/FeaturedLotsCarousel";
    import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
    import { PAGE_LIMITS } from "@/config/limits";
- import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2, ShoppingCart } from "lucide-react";
+ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2, ShoppingCart, Gavel } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
 import { useEffect, useState } from "react";
@@ -344,6 +344,11 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                )}>
                  {templateId === 'model3' && (
                    <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
+                 )}
+                 {templateId === 'model3' && (
+                   <div className="absolute top-10 right-10 opacity-10 rotate-12">
+                     <Gavel size={200} className="text-[#8b6b45]" />
+                   </div>
                  )}
                  <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
                  
