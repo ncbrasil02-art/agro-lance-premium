@@ -336,7 +336,10 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
                       >
                         <ShieldCheck className="mr-2 h-4 w-4" /> Lance de Segurança
                       </Button>
-                     <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
+                      <Button variant="outline" className="w-full border-red-200 text-red-700 hover:bg-red-50" onClick={() => setActiveTab("alertas")}>
+                        <ShieldAlert className="mr-2 h-4 w-4" /> Alertas Críticos
+                      </Button>
+                      <Button variant="outline" className="w-full" onClick={() => setActiveTab("settings")}>Configurações</Button>
                   </CardContent>
                 </Card>
               </div>
