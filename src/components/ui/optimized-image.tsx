@@ -109,7 +109,8 @@ export function OptimizedImage({
         className={cn(
           "h-full w-full transition-all duration-500",
           objectFit === "cover" ? "object-cover" : "object-contain",
-          isLoading ? "scale-105 blur-lg" : "scale-100 blur-0",
+          isLoading && !disablePlaceholder ? "scale-105 blur-lg" : "scale-100 blur-0",
+          isLoading && disablePlaceholder ? "opacity-0" : "opacity-100",
           className
         )}
         {...props}
