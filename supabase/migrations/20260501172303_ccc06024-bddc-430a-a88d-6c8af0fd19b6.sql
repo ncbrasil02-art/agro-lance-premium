@@ -1,0 +1,1 @@
+SELECT public.fn_notify_admin_email('Teste Direto', 'Esta é uma mensagem de teste enviada diretamente via SQL.');

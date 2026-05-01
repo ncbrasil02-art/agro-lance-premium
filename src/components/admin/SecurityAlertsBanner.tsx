@@ -37,11 +37,11 @@
                Existem <span className="font-black underline">{failedWebhooksCount} falhas de webhooks</span> pendentes de conciliação. Isso pode significar pagamentos recebidos que ainda não foram baixados no sistema.
              </AlertDescription>
            </div>
-           <Button size="sm" variant="outline" className="ml-4 border-red-200 text-red-700 hover:bg-red-100 font-bold gap-2" asChild>
-             <Link to="/admin?tab=installments">
-               REPARAR AGORA <ChevronRight className="h-4 w-4" />
-             </Link>
-           </Button>
+            <Link to="/admin" search={{ tab: "installments" }}>
+              <Button size="sm" variant="outline" className="border-red-200 text-red-700 hover:bg-red-100 font-bold gap-2 ml-4">
+                REPARAR AGORA <ChevronRight className="h-4 w-4" />
+              </Button>
+            </Link>
          </Alert>
        )}
  
@@ -54,11 +54,11 @@
                Há <span className="font-bold">{unapprovedUsersCount} novos cadastros</span> aguardando análise de segurança para participar dos leilões.
              </AlertDescription>
            </div>
-           <Button size="sm" variant="outline" className="ml-4 border-amber-200 text-amber-700 hover:bg-amber-100 font-bold" asChild>
-             <Link to="/admin?tab=users">
-               ANALISAR
-             </Link>
-           </Button>
+            <Link to="/admin" search={{ tab: "users" }}>
+              <Button size="sm" variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-100 font-bold ml-4">
+                ANALISAR
+              </Button>
+            </Link>
          </Alert>
        )}
      </div>
