@@ -155,9 +155,10 @@
            </div>
          </div>
        </div>
-      </div>
-    </section>
+        </div>
+      </section>
     );
+  };
   };
  
   export const ModernHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
