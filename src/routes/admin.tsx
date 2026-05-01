@@ -17,6 +17,7 @@
   import { AuditLogManagement } from "@/components/admin/AuditLogManagement";
   import { OfferManagement } from "@/components/admin/OfferManagement";
   import { ContractManagement } from "@/components/admin/ContractManagement";
+  import { TransactionManagement } from "@/components/admin/TransactionManagement";
   import { 
    Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
     LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
@@ -30,7 +31,7 @@
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
-  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts";
+   type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
