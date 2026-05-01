@@ -74,12 +74,14 @@ export function SellerCarousel() {
                className="inline-block w-48 h-28 shrink-0"
               whileHover={{ scale: 1.05 }}
             >
-               <div className="w-full h-full bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-4 flex items-center justify-center transition-all duration-500">
+               <div className="w-full h-full bg-zinc-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-4 flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.3)] hover:border-gold/30 transition-all duration-500 group">
                 <OptimizedImage
                   src={seller.logo_url}
                   alt={seller.name}
-                  className="max-w-full max-h-full object-contain"
+                   className="max-w-full max-h-full"
                    width={192}
+                   disablePlaceholder={true}
+                   objectFit="contain"
                 />
               </div>
             </motion.div>
