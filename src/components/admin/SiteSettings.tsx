@@ -11,7 +11,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Switch } from "@/components/ui/switch";
  import { toast } from "sonner";
- import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout } from "lucide-react";
+  import { Loader2, Save, Upload, Palette, Home, Info, ArrowUp, ArrowDown, Wand2, History, Trash2, Check, FileText, Type, Plus, Star, Search, Globe, ShieldCheck, Zap, Layout, Newspaper } from "lucide-react";
  import { BulkSeoAudit } from "./BulkSeoAudit";
 import { LotCard } from "../auctions/lot-card";
  
@@ -137,7 +137,17 @@ import { LotCard } from "../auctions/lot-card";
        template_id: 'model1'
     });
 
+    const [articleSettings, setArticleSettings] = useState({
+      card_style: 'standard',
+      show_date: true,
+      show_category: true,
+      show_excerpt: true,
+      image_aspect_ratio: '16/9'
+    });
+
     const [lotCardSettings, setLotCardSettings] = useState({
+          const articleData = data.find(i => i.key === "article_settings")?.value;
+          if (articleData) setArticleSettings((prev: any) => ({ ...prev, ...(articleData as any) }));
       media_mode: "gallery",
       displayed_fields: [
         { key: "father", label: "Pai", enabled: true },
@@ -370,7 +380,90 @@ import { LotCard } from "../auctions/lot-card";
           <TabsTrigger value="audit" className="gap-2">
             <ShieldCheck className="h-4 w-4" /> Auditoria SEO
           </TabsTrigger>
+          <TabsTrigger value="articles" className="gap-2">
+            <Newspaper className="h-4 w-4" /> Artigos
+          </TabsTrigger>
           <TabsTrigger value="lots" className="gap-2">
+        <TabsContent value="articles" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Newspaper className="h-5 w-5 text-gold" /> Personalização de Notícias
+              </CardTitle>
+              <CardDescription>Configure como os cards de notícias e artigos aparecem no site.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Estilo do Card</Label>
+                    <select 
+                      className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-gold/50"
+                      value={articleSettings.card_style}
+                      onChange={e => setArticleSettings({...articleSettings, card_style: e.target.value as any})}
+                    >
+                      <option value="standard">Padrão</option>
+                      <option value="glass">Efeito Vidro (Glassmorphism)</option>
+                      <option value="modern">Moderno (Sem bordas, Minimalista)</option>
+                      <option value="traditional">Tradicional (Bordas fortes, Elite)</option>
+                      <option value="minimal">Minimalista</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Proporção da Imagem</Label>
+                    <select 
+                      className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-gold/50"
+                      value={articleSettings.image_aspect_ratio}
+                      onChange={e => setArticleSettings({...articleSettings, image_aspect_ratio: e.target.value as any})}
+                    >
+                      <option value="16/9">Widescreen (16:9)</option>
+                      <option value="4/3">Clássico (4:3)</option>
+                      <option value="1/1">Quadrado (1:1)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="show_date">Mostrar Data de Publicação</Label>
+                    <Switch 
+                      id="show_date" 
+                      checked={articleSettings.show_date} 
+                      onCheckedChange={v => setArticleSettings({...articleSettings, show_date: v})} 
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="show_cat">Mostrar Categoria</Label>
+                    <Switch 
+                      id="show_cat" 
+                      checked={articleSettings.show_category} 
+                      onCheckedChange={v => setArticleSettings({...articleSettings, show_category: v})} 
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="show_exc">Mostrar Resumo (Excerpt)</Label>
+                    <Switch 
+                      id="show_exc" 
+                      checked={articleSettings.show_excerpt} 
+                      onCheckedChange={v => setArticleSettings({...articleSettings, show_excerpt: v})} 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                className="w-full bg-gold text-emerald-deep font-bold mt-4" 
+                onClick={() => handleSave("article_settings", articleSettings)}
+                disabled={isSaving}
+              >
+                {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                Salvar Configurações de Notícias
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
            <Star className="h-4 w-4" /> Card do Lote
          </TabsTrigger>
        </TabsList>
