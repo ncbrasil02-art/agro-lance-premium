@@ -11,6 +11,7 @@ import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loade
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { logger } from "@/utils/logger";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/auctions/event-card";
