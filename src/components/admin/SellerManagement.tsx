@@ -215,8 +215,9 @@ export function SellerManagement() {
                           const fileName = `seller_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
                           const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
                           if (error) throw error;
-                          const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
-                          setFormData(prev => ({ ...prev, logo_url: publicUrl }));
+                           const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
+                           if (!publicUrl) throw new Error("Não foi possível obter a URL pública");
+                           setFormData(prev => ({ ...prev, logo_url: publicUrl }));
                           toast.success("Logo enviado!");
                         } catch (error: any) {
                           toast.error("Erro no upload: " + error.message);
