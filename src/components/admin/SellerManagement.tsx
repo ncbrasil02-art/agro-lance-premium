@@ -257,9 +257,9 @@ export function SellerManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tipo</TableHead>
+                    <TableHead>Logo</TableHead>
                     <TableHead>Nome</TableHead>
-                     <TableHead>Logo</TableHead>
-                     <TableHead>Local</TableHead>
+                    <TableHead>Local</TableHead>
                     <TableHead>Contato</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
