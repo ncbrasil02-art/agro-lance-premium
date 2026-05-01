@@ -104,8 +104,7 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
         };
         
    const baseTemplateId = (baseSettings as any)?.template_id || 'model1';
-   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
-   const templateId = previewTemplate || baseTemplateId;
+    const templateId = 'model1';
         
    const activeSections = {
      ...baseSettings,
@@ -219,38 +218,8 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
      activeEvents: 14,
    };
 
-   return (
-     <div className={cn(
-       "relative min-h-screen transition-colors duration-700",
-       templateId === 'model3' && "bg-[#f4f1ea] font-serif text-[#1a1a1a]",
-       templateId === 'model2' && "bg-black text-white",
-       templateId === 'model4' && "bg-[#0a0f0a]",
-       templateId === 'model5' && "bg-[#fdfbf7]",
-       templateId === 'model6' && "bg-[#050505]"
-     )}>
-       {templateId !== 'model1' && <FloatingElements />}
-      {/* Temporary Preview Switcher for the client to test models */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 scale-[0.6] md:scale-90 origin-bottom-right">
-        <div className="bg-black/80 backdrop-blur-2xl border border-gold/30 p-3 rounded-3xl shadow-2xl flex flex-wrap gap-2 max-w-[300px] justify-center">
-          {['model1', 'model2', 'model3', 'model4', 'model5', 'model6'].map((m) => (
-            <Button 
-              key={m}
-              size="sm" 
-              variant={templateId === m ? "default" : "outline"}
-              className={cn(
-                "rounded-xl font-black uppercase text-[10px] h-9 px-3 transition-all",
-                templateId === m ? "bg-gold text-emerald-deep scale-110 shadow-lg shadow-gold/20" : "border-gold/20 text-gold hover:bg-gold/10"
-              )}
-              onClick={() => setPreviewTemplate(m)}
-            >
-              {m === 'model1' ? 'Elite' : m === 'model2' ? 'Modern' : m === 'model3' ? 'Agro' : m === 'model4' ? 'Eventos' : m === 'model5' ? 'Notícias' : 'Design'}
-            </Button>
-          ))}
-        </div>
-        <div className="text-[9px] text-center font-bold text-gold/60 uppercase tracking-widest bg-black/40 py-1 rounded-full backdrop-blur-sm">
-          Seletor de Layouts
-        </div>
-      </div>
+    return (
+      <div className="relative min-h-screen transition-colors duration-700">
       {/* ANNOUNCEMENT BANNER */}
       {announcement && (announcement as any).active && (
         <div className="bg-gold py-2.5 px-4 text-emerald-deep border-b border-gold-bright/30">
@@ -275,17 +244,10 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
         </div>
       )}
 
-       {/* HERO / BANNERS */}
-       {(!activeSections || (activeSections as any).show_animated_slides) && (
-         <>
-            {templateId === 'model1' && <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
-            {templateId === 'model2' && <ModernHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
-            {templateId === 'model3' && <TraditionalHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
-             {templateId === 'model4' && <EventsHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
-             {templateId === 'model5' && <NewsHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
-             {templateId === 'model6' && <CreativeHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />}
-         </>
-       )}
+        {/* HERO / BANNERS */}
+        {(!activeSections || (activeSections as any).show_animated_slides) && (
+           <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={stats} homepageSettings={activeSections} />
+        )}
 
       {/* AO VIVO */}
       {liveEvents.length > 0 && (
