@@ -554,8 +554,14 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
          </div>
  
          <div className="grid grid-cols-[1.5fr_1fr] gap-8">
-           <div className="space-y-6">
-             <img src={lot.animal?.photos?.[0]} className="rounded-3xl shadow-xl w-full aspect-video object-cover" />
+               <div className="space-y-6 print-block">
+                 {lot.animal?.photos?.[0] && (
+                   <img 
+                     src={lot.animal.photos[0]} 
+                     className="rounded-3xl shadow-xl w-full aspect-video object-cover" 
+                     style={{ display: 'block' }}
+                   />
+                 )}
              
              <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
                <h2 className="text-lg font-black text-emerald-900 uppercase mb-4 border-b border-emerald-200 pb-2">Informações Técnicas</h2>
