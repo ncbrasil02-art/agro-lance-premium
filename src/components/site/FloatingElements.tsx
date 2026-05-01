@@ -1,12 +1,14 @@
  import { motion } from "framer-motion";
- import { Gavel, Cherry as Cow, Ghost as Horse, Wheat, Sparkles } from "lucide-react";
+ import { Gavel, Wheat, Trees, Sprout, Tractor, Leaf, Sparkles } from "lucide-react";
  
  const icons = [
    { Icon: Gavel, size: 40, color: "text-gold/10" },
-   { Icon: Cow, size: 60, color: "text-white/5" },
-   { Icon: Horse, size: 50, color: "text-gold/5" },
-   { Icon: Wheat, size: 30, color: "text-white/10" },
-   { Icon: Sparkles, size: 20, color: "text-gold/20" },
+  { Icon: Wheat, size: 45, color: "text-white/5" },
+  { Icon: Trees, size: 50, color: "text-gold/5" },
+  { Icon: Sprout, size: 30, color: "text-white/10" },
+  { Icon: Tractor, size: 55, color: "text-gold/5" },
+  { Icon: Leaf, size: 25, color: "text-white/5" },
+  { Icon: Sparkles, size: 15, color: "text-gold/20" },
  ];
  
  export const FloatingElements = () => {
