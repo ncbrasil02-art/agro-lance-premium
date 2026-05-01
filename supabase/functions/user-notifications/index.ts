@@ -44,19 +44,34 @@
        { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
      )
  
-     const { data: { user: authUser }, error: authError } = await supabaseClient.auth.getUser()
-     if (authError || !authUser) throw new Error('Unauthorized')
- 
-     const { data: profileRole } = await supabaseClient
-       .from('profiles')
-       .select('role')
-       .eq('id', authUser.id)
-       .single()
- 
+      const authHeader = req.headers.get('Authorization')!;
+      const isServiceRole = authHeader.includes(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'never-match-this-default');
+
+      let authUser = null;
+      let profileRole = null;
+
+      if (!isServiceRole) {
+        const supabaseClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+          { global: { headers: { Authorization: authHeader } } }
+        )
+        const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
+        if (authError || !user) throw new Error('Unauthorized')
+        authUser = user;
+
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+        profileRole = profile;
+      }
+
       const { userId, type, data, userEmail, lotId, title, message } = await req.json()
-     
-     // Permissions check: only admins can send notifications (except for certain types if allowed)
-      if (profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
+      
+      // Permissions check: only admins (or service role) can send notifications (except for certain types if allowed)
+      if (!isServiceRole && profileRole?.role !== 'admin' && !['offer_received', 'direct_sale_request', 'outbid'].includes(type)) {
         throw new Error('Forbidden')
       }
 
