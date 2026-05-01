@@ -335,26 +335,41 @@ import { HomeSaleLots } from "@/components/site/HomeSaleLots";
                  />
                </div>
              )}
-            {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-              <>
-                <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
-                {/* Mobile/Alternative Grid for "chamativo" feel */}
-                <section className="container mx-auto px-4 py-8 lg:hidden">
-                   <div className="grid gap-6 sm:grid-cols-2">
-                      {mappedLots.slice(0, 4).map((lot: any) => (
-                         <LotCard key={lot.id} lot={lot} />
-                      ))}
-                   </div>
-                </section>
-              </>
-            )}
-            {sectionId === "articles" && (activeSections as any)?.show_articles && (
-              <ArticleCarousel 
-                articles={articles} 
-                variant={templateId} 
-                settings={articleSettings}
-              />
-            )}
+             {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
+               <div className={cn(
+                 "relative py-24",
+                 templateId === 'model2' && "bg-zinc-950",
+                 templateId === 'model3' && "bg-emerald-deep text-white py-32",
+                 templateId === 'model6' && "bg-black"
+               )}>
+                 {templateId === 'model3' && (
+                   <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]" />
+                 )}
+                 <FeaturedLotsCarousel lots={mappedLots} variant={templateId} />
+                 
+                 {/* Mobile Grid */}
+                 <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
+                    <div className="grid gap-6 sm:grid-cols-2">
+                       {mappedLots.slice(0, 4).map((lot: any) => (
+                          <LotCard key={lot.id} lot={lot} />
+                       ))}
+                    </div>
+                 </section>
+               </div>
+             )}
+             {sectionId === "articles" && (activeSections as any)?.show_articles && (
+               <div className={cn(
+                 "relative py-24",
+                 templateId === 'model5' && "bg-white",
+                 templateId === 'model3' && "bg-[#fdfbf7] border-t-8 border-[#8b6b45]/10",
+               )}>
+                 <ArticleCarousel 
+                   articles={articles} 
+                   variant={templateId} 
+                   settings={articleSettings}
+                 />
+               </div>
+             )}
             {sectionId === "articles" && directSales.length > 0 && (
               <HomeSaleLots directSales={directSales} />
             )}
