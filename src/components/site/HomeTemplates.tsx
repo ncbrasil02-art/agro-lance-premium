@@ -1,103 +1,4 @@
 
-export const EventsHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
-  const isMobileMode = homepageSettings?.mobile_mode_enabled;
-  return (
-    <section className={cn(
-      "relative min-h-[90vh] flex items-center bg-black text-white overflow-hidden",
-      isMobileMode && "min-h-[70vh] pt-10"
-    )}>
-      <div className="absolute inset-0 z-0">
-        <HeroBackground 
-          backgrounds={homepageSettings?.hero_backgrounds} 
-          opacity={30} 
-          blur={5} 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black" />
-      </div>
-
-      <div className="container relative z-10 mx-auto px-4 py-20">
-        <div className="flex flex-col items-center text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-4 mb-8"
-          >
-            <div className="h-px w-12 bg-gold/50" />
-            <span className="text-gold uppercase tracking-[0.5em] font-black text-xs">Agenda de Eventos</span>
-            <div className="h-px w-12 bg-gold/50" />
-          </motion.div>
-
-          <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-8 leading-none max-w-4xl">
-            {customTexts?.hero_title || "Os Maiores Encontros da Genética Mundial"}
-          </h1>
-          
-          <p className="text-xl text-white/60 max-w-2xl font-medium italic mb-12">
-            {customTexts?.hero_subtitle || "Acompanhe nossa agenda completa e não perca nenhuma oportunidade de investimento."}
-          </p>
-        </div>
-
-        {nextEvent && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="grid lg:grid-cols-2 gap-8 items-stretch"
-          >
-            <div className="relative group overflow-hidden rounded-[3rem] border border-white/10 aspect-video lg:aspect-auto">
-              <OptimizedImage 
-                src={nextEvent.cover} 
-                alt={nextEvent.name} 
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-12 flex flex-col justify-end">
-                <Badge className="bg-gold text-black w-fit mb-4 uppercase font-black">Destaque</Badge>
-                <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-4 leading-none">{nextEvent.name}</h2>
-                <p className="text-white/70 font-medium mb-8 max-w-md">{nextEvent.description}</p>
-                <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>
-                  <Button className="bg-white text-black font-black uppercase rounded-full h-14 px-8 hover:bg-gold transition-colors">
-                    Ver Detalhes do Evento
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white/5 backdrop-blur-3xl rounded-[3rem] border border-white/10 p-12 flex flex-col justify-center gap-12">
-              <div className="space-y-4">
-                <span className="text-[10px] font-black text-gold uppercase tracking-[0.4em]">Contagem Regressiva</span>
-                <Countdown endsAt={nextEvent.date} variant="segmented" />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-8 py-12 border-y border-white/10">
-                <div className="space-y-1">
-                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">Cidade/UF</span>
-                  <div className="text-xl font-bold">{nextEvent.city} - {nextEvent.state}</div>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">Início</span>
-                  <div className="text-xl font-bold">{new Date(nextEvent.date).toLocaleDateString()}</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-6">
-                <Link to="/ao-vivo" className="flex-1">
-                  <Button className="w-full bg-gold-gradient text-emerald-deep font-black uppercase h-16 rounded-2xl shadow-gold hover:scale-105 transition-transform">
-                    <Radio className="mr-2 h-4 w-4" /> Ao Vivo
-                  </Button>
-                </Link>
-                <Link to="/eventos">
-                  <Button variant="outline" className="h-16 px-8 rounded-2xl border-white/20 hover:bg-white/10 font-black uppercase">
-                    Agenda Completa
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
-    </section>
-  );
-};
-
-export const NewsHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
   return (
     <section className={cn(
@@ -177,7 +78,6 @@ export const NewsHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }:
   );
 };
 
-export const CreativeHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }: HeroProps) => {
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
   return (
     <section className={cn(
