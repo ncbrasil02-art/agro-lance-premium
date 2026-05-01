@@ -27,15 +27,15 @@
         return new Response('No ID found', { status: 400 });
       }
 
-      // Idempotency check: Check if we already processed this event
+      // Idempotency check: Check if we already processed this event successfully
       const { data: existingEvent } = await supabaseClient
         .from('webhook_events')
-        .select('id')
+        .select('id, status')
         .eq('gateway_name', 'mercado_pago')
         .eq('external_id', eventId)
         .maybeSingle();
 
-      if (existingEvent) {
+      if (existingEvent && existingEvent.status === 'processed') {
         console.log(`Event ${eventId} already processed, skipping.`);
         return new Response(JSON.stringify({ received: true, already_processed: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -43,91 +43,74 @@
         })
       }
 
-      if (body.type === 'payment' || body.topic === 'payment') {
-        const paymentId = body.data?.id || body.id;
+      try {
+        if (body.type === 'payment' || body.topic === 'payment') {
+          const paymentId = body.data?.id || body.id;
 
-        // 1. Fetch MP config from DB
-        const { data: gateway } = await supabaseClient
-          .from('payment_gateways')
-          .select('config')
-          .eq('name', 'mercado_pago')
-          .single();
+          // 1. Fetch MP config from DB
+          const { data: gateway } = await supabaseClient
+            .from('payment_gateways')
+            .select('config')
+            .eq('name', 'mercado_pago')
+            .single();
 
-        const accessToken = gateway?.config?.access_token;
+          const accessToken = gateway?.config?.access_token;
 
-        if (!accessToken) {
-          console.error('Mercado Pago Access Token not configured');
-          return new Response('Gateway not configured', { status: 500 });
-        }
+          if (!accessToken) throw new Error('Gateway not configured');
 
-        // 2. Get payment details from Mercado Pago
-        const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });
+          // 2. Get payment details from Mercado Pago
+          const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          });
 
-        if (!mpResponse.ok) {
-          const error = await mpResponse.text();
-          console.error('Error fetching payment from MP:', error);
-          return new Response('Error fetching payment', { status: 500 });
-        }
+          if (!mpResponse.ok) throw new Error(`Error fetching payment from MP: ${await mpResponse.text()}`);
 
-        const paymentData = await mpResponse.json();
-        console.log('MP Payment Status:', paymentData.status);
+          const paymentData = await mpResponse.json();
 
-        // 3. Update DB based on payment status
-        const externalReference = paymentData.external_reference;
-        
-        if (externalReference) {
-          if (externalReference.startsWith('inst_')) {
+          // 3. Update DB
+          const externalReference = paymentData.external_reference;
+          if (externalReference?.startsWith('inst_')) {
             const installmentId = externalReference.replace('inst_', '');
-            const status = paymentData.status === 'approved' ? 'paid' : 'pending';
-            const paidAt = paymentData.status === 'approved' ? new Date().toISOString() : null;
-
-            const { error: updateError } = await supabaseClient
-              .from('installments')
-              .update({ 
-                status: status,
-                paid_at: paidAt,
-                gateway_status: paymentData.status,
-                external_reference: paymentId.toString()
-              })
-              .eq('id', installmentId);
-
-            if (updateError) console.error('Error updating installment:', updateError);
-          } else {
-            const { error: updateError } = await supabaseClient
-              .from('transactions')
-              .update({ 
-                payment_status: paymentData.status === 'approved' ? 'paid' : 'pending',
-                gateway_status: paymentData.status,
-                gateway_reference: paymentId.toString()
-              })
-              .eq('id', externalReference);
-
-            if (updateError) console.error('Error updating transaction:', updateError);
-          }
-        } else {
-          const { error: updateError } = await supabaseClient
-            .from('installments')
-            .update({ 
+            await supabaseClient.from('installments').update({ 
               status: paymentData.status === 'approved' ? 'paid' : 'pending',
               paid_at: paymentData.status === 'approved' ? new Date().toISOString() : null,
-              gateway_status: paymentData.status
-            })
-            .eq('external_reference', paymentId.toString());
-
-          if (updateError) console.error('Error updating installment by reference:', updateError);
+              gateway_status: paymentData.status,
+              external_reference: paymentId.toString()
+            }).eq('id', installmentId);
+          } else if (externalReference) {
+            await supabaseClient.from('transactions').update({ 
+              payment_status: paymentData.status === 'approved' ? 'paid' : 'pending',
+              gateway_status: paymentData.status,
+              gateway_reference: paymentId.toString()
+            }).eq('id', externalReference);
+          }
         }
 
-        // Log the event as processed
-        await supabaseClient.from('webhook_events').insert({
+        // Log as success
+        await supabaseClient.from('webhook_events').upsert({
           gateway_name: 'mercado_pago',
           external_id: eventId,
           event_type: body.type || body.topic,
-          payload: body
-        });
+          payload: body,
+          status: 'processed',
+          error_message: null,
+          processed_at: new Date().toISOString()
+        }, { onConflict: 'gateway_name,external_id' });
+
+      } catch (err: any) {
+        console.error('Error processing webhook:', err);
+        // Log as failure
+        await supabaseClient.from('webhook_events').upsert({
+          gateway_name: 'mercado_pago',
+          external_id: eventId,
+          event_type: body.type || body.topic,
+          payload: body,
+          status: 'failed',
+          error_message: err.message,
+          processed_at: new Date().toISOString()
+        }, { onConflict: 'gateway_name,external_id' });
+        
+        return new Response(JSON.stringify({ error: err.message }), { status: 400 });
       }
  
      return new Response(JSON.stringify({ received: true }), {
