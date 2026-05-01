@@ -103,21 +103,27 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
             A nova era dos leilões de elite
           </Badge>
           
-          <div className="mb-6">
-            <HeroPhrase 
-              phrases={customTexts?.hero_phrases} 
-              className="text-5xl md:text-7xl font-bold leading-tight tracking-tight uppercase italic"
-              defaultTitle={
-                <h1 className="text-6xl md:text-8xl font-black leading-none tracking-tighter uppercase italic">
-                  {customTexts?.hero_title || (
-                    <div className="flex flex-col gap-0 items-start">
-                      <span className="text-gradient-gold font-signature normal-case text-8xl md:text-[10rem] -mb-8 block drop-shadow-sm leading-none">{siteInfo?.name?.split(' ')?.[0]}</span>
-                      <span className="block pl-2 tracking-[-0.05em] uppercase font-black">{siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}</span>
-                    </div>
-                  )}
-                </h1>
-              } 
-            />
+          <div className="mb-8">
+            {customTexts?.hero_phrases && customTexts.hero_phrases.length > 0 ? (
+              <HeroPhrase 
+                phrases={customTexts.hero_phrases} 
+                className="text-4xl md:text-6xl font-light tracking-[0.2em] uppercase text-gold/80 mb-4 h-20"
+                defaultTitle={null}
+              />
+            ) : null}
+            
+            <h1 className="text-6xl md:text-9xl font-black leading-none tracking-tighter uppercase italic drop-shadow-2xl">
+              {customTexts?.hero_title || (
+                <div className="flex flex-col gap-0 items-start">
+                  <span className="text-gradient-gold font-signature normal-case text-8xl md:text-[11rem] -mb-10 block drop-shadow-xl leading-none animate-in fade-in slide-in-from-left-8 duration-1000">
+                    {siteInfo?.name?.split(' ')?.[0]}
+                  </span>
+                  <span className="block pl-4 tracking-[-0.05em] uppercase font-black text-foreground animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+                    {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
+                  </span>
+                </div>
+              )}
+            </h1>
           </div>
           
           <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
