@@ -935,28 +935,6 @@
                    </div>
                  </div>
 
-                 <div className="space-y-2">
-                   <Label>Ajuste do Logotipo dos Parceiros</Label>
-                   <div className="flex gap-4">
-                     <Button 
-                       variant={homepage.partners_logo_fit === 'contain' || !homepage.partners_logo_fit ? "default" : "outline"}
-                       className={cn("flex-1 uppercase font-black italic text-xs tracking-widest", (homepage.partners_logo_fit === 'contain' || !homepage.partners_logo_fit) && "bg-gold text-emerald-deep")}
-                       onClick={() => setHomepage({...homepage, partners_logo_fit: 'contain'})}
-                     >
-                       Ajustar (Contain)
-                     </Button>
-                     <Button 
-                       variant={homepage.partners_logo_fit === 'cover' ? "default" : "outline"}
-                       className={cn("flex-1 uppercase font-black italic text-xs tracking-widest", homepage.partners_logo_fit === 'cover' && "bg-gold text-emerald-deep")}
-                       onClick={() => setHomepage({...homepage, partners_logo_fit: 'cover'})}
-                     >
-                       Preencher (Cover)
-                     </Button>
-                   </div>
-                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">
-                     {homepage.partners_logo_fit === 'cover' ? "Preenche todo o quadrado (pode cortar bordas)" : "Mostra a imagem inteira dentro do quadrado"}
-                   </p>
-                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="footer_text">Texto Institucional (Rodapé)</Label>
