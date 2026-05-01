@@ -43,7 +43,8 @@
    { id: "event_requests", label: "Pedidos de Evento", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
     { id: "direct_sales", label: "Vendas Diretas", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
     { id: "offers", label: "Ofertas/Propostas", icon: <MessageSquare className="mr-2 h-4 w-4" /> },
-    { id: "contracts", label: "Contratos/Assinaturas", icon: <FileText className="mr-2 h-4 w-4" /> },
+     { id: "contracts", label: "Contratos/Assinaturas", icon: <FileText className="mr-2 h-4 w-4" /> },
+     { id: "transactions", label: "Transações", icon: <ShoppingCart className="mr-2 h-4 w-4" /> },
     { id: "sellers", label: "Vendedores", icon: <Building2 className="mr-2 h-4 w-4" /> },
    { id: "users", label: "Usuários", icon: <Users className="mr-2 h-4 w-4" /> },
    { id: "posts", label: "Notícias", icon: <Newspaper className="mr-2 h-4 w-4" /> },
@@ -357,7 +358,8 @@
              {activeTab === "rls_test" && <RLSSecurityTests />}
              {activeTab === "audit" && <AuditLogManagement />}
              {activeTab === "logs" && <SystemLogs />}
-               {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
+                {activeTab === "transactions" && <TransactionManagement />}
+                {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
        </main>
      </div>
    );
