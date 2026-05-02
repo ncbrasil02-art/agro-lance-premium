@@ -29,6 +29,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HomeSaleLots } from "@/components/site/HomeSaleLots";
 import { EliteHero } from "@/components/site/HomeTemplates";
+ import { SectionFallback } from "@/components/site/SectionFallback";
 
 export const Route = createFileRoute("/")({
   head: ({ matches }) => {
