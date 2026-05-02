@@ -20,7 +20,18 @@ const iconMap: Record<string, any> = {
   Sparkles
 };
 
-export const Route = createFileRoute("/sobre")({
+ import { PageSkeleton } from "@/components/ui/page-skeleton";
+ 
+ export const Route = createFileRoute("/sobre")({
+   pendingComponent: PageSkeleton,
+   loader: async () => {
+     const { data } = await supabase
+       .from("site_settings")
+       .select("value")
+       .eq("key", "about_page")
+       .single();
+     return { initialSettings: data?.value || { enabled: true, title: "Sobre" } };
+   },
   head: ({ matches }) => {
     const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
     const seoSettings = rootData?.seoSettings;
@@ -37,31 +48,9 @@ export const Route = createFileRoute("/sobre")({
   component: AboutPage,
 });
 
- function AboutPage() {
-   const [settings, setSettings] = useState<any>(null);
-   const [isLoading, setIsLoading] = useState(true);
- 
-   useEffect(() => {
-     async function fetchSettings() {
-       const { data } = await supabase
-         .from("site_settings")
-         .select("value")
-         .eq("key", "about_page")
-         .single();
-       
-       setSettings(data?.value || { enabled: true, title: "Sobre" });
-       setIsLoading(false);
-     }
-     fetchSettings();
-   }, []);
- 
-   if (isLoading) {
-     return (
-       <div className="flex min-h-[60vh] items-center justify-center">
-         <Loader2 className="h-8 w-8 animate-spin text-gold" />
-       </div>
-     );
-   }
+  function AboutPage() {
+    const { initialSettings } = Route.useLoaderData();
+    const [settings] = useState<any>(initialSettings);
  
    if (settings && !settings.enabled) {
      return <Navigate to="/" />;

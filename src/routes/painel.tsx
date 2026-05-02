@@ -460,7 +460,10 @@ import { Separator } from "@/components/ui/separator";
  import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const Route = createFileRoute("/painel")({
+ import { PanelSkeleton } from "@/components/ui/page-skeleton";
+ 
+ export const Route = createFileRoute("/painel")({
+   pendingComponent: PanelSkeleton,
   component: UserDashboard,
 });
 

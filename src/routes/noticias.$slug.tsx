@@ -5,9 +5,11 @@
  import { format } from "date-fns"
  import { ptBR } from "date-fns/locale"
   import { Calendar, ChevronLeft, Share2, Mail, User, Clock } from "lucide-react"
- import { Button } from "@/components/ui/button"
+  import { Button } from "@/components/ui/button"
+  import { NewsDetailSkeleton } from "@/components/ui/page-skeleton"
 
-  export const Route = createFileRoute("/noticias/$slug")({
+   export const Route = createFileRoute("/noticias/$slug")({
+     pendingComponent: NewsDetailSkeleton,
     head: (ctx: any) => {
       const post = ctx.loaderData?.post;
       const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;

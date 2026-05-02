@@ -2,9 +2,11 @@
  import { PixPaymentStatus } from "@/components/payment/PixPaymentStatus";
  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  import { ChevronLeft, Receipt } from "lucide-react";
- import { Button } from "@/components/ui/button";
+  import { Button } from "@/components/ui/button";
+  import { PageSkeleton } from "@/components/ui/page-skeleton";
  
- export const Route = createFileRoute("/pagamento/$installmentId")({
+  export const Route = createFileRoute("/pagamento/$installmentId")({
+    pendingComponent: PageSkeleton,
    component: PaymentStatusPage,
  });
  
