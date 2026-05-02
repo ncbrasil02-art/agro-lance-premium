@@ -36,29 +36,9 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
   );
 };
 
-export function LotCard({ lot, settings: propSettings }: { 
-  lot: Lot & { 
-    eventStartDate?: string; 
-    eventEndDate?: string; 
-    allowsPreBidding?: boolean; 
-    eventType?: string;
-    eventStatus?: string;
-    father?: string;
-    mother?: string;
-    sex?: string;
-    color?: string;
-    birthDate?: string;
-    seller?: string;
-    location?: string;
-    winnerName?: string;
-    acceptsOffers?: boolean;
-    photos?: string[];
-    youtube_url?: string;
-    registration_number?: string;
-    vaccination_records?: any;
-  },
-  settings?: any
-}) {
+ export function LotCard({ lot, settings: propSettings }: { lot: any, settings?: any }) {
+   if (!lot) return null;
+   
   const [isUrgent, setIsUrgent] = useState(false);
   const [isOfferOpen, setIsOfferOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
@@ -267,7 +247,7 @@ export function LotCard({ lot, settings: propSettings }: {
                     className={`flex justify-between items-center ${isLast ? 'pt-1 mt-1 border-t border-border/30' : ''}`}
                   >
                     <span className="font-medium uppercase">{field.label}:</span>
-                    <span className={`font-semibold truncate ml-2 ${isSeller ? 'text-emerald-deep' : 'text-foreground'}`}>
+                     <span className={`font-semibold truncate ml-2 text-right ${isSeller ? 'text-emerald-deep' : 'text-foreground'}`}>
                       {value || "--"}
                     </span>
                   </div>
