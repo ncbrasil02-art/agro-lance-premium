@@ -6,6 +6,7 @@ import { AlertTriangle, RefreshCcw, Home } from "lucide-react";
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  tag?: string;
 }
 
 interface ErrorBoundaryState {
@@ -25,7 +26,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: any) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-     logErrorToDb("ErrorBoundary", error, errorInfo);
+     logErrorToDb(`ErrorBoundary${this.props.tag ? `:${this.props.tag}` : ""}`, error, errorInfo);
   }
 
   render() {
