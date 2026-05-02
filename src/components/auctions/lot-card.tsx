@@ -36,29 +36,9 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
   );
 };
 
-export function LotCard({ lot, settings: propSettings }: { 
-  lot: Lot & { 
-    eventStartDate?: string; 
-    eventEndDate?: string; 
-    allowsPreBidding?: boolean; 
-    eventType?: string;
-    eventStatus?: string;
-    father?: string;
-    mother?: string;
-    sex?: string;
-    color?: string;
-    birthDate?: string;
-    seller?: string;
-    location?: string;
-    winnerName?: string;
-    acceptsOffers?: boolean;
-    photos?: string[];
-    youtube_url?: string;
-    registration_number?: string;
-    vaccination_records?: any;
-  },
-  settings?: any
-}) {
+ export function LotCard({ lot, settings: propSettings }: { lot: any, settings?: any }) {
+   if (!lot) return null;
+   
   const [isUrgent, setIsUrgent] = useState(false);
   const [isOfferOpen, setIsOfferOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
@@ -164,16 +144,16 @@ export function LotCard({ lot, settings: propSettings }: {
                 </div>
               )}
 
-              {lot.photos && lot.photos.length > 1 && settings.media_mode === 'gallery' && (
-                <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1 z-20">
-                  {lot.photos.map((_, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`h-1 rounded-full transition-all ${idx === currentPhotoIndex ? 'w-4 bg-gold' : 'w-1.5 bg-white/40'}`}
-                    />
-                  ))}
-                </div>
-              )}
+               {lot.photos && lot.photos.length > 1 && settings.media_mode === 'gallery' && (
+                 <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1 z-20">
+                   {lot.photos.map((_: any, idx: number) => (
+                     <div 
+                       key={idx} 
+                       className={`h-1 rounded-full transition-all ${idx === currentPhotoIndex ? 'w-4 bg-gold' : 'w-1.5 bg-white/40'}`}
+                     />
+                   ))}
+                 </div>
+               )}
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/90 via-transparent to-transparent" />
@@ -267,7 +247,7 @@ export function LotCard({ lot, settings: propSettings }: {
                     className={`flex justify-between items-center ${isLast ? 'pt-1 mt-1 border-t border-border/30' : ''}`}
                   >
                     <span className="font-medium uppercase">{field.label}:</span>
-                    <span className={`font-semibold truncate ml-2 ${isSeller ? 'text-emerald-deep' : 'text-foreground'}`}>
+                     <span className={`font-semibold truncate ml-2 text-right ${isSeller ? 'text-emerald-deep' : 'text-foreground'}`}>
                       {value || "--"}
                     </span>
                   </div>

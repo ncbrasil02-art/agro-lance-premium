@@ -129,7 +129,7 @@
          </div>
        ) : (
          <div className="w-full flex flex-col items-center gap-6">
-           <div className="p-4 bg-white rounded-2xl border-2 border-emerald-100 shadow-sm flex flex-col items-center w-full max-w-[280px]">
+            <div className="p-4 bg-white rounded-2xl border-2 border-emerald-100 shadow-xl flex flex-col items-center w-full max-w-[280px]">
              {pixData?.qr_code_base64 ? (
                <img 
                  src={`data:image/png;base64,${pixData.qr_code_base64}`} 
@@ -152,11 +152,20 @@
              </div>
            </div>
  
-           <div className="w-full space-y-3">
-             <Button 
-               variant="outline" 
-               className="w-full border-emerald-200 text-emerald-700 h-11 font-bold gap-2 hover:bg-emerald-50"
-               onClick={() => {
+            <div className="w-full space-y-4">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative bg-white dark:bg-emerald-800 p-4 rounded-xl border border-emerald-100 dark:border-emerald-700 flex flex-col gap-2">
+                  <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Chave Pix Copia e Cola</span>
+                  <div className="bg-emerald-50 dark:bg-emerald-950/50 p-3 rounded-lg border border-emerald-100 dark:border-emerald-800 break-all text-[10px] font-mono font-bold text-emerald-900 dark:text-emerald-100 leading-relaxed">
+                    {pixData?.qr_code || installment?.external_reference || "Carregando..."}
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white h-12 font-black gap-2 shadow-lg hover:scale-[1.02] transition-all"
+                onClick={() => {
                  const code = pixData?.qr_code || installment?.external_reference;
                  if (code) {
                    navigator.clipboard.writeText(code);
@@ -166,7 +175,7 @@
              >
                <Copy className="h-4 w-4" /> COPIAR CÓDIGO PIX
              </Button>
-             <p className="text-[10px] text-center text-gray-500 italic">
+              <p className="text-[11px] text-center text-emerald-600 dark:text-emerald-300 font-medium italic">
                Abra o app do seu banco e escolha a opção "PIX Copia e Cola" ou escaneie o QR Code.
              </p>
            </div>

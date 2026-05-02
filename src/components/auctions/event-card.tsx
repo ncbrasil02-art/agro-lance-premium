@@ -40,7 +40,9 @@ import { Countdown } from "@/components/auctions/countdown";
   import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
   import { Maximize2 } from "lucide-react";
  
-  export function EventCard({ event }: { event: AuctionEvent & { end_date?: string | null } }) {
+   export function EventCard({ event }: { event: any }) {
+    if (!event) return null;
+    
    const [isUrgent, setIsUrgent] = useState(false);
     const [isFlyerOpen, setIsFlyerOpen] = useState(false);
    
@@ -106,7 +108,7 @@ import { Countdown } from "@/components/auctions/countdown";
             {effectiveStatus === 'scheduled' && event?.date && (
               <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 px-2.5 py-1 text-[10px] font-bold text-gold shadow-lg">
                 <Timer className="h-3 w-3" />
-                <Countdown endsAt={event.date} className="font-mono" />
+               <Countdown endsAt={event.date || ""} className="font-mono" />
               </div>
             )}
           </div>
@@ -133,10 +135,10 @@ import { Countdown } from "@/components/auctions/countdown";
         </div>
 
         <div className="grid grid-cols-2 gap-3 p-4 text-xs">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5 text-gold" />
-            <span suppressHydrationWarning>{event?.date ? formatDateBR(event.date) : "--"}</span>
-          </div>
+           <div className="flex items-center gap-2 text-muted-foreground overflow-hidden">
+             <Calendar className="h-3.5 w-3.5 text-gold shrink-0" />
+             <span suppressHydrationWarning className="truncate">{event?.date ? formatDateBR(event.date) : "--"}</span>
+           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <MapPin className="h-3.5 w-3.5 text-gold" />
             <span>{event?.city || ""}/{event?.state || ""}</span>
