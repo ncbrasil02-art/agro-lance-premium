@@ -10,7 +10,7 @@ import { PAGE_LIMITS } from "@/config/limits";
 import { ArrowRight, Radio, ShieldCheck, Sparkles, Trophy, Calendar, Bell, Loader2, ShoppingCart, Gavel } from "lucide-react";
 import { Countdown } from "@/components/auctions/countdown";
 import { getEffectiveEventStatus, getEffectiveLotStatus } from "@/utils/auction-status";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { logger } from "@/utils/logger";
 import { Button } from "@/components/ui/button";
@@ -112,9 +112,11 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  useHomeRealtime(() => {
+  const handleRealtimeUpdate = useCallback(() => {
     router.invalidate();
-  });
+  }, [router]);
+
+  useHomeRealtime(handleRealtimeUpdate);
 
   const mapEvent = (e: any) => ({
     id: e?.id || Math.random().toString(),

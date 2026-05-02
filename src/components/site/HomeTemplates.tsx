@@ -150,7 +150,7 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                      transition={{ delay: 0.2, duration: 0.8 }}
                      className="text-gradient-gold font-signature normal-case text-8xl md:text-[11rem] -mb-10 block drop-shadow-xl leading-none"
                    >
-                     {siteInfo?.name?.split(' ')?.[0]}
+                     {siteInfo?.name && typeof siteInfo.name === 'string' ? siteInfo.name.split(' ')[0] : "NC"}
                    </motion.span>
                    <motion.span 
                      initial={{ x: 50, opacity: 0 }}
@@ -158,7 +158,7 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                      transition={{ delay: 0.4, duration: 0.8 }}
                      className="block pl-4 tracking-[-0.05em] uppercase font-black text-foreground"
                    >
-                     {siteInfo?.name?.split(' ')?.slice(1)?.join(' ')}
+                     {siteInfo?.name && typeof siteInfo.name === 'string' ? siteInfo.name.split(' ').slice(1).join(' ') : "Agro Leilões"}
                    </motion.span>
                 </div>
               )}
