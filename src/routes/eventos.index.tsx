@@ -31,7 +31,7 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
        canonical: "/eventos"
      });
    },
-      loader: async ({ search }: { search: { limit?: number } }) => {
+      loader: async ({ search }) => {
       logger.info("Iniciando carregamento da página de Eventos");
       try {
         const { data: events, error } = await supabase
