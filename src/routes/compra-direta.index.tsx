@@ -33,12 +33,13 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
        canonical: "/compra-direta"
      });
    },
-  loader: async () => {
-    const { data: animals, error: animalsError } = await supabase
-      .from("animals")
-      .select("*, categories(name)")
-      .eq("is_direct_sale", true)
-      .order("created_at", { ascending: false });
+   loader: async ({ deps }: any) => {
+     const { data: animals, error: animalsError } = await supabase
+       .from("animals")
+       .select("*, categories(name)")
+       .eq("is_direct_sale", true)
+       .order("created_at", { ascending: false })
+       .limit(deps.limit || 12);
 
     const { data: categories, error: categoriesError } = await supabase
       .from("categories")
