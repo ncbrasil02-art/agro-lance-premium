@@ -139,10 +139,10 @@ function Home() {
     show_countdown: e.show_countdown !== false,
   });
 
-  const mappedEvents = (events || []).map(mapEvent);
-  const mappedPastEvents = (pastEvents || []).map(mapEvent);
-
-  const mappedLots = (lots || []).map((l: any) => ({
+   const mappedEvents = (events || []).filter(Boolean).map(mapEvent);
+   const mappedPastEvents = (pastEvents || []).filter(Boolean).map(mapEvent);
+ 
+   const mappedLots = (lots || []).filter(l => l && l.animal).map((l: any) => ({
     id: l.id,
     number: l.lot_number,
     eventId: l.event_id,
@@ -211,14 +211,20 @@ function Home() {
       totalAnimals: 12847,
       totalUsers: 38420,
       activeEvents: 14,
-      labels: {
-        totalSold: "Volume Negociado",
-        totalAnimals: "Animais Registrados",
-        totalUsers: "Base de Investidores",
-        activeEvents: "Eventos Ativos"
-      },
-      ...(sectionsSettings?.stats || {})
-    };
+   };
+ 
+   const siteStats = {
+     totalSold: sectionsSettings?.stats?.totalSold ?? 184500000,
+     totalAnimals: sectionsSettings?.stats?.totalAnimals ?? 12847,
+     totalUsers: sectionsSettings?.stats?.totalUsers ?? 38420,
+     activeEvents: sectionsSettings?.stats?.activeEvents ?? 14,
+     labels: {
+       totalSold: sectionsSettings?.stats?.labels?.totalSold || "Volume Negociado",
+       totalAnimals: sectionsSettings?.stats?.labels?.totalAnimals || "Animais Registrados",
+       totalUsers: sectionsSettings?.stats?.labels?.totalUsers || "Base de Investidores",
+       activeEvents: sectionsSettings?.stats?.labels?.activeEvents || "Eventos Ativos"
+     }
+   };
 
   return (
     <div className="relative min-h-screen transition-colors duration-700">
