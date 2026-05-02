@@ -5,8 +5,10 @@
  import { ptBR } from "date-fns/locale"
   import { Calendar, ArrowRight } from "lucide-react"
   import { generateMetaTags } from "@/utils/seo"
+  import { NewsPageSkeleton } from "@/components/ui/page-skeleton"
 
-  export const Route = createFileRoute("/noticias/")({
+   export const Route = createFileRoute("/noticias/")({
+     pendingComponent: NewsPageSkeleton,
     head: ({ matches }) => {
       const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
       const seoSettings = rootData?.seoSettings;
