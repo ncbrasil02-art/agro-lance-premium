@@ -11,9 +11,16 @@ import { useState, useMemo } from "react";
   import { z } from "zod";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getEffectiveEventStatus } from "@/utils/auction-status";
-import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
+ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
+ import { RefreshCw } from "lucide-react";
+ import { useRouter } from "@tanstack/react-router";
 
- export const Route = createFileRoute("/eventos/")({
+  export const Route = createFileRoute("/eventos/")({
+    validateSearch: (search: Record<string, unknown>) => {
+      return {
+        limit: (search.limit as number) || PAGE_LIMITS.EVENTS_LIST,
+      };
+    },
    head: ({ matches }) => {
      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
      const seoSettings = rootData?.seoSettings;
@@ -24,14 +31,14 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
        canonical: "/eventos"
      });
    },
-    loader: async () => {
+     loader: async ({ search }) => {
       logger.info("Iniciando carregamento da página de Eventos");
       try {
         const { data: events, error } = await supabase
            .from("events")
            .select("*, lots!lots_event_id_fkey(id)")
            .order("start_date")
-           .limit(PAGE_LIMITS.EVENTS_LIST);
+            .limit(search.limit);
    
         if (error) {
           logger.error("Erro Supabase ao carregar eventos", { error });
@@ -60,8 +67,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
    errorComponent: ErrorFallback,
 });
 
-function EventsPage() {
-   const { events } = Route.useLoaderData();
+ function EventsPage() {
+    const { events } = Route.useLoaderData();
+    const { limit } = Route.useSearch();
+    const router = useRouter();
   const [filter, setFilter] = useState("all");
  
     const mappedEvents = events.map((e: ValidatedEvent) => {
