@@ -40,11 +40,12 @@ import { Countdown } from "@/components/auctions/countdown";
   import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
   import { Maximize2 } from "lucide-react";
  
-   export function EventCard({ event }: { event: any }) {
-    if (!event) return null;
-    
-   const [isUrgent, setIsUrgent] = useState(false);
+    export function EventCard({ event }: { event: any }) {
+    const [isUrgent, setIsUrgent] = useState(false);
     const [isFlyerOpen, setIsFlyerOpen] = useState(false);
+
+    if (!event) return null;
+     
    
    useEffect(() => {
      const checkUrgency = () => {

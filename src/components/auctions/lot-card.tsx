@@ -36,13 +36,13 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
   );
 };
 
- export function LotCard({ lot, settings: propSettings }: { lot: any, settings?: any }) {
+  export function LotCard({ lot, settings: propSettings }: { lot: any, settings?: any }) {
+   const [isUrgent, setIsUrgent] = useState(false);
+   const [isOfferOpen, setIsOfferOpen] = useState(false);
+   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+   const router = useRouter();
+
    if (!lot) return null;
-   
-  const [isUrgent, setIsUrgent] = useState(false);
-  const [isOfferOpen, setIsOfferOpen] = useState(false);
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const router = useRouter();
   const rootContext = router.state.matches.find(m => m.id === '__root__')?.context as any;
   
   const animations = useMemo(() => rootContext?.animations || {
