@@ -29,6 +29,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HomeSaleLots } from "@/components/site/HomeSaleLots";
 import { EliteHero } from "@/components/site/HomeTemplates";
+ import { SectionFallback } from "@/components/site/SectionFallback";
 
 export const Route = createFileRoute("/")({
   head: ({ matches }) => {
@@ -246,13 +247,22 @@ function Home() {
       )}
 
       <div className="flex flex-col gap-0">
-        {(activeSections.order).map((sectionId: string) => (
-          <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
-             {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
-               <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={siteStats} homepageSettings={activeSections} />
-             )}
-
-             {sectionId === "live_now" && liveEvents.length > 0 && (
+         {(activeSections.order || []).map((sectionId: string) => (
+           <ErrorBoundary 
+             key={sectionId} 
+             fallback={
+               <SectionFallback 
+                 variant="error" 
+                 title={`Seção ${sectionId}`} 
+                 message="Ocorreu um problema ao carregar esta seção. Tente recarregar a página." 
+               />
+             }
+           >
+              {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
+                <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={siteStats} homepageSettings={activeSections} />
+              )}
+ 
+              {sectionId === "live_now" && liveEvents.length > 0 && (
                <section className="container mx-auto px-4 py-8 lg:py-12 relative z-20">
                  <motion.div 
                    initial={{ opacity: 0, y: 30 }}
@@ -343,37 +353,60 @@ function Home() {
                  )}
                </section>
              )}
-              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
-                <div className="relative py-8 overflow-hidden">
-                  <EventCarousel 
-                   events={upcomingEvents} 
-                   title="Próximos eventos" 
-                   subtitle="Reserve sua agenda e participe das maiores oportunidades."
-                   variant="model1"
-                 />
-               </div>
-             )}
-              {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-                <div className="relative py-12">
-                  <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
-                 <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
-                    <div className="grid gap-6 sm:grid-cols-2">
-                       {mappedLots.slice(0, 4).map((lot: any) => (
-                          <LotCard key={lot.id} lot={lot} />
-                       ))}
-                    </div>
-                 </section>
-               </div>
-             )}
-              {sectionId === "articles" && (activeSections as any)?.show_articles && (
-                <div className="relative py-12">
-                  <ArticleCarousel 
-                   articles={articles} 
-                   variant="model1" 
-                   settings={articleSettings}
-                 />
-               </div>
-             )}
+               {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
+                 <div className="relative py-8 overflow-hidden">
+                   {upcomingEvents.length > 0 ? (
+                     <EventCarousel 
+                       events={upcomingEvents} 
+                       title="Próximos eventos" 
+                       subtitle="Reserve sua agenda e participe das maiores oportunidades."
+                       variant="model1"
+                     />
+                   ) : (
+                     <SectionFallback 
+                       title="Próximos Eventos" 
+                       message="Novos eventos estão sendo preparados. Volte em breve para conferir!" 
+                     />
+                   )}
+                 </div>
+               )}
+               {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
+                 <div className="relative py-12">
+                   {mappedLots.length > 0 ? (
+                     <>
+                       <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
+                       <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
+                         <div className="grid gap-6 sm:grid-cols-2">
+                            {mappedLots.slice(0, 4).map((lot: any) => (
+                               <LotCard key={lot.id} lot={lot} />
+                            ))}
+                         </div>
+                       </section>
+                     </>
+                   ) : (
+                     <SectionFallback 
+                       title="Lotes em Destaque" 
+                       message="Novos lotes de elite serão anunciados em breve." 
+                     />
+                   )}
+                </div>
+               )}
+               {sectionId === "articles" && (activeSections as any)?.show_articles && (
+                 <div className="relative py-12">
+                   {articles.length > 0 ? (
+                     <ArticleCarousel 
+                       articles={articles} 
+                       variant="model1" 
+                       settings={articleSettings}
+                     />
+                   ) : (
+                     <SectionFallback 
+                       title="Últimas Notícias" 
+                       message="Novos conteúdos estão sendo redigidos. Fique por dentro em breve!" 
+                     />
+                   )}
+                 </div>
+               )}
              {sectionId === "articles" && directSales.length > 0 && (
                <HomeSaleLots directSales={directSales} />
              )}
