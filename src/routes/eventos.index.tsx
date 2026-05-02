@@ -31,15 +31,15 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
        canonical: "/eventos"
      });
    },
-     loaderDeps: ({ search: { limit } }) => ({ limit }),
-     loader: async ({ deps: { limit } }) => {
+      loaderDeps: ({ search }: any) => ({ limit: search.limit }),
+      loader: async ({ deps }: any) => {
       logger.info("Iniciando carregamento da página de Eventos");
       try {
         const { data: events, error } = await supabase
            .from("events")
            .select("*, lots!lots_event_id_fkey(id)")
            .order("start_date")
-            .limit(limit || PAGE_LIMITS.EVENTS_LIST);
+             .limit(deps.limit || PAGE_LIMITS.EVENTS_LIST);
    
         if (error) {
           logger.error("Erro Supabase ao carregar eventos", { error });
