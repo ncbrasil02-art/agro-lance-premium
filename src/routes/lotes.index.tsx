@@ -235,7 +235,7 @@
         {lots.length >= limit && (
           <div className="flex justify-center py-12">
             <button
-             onClick={() => router.navigate({ search: (prev: any) => ({ ...prev, limit: limit + PAGE_LIMITS.LOTS_LIST }) })}
+             onClick={() => (router as any).navigate({ search: (prev: any) => ({ ...prev, limit: limit + PAGE_LIMITS.LOTS_LIST }) })}
               className="group relative px-10 py-4 bg-emerald-deep/40 border border-gold/30 rounded-2xl text-gold font-black uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all duration-300 shadow-2xl overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
