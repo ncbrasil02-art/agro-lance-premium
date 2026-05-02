@@ -178,7 +178,92 @@ export function PageSkeleton() {
   );
 }
 
-export function HomeSkeleton() {
+ export function NewsPageSkeleton() {
+   return (
+     <div className="container mx-auto px-4 py-20 animate-in fade-in duration-500">
+       <div className="space-y-4 mb-12">
+         <Skeleton className="h-12 w-64" />
+         <Skeleton className="h-6 w-full max-w-2xl" />
+       </div>
+       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+         {[1, 2, 3, 4, 5, 6].map((i) => (
+           <div key={i} className="space-y-4 border rounded-2xl p-0 overflow-hidden">
+             <Skeleton className="aspect-video w-full" />
+             <div className="p-6 space-y-4">
+               <div className="flex justify-between">
+                 <Skeleton className="h-4 w-24" />
+                 <Skeleton className="h-4 w-20" />
+               </div>
+               <Skeleton className="h-8 w-full" />
+               <Skeleton className="h-20 w-full" />
+               <Skeleton className="h-6 w-24" />
+             </div>
+           </div>
+         ))}
+       </div>
+     </div>
+   );
+ }
+ 
+ export function NewsDetailSkeleton() {
+   return (
+     <div className="container mx-auto px-4 py-20 max-w-4xl animate-in fade-in duration-500">
+       <Skeleton className="h-6 w-32 mb-8" />
+       <div className="space-y-6 mb-12">
+         <Skeleton className="h-4 w-24" />
+         <Skeleton className="h-16 w-full" />
+         <div className="flex gap-4 border-y py-4">
+           <Skeleton className="h-5 w-40" />
+           <Skeleton className="h-5 w-32" />
+         </div>
+       </div>
+       <Skeleton className="aspect-[21/9] w-full rounded-3xl mb-12" />
+       <div className="space-y-4 mb-16">
+         <Skeleton className="h-6 w-full" />
+         <Skeleton className="h-6 w-full" />
+         <Skeleton className="h-6 w-5/6" />
+         <Skeleton className="h-6 w-full" />
+         <Skeleton className="h-6 w-4/5" />
+       </div>
+     </div>
+   );
+ }
+ 
+ export function PanelSkeleton() {
+   return (
+     <div className="container mx-auto px-4 py-12 animate-in fade-in duration-500">
+       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+         <div className="space-y-4">
+           <Skeleton className="h-12 w-64" />
+           <Skeleton className="h-6 w-96 max-w-full" />
+         </div>
+         <div className="flex gap-4">
+           <Skeleton className="h-12 w-32 rounded-xl" />
+           <Skeleton className="h-12 w-12 rounded-xl" />
+         </div>
+       </div>
+       
+       <div className="grid gap-8 lg:grid-cols-3">
+         <div className="lg:col-span-2 space-y-8">
+           <div className="grid gap-6 sm:grid-cols-2">
+             {[1, 2, 3, 4].map(i => (
+               <Skeleton key={i} className="h-32 rounded-3xl" />
+             ))}
+           </div>
+           <div className="space-y-4">
+             <Skeleton className="h-10 w-48" />
+             <Skeleton className="h-64 w-full rounded-3xl" />
+           </div>
+         </div>
+         <div className="space-y-8">
+           <Skeleton className="h-[500px] w-full rounded-3xl" />
+         </div>
+       </div>
+     </div>
+   );
+ }
+ 
+ export function HomeSkeleton() {
   return (
     <div className="animate-in fade-in duration-500">
       {/* Hero Skeleton */}
