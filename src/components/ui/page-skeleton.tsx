@@ -265,29 +265,87 @@ export function PageSkeleton() {
  }
  
  export function HomeSkeleton() {
-  return (
-    <div className="animate-in fade-in duration-500">
-      {/* Hero Skeleton */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="container relative mx-auto px-4">
-          <div className="max-w-2xl space-y-6">
-            <Skeleton className="h-7 w-48 rounded-full" />
-            <Skeleton className="h-16 w-3/4 md:h-24 rounded-2xl" />
-            <Skeleton className="h-5 w-full rounded-lg" />
-            <Skeleton className="h-5 w-2/3 rounded-lg" />
-            <div className="flex flex-wrap gap-3 mt-8">
-              <Skeleton className="h-12 w-40 rounded-xl" />
-              <Skeleton className="h-12 w-48 rounded-xl" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="container mx-auto px-4 py-16 space-y-0">
-        <SectionSkeleton type="cards" count={3} />
-        <SectionSkeleton type="lots" count={3} />
-        <SectionSkeleton type="articles" count={4} />
-      </div>
-    </div>
-  );
-}
+   return (
+     <div className="animate-in fade-in duration-700 bg-background overflow-hidden">
+       {/* Hero Skeleton - matching EliteHero style */}
+       <section className="relative min-h-[90vh] flex items-center pt-20">
+         <div className="container relative z-10 mx-auto px-4">
+           <div className="max-w-3xl space-y-8">
+             <Skeleton className="h-8 w-64 rounded-full bg-gold/5" />
+             <div className="space-y-4">
+               <Skeleton className="h-20 md:h-32 w-3/4 rounded-3xl" />
+               <Skeleton className="h-20 md:h-32 w-full rounded-3xl" />
+             </div>
+             <Skeleton className="h-6 w-full max-w-xl rounded-lg" />
+             <div className="flex flex-wrap gap-4 pt-4">
+               <Skeleton className="h-14 w-48 rounded-xl" />
+               <Skeleton className="h-14 w-48 rounded-xl" />
+             </div>
+             <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+               {[1, 2, 3, 4].map(i => (
+                 <div key={i} className="space-y-2">
+                   <Skeleton className="h-3 w-20 rounded-full" />
+                   <Skeleton className="h-8 w-24 rounded-lg" />
+                 </div>
+               ))}
+             </div>
+           </div>
+         </div>
+       </section>
+ 
+       {/* Live Now Card Skeleton */}
+       <section className="container mx-auto px-4 py-12">
+         <div className="rounded-[2.5rem] overflow-hidden border border-live/10 bg-muted/20">
+           <div className="flex flex-col md:flex-row h-[400px]">
+             <Skeleton className="w-full md:w-[45%] h-full" />
+             <div className="flex-1 p-12 space-y-8 flex flex-col justify-center">
+               <div className="space-y-4">
+                 <Skeleton className="h-16 w-3/4 rounded-2xl" />
+                 <Skeleton className="h-6 w-1/2 rounded-lg" />
+               </div>
+               <div className="flex items-center justify-between pt-8 border-t border-white/5">
+                 <div className="flex gap-4">
+                   <Skeleton className="h-12 w-12 rounded-2xl" />
+                   <div className="space-y-2">
+                     <Skeleton className="h-3 w-20" />
+                     <Skeleton className="h-5 w-32" />
+                   </div>
+                 </div>
+                 <Skeleton className="h-16 w-48 rounded-2xl" />
+               </div>
+             </div>
+           </div>
+         </div>
+       </section>
+ 
+       <div className="space-y-8">
+         <SectionSkeleton type="cards" count={3} />
+         
+         {/* Direct Sale Banner Skeleton */}
+         <section className="container mx-auto px-4 py-16">
+           <div className="rounded-3xl bg-emerald-deep/10 border border-gold/10 p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+             <div className="space-y-4">
+               <Skeleton className="h-10 w-64 rounded-xl" />
+               <Skeleton className="h-6 w-96 max-w-full rounded-lg" />
+             </div>
+             <Skeleton className="h-16 w-48 rounded-2xl" />
+           </div>
+         </section>
+ 
+         <SectionSkeleton type="lots" count={4} />
+         <SectionSkeleton type="articles" count={4} />
+ 
+         {/* Sellers Carousel Skeleton */}
+         <section className="py-20 bg-muted/10">
+           <div className="container mx-auto px-4">
+             <div className="flex flex-wrap justify-center gap-12">
+               {[1, 2, 3, 4, 5, 6].map(i => (
+                 <Skeleton key={i} className="h-12 w-32 rounded-lg grayscale opacity-30" />
+               ))}
+             </div>
+           </div>
+         </section>
+       </div>
+     </div>
+   );
+ }
