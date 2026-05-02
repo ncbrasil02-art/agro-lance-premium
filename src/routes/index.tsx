@@ -142,7 +142,7 @@ function Home() {
    const mappedEvents = (events || []).filter(Boolean).map(mapEvent);
    const mappedPastEvents = (pastEvents || []).filter(Boolean).map(mapEvent);
  
-   const mappedLots = (lots || []).filter(l => l && l.animal).map((l: any) => ({
+    const mappedLots = (lots || []).filter((l: any) => l && l.animal).map((l: any) => ({
     id: l.id,
     number: l.lot_number,
     eventId: l.event_id,
@@ -206,14 +206,7 @@ function Home() {
 
   const featuredLots = mappedLots.slice(0, 6);
 
-    const siteStats = {
-      totalSold: 184500000,
-      totalAnimals: 12847,
-      totalUsers: 38420,
-      activeEvents: 14,
-   };
- 
-   const siteStats = {
+   const siteStats: any = {
      totalSold: sectionsSettings?.stats?.totalSold ?? 184500000,
      totalAnimals: sectionsSettings?.stats?.totalAnimals ?? 12847,
      totalUsers: sectionsSettings?.stats?.totalUsers ?? 38420,
