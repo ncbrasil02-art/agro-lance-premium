@@ -258,7 +258,7 @@ function Home() {
                    initial={{ opacity: 0, y: 30 }}
                    whileInView={{ opacity: 1, y: 0 }}
                    viewport={{ once: true }}
-                   className="group relative overflow-hidden rounded-[2rem] border-2 border-live/20 bg-emerald-deep shadow-[0_20px_50px_-15px_rgba(239,68,68,0.3)]"
+                    className="group relative overflow-hidden rounded-[2.5rem] border border-live/30 bg-emerald-deep shadow-[0_30px_60px_-15px_rgba(239,68,68,0.4)] transition-all duration-700 hover:shadow-live/50"
                  >
                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
                    <div className="flex flex-col md:flex-row items-stretch min-h-[350px]">
@@ -279,45 +279,59 @@ function Home() {
                        </div>
                      </div>
 
-                     {/* Content Section */}
-                     <div className="flex-1 p-8 md:p-12 flex flex-col justify-center gap-6 relative">
-                       <div>
-                         <h2 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter leading-none mb-4 group-hover:text-gold transition-colors duration-500">
-                           {liveEvents[0].name}
-                         </h2>
-                         <p className="text-white/70 text-base md:text-xl max-w-md italic font-medium leading-relaxed">
-                           {liveEvents[0].description || "Participe agora do nosso leilão de elite em tempo real."}
-                         </p>
-                       </div>
-
-                       <div className="flex flex-wrap items-center justify-between gap-6 pt-4 border-t border-white/10">
-                         <div className="flex items-center gap-3 text-live">
-                           <div className="h-10 w-10 rounded-full bg-live/10 flex items-center justify-center border border-live/20">
-                             <Radio className="h-5 w-5 animate-pulse" />
-                           </div>
-                           <div className="flex flex-col">
-                             <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Audiência Real</span>
-                             <span className="text-lg font-black text-white uppercase tracking-tighter italic">
-                               {Math.max(1, liveEvents[0].viewers).toLocaleString()} assistindo
-                             </span>
-                           </div>
-                         </div>
-                         
-                         <Link 
-                           to="/eventos/$eventSlug" 
-                           params={{ eventSlug: liveEvents[0].slug }}
-                           className="w-full md:w-auto"
-                         >
-                           <Button 
-                             size="lg" 
-                             className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-widest h-16 px-10 rounded-2xl shadow-live hover:scale-105 transition-all w-full"
-                           >
-                             ENTRAR NO LEILÃO
-                             <ArrowRight className="ml-2 h-5 w-5" />
-                           </Button>
-                         </Link>
-                       </div>
-                     </div>
+                      {/* Content Section with Super Elegant Effect */}
+                      <div className="flex-1 p-10 md:p-16 flex flex-col justify-center gap-8 relative overflow-hidden">
+                        {/* Animated Glow Backdrops */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-live/10 rounded-full blur-[100px] -mr-32 -mt-32" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gold/5 rounded-full blur-[80px] -ml-24 -mb-24" />
+                        
+                        <div className="relative z-10">
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            <h2 className="text-5xl md:text-7xl font-black text-white uppercase italic tracking-tighter leading-[0.9] mb-6 group-hover:text-gold transition-colors duration-700">
+                              {liveEvents[0].name}
+                            </h2>
+                            <p className="text-white/80 text-lg md:text-2xl max-w-lg italic font-medium leading-tight border-l-2 border-live/50 pl-6 py-2">
+                              {liveEvents[0].description || "Participe agora do nosso leilão de elite em tempo real."}
+                            </p>
+                          </motion.div>
+                        </div>
+ 
+                        <div className="flex flex-wrap items-center justify-between gap-8 pt-8 border-t border-white/10 relative z-10">
+                          <div className="flex items-center gap-4 text-live">
+                            <div className="h-14 w-14 rounded-2xl bg-live/20 flex items-center justify-center border border-live/40 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                              <Radio className="h-7 w-7 animate-pulse" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em]">Audiência Real</span>
+                              <span className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
+                                {Math.max(1, liveEvents[0].viewers).toLocaleString()} 
+                                <span className="text-sm font-bold text-live animate-pulse">LIVE</span>
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <Link 
+                            to="/eventos/$eventSlug" 
+                            params={{ eventSlug: liveEvents[0].slug }}
+                            className="w-full md:w-auto"
+                          >
+                            <Button 
+                              size="lg" 
+                              className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-[0.15em] h-20 px-12 rounded-[1.25rem] shadow-[0_15px_40px_-10px_rgba(239,68,68,0.5)] hover:scale-105 hover:shadow-live transition-all duration-500 w-full group/btn relative overflow-hidden"
+                            >
+                              <span className="relative z-10 flex items-center gap-3 text-lg">
+                                ENTRAR NO LEILÃO
+                                <ArrowRight className="h-6 w-6 group-hover/btn:translate-x-1 transition-transform" />
+                              </span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
                    </div>
                  </motion.div>
                  {liveEvents.length > 1 && (
