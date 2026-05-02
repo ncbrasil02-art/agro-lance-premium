@@ -4,7 +4,8 @@ import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingCart, Search, Filter, ArrowRight, DollarSign, Package } from "lucide-react";
+ import { ShoppingCart, Search, Filter, ArrowRight, DollarSign, Package, RefreshCw } from "lucide-react";
+ import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -15,7 +16,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { OfferDialog } from "@/components/auctions/OfferDialog";
 
- export const Route = createFileRoute("/compra-direta/")({
+  export const Route = createFileRoute("/compra-direta/")({
+    validateSearch: (search: Record<string, unknown>): { limit?: number } => {
+      return {
+        limit: Number(search.limit) || undefined,
+      };
+    },
+    loaderDeps: ({ search }: any) => ({ limit: search.limit }),
    head: ({ matches }) => {
      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
      const seoSettings = rootData?.seoSettings;
@@ -26,12 +33,13 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
        canonical: "/compra-direta"
      });
    },
-  loader: async () => {
-    const { data: animals, error: animalsError } = await supabase
-      .from("animals")
-      .select("*, categories(name)")
-      .eq("is_direct_sale", true)
-      .order("created_at", { ascending: false });
+   loader: async ({ deps }: any) => {
+     const { data: animals, error: animalsError } = await supabase
+       .from("animals")
+       .select("*, categories(name)")
+       .eq("is_direct_sale", true)
+       .order("created_at", { ascending: false })
+       .limit(deps.limit || 12);
 
     const { data: categories, error: categoriesError } = await supabase
       .from("categories")
@@ -49,8 +57,10 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
   pendingComponent: PageSkeleton,
 });
 
-function DirectSalePage() {
-  const { animals, categories } = Route.useLoaderData();
+ function DirectSalePage() {
+   const { animals, categories } = Route.useLoaderData() as any;
+   const { limit = 12 } = Route.useSearch();
+   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null);
@@ -258,9 +268,21 @@ function DirectSalePage() {
             </Card>
           ))
         )}
-      </div>
-
-      <OfferDialog 
+       </div>
+ 
+       {animals.length >= limit && (
+         <div className="flex justify-center py-12">
+           <Button
+             onClick={() => (router as any).navigate({ search: (prev: any) => ({ ...prev, limit: limit + 12 }) })}
+             className="bg-emerald-deep/40 border border-gold/30 text-gold font-black uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all h-14 px-10 rounded-2xl shadow-xl"
+           >
+             <RefreshCw className="h-4 w-4 mr-2" />
+             Ver Mais Ofertas
+           </Button>
+         </div>
+       )}
+ 
+       <OfferDialog 
         isOpen={isOfferDialogOpen} 
         onOpenChange={setIsOfferDialogOpen} 
         item={selectedAnimal ? {

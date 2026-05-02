@@ -11,9 +11,16 @@ import { useState, useMemo } from "react";
   import { z } from "zod";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getEffectiveEventStatus } from "@/utils/auction-status";
-import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
+ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
+ import { RefreshCw } from "lucide-react";
+ import { useRouter } from "@tanstack/react-router";
 
- export const Route = createFileRoute("/eventos/")({
+  export const Route = createFileRoute("/eventos/")({
+     validateSearch: (search: Record<string, unknown>): { limit?: number } => {
+       return {
+         limit: Number(search.limit) || undefined,
+       };
+     },
    head: ({ matches }) => {
      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
      const seoSettings = rootData?.seoSettings;
@@ -24,14 +31,15 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
        canonical: "/eventos"
      });
    },
-    loader: async () => {
+      loaderDeps: ({ search }: any) => ({ limit: search.limit }),
+      loader: async ({ deps }: any) => {
       logger.info("Iniciando carregamento da página de Eventos");
       try {
         const { data: events, error } = await supabase
            .from("events")
            .select("*, lots!lots_event_id_fkey(id)")
            .order("start_date")
-           .limit(PAGE_LIMITS.EVENTS_LIST);
+             .limit(deps.limit || PAGE_LIMITS.EVENTS_LIST);
    
         if (error) {
           logger.error("Erro Supabase ao carregar eventos", { error });
@@ -60,8 +68,10 @@ import { EventRequestDialog } from "@/components/auctions/EventRequestDialog";
    errorComponent: ErrorFallback,
 });
 
-function EventsPage() {
-   const { events } = Route.useLoaderData();
+ function EventsPage() {
+     const { events } = Route.useLoaderData() as { events: ValidatedEvent[] };
+     const { limit = PAGE_LIMITS.EVENTS_LIST } = Route.useSearch();
+    const router = useRouter();
   const [filter, setFilter] = useState("all");
  
     const mappedEvents = events.map((e: ValidatedEvent) => {
@@ -143,7 +153,22 @@ function EventsPage() {
           ) : (
             filteredEvents.map((e: any) => <EventCard key={e.id} event={e as any} />)
           )}
-      </div>
-    </div>
+       </div>
+ 
+       {events.length >= limit && (
+         <div className="flex justify-center py-12">
+           <button
+             onClick={() => (router as any).navigate({ search: (prev: any) => ({ ...prev, limit: limit + PAGE_LIMITS.EVENTS_LIST }) })}
+             className="group relative px-10 py-4 bg-emerald-deep/40 border border-gold/30 rounded-2xl text-gold font-black uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all duration-300 shadow-2xl overflow-hidden"
+           >
+             <span className="relative z-10 flex items-center gap-2">
+               Carregar Mais Eventos
+               <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
+             </span>
+             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+           </button>
+         </div>
+       )}
+     </div>
   );
 }

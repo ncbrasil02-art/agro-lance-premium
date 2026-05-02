@@ -8,7 +8,7 @@
  import { lotSchema } from "@/lib/schemas";
  import { z } from "zod";
  import { useQuery } from "@tanstack/react-query";
- import { Loader2, Search, Filter } from "lucide-react";
+  import { Loader2, Search, Filter, RefreshCw } from "lucide-react";
  import { logger } from "@/utils/logger";
  import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { Input } from "@/components/ui/input";
@@ -16,7 +16,13 @@
  import { getEffectiveLotStatus } from "@/utils/auction-status";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const Route = createFileRoute("/lotes/")({
+ export const Route = createFileRoute("/lotes/")({
+   validateSearch: (search: Record<string, unknown>): { limit?: number } => {
+     return {
+       limit: Number(search.limit) || undefined,
+     };
+   },
+   loaderDeps: ({ search }: any) => ({ limit: search.limit }),
   head: () => ({
     meta: [
       { title: "Lotes — Premium Agro Leilões" },
@@ -25,7 +31,7 @@ export const Route = createFileRoute("/lotes/")({
       { property: "og:description", content: "Animais e embriões selecionados para leilão." },
     ],
   }),
-    loader: async () => {
+     loader: async ({ deps }: any) => {
       logger.info("Iniciando carregamento da página de Lotes");
       try {
          const { data: settingsData } = await supabase
@@ -38,7 +44,7 @@ export const Route = createFileRoute("/lotes/")({
             .from("lots")
             .select("*, animal:animals!lots_animal_id_fkey(*, sellers!animals_seller_id_fkey(name)), event:events!lots_event_id_fkey(*)")
             .order("created_at", { ascending: false })
-            .limit(PAGE_LIMITS.LOTS_LIST);
+             .limit(deps.limit || PAGE_LIMITS.LOTS_LIST);
        
         if (error) {
           logger.error("Erro Supabase ao carregar lotes", { error });
@@ -59,7 +65,8 @@ export const Route = createFileRoute("/lotes/")({
 });
 
   function LotsPage() {
-    const { lots = [], settings } = Route.useLoaderData() as any;
+     const { lots = [], settings } = Route.useLoaderData() as any;
+     const { limit = PAGE_LIMITS.LOTS_LIST } = Route.useSearch();
     const router = useRouter();
    const [filter, setFilter] = useState("all");
    const [searchTerm, setSearchTerm] = useState("");
@@ -223,7 +230,22 @@ export const Route = createFileRoute("/lotes/")({
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
             {filteredLots?.map((l: any) => <LotCard key={l.id} lot={l as any} settings={settings} />)}
           </div>
-       )}
-     </div>
+        )}
+ 
+        {lots.length >= limit && (
+          <div className="flex justify-center py-12">
+            <button
+             onClick={() => (router as any).navigate({ search: (prev: any) => ({ ...prev, limit: limit + PAGE_LIMITS.LOTS_LIST }) })}
+              className="group relative px-10 py-4 bg-emerald-deep/40 border border-gold/30 rounded-2xl text-gold font-black uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all duration-300 shadow-2xl overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Carregar Mais Lotes
+                <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </button>
+          </div>
+        )}
+      </div>
    );
  }

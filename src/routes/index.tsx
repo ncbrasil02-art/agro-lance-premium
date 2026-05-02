@@ -110,10 +110,12 @@ function Home() {
       : ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"]
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {}, 1000);
-    return () => clearInterval(interval);
-  }, []);
+   useEffect(() => {
+     const interval = setInterval(() => {
+       router.invalidate();
+     }, 60000);
+     return () => clearInterval(interval);
+   }, [router]);
 
   const handleRealtimeUpdate = useCallback(() => {
     router.invalidate();
