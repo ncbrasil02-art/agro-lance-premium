@@ -1,3 +1,6 @@
+ import { Skeleton } from "./skeleton";
+ import { Loader2, Calendar, MapPin, Gavel, Trophy, Radio, ArrowRight } from "lucide-react";
+ 
  export function SectionSkeleton({ type = "cards", count = 3 }: { type?: "cards" | "lots" | "articles", count?: number }) {
    return (
      <section className="container mx-auto px-4 py-16 animate-pulse">
@@ -82,8 +85,6 @@ export function LotDetailSkeleton() {
     </div>
   );
 }
-import { Skeleton } from "./skeleton";
-import { Loader2, Calendar, MapPin, Gavel, Trophy } from "lucide-react";
 export function EventDetailSkeleton() {
   return (
     <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-500">
