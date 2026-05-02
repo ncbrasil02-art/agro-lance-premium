@@ -48,9 +48,9 @@ export const Route = createFileRoute("/")({
   loader: async () => {
     try {
       const results = await Promise.allSettled([
-        supabase.from("events").select("*, lots!lots_event_id_fkey(id)").or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento").order("start_date", { ascending: true }).limit(PAGE_LIMITS.HOME_EVENTS),
+         supabase.from("events").select("*, lots!lots_event_id_fkey(count)").or("status.eq.live,status.eq.scheduled,status.eq.recebendo_lances,status.eq.incondicional,status.eq.em_condicional,status.eq.em_loteamento").order("start_date", { ascending: true }).limit(PAGE_LIMITS.HOME_EVENTS),
         supabase.from("lots").select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)").eq("is_featured", true).order("created_at", { ascending: false }).limit(PAGE_LIMITS.HOME_FEATURED_LOTS),
-        supabase.from("events").select("*, lots!lots_event_id_fkey(id)").eq("status", "finished").order("start_date", { ascending: false }).limit(PAGE_LIMITS.HOME_PAST_EVENTS),
+         supabase.from("events").select("*, lots!lots_event_id_fkey(count)").eq("status", "finished").order("start_date", { ascending: false }).limit(PAGE_LIMITS.HOME_PAST_EVENTS),
         supabase.from("site_settings").select("*").eq("key", "announcement").maybeSingle(),
         supabase.from("posts").select("*, category:categories(name)").eq("status", "published").order("published_at", { ascending: false }).limit(PAGE_LIMITS.HOME_ARTICLES),
         supabase.from("animals").select("*, categories(name)").eq("is_direct_sale", true).eq("sale_status", "available").order("created_at", { ascending: false }).limit(4),
@@ -132,7 +132,7 @@ function Home() {
     cover: e?.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
     status: e.status as any,
     end_date: (e as any).end_date,
-    lotsCount: e.lots?.length || 0,
+     lotsCount: e.lots?.[0]?.count || 0,
     viewers: e.viewers || 0,
     bidsCount: 0,
     auctioneer: e.auctioneer_name || "",
