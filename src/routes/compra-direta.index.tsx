@@ -4,7 +4,8 @@ import { PageSkeleton } from "@/components/ui/page-skeleton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingCart, Search, Filter, ArrowRight, DollarSign, Package } from "lucide-react";
+ import { ShoppingCart, Search, Filter, ArrowRight, DollarSign, Package, RefreshCw } from "lucide-react";
+ import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -15,7 +16,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { OfferDialog } from "@/components/auctions/OfferDialog";
 
- export const Route = createFileRoute("/compra-direta/")({
+  export const Route = createFileRoute("/compra-direta/")({
+    validateSearch: (search: Record<string, unknown>): { limit?: number } => {
+      return {
+        limit: Number(search.limit) || undefined,
+      };
+    },
+    loaderDeps: ({ search }: any) => ({ limit: search.limit }),
    head: ({ matches }) => {
      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
      const seoSettings = rootData?.seoSettings;
