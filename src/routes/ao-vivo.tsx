@@ -35,8 +35,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
  import { useAuth } from "@/components/auth/auth-provider";
 import { motion, AnimatePresence } from "framer-motion";
 
- export const Route = createFileRoute("/ao-vivo")({
-   pendingComponent: PageSkeleton,
+  export const Route = createFileRoute("/ao-vivo")({
   head: () => ({
     meta: [
       { title: "Ao Vivo — Premium Agro Leilões" },
