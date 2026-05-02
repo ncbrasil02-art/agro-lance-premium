@@ -57,8 +57,10 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
   pendingComponent: PageSkeleton,
 });
 
-function DirectSalePage() {
-  const { animals, categories } = Route.useLoaderData();
+ function DirectSalePage() {
+   const { animals, categories } = Route.useLoaderData() as any;
+   const { limit = 12 } = Route.useSearch();
+   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null);
@@ -266,9 +268,21 @@ function DirectSalePage() {
             </Card>
           ))
         )}
-      </div>
-
-      <OfferDialog 
+       </div>
+ 
+       {animals.length >= limit && (
+         <div className="flex justify-center py-12">
+           <Button
+             onClick={() => (router as any).navigate({ search: (prev: any) => ({ ...prev, limit: limit + 12 }) })}
+             className="bg-emerald-deep/40 border border-gold/30 text-gold font-black uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all h-14 px-10 rounded-2xl shadow-xl"
+           >
+             <RefreshCw className="h-4 w-4 mr-2" />
+             Ver Mais Ofertas
+           </Button>
+         </div>
+       )}
+ 
+       <OfferDialog 
         isOpen={isOfferDialogOpen} 
         onOpenChange={setIsOfferDialogOpen} 
         item={selectedAnimal ? {
