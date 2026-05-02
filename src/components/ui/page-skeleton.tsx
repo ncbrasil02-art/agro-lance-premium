@@ -131,53 +131,67 @@ export function EventDetailSkeleton() {
   );
 }
 
-export function PageSkeleton() {
-  return (
-    <div className="container mx-auto px-4 py-12 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div className="space-y-3">
-          <Skeleton className="h-10 w-64 md:h-12" />
-          <Skeleton className="h-5 w-96 max-w-full" />
-        </div>
-        <Skeleton className="h-10 w-40 rounded-xl" />
-      </div>
-
-      <div className="mb-8 overflow-x-auto scrollbar-hide pb-2">
-        <div className="flex gap-2 p-1">
-          <Skeleton className="h-10 w-24 rounded-xl" />
-          <Skeleton className="h-10 w-24 rounded-xl" />
-          <Skeleton className="h-10 w-24 rounded-xl" />
-        </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="space-y-4">
-            <Skeleton className="aspect-video w-full rounded-2xl" />
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-            <div className="flex justify-between gap-4 pt-4">
-              <Skeleton className="h-10 flex-1 rounded-xl" />
-              <Skeleton className="h-10 w-10 rounded-xl" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/20 backdrop-blur-[2px] pointer-events-none">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-gold/20 blur-xl animate-pulse" />
-            <Loader2 className="h-12 w-12 text-gold animate-spin relative z-10" />
-          </div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-gold animate-pulse">Carregando...</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+ export function PageSkeleton() {
+   return (
+     <div className="container mx-auto px-4 py-16 animate-in fade-in duration-700 bg-background">
+       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 border-l-4 border-gold/20 pl-8">
+         <div className="space-y-4">
+           <Skeleton className="h-12 w-80 md:h-16 rounded-2xl" />
+           <Skeleton className="h-6 w-full max-w-lg rounded-lg" />
+         </div>
+         <div className="hidden md:block">
+            <Skeleton className="h-14 w-44 rounded-2xl bg-gold/5" />
+         </div>
+       </div>
+ 
+       <div className="mb-12 overflow-x-auto scrollbar-hide pb-4">
+         <div className="flex gap-4 p-2 bg-muted/20 rounded-3xl w-fit">
+           <Skeleton className="h-12 w-28 rounded-2xl" />
+           <Skeleton className="h-12 w-28 rounded-2xl" />
+           <Skeleton className="h-12 w-28 rounded-2xl" />
+           <Skeleton className="h-12 w-28 rounded-2xl" />
+         </div>
+       </div>
+ 
+       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+         {[1, 2, 3, 4, 5, 6].map((i) => (
+           <div key={i} className="group space-y-6">
+             <div className="relative overflow-hidden rounded-[2.5rem] bg-muted/30 aspect-[4/3]">
+               <Skeleton className="h-full w-full" />
+               <div className="absolute top-6 left-6 flex gap-3">
+                 <Skeleton className="h-6 w-20 rounded-full" />
+                 <Skeleton className="h-6 w-16 rounded-full" />
+               </div>
+             </div>
+             <div className="space-y-4 px-4">
+               <div className="flex items-center gap-3">
+                 <Skeleton className="h-5 w-5 rounded-full" />
+                 <Skeleton className="h-8 w-2/3 rounded-lg" />
+               </div>
+               <div className="space-y-2">
+                 <Skeleton className="h-4 w-full rounded-md" />
+                 <Skeleton className="h-4 w-4/5 rounded-md" />
+               </div>
+               <div className="flex justify-between items-end gap-6 pt-6 border-t border-border/50">
+                 <div className="space-y-2 flex-1">
+                   <Skeleton className="h-3 w-16 rounded-full" />
+                   <Skeleton className="h-10 w-full rounded-xl" />
+                 </div>
+                 <Skeleton className="h-10 w-24 rounded-xl" />
+               </div>
+             </div>
+           </div>
+         ))}
+       </div>
+ 
+       <div className="fixed bottom-12 right-12 z-[100] pointer-events-none">
+         <div className="bg-emerald-deep shadow-2xl rounded-full p-4 border border-gold/30 animate-bounce">
+           <RefreshCw className="h-8 w-8 text-gold animate-spin" />
+         </div>
+       </div>
+     </div>
+   );
+ }
 
  export function NewsPageSkeleton() {
    return (
