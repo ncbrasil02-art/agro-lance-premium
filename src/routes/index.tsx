@@ -246,13 +246,22 @@ function Home() {
       )}
 
       <div className="flex flex-col gap-0">
-        {(activeSections.order).map((sectionId: string) => (
-          <ErrorBoundary key={sectionId} fallback={<div className="p-10 text-center text-muted-foreground">Erro ao carregar seção {sectionId}</div>}>
-             {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
-               <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={siteStats} homepageSettings={activeSections} />
-             )}
-
-             {sectionId === "live_now" && liveEvents.length > 0 && (
+         {(activeSections.order || []).map((sectionId: string) => (
+           <ErrorBoundary 
+             key={sectionId} 
+             fallback={
+               <SectionFallback 
+                 variant="error" 
+                 title={`Seção ${sectionId}`} 
+                 message="Ocorreu um problema ao carregar esta seção. Tente recarregar a página." 
+               />
+             }
+           >
+              {sectionId === "banners" && (!activeSections || (activeSections as any).show_animated_slides) && (
+                <EliteHero siteInfo={currentSiteInfo} nextEvent={nextEvent} customTexts={customTexts} stats={siteStats} homepageSettings={activeSections} />
+              )}
+ 
+              {sectionId === "live_now" && liveEvents.length > 0 && (
                <section className="container mx-auto px-4 py-8 lg:py-12 relative z-20">
                  <motion.div 
                    initial={{ opacity: 0, y: 30 }}
