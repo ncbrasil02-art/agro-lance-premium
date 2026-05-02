@@ -391,15 +391,22 @@ function Home() {
                    )}
                 </div>
                )}
-              {sectionId === "articles" && (activeSections as any)?.show_articles && (
-                <div className="relative py-12">
-                  <ArticleCarousel 
-                   articles={articles} 
-                   variant="model1" 
-                   settings={articleSettings}
-                 />
-               </div>
-             )}
+               {sectionId === "articles" && (activeSections as any)?.show_articles && (
+                 <div className="relative py-12">
+                   {articles.length > 0 ? (
+                     <ArticleCarousel 
+                       articles={articles} 
+                       variant="model1" 
+                       settings={articleSettings}
+                     />
+                   ) : (
+                     <SectionFallback 
+                       title="Últimas Notícias" 
+                       message="Novos conteúdos estão sendo redigidos. Fique por dentro em breve!" 
+                     />
+                   )}
+                 </div>
+               )}
              {sectionId === "articles" && directSales.length > 0 && (
                <HomeSaleLots directSales={directSales} />
              )}
