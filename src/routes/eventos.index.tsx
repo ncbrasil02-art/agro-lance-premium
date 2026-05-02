@@ -153,7 +153,22 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
           ) : (
             filteredEvents.map((e: any) => <EventCard key={e.id} event={e as any} />)
           )}
-      </div>
-    </div>
+       </div>
+ 
+       {events.length >= limit && (
+         <div className="flex justify-center py-12">
+           <button
+             onClick={() => (router as any).navigate({ search: (prev: any) => ({ ...prev, limit: limit + PAGE_LIMITS.EVENTS_LIST }) })}
+             className="group relative px-10 py-4 bg-emerald-deep/40 border border-gold/30 rounded-2xl text-gold font-black uppercase tracking-widest hover:bg-gold hover:text-emerald-deep transition-all duration-300 shadow-2xl overflow-hidden"
+           >
+             <span className="relative z-10 flex items-center gap-2">
+               Carregar Mais Eventos
+               <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
+             </span>
+             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+           </button>
+         </div>
+       )}
+     </div>
   );
 }
