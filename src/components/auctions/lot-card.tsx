@@ -145,14 +145,16 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
               )}
 
               {lot.photos && lot.photos.length > 1 && settings.media_mode === 'gallery' && (
-                <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1 z-20">
-                  {lot.photos.map((_, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`h-1 rounded-full transition-all ${idx === currentPhotoIndex ? 'w-4 bg-gold' : 'w-1.5 bg-white/40'}`}
-                    />
-                  ))}
-                </div>
+                 {Array.isArray(lot.photos) && lot.photos.length > 0 && (
+                   <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1 z-20">
+                     {lot.photos.map((_: any, idx: number) => (
+                       <div 
+                         key={idx} 
+                         className={`h-1 rounded-full transition-all ${idx === currentPhotoIndex ? 'w-4 bg-gold' : 'w-1.5 bg-white/40'}`}
+                       />
+                     ))}
+                   </div>
+                 )}
               )}
             </div>
           )}
