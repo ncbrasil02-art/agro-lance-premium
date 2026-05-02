@@ -1591,8 +1591,11 @@ import { motion, AnimatePresence } from "framer-motion";
                </li>
              ))}
           </ul>
-        </aside>
-      </div>
-    </div>
+         </aside>
+       </div>
+     </div>
+   </div>
+ </div>
+ </div>
   );
 }
