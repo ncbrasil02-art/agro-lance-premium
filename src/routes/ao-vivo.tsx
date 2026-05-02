@@ -1074,6 +1074,7 @@ import { motion, AnimatePresence } from "framer-motion";
              <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur z-10">
                <Volume2 className="h-4 w-4" />
              </div>
+            </div>
           </div>
         </ErrorBoundary>
 
