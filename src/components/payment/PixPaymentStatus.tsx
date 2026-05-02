@@ -175,7 +175,7 @@
              >
                <Copy className="h-4 w-4" /> COPIAR CÓDIGO PIX
              </Button>
-             <p className="text-[10px] text-center text-gray-500 italic">
+              <p className="text-[11px] text-center text-emerald-600 dark:text-emerald-300 font-medium italic">
                Abra o app do seu banco e escolha a opção "PIX Copia e Cola" ou escaneie o QR Code.
              </p>
            </div>
