@@ -16,10 +16,10 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
  import { useRouter } from "@tanstack/react-router";
 
   export const Route = createFileRoute("/eventos/")({
-     validateSearch: (search: Record<string, unknown>) => {
-       return z.object({
-         limit: z.number().optional(),
-       }).parse(search);
+     validateSearch: (search: Record<string, unknown>): { limit?: number } => {
+       return {
+         limit: Number(search.limit) || undefined,
+       };
      },
    head: ({ matches }) => {
      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
