@@ -206,16 +206,17 @@ function Home() {
 
   const featuredLots = mappedLots.slice(0, 6);
 
+   const statsData = (sectionsSettings as any)?.stats || {};
    const siteStats: any = {
-     totalSold: sectionsSettings?.stats?.totalSold ?? 184500000,
-     totalAnimals: sectionsSettings?.stats?.totalAnimals ?? 12847,
-     totalUsers: sectionsSettings?.stats?.totalUsers ?? 38420,
-     activeEvents: sectionsSettings?.stats?.activeEvents ?? 14,
+     totalSold: statsData.totalSold ?? 184500000,
+     totalAnimals: statsData.totalAnimals ?? 12847,
+     totalUsers: statsData.totalUsers ?? 38420,
+     activeEvents: statsData.activeEvents ?? 14,
      labels: {
-       totalSold: sectionsSettings?.stats?.labels?.totalSold || "Volume Negociado",
-       totalAnimals: sectionsSettings?.stats?.labels?.totalAnimals || "Animais Registrados",
-       totalUsers: sectionsSettings?.stats?.labels?.totalUsers || "Base de Investidores",
-       activeEvents: sectionsSettings?.stats?.labels?.activeEvents || "Eventos Ativos"
+       totalSold: statsData.labels?.totalSold || "Volume Negociado",
+       totalAnimals: statsData.labels?.totalAnimals || "Animais Registrados",
+       totalUsers: statsData.labels?.totalUsers || "Base de Investidores",
+       activeEvents: statsData.labels?.activeEvents || "Eventos Ativos"
      }
    };
 
