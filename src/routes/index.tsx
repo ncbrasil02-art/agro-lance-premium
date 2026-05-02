@@ -104,7 +104,9 @@ function Home() {
   
   const activeSections = {
     ...baseSettings,
-    order: (baseSettings as any).order || ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"]
+    order: Array.isArray((baseSettings as any)?.order) 
+      ? (baseSettings as any).order 
+      : ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"]
   };
 
   useEffect(() => {
