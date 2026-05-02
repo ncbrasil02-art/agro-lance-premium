@@ -25,6 +25,8 @@ import {
  import { Countdown } from "@/components/auctions/countdown";
  import { StatusBadge } from "@/components/auctions/status-badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ErrorBoundary } from "@/components/ui/error-fallback";
+import { SectionFallback } from "@/components/site/SectionFallback";
   import { supabase } from "@/integrations/supabase/client";
   import { formatBRL } from "@/utils/format";
   import { eventSchema, lotSchema } from "@/lib/schemas";
@@ -1005,7 +1007,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px] flex-col lg:flex-row">
         {/* Player + Lote em destaque */}
-        <div className="space-y-6 order-1 flex flex-col">
+        <ErrorBoundary tag="live-player" fallback={<SectionFallback title="Transmissão" message="Falha ao carregar o player de vídeo." variant="error" />}>
+          <div className="space-y-6 order-1 flex flex-col">
            <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
              {liveEvent.transmission_link ? (
                <iframe
@@ -1071,7 +1074,9 @@ import { motion, AnimatePresence } from "framer-motion";
              <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur z-10">
                <Volume2 className="h-4 w-4" />
              </div>
-           </div>
+            </div>
+          </div>
+        </ErrorBoundary>
 
           {/* Bid History for Mobile (Visible between Player and Lot Highlight) */}
           <div className="lg:hidden order-2 mb-2">
@@ -1516,14 +1521,14 @@ import { motion, AnimatePresence } from "framer-motion";
                       </DialogContent>
                     </Dialog>
                   </div>
-                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Chat / Histórico de lances */}
+             </div>
+           </div>
+         </div>
+       </div>
+ 
+          {/* Chat / Histórico de lances */}
         <aside className="rounded-2xl border border-border bg-card order-2 lg:order-none">
           <div className="border-b border-border p-4 space-y-3">
             {statusMessage && (
@@ -1589,8 +1594,8 @@ import { motion, AnimatePresence } from "framer-motion";
                </li>
              ))}
           </ul>
-        </aside>
+          </aside>
+        </div>
       </div>
-    </div>
-  );
+    );
 }

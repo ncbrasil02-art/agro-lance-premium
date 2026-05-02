@@ -11,6 +11,8 @@ import { eventSchema } from "@/lib/schemas";
 import { LotCard } from "@/components/auctions/lot-card";
  import { StatusBadge } from "@/components/auctions/status-badge";
  import { getEffectiveEventStatus } from "@/utils/auction-status";
+import { ErrorBoundary } from "@/components/ui/error-fallback";
+import { SectionFallback } from "@/components/site/SectionFallback";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
@@ -345,7 +347,8 @@ function EventDetail() {
 
       {/* Gallery Section - Only if there are photos */}
        {Array.isArray(event.photos) && event.photos.length > 0 && (
-        <section className="container mx-auto px-4 py-16 border-t border-white/5">
+         <ErrorBoundary tag="event-gallery" fallback={<SectionFallback title="Galeria" message="Não foi possível carregar a galeria de fotos." variant="error" />}>
+           <section className="container mx-auto px-4 py-16 border-t border-white/5">
           <div className="flex items-center gap-4 mb-10">
             <div className="h-12 w-12 rounded-2xl bg-gold/10 flex items-center justify-center">
               <ImageIcon className="h-6 w-6 text-gold" />
@@ -385,11 +388,13 @@ function EventDetail() {
               </Dialog>
             ))}
           </div>
-        </section>
+           </section>
+         </ErrorBoundary>
       )}
 
       {/* Lots Section */}
-      <section className="container mx-auto px-4 py-16">
+      <ErrorBoundary tag="event-lots" fallback={<SectionFallback title="Lotes" message="Não foi possível carregar os lotes deste evento." variant="error" />}>
+        <section className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
              <h2 className="text-3xl md:text-5xl font-black text-foreground uppercase tracking-tighter">Lotes Disponíveis</h2>
@@ -447,7 +452,8 @@ function EventDetail() {
             <p className="text-sm text-muted-foreground/60 mt-1">Acompanhe nossas redes para saber quando os lotes forem liberados.</p>
           </div>
         )}
-      </section>
+        </section>
+      </ErrorBoundary>
     </div>
   );
 }
