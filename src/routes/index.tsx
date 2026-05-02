@@ -252,6 +252,7 @@ function Home() {
          {(activeSections.order || []).map((sectionId: string) => (
            <ErrorBoundary 
              key={sectionId} 
+            tag={sectionId}
              fallback={
                <SectionFallback 
                  variant="error" 
