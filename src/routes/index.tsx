@@ -370,18 +370,27 @@ function Home() {
                    )}
                  </div>
                )}
-              {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
-                <div className="relative py-12">
-                  <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
-                 <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
-                    <div className="grid gap-6 sm:grid-cols-2">
-                       {mappedLots.slice(0, 4).map((lot: any) => (
-                          <LotCard key={lot.id} lot={lot} />
-                       ))}
-                    </div>
-                 </section>
-               </div>
-             )}
+               {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
+                 <div className="relative py-12">
+                   {mappedLots.length > 0 ? (
+                     <>
+                       <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
+                       <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
+                         <div className="grid gap-6 sm:grid-cols-2">
+                            {mappedLots.slice(0, 4).map((lot: any) => (
+                               <LotCard key={lot.id} lot={lot} />
+                            ))}
+                         </div>
+                       </section>
+                     </>
+                   ) : (
+                     <SectionFallback 
+                       title="Lotes em Destaque" 
+                       message="Novos lotes de elite serão anunciados em breve." 
+                     />
+                   )}
+                </div>
+               )}
               {sectionId === "articles" && (activeSections as any)?.show_articles && (
                 <div className="relative py-12">
                   <ArticleCarousel 
