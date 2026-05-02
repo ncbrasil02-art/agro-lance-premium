@@ -1,5 +1,5 @@
  import { Skeleton } from "./skeleton";
- import { Loader2, Calendar, MapPin, Gavel, Trophy, Radio, ArrowRight } from "lucide-react";
+ import { Loader2, Calendar, MapPin, Gavel, Trophy, Radio, ArrowRight, RefreshCw } from "lucide-react";
  
  export function SectionSkeleton({ type = "cards", count = 3 }: { type?: "cards" | "lots" | "articles", count?: number }) {
    return (
