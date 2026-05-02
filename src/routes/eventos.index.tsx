@@ -16,11 +16,11 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
  import { useRouter } from "@tanstack/react-router";
 
   export const Route = createFileRoute("/eventos/")({
-    validateSearch: (search: Record<string, unknown>) => {
-      return {
-        limit: (search.limit as number) || PAGE_LIMITS.EVENTS_LIST,
-      };
-    },
+     validateSearch: (search: Record<string, unknown>) => {
+       return z.object({
+         limit: z.number().optional(),
+       }).parse(search);
+     },
    head: ({ matches }) => {
      const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
      const seoSettings = rootData?.seoSettings;
@@ -31,14 +31,14 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
        canonical: "/eventos"
      });
    },
-     loader: async ({ search }) => {
+      loader: async ({ search }: { search: { limit?: number } }) => {
       logger.info("Iniciando carregamento da página de Eventos");
       try {
         const { data: events, error } = await supabase
            .from("events")
            .select("*, lots!lots_event_id_fkey(id)")
            .order("start_date")
-            .limit(search.limit);
+             .limit(search.limit || PAGE_LIMITS.EVENTS_LIST);
    
         if (error) {
           logger.error("Erro Supabase ao carregar eventos", { error });
@@ -68,8 +68,8 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
 });
 
  function EventsPage() {
-    const { events } = Route.useLoaderData();
-    const { limit } = Route.useSearch();
+     const { events } = Route.useLoaderData() as { events: ValidatedEvent[] };
+     const { limit = PAGE_LIMITS.EVENTS_LIST } = Route.useSearch();
     const router = useRouter();
   const [filter, setFilter] = useState("all");
  
