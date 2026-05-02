@@ -1523,8 +1523,11 @@ import { motion, AnimatePresence } from "framer-motion";
                    </div>
                  </div>
                </div>
+             </div>
+           </div>
+         </div>
  
-          {/* Chat / Histórico de lances */}
+           {/* Chat / Histórico de lances */}
         <aside className="rounded-2xl border border-border bg-card order-2 lg:order-none">
           <div className="border-b border-border p-4 space-y-3">
             {statusMessage && (
