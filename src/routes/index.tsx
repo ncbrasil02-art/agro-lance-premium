@@ -353,16 +353,23 @@ function Home() {
                  )}
                </section>
              )}
-              {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
-                <div className="relative py-8 overflow-hidden">
-                  <EventCarousel 
-                   events={upcomingEvents} 
-                   title="Próximos eventos" 
-                   subtitle="Reserve sua agenda e participe das maiores oportunidades."
-                   variant="model1"
-                 />
-               </div>
-             )}
+               {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
+                 <div className="relative py-8 overflow-hidden">
+                   {upcomingEvents.length > 0 ? (
+                     <EventCarousel 
+                       events={upcomingEvents} 
+                       title="Próximos eventos" 
+                       subtitle="Reserve sua agenda e participe das maiores oportunidades."
+                       variant="model1"
+                     />
+                   ) : (
+                     <SectionFallback 
+                       title="Próximos Eventos" 
+                       message="Novos eventos estão sendo preparados. Volte em breve para conferir!" 
+                     />
+                   )}
+                 </div>
+               )}
               {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
                 <div className="relative py-12">
                   <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
