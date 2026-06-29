@@ -135,35 +135,25 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
             A nova era dos leilões de elite
           </Badge>
           
-           <div className="mb-8 min-h-[140px] md:min-h-[250px]">
-             <motion.h1 
-               initial={{ opacity: 0, scale: 0.9 }}
-               animate={{ opacity: 1, scale: 1 }}
-               transition={{ duration: 1, ease: "easeOut" }}
-                className="text-6xl md:text-[8rem] font-black leading-none tracking-tighter uppercase italic drop-shadow-2xl"
-             >
-              {customTexts?.hero_title || (
-                <div className="flex flex-col gap-0 items-start">
-                   <motion.span 
-                     initial={{ x: -50, opacity: 0 }}
-                     animate={{ x: 0, opacity: 1 }}
-                     transition={{ delay: 0.2, duration: 0.8 }}
-                     className="text-gradient-gold font-signature normal-case text-8xl md:text-[11rem] -mb-10 block drop-shadow-xl leading-none"
-                   >
+           <div className="mb-8">
+              <motion.h1 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter uppercase"
+              >
+               {customTexts?.hero_title || (
+                 <span className="flex flex-wrap items-baseline gap-x-3">
+                   <span className="text-emerald-bright">
                      {siteInfo?.name && typeof siteInfo.name === 'string' ? siteInfo.name.split(' ')[0] : "NC"}
-                   </motion.span>
-                   <motion.span 
-                     initial={{ x: 50, opacity: 0 }}
-                     animate={{ x: 0, opacity: 1 }}
-                     transition={{ delay: 0.4, duration: 0.8 }}
-                     className="block pl-4 tracking-[-0.05em] uppercase font-black text-foreground"
-                   >
+                   </span>
+                   <span className="text-gradient-gold">
                      {siteInfo?.name && typeof siteInfo.name === 'string' ? siteInfo.name.split(' ').slice(1).join(' ') : "Agro Leilões"}
-                   </motion.span>
-                </div>
-              )}
-             </motion.h1>
-          </div>
+                   </span>
+                 </span>
+               )}
+              </motion.h1>
+           </div>
           
           <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
             {customTexts?.hero_subtitle || "Curadoria genética de excelência e tecnologia de ponta para o agronegócio global."}
