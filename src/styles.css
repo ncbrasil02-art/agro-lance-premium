@@ -1,5 +1,4 @@
- @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cedarville+Cursive&display=swap');
- 
+
  @keyframes neon-pulse-urgent {
    0%, 100% {
      box-shadow: 0 0 6px rgba(239, 68, 68, 0.2);
