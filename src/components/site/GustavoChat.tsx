@@ -13,6 +13,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -49,7 +50,34 @@ export function GustavoChat() {
   const [loadingThread, setLoadingThread] = useState(false);
   const { siteInfo } = useSiteSettings();
   const { user } = useAuth();
+  const router = useRouter();
   const [config, setConfig] = useState<ChatbotConfig>(DEFAULT_CHATBOT_CONFIG);
+  const markdownComponents = {
+    a: ({ href, children, ...rest }: any) => {
+      const isInternal = typeof href === "string" && href.startsWith("/");
+      if (!isInternal) {
+        return (
+          <a href={href} target="_blank" rel="noopener noreferrer" {...rest}>
+            {children}
+          </a>
+        );
+      }
+      return (
+        <a
+          href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(false);
+            router.navigate({ to: href });
+          }}
+          {...rest}
+        >
+          {children}
+        </a>
+      );
+    },
+  } as const;
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const persistedIdsRef = useRef<Set<string>>(new Set());
@@ -338,7 +366,7 @@ export function GustavoChat() {
             {!loadingThread && messages.length === 0 && (
               <div className="space-y-3">
                 <div className="bg-background rounded-2xl rounded-tl-sm p-3 text-sm shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1">
-                  <ReactMarkdown>{config.welcome}</ReactMarkdown>
+                  <ReactMarkdown components={markdownComponents}>{config.welcome}</ReactMarkdown>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((s) => (
@@ -376,7 +404,7 @@ export function GustavoChat() {
                       <p className="whitespace-pre-wrap">{text}</p>
                     ) : (
                       <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1">
-                        <ReactMarkdown>{text}</ReactMarkdown>
+                        <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>
                       </div>
                     )}
                   </div>
