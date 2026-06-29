@@ -7,6 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
   import { Plus, Search, Pencil, Trash2, Loader2, PlusCircle, Building2, User, Upload, Image as ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
 import { generateSlug } from "@/utils/slug";
@@ -28,6 +38,15 @@ export function SellerManagement() {
   const [sellers, setSellers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+    animals: number;
+    lots: number;
+    bids: number;
+    offers: number;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchSellers = async () => {
     setIsLoading(true);
@@ -110,27 +129,75 @@ export function SellerManagement() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const { count } = await supabase
-      .from("animals")
-      .select("id", { count: "exact", head: true })
-      .eq("seller_id", id);
-
-    const warning = count && count > 0
-      ? `\n\nATENÇÃO: Este vendedor possui ${count} animal(is) vinculado(s). Todos os animais, lotes, lances e ofertas relacionados serão excluídos em cascata. Esta ação é IRREVERSÍVEL.`
-      : "";
-
-    if (!confirm(`Tem certeza que deseja excluir este vendedor?${warning}`)) return;
-
+  const openDeleteDialog = async (seller: any) => {
+    const tid = toast.loading("Verificando dependências...");
     try {
-      const { error } = await supabase.from("sellers").delete().eq("id", id);
+      const { data: animals } = await supabase
+        .from("animals")
+        .select("id")
+        .eq("seller_id", seller.id);
+      const animalIds = (animals || []).map((a: any) => a.id);
+
+      let lotIds: string[] = [];
+      let lotsCount = 0;
+      if (animalIds.length > 0) {
+        const { data: lots } = await supabase
+          .from("lots")
+          .select("id")
+          .in("animal_id", animalIds);
+        lotIds = (lots || []).map((l: any) => l.id);
+        lotsCount = lotIds.length;
+      }
+
+      let bidsCount = 0;
+      if (lotIds.length > 0) {
+        const { count } = await supabase
+          .from("bids")
+          .select("id", { count: "exact", head: true })
+          .in("lot_id", lotIds);
+        bidsCount = count || 0;
+      }
+
+      let offersCount = 0;
+      if (animalIds.length > 0) {
+        const { count } = await supabase
+          .from("offers")
+          .select("id", { count: "exact", head: true })
+          .in("animal_id", animalIds);
+        offersCount = count || 0;
+      }
+
+      setDeleteTarget({
+        id: seller.id,
+        name: seller.name,
+        animals: animalIds.length,
+        lots: lotsCount,
+        bids: bidsCount,
+        offers: offersCount,
+      });
+    } catch (error: any) {
+      toast.error("Erro ao verificar dependências: " + error.message);
+    } finally {
+      toast.dismiss(tid);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.from("sellers").delete().eq("id", deleteTarget.id);
       if (error) throw error;
-      toast.success(count && count > 0
-        ? `Vendedor e ${count} animal(is) vinculado(s) excluídos com sucesso`
+      const total = deleteTarget.animals + deleteTarget.lots + deleteTarget.bids + deleteTarget.offers;
+      toast.success(total > 0
+        ? `Vendedor e ${total} registro(s) vinculado(s) excluídos com sucesso`
         : "Vendedor excluído com sucesso");
+      setDeleteTarget(null);
       fetchSellers();
     } catch (error: any) {
       toast.error("Erro ao excluir vendedor: " + error.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -326,7 +393,7 @@ export function SellerManagement() {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={() => handleDelete(seller.id)}>
+                                  <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(seller)}>
                                     <Trash2 className="h-4 w-4 text-red-500" />
                                   </Button>
                                 </TooltipTrigger>
@@ -350,6 +417,38 @@ export function SellerManagement() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && !isDeleting && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir vendedor "{deleteTarget?.name}"?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>Esta ação é <strong className="text-red-600">irreversível</strong>. Os seguintes registros vinculados serão excluídos em cascata:</p>
+                <ul className="rounded-md border bg-muted/50 p-3 space-y-1 text-sm">
+                  <li className="flex justify-between"><span>Animais</span><strong>{deleteTarget?.animals ?? 0}</strong></li>
+                  <li className="flex justify-between"><span>Lotes</span><strong>{deleteTarget?.lots ?? 0}</strong></li>
+                  <li className="flex justify-between"><span>Lances</span><strong>{deleteTarget?.bids ?? 0}</strong></li>
+                  <li className="flex justify-between"><span>Ofertas</span><strong>{deleteTarget?.offers ?? 0}</strong></li>
+                </ul>
+                {(deleteTarget?.bids ?? 0) > 0 && (
+                  <p className="text-xs text-amber-600">⚠️ Existem lances registrados. A exclusão pode impactar o histórico de leilões.</p>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); confirmDelete(); }}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Excluindo...</> : "Excluir definitivamente"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
