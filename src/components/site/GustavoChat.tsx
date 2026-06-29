@@ -61,7 +61,12 @@ export function GustavoChat() {
 
   const isLoading = status === "submitted" || status === "streaming";
   const phone = siteInfo?.phone || "(21) 99650-9905";
-  const waLink = buildWhatsAppLink(phone);
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((m) => m.role === "user")
+    ?.parts.map((p) => (p.type === "text" ? p.text : ""))
+    .join("");
+  const waLink = buildWhatsAppLink(phone, lastUserMessage);
 
   // Load threads list when user opens chat
   const loadThreads = useCallback(async () => {
