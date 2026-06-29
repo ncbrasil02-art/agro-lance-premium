@@ -366,7 +366,7 @@ export function GustavoChat() {
             {!loadingThread && messages.length === 0 && (
               <div className="space-y-3">
                 <div className="bg-background rounded-2xl rounded-tl-sm p-3 text-sm shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1">
-                  <ReactMarkdown>{config.welcome}</ReactMarkdown>
+                  <ReactMarkdown components={markdownComponents}>{config.welcome}</ReactMarkdown>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((s) => (
@@ -404,7 +404,7 @@ export function GustavoChat() {
                       <p className="whitespace-pre-wrap">{text}</p>
                     ) : (
                       <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1">
-                        <ReactMarkdown>{text}</ReactMarkdown>
+                        <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>
                       </div>
                     )}
                   </div>
