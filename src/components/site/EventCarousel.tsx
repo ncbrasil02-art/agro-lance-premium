@@ -8,12 +8,8 @@ import { cn } from "@/lib/utils"
   export function EventCarousel({ events, title, subtitle, variant = 'model1' }: { events: any[], title: string, subtitle: string, variant?: string }) {
    const [emblaRef, emblaApi] = useEmblaCarousel({ 
      align: "start",
-     loop: events.length > 3,
+     loop: events.length > 1,
      slidesToScroll: 1,
-     breakpoints: {
-       "(min-width: 768px)": { slidesToScroll: 2 },
-       "(min-width: 1024px)": { slidesToScroll: 3 }
-     }
    })
 
    const scrollPrev = React.useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
@@ -39,13 +35,13 @@ import { cn } from "@/lib/utils"
               variant === 'model3' && "text-white/60"
             )}>{subtitle}</p>
          </div>
-         {events.length > 3 && (
+         {events.length > 1 && (
            <div className="flex gap-2">
              <Button 
                variant="outline" 
                size="icon" 
                onClick={scrollPrev}
-               className="rounded-full border-gold/30 hover:bg-gold/10 text-gold"
+                className="rounded-full border-gold/30 hover:bg-gold/10 text-gold lg:hidden"
              >
                <ChevronLeft className="h-4 w-4" />
              </Button>
@@ -53,7 +49,7 @@ import { cn } from "@/lib/utils"
                variant="outline" 
                size="icon" 
                onClick={scrollNext}
-               className="rounded-full border-gold/30 hover:bg-gold/10 text-gold"
+                className="rounded-full border-gold/30 hover:bg-gold/10 text-gold lg:hidden"
              >
                <ChevronRight className="h-4 w-4" />
              </Button>
@@ -61,10 +57,16 @@ import { cn } from "@/lib/utils"
          )}
        </div>
 
-        <div className={cn("overflow-hidden", variant === 'model3' && "container mx-auto px-4")} ref={emblaRef}>
+        {/* Desktop: full grid, 3 columns; Mobile/Tablet: carousel */}
+        <div className={cn("hidden lg:grid gap-6 grid-cols-3", variant === 'model3' && "container mx-auto px-4")}>
+          {events.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+        <div className={cn("lg:hidden overflow-hidden", variant === 'model3' && "container mx-auto px-4")} ref={emblaRef}>
          <div className="flex -ml-6">
            {events.map((event) => (
-             <div key={event.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] pl-6">
+             <div key={event.id} className="flex-[0_0_100%] md:flex-[0_0_50%] pl-6">
                <EventCard event={event} />
              </div>
            ))}
