@@ -26,6 +26,7 @@ import { Route as PagamentoInstallmentIdRouteImport } from './routes/pagamento.$
 import { Route as NoticiasSlugRouteImport } from './routes/noticias.$slug'
 import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -112,6 +113,11 @@ const EventosEventSlugRoute = EventosEventSlugRouteImport.update({
   path: '/$eventSlug',
   getParentRoute: () => EventosRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/lotes': typeof LotesRouteWithChildren
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
+  '/api/chat': typeof ApiChatRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
+  '/api/chat': typeof ApiChatRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/lotes': typeof LotesRouteWithChildren
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
+  '/api/chat': typeof ApiChatRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
   '/lotes/$lotId': typeof LotesLotIdRoute
   '/noticias/$slug': typeof NoticiasSlugRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/lotes'
     | '/painel'
     | '/sobre'
+    | '/api/chat'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/painel'
     | '/sobre'
+    | '/api/chat'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/lotes'
     | '/painel'
     | '/sobre'
+    | '/api/chat'
     | '/eventos/$eventSlug'
     | '/lotes/$lotId'
     | '/noticias/$slug'
@@ -237,6 +249,7 @@ export interface RootRouteChildren {
   LotesRoute: typeof LotesRouteWithChildren
   PainelRoute: typeof PainelRoute
   SobreRoute: typeof SobreRoute
+  ApiChatRoute: typeof ApiChatRoute
   NoticiasSlugRoute: typeof NoticiasSlugRoute
   PagamentoInstallmentIdRoute: typeof PagamentoInstallmentIdRoute
   CompraDiretaIndexRoute: typeof CompraDiretaIndexRoute
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventosEventSlugRouteImport
       parentRoute: typeof EventosRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -402,6 +422,7 @@ const rootRouteChildren: RootRouteChildren = {
   LotesRoute: LotesRouteWithChildren,
   PainelRoute: PainelRoute,
   SobreRoute: SobreRoute,
+  ApiChatRoute: ApiChatRoute,
   NoticiasSlugRoute: NoticiasSlugRoute,
   PagamentoInstallmentIdRoute: PagamentoInstallmentIdRoute,
   CompraDiretaIndexRoute: CompraDiretaIndexRoute,
