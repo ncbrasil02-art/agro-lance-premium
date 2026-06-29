@@ -55,7 +55,7 @@ function NotificationsCenter() {
   const updatePref = async (key: string, value: boolean) => {
     if (!user?.id) return;
     setSavingPref(key);
-    const { error } = await supabase.from("profiles").update({ [key]: value }).eq("id", user.id);
+    const { error } = await supabase.from("profiles").update({ [key]: value } as any).eq("id", user.id);
     setSavingPref(null);
     if (error) return toast.error("Erro ao salvar", { description: error.message });
     await refreshProfile();
