@@ -209,19 +209,16 @@ export function GustavoChat() {
     setInput("");
   };
 
-  const suggestions = [
-    "Como me cadastro?",
-    "Como dou um lance?",
-    "Como crio um evento?",
-    "Quais formas de pagamento?",
-  ];
+  const suggestions = config.suggestions;
+
+  if (!config.enabled) return null;
 
   return (
     <>
       {/* Floating button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Abrir chat com Gustavo Leilão"
+        aria-label={`Abrir chat com ${config.name}`}
         className={cn(
           "fixed z-50 bottom-20 right-4 md:bottom-6 md:right-6",
           "h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-2xl",
@@ -259,7 +256,7 @@ export function GustavoChat() {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold leading-tight">Gustavo Leilão</div>
+                <div className="font-semibold leading-tight">{config.name}</div>
                 <div className="text-xs opacity-90 flex items-center gap-1">
                   <span className="h-2 w-2 rounded-full bg-green-400 inline-block" />
                   {showThreads ? "Histórico de conversas" : "Assistente virtual · online"}
@@ -340,10 +337,8 @@ export function GustavoChat() {
             )}
             {!loadingThread && messages.length === 0 && (
               <div className="space-y-3">
-                <div className="bg-background rounded-2xl rounded-tl-sm p-3 text-sm shadow-sm">
-                  Olá! 👋 Sou o <strong>Gustavo Leilão</strong>, seu assistente sobre leilões do
-                  agronegócio. Posso ajudar com cadastro, lances, eventos, propostas e pagamentos.
-                  Como posso te ajudar hoje?
+                <div className="bg-background rounded-2xl rounded-tl-sm p-3 text-sm shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1">
+                  <ReactMarkdown>{config.welcome}</ReactMarkdown>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((s) => (
