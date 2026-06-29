@@ -66,7 +66,7 @@ export function GustavoChat() {
   const loadThreads = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
-      .from("chat_threads" as never)
+      .from("chat_threads")
       .select("id,title,updated_at")
       .order("updated_at", { ascending: false })
       .limit(50);
@@ -82,7 +82,7 @@ export function GustavoChat() {
     if (!open || !user || activeThreadId) return;
     (async () => {
       const { data: existing } = await supabase
-        .from("chat_threads" as never)
+        .from("chat_threads")
         .select("id,title,updated_at")
         .order("updated_at", { ascending: false })
         .limit(1)
@@ -101,7 +101,7 @@ export function GustavoChat() {
     setActiveThreadId(id);
     persistedIdsRef.current = new Set();
     const { data } = await supabase
-      .from("chat_messages" as never)
+      .from("chat_messages")
       .select("id,role,parts,created_at")
       .eq("thread_id", id)
       .order("created_at", { ascending: true });
@@ -116,7 +116,7 @@ export function GustavoChat() {
   const createThread = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
-      .from("chat_threads" as never)
+      .from("chat_threads")
       .insert({ user_id: user.id, title: "Nova conversa" })
       .select("id,title,updated_at")
       .single();
@@ -131,7 +131,7 @@ export function GustavoChat() {
   }, [user, setMessages]);
 
   const deleteThread = useCallback(async (id: string) => {
-    await supabase.from("chat_threads" as never).delete().eq("id", id);
+    await supabase.from("chat_threads").delete().eq("id", id);
     setThreads((prev) => prev.filter((t) => t.id !== id));
     if (activeThreadId === id) {
       setActiveThreadId(null);
@@ -147,7 +147,7 @@ export function GustavoChat() {
     (async () => {
       for (const m of fresh) {
         persistedIdsRef.current.add(m.id);
-        await supabase.from("chat_messages" as never).insert({
+        await supabase.from("chat_messages").insert({
           thread_id: activeThreadId,
           user_id: user.id,
           role: m.role,
@@ -158,7 +158,7 @@ export function GustavoChat() {
           const text = m.parts.map((p) => (p.type === "text" ? p.text : "")).join("").slice(0, 60);
           const current = threads.find((t) => t.id === activeThreadId);
           if (current && current.title === "Nova conversa" && text) {
-            await supabase.from("chat_threads" as never).update({ title: text }).eq("id", activeThreadId);
+            await supabase.from("chat_threads").update({ title: text }).eq("id", activeThreadId);
             setThreads((prev) => prev.map((t) => (t.id === activeThreadId ? { ...t, title: text } : t)));
           }
         }
