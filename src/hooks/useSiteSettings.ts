@@ -106,11 +106,6 @@
       const [status, setStatus] = useState<string>("INITIAL");
 
       const fetchSettings = useCallback(async () => {
-        const hasInitialData = initialData && (initialData.siteInfo || initialData.theme || initialData.homepage);
-        if (hasInitialData && isLoading) {
-           setIsLoading(false);
-        }
-
         try {
           const { data, error } = await supabase
             .from("site_settings")
@@ -138,7 +133,7 @@
         } finally {
           setIsLoading(false);
         }
-      }, [initialData, isLoading]);
+      }, []);
 
       useEffect(() => {
         fetchSettings();
@@ -177,8 +172,8 @@
         status,
         onUpdate: fetchSettings,
         label: "Site Settings",
-        pollInterval: 60000,
-        initialPollInterval: 15000
+        pollInterval: 300000,
+        initialPollInterval: 60000
       });
  
      return { siteInfo, theme, homepage, customTexts, aboutPage, articleSettings, animations, isLoading };

@@ -81,6 +81,8 @@ export const Route = createFileRoute("/")({
   component: Home,
   pendingComponent: HomeSkeleton,
   errorComponent: ErrorFallback,
+  staleTime: 60_000,
+  gcTime: 5 * 60_000,
 });
 
 function Home() {
@@ -113,7 +115,7 @@ function Home() {
    useEffect(() => {
      const interval = setInterval(() => {
        router.invalidate();
-     }, 60000);
+     }, 180000);
      return () => clearInterval(interval);
    }, [router]);
 
