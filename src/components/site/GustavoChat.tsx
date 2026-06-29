@@ -18,15 +18,15 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/components/auth/auth-provider";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { DEFAULT_CHATBOT_CONFIG, type ChatbotConfig } from "@/components/admin/ChatbotSettings";
 
-function buildWhatsAppLink(phone: string, lastUserMessage?: string) {
+function buildWhatsAppLink(phone: string, baseMessage: string, lastUserMessage?: string) {
   const digits = (phone || "").replace(/\D/g, "");
   const full = digits.startsWith("55") ? digits : `55${digits}`;
-  const base = "Olá! Vim do chat do Gustavo Leilão e gostaria de falar com um atendente.";
   const ctx = lastUserMessage?.trim()
     ? `\n\nMinha última dúvida foi:\n"${lastUserMessage.trim().slice(0, 280)}"`
     : "";
-  return `https://wa.me/${full}?text=${encodeURIComponent(base + ctx)}`;
+  return `https://wa.me/${full}?text=${encodeURIComponent(baseMessage + ctx)}`;
 }
 
 type Thread = { id: string; title: string; updated_at: string };
@@ -49,6 +49,7 @@ export function GustavoChat() {
   const [loadingThread, setLoadingThread] = useState(false);
   const { siteInfo } = useSiteSettings();
   const { user } = useAuth();
+  const [config, setConfig] = useState<ChatbotConfig>(DEFAULT_CHATBOT_CONFIG);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const persistedIdsRef = useRef<Set<string>>(new Set());
@@ -66,7 +67,25 @@ export function GustavoChat() {
     .find((m) => m.role === "user")
     ?.parts.map((p) => (p.type === "text" ? p.text : ""))
     .join("");
-  const waLink = buildWhatsAppLink(phone, lastUserMessage);
+  const waLink = buildWhatsAppLink(phone, config.whatsappMessage, lastUserMessage);
+
+  // Load chatbot config (live updates via realtime in useSiteSettings flow)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "chatbot_config")
+        .maybeSingle();
+      if (!cancelled && data?.value) {
+        setConfig({ ...DEFAULT_CHATBOT_CONFIG, ...(data.value as Partial<ChatbotConfig>) });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Load threads list when user opens chat
   const loadThreads = useCallback(async () => {
