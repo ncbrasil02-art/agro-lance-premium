@@ -19,13 +19,14 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-function buildWhatsAppLink(phone: string) {
+function buildWhatsAppLink(phone: string, lastUserMessage?: string) {
   const digits = (phone || "").replace(/\D/g, "");
   const full = digits.startsWith("55") ? digits : `55${digits}`;
-  const msg = encodeURIComponent(
-    "Olá! Vim do chat do Gustavo Leilão e gostaria de falar com um atendente.",
-  );
-  return `https://wa.me/${full}?text=${msg}`;
+  const base = "Olá! Vim do chat do Gustavo Leilão e gostaria de falar com um atendente.";
+  const ctx = lastUserMessage?.trim()
+    ? `\n\nMinha última dúvida foi:\n"${lastUserMessage.trim().slice(0, 280)}"`
+    : "";
+  return `https://wa.me/${full}?text=${encodeURIComponent(base + ctx)}`;
 }
 
 type Thread = { id: string; title: string; updated_at: string };
@@ -60,7 +61,12 @@ export function GustavoChat() {
 
   const isLoading = status === "submitted" || status === "streaming";
   const phone = siteInfo?.phone || "(21) 99650-9905";
-  const waLink = buildWhatsAppLink(phone);
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((m) => m.role === "user")
+    ?.parts.map((p) => (p.type === "text" ? p.text : ""))
+    .join("");
+  const waLink = buildWhatsAppLink(phone, lastUserMessage);
 
   // Load threads list when user opens chat
   const loadThreads = useCallback(async () => {
