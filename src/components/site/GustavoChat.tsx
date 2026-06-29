@@ -150,8 +150,8 @@ export function GustavoChat() {
         await supabase.from("chat_messages").insert({
           thread_id: activeThreadId,
           user_id: user.id,
-          role: m.role,
-          parts: m.parts as unknown as object,
+          role: m.role === "user" ? "user" : "assistant",
+          parts: m.parts as unknown as never,
         });
         // Update thread title from first user message
         if (m.role === "user") {
