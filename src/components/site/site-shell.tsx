@@ -4,6 +4,7 @@ import { Header } from "./header";
 import { Footer } from "./footer";
  import { BottomNav } from "./bottom-nav";
 import { FloatingElements } from "./FloatingElements";
+import { PWAInstallProvider } from "./PWAInstallPrompt";
 
 export function SiteShell({ children }: { children: ReactNode }) {
    const location = useLocation();
@@ -14,6 +15,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
    }
  
   return (
+    <PWAInstallProvider>
     <div className="flex min-h-screen flex-col relative overflow-hidden">
       <FloatingElements />
       <Header />
@@ -21,5 +23,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <Footer />
        <BottomNav />
     </div>
+    </PWAInstallProvider>
   );
 }
