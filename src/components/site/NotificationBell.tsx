@@ -200,6 +200,11 @@ export function NotificationBell({ userId }: { userId: string }) {
             </div>
           )}
         </ScrollArea>
+        <div className="border-t border-border/40 p-2 bg-secondary/20">
+          <Link to="/notificacoes" className="block text-center text-xs font-bold uppercase tracking-wider text-gold hover:underline py-1">
+            Ver todas as notificações
+          </Link>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
