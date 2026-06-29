@@ -58,9 +58,11 @@ export const Route = createFileRoute("/api/chat")({
         }
         const gateway = createLovableAiGatewayProvider(key);
 
+        const deepLinks = await buildDeepLinksContext();
+
         const result = streamText({
           model: gateway(cfg.model),
-          system: cfg.systemPrompt,
+          system: cfg.systemPrompt + "\n\n" + deepLinks,
           messages: await convertToModelMessages(messages),
         });
 
@@ -69,3 +71,46 @@ export const Route = createFileRoute("/api/chat")({
     },
   },
 });
+
+async function buildDeepLinksContext(): Promise<string> {
+  try {
+    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const anon = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !anon) return "";
+    const sb = createClient(url, anon);
+    const nowIso = new Date().toISOString();
+    const [{ data: events }, { data: lots }] = await Promise.all([
+      sb
+        .from("events")
+        .select("title,slug,status,start_at")
+        .gte("start_at", nowIso)
+        .order("start_at", { ascending: true })
+        .limit(6),
+      sb
+        .from("lots")
+        .select("id,name,status")
+        .in("status", ["live", "scheduled"])
+        .order("created_at", { ascending: false })
+        .limit(6),
+    ]);
+    const eventLines = (events ?? [])
+      .filter((e: any) => e?.slug)
+      .map((e: any) => `- [${e.title}](/eventos/${e.slug}) — ${e.status}`)
+      .join("\n");
+    const lotLines = (lots ?? [])
+      .filter((l: any) => l?.id)
+      .map((l: any) => `- [${l.name ?? "Lote"}](/lotes/${l.id}) — ${l.status}`)
+      .join("\n");
+    if (!eventLines && !lotLines) return "";
+    return `## Deep links ao vivo (use estes URLs reais ao recomendar)
+### Próximos eventos
+${eventLines || "- (nenhum)"}
+
+### Lotes em destaque
+${lotLines || "- (nenhum)"}
+
+Sempre prefira estes links concretos a textos genéricos. Se o usuário pedir "ao vivo", use [/ao-vivo](/ao-vivo) ou o link do evento específico acima.`;
+  } catch {
+    return "";
+  }
+}
