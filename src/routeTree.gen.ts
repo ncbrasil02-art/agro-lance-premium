@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as LotesRouteImport } from './routes/lotes'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -36,6 +37,11 @@ const SobreRoute = SobreRouteImport.update({
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LotesRoute = LotesRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
   '/lotes': typeof LotesRouteWithChildren
+  '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
   '/api/chat': typeof ApiChatRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
   '/api/chat': typeof ApiChatRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
   '/lotes': typeof LotesRouteWithChildren
+  '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
   '/sobre': typeof SobreRoute
   '/api/chat': typeof ApiChatRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/login'
     | '/lotes'
+    | '/notificacoes'
     | '/painel'
     | '/sobre'
     | '/api/chat'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/ao-vivo'
     | '/cadastro'
     | '/login'
+    | '/notificacoes'
     | '/painel'
     | '/sobre'
     | '/api/chat'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/login'
     | '/lotes'
+    | '/notificacoes'
     | '/painel'
     | '/sobre'
     | '/api/chat'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRouteWithChildren
   LoginRoute: typeof LoginRoute
   LotesRoute: typeof LotesRouteWithChildren
+  NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRoute
   SobreRoute: typeof SobreRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lotes': {
@@ -420,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRouteWithChildren,
   LoginRoute: LoginRoute,
   LotesRoute: LotesRouteWithChildren,
+  NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRoute,
   SobreRoute: SobreRoute,
   ApiChatRoute: ApiChatRoute,
