@@ -54,22 +54,32 @@ export function GustavoChat() {
   const [config, setConfig] = useState<ChatbotConfig>(DEFAULT_CHATBOT_CONFIG);
   const markdownComponents = {
     a: ({ href, children, ...rest }: any) => {
-      const isInternal = typeof href === "string" && href.startsWith("/");
-      if (!isInternal) {
+      const url = typeof href === "string" ? href : "";
+      const isInternal = url.startsWith("/") && !url.startsWith("//");
+      if (isInternal) {
         return (
-          <a href={href} target="_blank" rel="noopener noreferrer" {...rest}>
+          <a
+            href={url}
+            className="text-primary underline underline-offset-2 hover:opacity-80"
+            onClick={(e) => {
+              e.preventDefault();
+              setOpen(false);
+              router.navigate({ to: url });
+            }}
+            {...rest}
+          >
             {children}
           </a>
         );
       }
+      // Protocolos diretos (mailto/tel/sms) abrem no app nativo, sem nova aba
+      const isProtocol = /^(mailto:|tel:|sms:)/i.test(url);
       return (
         <a
-          href={href}
-          onClick={(e) => {
-            e.preventDefault();
-            setOpen(false);
-            router.navigate({ to: href });
-          }}
+          href={url}
+          target={isProtocol ? undefined : "_blank"}
+          rel={isProtocol ? undefined : "noopener noreferrer nofollow"}
+          className="text-primary underline underline-offset-2 hover:opacity-80 break-all"
           {...rest}
         >
           {children}
