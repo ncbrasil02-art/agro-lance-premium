@@ -373,6 +373,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
                  {activeTab === "alertas" && <SecurityAlerts />}
                 {activeTab === "transactions" && <TransactionManagement />}
                 {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
+               {activeTab === "chatbot" && <ChatbotSettings />}
        </main>
      </div>
    );
