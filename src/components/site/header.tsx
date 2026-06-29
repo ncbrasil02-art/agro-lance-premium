@@ -3,8 +3,10 @@
    import { useHomeRealtime } from "@/hooks/useRealtimeEvent";
    import { useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-  import { Gavel, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle } from "lucide-react";
+  import { Gavel, Menu, X, User as UserIcon, LogOut, LayoutDashboard, UserPlus, LogIn, UserCircle, Download } from "lucide-react";
  import { useState, useEffect } from "react";
+ import { useIsMobile } from "@/hooks/use-mobile";
+ import { usePWAInstall } from "@/components/site/PWAInstallPrompt";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./theme-provider";
 import { useAuth } from "../auth/auth-provider";
@@ -43,6 +45,13 @@ import { toast } from "sonner";
      const { theme } = useTheme();
      const { siteInfo, homepage, aboutPage } = useSiteSettings();
      const isMobileMode = homepage?.mobile_mode_enabled;
+    const isMobile = useIsMobile();
+    const { canInstall, openInstall } = usePWAInstall();
+
+    const logoHeight = (isMobile ? siteInfo?.logo_height_mobile : siteInfo?.logo_height_desktop) ?? (isMobile ? 32 : 40);
+    const logoPadX = siteInfo?.logo_padding_x ?? 0;
+    const logoPadY = siteInfo?.logo_padding_y ?? 0;
+    const headerGap = siteInfo?.header_gap ?? 16;
  
      const { delaySeconds, isPolling } = useHomeRealtime(() => {
        router.invalidate();
@@ -71,10 +80,10 @@ import { toast } from "sonner";
          isHome && isElite ? "bg-transparent border-transparent h-20" : 
          "bg-background/80 backdrop-blur-xl border-border/60 h-16"
        )}>
-        <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
-          <Link to="/" className="flex items-center gap-2 font-bold group min-w-[150px]">
+        <div className="container mx-auto flex items-center justify-between px-4 h-full" style={{ gap: `${headerGap}px` }}>
+          <Link to="/" className="flex items-center gap-2 font-bold group min-w-[120px]" style={{ padding: `${logoPadY}px ${logoPadX}px` }}>
             {isDataLoaded && siteInfo.logo_url ? (
-              <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
+              <img src={siteInfo.logo_url} alt={siteInfo.name} style={{ height: `${logoHeight}px` }} className="object-contain transition-transform group-hover:scale-105" />
             ) : isDataLoaded ? (
               <div className="flex items-center gap-2">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
@@ -86,7 +95,7 @@ import { toast } from "sonner";
                 </span>
               </div>
             ) : (
-              <div className="h-10 w-32" />
+              <div style={{ height: `${logoHeight}px` }} className="w-32" />
             )}
           </Link>
 
@@ -161,6 +170,11 @@ import { toast } from "sonner";
            </TooltipProvider>
  
             <div className="flex items-center gap-1.5 md:gap-2">
+           {canInstall && (
+             <Button variant="outline" size="sm" onClick={openInstall} className="hidden sm:inline-flex gap-1.5 border-gold/40 text-gold hover:bg-gold/10">
+               <Download className="h-3.5 w-3.5" /> Instalar app
+             </Button>
+           )}
            {user && <NotificationBell userId={user.id} />}
  
            {user ? (
