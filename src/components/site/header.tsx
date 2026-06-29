@@ -73,11 +73,9 @@ import { toast } from "sonner";
        )}>
         <div className={cn("container mx-auto flex items-center justify-between px-4 h-full")}>
           <Link to="/" className="flex items-center gap-2 font-bold group min-w-[150px]">
-            {!isDataLoaded ? (
-              <div className="h-8 w-32 bg-white/5 animate-pulse rounded-lg" />
-            ) : siteInfo.logo_url ? (
+            {isDataLoaded && siteInfo.logo_url ? (
               <img src={siteInfo.logo_url} alt={siteInfo.name} className="h-10 object-contain transition-transform group-hover:scale-105" />
-            ) : (
+            ) : isDataLoaded ? (
               <div className="flex items-center gap-2">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-gradient shadow-gold">
                   <Gavel className="h-5 w-5 text-emerald-deep" />
@@ -87,6 +85,8 @@ import { toast } from "sonner";
                   <span className="text-gradient-gold">{siteInfo.name?.split(' ')?.slice(1)?.join(' ')}</span>
                 </span>
               </div>
+            ) : (
+              <div className="h-10 w-32" />
             )}
           </Link>
 
