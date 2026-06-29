@@ -299,3 +299,30 @@ function NotificationsCenter() {
     </div>
   );
 }
+
+function PrefRow({
+  label,
+  k,
+  profile,
+  onChange,
+  saving,
+}: {
+  label: string;
+  k: string;
+  profile: any;
+  onChange: (k: string, v: boolean) => void;
+  saving: string | null;
+}) {
+  const checked = profile?.[k] ?? true;
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <Label htmlFor={k} className="text-sm font-normal cursor-pointer">{label}</Label>
+      <Switch
+        id={k}
+        checked={!!checked}
+        disabled={saving === k}
+        onCheckedChange={(v) => onChange(k, v)}
+      />
+    </div>
+  );
+}
