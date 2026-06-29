@@ -13,6 +13,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -49,7 +50,34 @@ export function GustavoChat() {
   const [loadingThread, setLoadingThread] = useState(false);
   const { siteInfo } = useSiteSettings();
   const { user } = useAuth();
+  const router = useRouter();
   const [config, setConfig] = useState<ChatbotConfig>(DEFAULT_CHATBOT_CONFIG);
+  const markdownComponents = {
+    a: ({ href, children, ...rest }: any) => {
+      const isInternal = typeof href === "string" && href.startsWith("/");
+      if (!isInternal) {
+        return (
+          <a href={href} target="_blank" rel="noopener noreferrer" {...rest}>
+            {children}
+          </a>
+        );
+      }
+      return (
+        <a
+          href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(false);
+            router.navigate({ to: href });
+          }}
+          {...rest}
+        >
+          {children}
+        </a>
+      );
+    },
+  } as const;
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const persistedIdsRef = useRef<Set<string>>(new Set());
