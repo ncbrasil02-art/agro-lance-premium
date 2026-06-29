@@ -100,7 +100,12 @@
      phone: "",
      cnpj: "",
       logo_url: "",
-      site_url: ""
+     site_url: "",
+     logo_height_desktop: 40,
+     logo_height_mobile: 32,
+     logo_padding_x: 0,
+     logo_padding_y: 0,
+     header_gap: 16
    });
  
    const [theme, setTheme] = useState<any>({
