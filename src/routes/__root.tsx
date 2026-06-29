@@ -104,6 +104,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('theme')||'dark';document.documentElement.classList.toggle('dark',t==='dark');}catch(e){}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `html:not(.fonts-ready) body{visibility:hidden}html.fonts-ready body{visibility:visible;animation:fadeIn .25s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var d=document.documentElement;var done=function(){d.classList.add('fonts-ready')};if(document.fonts&&document.fonts.ready){document.fonts.ready.then(done);setTimeout(done,1500)}else{done()}})();` }} />
       </head>
       <body>
         {children}
