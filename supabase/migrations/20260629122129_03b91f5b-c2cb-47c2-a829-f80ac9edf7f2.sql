@@ -1,0 +1,2 @@
+ALTER TABLE public.animals DROP CONSTRAINT animals_seller_id_fkey;
+ALTER TABLE public.animals ADD CONSTRAINT animals_seller_id_fkey FOREIGN KEY (seller_id) REFERENCES public.sellers(id) ON DELETE SET NULL;
