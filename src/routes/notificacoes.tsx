@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Bell, ShieldAlert, Info, Check, Trash2, Loader2, ExternalLink } from "lucide-react";
+import { Bell, ShieldAlert, Info, Check, Trash2, Loader2, ExternalLink, Settings } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -44,10 +46,21 @@ type Notification = {
 };
 
 function NotificationsCenter() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, profile, isLoading: authLoading, refreshProfile } = useAuth();
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "unread" | "security">("all");
+  const [filter, setFilter] = useState<"all" | "unread" | "security" | "prefs">("all");
+  const [savingPref, setSavingPref] = useState<string | null>(null);
+
+  const updatePref = async (key: string, value: boolean) => {
+    if (!user?.id) return;
+    setSavingPref(key);
+    const { error } = await supabase.from("profiles").update({ [key]: value } as any).eq("id", user.id);
+    setSavingPref(null);
+    if (error) return toast.error("Erro ao salvar", { description: error.message });
+    await refreshProfile();
+    toast.success("Preferência atualizada");
+  };
 
   const load = async (uid: string) => {
     setLoading(true);
@@ -170,7 +183,44 @@ function NotificationsCenter() {
           <TabsTrigger value="security">
             <ShieldAlert className="h-3 w-3 mr-1" /> Segurança
           </TabsTrigger>
+          <TabsTrigger value="prefs">
+            <Settings className="h-3 w-3 mr-1" /> Preferências
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="prefs" className="space-y-4">
+          <Card className="p-6 space-y-5">
+            <div>
+              <h3 className="font-semibold text-base mb-1">Lance superado</h3>
+              <p className="text-xs text-muted-foreground mb-3">Quando alguém cobrir um lance seu.</p>
+              <div className="space-y-2 pl-1">
+                <PrefRow label="Notificação no app (sino + toast)" k="pref_outbid_push" profile={profile} onChange={updatePref} saving={savingPref} />
+                <PrefRow label="E-mail" k="pref_outbid_email" profile={profile} onChange={updatePref} saving={savingPref} />
+                <PrefRow label="WhatsApp" k="pref_outbid_whatsapp" profile={profile} onChange={updatePref} saving={savingPref} />
+                <PrefRow label="SMS" k="pref_outbid_sms" profile={profile} onChange={updatePref} saving={savingPref} />
+              </div>
+            </div>
+            <div className="border-t pt-5">
+              <h3 className="font-semibold text-base mb-1">Novos eventos</h3>
+              <p className="text-xs text-muted-foreground mb-3">Quando um novo leilão for publicado.</p>
+              <div className="space-y-2 pl-1">
+                <PrefRow label="E-mail" k="pref_new_event_email" profile={profile} onChange={updatePref} saving={savingPref} />
+                <PrefRow label="WhatsApp" k="pref_new_event_whatsapp" profile={profile} onChange={updatePref} saving={savingPref} />
+                <PrefRow label="SMS" k="pref_new_event_sms" profile={profile} onChange={updatePref} saving={savingPref} />
+              </div>
+            </div>
+            <div className="border-t pt-5">
+              <h3 className="font-semibold text-base mb-1">Lotes seguidos</h3>
+              <p className="text-xs text-muted-foreground mb-3">Atualizações em lotes que você está acompanhando.</p>
+              <div className="space-y-2 pl-1">
+                <PrefRow label="Receber atualizações" k="pref_followed_lot_update" profile={profile} onChange={updatePref} saving={savingPref} />
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground border-t pt-4">
+              Alertas de segurança são sempre enviados e não podem ser desativados.
+            </p>
+          </Card>
+        </TabsContent>
 
         <TabsContent value={filter} className="space-y-2">
           {loading ? (
@@ -246,6 +296,33 @@ function NotificationsCenter() {
           )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function PrefRow({
+  label,
+  k,
+  profile,
+  onChange,
+  saving,
+}: {
+  label: string;
+  k: string;
+  profile: any;
+  onChange: (k: string, v: boolean) => void;
+  saving: string | null;
+}) {
+  const checked = profile?.[k] ?? true;
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <Label htmlFor={k} className="text-sm font-normal cursor-pointer">{label}</Label>
+      <Switch
+        id={k}
+        checked={!!checked}
+        disabled={saving === k}
+        onCheckedChange={(v) => onChange(k, v)}
+      />
     </div>
   );
 }
