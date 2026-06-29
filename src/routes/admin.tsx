@@ -1,6 +1,7 @@
  import { useState, useEffect, ReactNode } from "react";
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
- import { SiteSettings } from "@/components/admin/SiteSettings";
+import { SiteSettings } from "@/components/admin/SiteSettings";
+import { ChatbotSettings } from "@/components/admin/ChatbotSettings";
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
@@ -25,7 +26,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
     Loader2, LayoutDashboard, Calendar, Gavel, Users, Settings,
      LogOut, Package, Zap, Menu, ExternalLink, Building2, Tag,
      ClipboardList, ShoppingCart, ShieldCheck, ShieldAlert, Newspaper, Info,
-    MessageSquare, FileText
+    MessageSquare, FileText, Bot
  } from "lucide-react";
  import { supabase } from "@/integrations/supabase/client";
  import { toast } from "sonner";
@@ -34,7 +35,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
-  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments" | "alertas";
+  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments" | "alertas" | "chatbot";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
@@ -57,6 +58,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
    { id: "rls_test", label: "Testes RLS", icon: <ShieldCheck className="mr-2 h-4 w-4" /> },
   { id: "audit", label: "Auditoria Completa", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
    { id: "logs", label: "Logs de Erro", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
+   { id: "chatbot", label: "Chatbot Gustavo", icon: <Bot className="mr-2 h-4 w-4" /> },
    { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
  ];
  
@@ -371,6 +373,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
                  {activeTab === "alertas" && <SecurityAlerts />}
                 {activeTab === "transactions" && <TransactionManagement />}
                 {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
+               {activeTab === "chatbot" && <ChatbotSettings />}
        </main>
      </div>
    );

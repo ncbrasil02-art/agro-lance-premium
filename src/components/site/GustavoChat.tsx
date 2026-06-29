@@ -18,15 +18,15 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/components/auth/auth-provider";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { DEFAULT_CHATBOT_CONFIG, type ChatbotConfig } from "@/components/admin/ChatbotSettings";
 
-function buildWhatsAppLink(phone: string, lastUserMessage?: string) {
+function buildWhatsAppLink(phone: string, baseMessage: string, lastUserMessage?: string) {
   const digits = (phone || "").replace(/\D/g, "");
   const full = digits.startsWith("55") ? digits : `55${digits}`;
-  const base = "Olá! Vim do chat do Gustavo Leilão e gostaria de falar com um atendente.";
   const ctx = lastUserMessage?.trim()
     ? `\n\nMinha última dúvida foi:\n"${lastUserMessage.trim().slice(0, 280)}"`
     : "";
-  return `https://wa.me/${full}?text=${encodeURIComponent(base + ctx)}`;
+  return `https://wa.me/${full}?text=${encodeURIComponent(baseMessage + ctx)}`;
 }
 
 type Thread = { id: string; title: string; updated_at: string };
@@ -49,6 +49,7 @@ export function GustavoChat() {
   const [loadingThread, setLoadingThread] = useState(false);
   const { siteInfo } = useSiteSettings();
   const { user } = useAuth();
+  const [config, setConfig] = useState<ChatbotConfig>(DEFAULT_CHATBOT_CONFIG);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const persistedIdsRef = useRef<Set<string>>(new Set());
@@ -66,7 +67,25 @@ export function GustavoChat() {
     .find((m) => m.role === "user")
     ?.parts.map((p) => (p.type === "text" ? p.text : ""))
     .join("");
-  const waLink = buildWhatsAppLink(phone, lastUserMessage);
+  const waLink = buildWhatsAppLink(phone, config.whatsappMessage, lastUserMessage);
+
+  // Load chatbot config (live updates via realtime in useSiteSettings flow)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "chatbot_config")
+        .maybeSingle();
+      if (!cancelled && data?.value) {
+        setConfig({ ...DEFAULT_CHATBOT_CONFIG, ...(data.value as Partial<ChatbotConfig>) });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Load threads list when user opens chat
   const loadThreads = useCallback(async () => {
@@ -190,19 +209,16 @@ export function GustavoChat() {
     setInput("");
   };
 
-  const suggestions = [
-    "Como me cadastro?",
-    "Como dou um lance?",
-    "Como crio um evento?",
-    "Quais formas de pagamento?",
-  ];
+  const suggestions = config.suggestions;
+
+  if (!config.enabled) return null;
 
   return (
     <>
       {/* Floating button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Abrir chat com Gustavo Leilão"
+        aria-label={`Abrir chat com ${config.name}`}
         className={cn(
           "fixed z-50 bottom-20 right-4 md:bottom-6 md:right-6",
           "h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-2xl",
@@ -240,7 +256,7 @@ export function GustavoChat() {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold leading-tight">Gustavo Leilão</div>
+                <div className="font-semibold leading-tight">{config.name}</div>
                 <div className="text-xs opacity-90 flex items-center gap-1">
                   <span className="h-2 w-2 rounded-full bg-green-400 inline-block" />
                   {showThreads ? "Histórico de conversas" : "Assistente virtual · online"}
@@ -321,10 +337,8 @@ export function GustavoChat() {
             )}
             {!loadingThread && messages.length === 0 && (
               <div className="space-y-3">
-                <div className="bg-background rounded-2xl rounded-tl-sm p-3 text-sm shadow-sm">
-                  Olá! 👋 Sou o <strong>Gustavo Leilão</strong>, seu assistente sobre leilões do
-                  agronegócio. Posso ajudar com cadastro, lances, eventos, propostas e pagamentos.
-                  Como posso te ajudar hoje?
+                <div className="bg-background rounded-2xl rounded-tl-sm p-3 text-sm shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1">
+                  <ReactMarkdown>{config.welcome}</ReactMarkdown>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((s) => (

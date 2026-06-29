@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createClient } from "@supabase/supabase-js";
 
-const SYSTEM_PROMPT = `Você é **Gustavo Leilão**, assistente virtual especialista em leilões do agronegócio na plataforma AgroNCBrasil.
+const DEFAULT_SYSTEM_PROMPT = `Você é **Gustavo Leilão**, assistente virtual especialista em leilões do agronegócio na plataforma AgroNCBrasil.
 
 Sua missão: tirar dúvidas sobre o mercado agro de leilões, o agronegócio e o uso da plataforma. Seja cordial, objetivo, use linguagem do campo, emojis com moderação 🐂🐎.
 
@@ -22,6 +23,26 @@ Regras importantes:
 4. Nunca prometa preços, garantias jurídicas ou resultados financeiros.
 5. Se não souber, admita e oriente a falar com atendente.`;
 
+const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
+async function loadChatbotConfig(): Promise<{ systemPrompt: string; model: string; enabled: boolean }> {
+  try {
+    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const anon = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !anon) return { systemPrompt: DEFAULT_SYSTEM_PROMPT, model: DEFAULT_MODEL, enabled: true };
+    const sb = createClient(url, anon);
+    const { data } = await sb.from("site_settings").select("value").eq("key", "chatbot_config").maybeSingle();
+    const v = (data?.value ?? {}) as { systemPrompt?: string; model?: string; enabled?: boolean };
+    return {
+      systemPrompt: v.systemPrompt || DEFAULT_SYSTEM_PROMPT,
+      model: v.model || DEFAULT_MODEL,
+      enabled: v.enabled !== false,
+    };
+  } catch {
+    return { systemPrompt: DEFAULT_SYSTEM_PROMPT, model: DEFAULT_MODEL, enabled: true };
+  }
+}
+
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
@@ -31,11 +52,15 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
         const { messages }: { messages: UIMessage[] } = await request.json();
+        const cfg = await loadChatbotConfig();
+        if (!cfg.enabled) {
+          return new Response("Chatbot desativado", { status: 503 });
+        }
         const gateway = createLovableAiGatewayProvider(key);
 
         const result = streamText({
-          model: gateway("google/gemini-3-flash-preview"),
-          system: SYSTEM_PROMPT,
+          model: gateway(cfg.model),
+          system: cfg.systemPrompt,
           messages: await convertToModelMessages(messages),
         });
 
