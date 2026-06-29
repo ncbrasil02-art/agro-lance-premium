@@ -27,6 +27,12 @@
    phone: string;
    cnpj: string;
    logo_url: string;
+  site_url?: string;
+  logo_height_desktop?: number;
+  logo_height_mobile?: number;
+  logo_padding_x?: number;
+  logo_padding_y?: number;
+  header_gap?: number;
  }
  
   export interface ThemeSettings {

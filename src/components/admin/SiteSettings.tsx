@@ -100,7 +100,12 @@
      phone: "",
      cnpj: "",
       logo_url: "",
-      site_url: ""
+     site_url: "",
+     logo_height_desktop: 40,
+     logo_height_mobile: 32,
+     logo_padding_x: 0,
+     logo_padding_y: 0,
+     header_gap: 16
    });
  
    const [theme, setTheme] = useState<any>({
@@ -1132,6 +1137,43 @@
                      onChange={handleLogoUpload}
                    />
                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                    <div className="md:col-span-2">
+                      <Label className="text-sm font-semibold">Tamanho e espaçamento do logotipo</Label>
+                      <p className="text-xs text-muted-foreground mt-1">Ajuste manualmente para web e mobile.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Altura desktop ({siteInfo.logo_height_desktop ?? 40}px)</Label>
+                      <Input type="range" min={16} max={120} step={1}
+                        value={siteInfo.logo_height_desktop ?? 40}
+                        onChange={e => setSiteInfo({ ...siteInfo, logo_height_desktop: Number(e.target.value) })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Altura mobile ({siteInfo.logo_height_mobile ?? 32}px)</Label>
+                      <Input type="range" min={16} max={80} step={1}
+                        value={siteInfo.logo_height_mobile ?? 32}
+                        onChange={e => setSiteInfo({ ...siteInfo, logo_height_mobile: Number(e.target.value) })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Padding horizontal ({siteInfo.logo_padding_x ?? 0}px)</Label>
+                      <Input type="range" min={0} max={48} step={1}
+                        value={siteInfo.logo_padding_x ?? 0}
+                        onChange={e => setSiteInfo({ ...siteInfo, logo_padding_x: Number(e.target.value) })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Padding vertical ({siteInfo.logo_padding_y ?? 0}px)</Label>
+                      <Input type="range" min={0} max={32} step={1}
+                        value={siteInfo.logo_padding_y ?? 0}
+                        onChange={e => setSiteInfo({ ...siteInfo, logo_padding_y: Number(e.target.value) })} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="text-xs">Espaço entre logo e menu ({siteInfo.header_gap ?? 16}px)</Label>
+                      <Input type="range" min={0} max={64} step={1}
+                        value={siteInfo.header_gap ?? 16}
+                        onChange={e => setSiteInfo({ ...siteInfo, header_gap: Number(e.target.value) })} />
+                    </div>
+                  </div>
                </div>
              </div>
              <Button 
