@@ -66,6 +66,10 @@ import { getEffectiveEventStatus } from "@/utils/auction-status";
    component: EventsPage,
    pendingComponent: PageSkeleton,
    errorComponent: ErrorFallback,
+   staleTime: 60_000,
+   gcTime: 5 * 60_000,
+   pendingMs: 0,
+   pendingMinMs: 300,
 });
 
  function EventsPage() {
