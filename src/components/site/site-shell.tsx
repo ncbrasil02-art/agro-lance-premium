@@ -5,6 +5,7 @@ import { Footer } from "./footer";
  import { BottomNav } from "./bottom-nav";
 import { FloatingElements } from "./FloatingElements";
 import { PWAInstallProvider } from "./PWAInstallPrompt";
+import { GustavoChat } from "./GustavoChat";
 
 export function SiteShell({ children }: { children: ReactNode }) {
    const location = useLocation();
@@ -22,6 +23,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <main className="flex-1 pb-16 md:pb-0 overflow-x-hidden">{children}</main>
       <Footer />
        <BottomNav />
+      <GustavoChat />
     </div>
     </PWAInstallProvider>
   );
