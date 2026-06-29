@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
         supabase.from("lots").select("id,lot_number,event_id,current_price,starting_price,bid_increment,bids_count,viewers,end_date,status,is_featured,created_at,animal:animals(name,breed,species,photos,youtube_url,registration_number,vaccination_records,genealogy,sex,color,birth_date,location,accepts_offers,seller:sellers(name)),event:events!lots_event_id_fkey(status,start_date,end_date,allows_pre_bidding,event_type)").eq("is_featured", true).order("created_at", { ascending: false }).limit(PAGE_LIMITS.HOME_FEATURED_LOTS),
          supabase.from("events").select("id,slug,name,status,start_date,end_date,location,banner_url,lots!lots_event_id_fkey(id)").eq("status", "finished").order("start_date", { ascending: false }).limit(PAGE_LIMITS.HOME_PAST_EVENTS),
         supabase.from("site_settings").select("*").eq("key", "announcement").maybeSingle(),
-        supabase.from("posts").select("id,slug,title,excerpt,cover_image,published_at,category:categories(name)").eq("status", "published").order("published_at", { ascending: false }).limit(PAGE_LIMITS.HOME_ARTICLES),
+        supabase.from("posts").select("id,slug,title,excerpt,featured_image,published_at,category:categories(name)").eq("status", "published").order("published_at", { ascending: false }).limit(PAGE_LIMITS.HOME_ARTICLES),
         supabase.from("animals").select("id,name,breed,species,photos,direct_sale_price,sale_status,location,categories(name)").eq("is_direct_sale", true).eq("sale_status", "available").order("created_at", { ascending: false }).limit(4),
       ]);
 
