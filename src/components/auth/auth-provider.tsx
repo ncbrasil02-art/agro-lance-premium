@@ -78,32 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       )
       .subscribe();
 
-     const notificationsUniqueId = `notifications-${user.id}-${Math.random().toString(36).slice(2, 9)}`;
-     const notificationsChannel = supabase
-       .channel(notificationsUniqueId)
-       .on(
-         "postgres_changes",
-         {
-           event: "INSERT",
-           schema: "public",
-           table: "notifications",
-           filter: `user_id=eq.${user.id}`
-         },
-         (payload) => {
-           console.log("New notification received in real-time:", payload.new);
-           import("sonner").then(({ toast }) => {
-             toast(payload.new.title, {
-               description: payload.new.message,
-               duration: 6000,
-             });
-           });
-         }
-       )
-       .subscribe();
-
      return () => {
        supabase.removeChannel(channel);
-       supabase.removeChannel(notificationsChannel);
      };
    }, [user?.id]);
 
