@@ -111,12 +111,23 @@ export function SellerManagement() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este vendedor?")) return;
-    
+    const { count } = await supabase
+      .from("animals")
+      .select("id", { count: "exact", head: true })
+      .eq("seller_id", id);
+
+    const warning = count && count > 0
+      ? `\n\nATENÇÃO: Este vendedor possui ${count} animal(is) vinculado(s). Todos os animais, lotes, lances e ofertas relacionados serão excluídos em cascata. Esta ação é IRREVERSÍVEL.`
+      : "";
+
+    if (!confirm(`Tem certeza que deseja excluir este vendedor?${warning}`)) return;
+
     try {
       const { error } = await supabase.from("sellers").delete().eq("id", id);
       if (error) throw error;
-      toast.success("Vendedor excluído com sucesso");
+      toast.success(count && count > 0
+        ? `Vendedor e ${count} animal(is) vinculado(s) excluídos com sucesso`
+        : "Vendedor excluído com sucesso");
       fetchSellers();
     } catch (error: any) {
       toast.error("Erro ao excluir vendedor: " + error.message);
