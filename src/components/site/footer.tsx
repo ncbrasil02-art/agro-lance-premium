@@ -110,10 +110,20 @@
        </div>
  
        <div className="border-t border-border/60">
-         <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-6 text-xs text-muted-foreground md:flex-row">
-           <span>© {new Date().getFullYear()} {siteInfo?.name || "Premium Agro Leilões"}. Todos os direitos reservados.</span>
-           <span>CNPJ {siteInfo?.cnpj || "00.000.000/0001-00"} · Leiloeiro JUCESP nº 000</span>
-         </div>
+        <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-6 text-xs text-muted-foreground md:flex-row">
+          <span>© {new Date().getFullYear()} {siteInfo?.name || "Premium Agro Leilões"}. Todos os direitos reservados.</span>
+          <div className="flex flex-col items-center gap-1 md:items-end">
+            <span>CNPJ {siteInfo?.cnpj || "00.000.000/0001-00"} · Leiloeiro JUCESP nº 000</span>
+            <a
+              href="https://www.ncbrasil.com.br/sistema-de-leilao-rural-online"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold hover:text-gold-bright transition-colors"
+            >
+              Plataforma de leilões de animais
+            </a>
+          </div>
+        </div>
        </div>
      </footer>
    );
