@@ -32,8 +32,9 @@ const FONTS = [
     family: "Dancing Script",
     weight: 700,
     style: "normal",
-    // Direct Google Fonts woff2 URL for Dancing Script 700.
-    src: "https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_swLkjm4ITPRHQUuxYg.woff2",
+    // Resolved at runtime from Google Fonts CSS (version-proof).
+    cssUrl:
+      "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap",
     file: "dancing-script-700.woff2",
   },
 ];
@@ -61,7 +62,18 @@ for (const f of FONTS) {
     buf = await readFile(cached);
   } else {
     console.log(`↓ ${f.family} ${f.weight}`);
-    buf = await fetchBuf(f.src);
+    const css = await (await fetch(f.cssUrl, {
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36",
+      },
+    })).text();
+    // Pick the latin block (last @font-face in google's css2 response).
+    const blocks = css.split("@font-face");
+    const latin = blocks.reverse().find((b) => /U\+0000-00FF/i.test(b)) ?? blocks[0];
+    const m = latin.match(/https:\/\/[^)]+\.woff2/);
+    if (!m) throw new Error(`no woff2 in css for ${f.family}`);
+    buf = await fetchBuf(m[0]);
     await writeFile(cached, buf);
   }
 
