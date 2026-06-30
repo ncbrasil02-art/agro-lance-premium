@@ -13,6 +13,19 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, Save, Send, Mail, FileText, ClipboardList } from "lucide-react";
 
+function makeTestToken(len = 32): string {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let out = "";
+  for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
+const TEST_TOKEN = makeTestToken();
+const TEST_OTP = String(Math.floor(100000 + Math.random() * 900000));
+const SITE_BASE =
+  (typeof window !== "undefined" && window.location?.origin) ||
+  "https://agro-ncbrasil.lovable.app";
+
 const SAMPLE_VALUES: Record<string, string> = {
   name: "João da Silva",
   user_name: "João da Silva",
@@ -21,15 +34,22 @@ const SAMPLE_VALUES: Record<string, string> = {
   email: "joao@exemplo.com.br",
   user_email: "joao@exemplo.com.br",
   site_name: "NC Agro Leilões",
-  site_url: "https://agro-ncbrasil.lovable.app",
-  url: "https://agro-ncbrasil.lovable.app/confirmar?token=abc123",
-  link: "https://agro-ncbrasil.lovable.app/confirmar?token=abc123",
-  confirmation_url: "https://agro-ncbrasil.lovable.app/confirmar?token=abc123",
-  reset_url: "https://agro-ncbrasil.lovable.app/recuperar?token=abc123",
-  action_url: "https://agro-ncbrasil.lovable.app/acao?token=abc123",
-  token: "ABC123XYZ",
-  code: "742193",
-  otp: "742193",
+  site_url: SITE_BASE,
+  url: `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`,
+  link: `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`,
+  confirmation_url: `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`,
+  confirm_url: `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`,
+  verify_url: `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`,
+  activation_url: `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`,
+  reset_url: `${SITE_BASE}/recuperar?token=${TEST_TOKEN}&type=recovery`,
+  recovery_url: `${SITE_BASE}/recuperar?token=${TEST_TOKEN}&type=recovery`,
+  password_reset_url: `${SITE_BASE}/recuperar?token=${TEST_TOKEN}&type=recovery`,
+  magic_link: `${SITE_BASE}/auth?token=${TEST_TOKEN}&type=magiclink`,
+  magic_link_url: `${SITE_BASE}/auth?token=${TEST_TOKEN}&type=magiclink`,
+  action_url: `${SITE_BASE}/acao?token=${TEST_TOKEN}`,
+  token: TEST_TOKEN,
+  code: TEST_OTP,
+  otp: TEST_OTP,
   amount: "R$ 1.250,00",
   value: "R$ 1.250,00",
   total: "R$ 1.250,00",
@@ -52,12 +72,20 @@ const SAMPLE_VALUES: Record<string, string> = {
 function sampleValueFor(name: string): string {
   const key = name.toLowerCase();
   if (SAMPLE_VALUES[key]) return SAMPLE_VALUES[key];
-  if (key.includes("url") || key.includes("link")) return "https://agro-ncbrasil.lovable.app/exemplo";
+  if (key.includes("reset") || key.includes("recover") || key.includes("senha") || key.includes("password")) {
+    return `${SITE_BASE}/recuperar?token=${TEST_TOKEN}&type=recovery`;
+  }
+  if (key.includes("confirm") || key.includes("verify") || key.includes("activat") || key.includes("signup")) {
+    return `${SITE_BASE}/confirmar?token=${TEST_TOKEN}&type=signup`;
+  }
+  if (key.includes("magic")) return `${SITE_BASE}/auth?token=${TEST_TOKEN}&type=magiclink`;
+  if (key.includes("url") || key.includes("link")) return `${SITE_BASE}/exemplo?token=${TEST_TOKEN}`;
   if (key.includes("email")) return "exemplo@ncbrasil.com.br";
   if (key.includes("name") || key.includes("nome")) return "Exemplo";
   if (key.includes("date") || key.includes("data")) return new Date().toLocaleDateString("pt-BR");
   if (key.includes("value") || key.includes("amount") || key.includes("valor") || key.includes("total") || key.includes("price")) return "R$ 1.000,00";
-  if (key.includes("code") || key.includes("token") || key.includes("otp")) return "ABC123";
+  if (key.includes("otp") || key.includes("code")) return TEST_OTP;
+  if (key.includes("token")) return TEST_TOKEN;
   return "[" + name + "]";
 }
 
