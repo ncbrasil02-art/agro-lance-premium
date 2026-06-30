@@ -432,13 +432,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           toast.info(`Vinculando arremate automaticamente ao perfil: ${profiles.find(p => p.id === phoneBid.profileId)?.full_name}`);
         } else if (lastBid.user_id) {
           finalWinnerId = lastBid.user_id;
-        } else if (isGenericPhoneBid && !phoneBid.profileId) {
-          // Still generic, ask if they want to link it first
-          if (confirm(`Este arremate foi via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vinculá-lo a um perfil cadastrado agora?`)) {
-            toast.info("Selecione um 'Cadastro Real' na barra lateral e clique em Arrematar novamente.");
-            return;
-          }
-        }
+         } else if (isGenericPhoneBid && !phoneBid.profileId) {
+           // Allow sale but leave winner pending — surfaces in "Pendências de Arrematante"
+           finalWinnerId = null;
+           toast.warning(`Lote arrematado SEM vínculo (${lastBid.phone_bidder_identifier || 'telefone/auditório'}). Vincule um cadastro antes de encerrar o evento.`);
+         }
 
        setIsActionLoading(true);
        try {
@@ -447,7 +445,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           status: 'sold', 
           is_currently_live: false,
           winner_id: finalWinnerId,
-          winner_link_reason: lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)',
+          winner_link_reason: !finalWinnerId
+            ? 'PENDENTE - Vínculo obrigatório (Lance Telefone/Auditório)'
+            : (lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)'),
           updated_at: new Date().toISOString()
         }).eq("id", lotId).select('animal_id').single();
 
