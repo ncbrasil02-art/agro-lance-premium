@@ -81,9 +81,12 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
       ogImage: event?.og_image_url
     });
     // Per-route font: signature script used only on this page.
-    // Latin subset + single weight keeps it ~6KB.
+    // Drop forced `subset=latin` so Google serves per-script @font-face
+    // declarations with proper `unicode-range`. Browsers then fetch only
+    // the subset matching the glyphs actually rendered (latin for most
+    // signatures; latin-ext for PT-BR accents like ã/ç when needed).
     const fontHref =
-      "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap&subset=latin";
+      "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap";
     return {
       ...tags,
       links: [
