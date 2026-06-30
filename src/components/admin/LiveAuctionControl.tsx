@@ -790,11 +790,18 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                          <RefreshCw className={`mr-2 h-4 w-4 ${isActionLoading ? 'animate-spin' : ''}`} /> Atualizar Usuários
                        </Button>
                         <div className="flex flex-col gap-2 w-full">
+                          <PendingWinnersCard
+                            lots={lots}
+                            profiles={profiles}
+                            onAssign={assignWinner}
+                            disabled={isActionLoading}
+                          />
                           <Button 
                             variant="destructive" 
                             onClick={finalizeEvent}
-                            disabled={isActionLoading}
+                            disabled={isActionLoading || lots.some(l => l.status === 'sold' && !l.winner_id)}
                             className="w-full"
+                            title={lots.some(l => l.status === 'sold' && !l.winner_id) ? "Resolva as pendências de arrematante antes de encerrar." : ""}
                           >
                             <Square className="mr-2 h-4 w-4" /> Encerrar Evento
                           </Button>
