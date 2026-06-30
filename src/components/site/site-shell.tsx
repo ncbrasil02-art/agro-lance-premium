@@ -5,6 +5,7 @@ import { Footer } from "./footer";
  import { BottomNav } from "./bottom-nav";
 import { PWAInstallProvider } from "./PWAInstallPrompt";
 import { GustavoChat } from "./GustavoChat";
+import { FpsMeter } from "@/components/dev/FpsMeter";
 
 export function SiteShell({ children }: { children: ReactNode }) {
    const location = useLocation();
@@ -22,6 +23,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <Footer />
        <BottomNav />
       <GustavoChat />
+      <FpsMeter />
     </div>
     </PWAInstallProvider>
   );
