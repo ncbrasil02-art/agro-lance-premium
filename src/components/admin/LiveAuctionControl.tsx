@@ -394,6 +394,38 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       setIsActionLoading(false);
     }
   };
+
+  const assignWinner = async (lotId: string, profileId: string) => {
+    if (!profileId) {
+      toast.error("Selecione um cadastro para vincular como arrematante.");
+      return;
+    }
+    setIsActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from("lots")
+        .update({
+          winner_id: profileId,
+          winner_link_reason: 'Vínculo manual pós-arremate (Telefone/Auditório)',
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", lotId);
+      if (error) throw error;
+      // also link the last bid to this user for audit
+      const { data: lastBid } = await supabase
+        .from("bids").select("id").eq("lot_id", lotId)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (lastBid?.id) {
+        await supabase.from("bids").update({ user_id: profileId }).eq("id", lastBid.id);
+      }
+      toast.success("Arrematante vinculado com sucesso!");
+      fetchEventDetails(selectedEventId);
+    } catch (e: any) {
+      toast.error("Erro ao vincular arrematante: " + e.message);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
  
      const sellLot = async (lotId: string) => {
        // Find the winner (last bid)
