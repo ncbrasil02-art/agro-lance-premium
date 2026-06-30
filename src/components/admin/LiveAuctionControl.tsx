@@ -427,7 +427,6 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           is_currently_live: false,
           winner_id: finalWinnerId,
           winner_link_reason: lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)',
-          last_bid_ip: lastBid.ip_address,
           updated_at: new Date().toISOString()
         }).eq("id", lotId).select('animal_id').single();
 

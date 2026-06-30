@@ -16,8 +16,8 @@ export function SellerCarousel() {
   useEffect(() => {
      const fetchData = async () => {
        const { data: sellersData } = await supabase
-         .from("sellers")
-         .select("*")
+          .from("sellers_public" as any)
+          .select("id, name, logo_url, slug")
          .not("logo_url", "is", null)
          .neq("logo_url", "")
          .limit(20);

@@ -39,7 +39,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
         let sellerData = null;
         if (eventData.seller_id) {
           const { data: sData } = await supabase
-            .from("sellers")
+            .from("sellers_public" as any)
             .select("logo_url, name")
             .eq("id", eventData.seller_id)
             .maybeSingle();
