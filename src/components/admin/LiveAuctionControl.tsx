@@ -373,6 +373,27 @@ import { StatusBadge } from "@/components/auctions/status-badge";
        setIsActionLoading(false);
      }
    };
+
+  const reopenLot = async (lotId: string) => {
+    setIsActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from("lots")
+        .update({ status: 'upcoming', winner_id: null, is_currently_live: false })
+        .eq("id", lotId);
+      if (error) throw error;
+      const lot = lots.find(l => l.id === lotId);
+      if (lot?.animal_id) {
+        await supabase.from("animals").update({ sale_status: 'available' }).eq("id", lot.animal_id);
+      }
+      toast.success("Lote reaberto. Já pode colocá-lo na tela.");
+      fetchEventDetails(selectedEventId);
+    } catch (e: any) {
+      toast.error("Erro ao reabrir lote: " + e.message);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
  
      const sellLot = async (lotId: string) => {
        // Find the winner (last bid)
@@ -945,6 +966,17 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                                 <Ban className="mr-1 h-3 w-3" /> Passou
                               </Button>
                             </div>
+                          )}
+                          {(lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished') && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full h-7 text-[10px]"
+                              onClick={() => reopenLot(lot.id)}
+                              disabled={isActionLoading}
+                            >
+                              Reabrir lote
+                            </Button>
                           )}
                         </div>
                      </div>
