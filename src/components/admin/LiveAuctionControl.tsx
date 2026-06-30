@@ -891,9 +891,29 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                         {formatBRL(activeLot.current_price || activeLot.starting_price)}
                       </div>
                       <div className="mt-4 flex gap-4">
-                         <div className="flex flex-col">
+                         <div className="flex flex-col items-center">
                             <span className="text-[10px] text-white/40 uppercase font-bold">Mín. p/ Próximo</span>
-                            <span className="text-gold font-bold">{formatBRL((activeLot.current_price || activeLot.starting_price) + (activeLot.bid_increment || 500))}</span>
+                            <span className="text-gold font-bold">{formatBRL((activeLot.current_price || activeLot.starting_price) + (activeLot.bid_increment || 0))}</span>
+                         </div>
+                         <div className="flex flex-col items-center">
+                            <span className="text-[10px] text-white/40 uppercase font-bold">Incremento Mínimo</span>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Input
+                                type="number"
+                                min={0}
+                                step={50}
+                                defaultValue={activeLot.bid_increment || 0}
+                                onBlur={async (e) => {
+                                  const v = parseFloat(e.target.value);
+                                  if (isNaN(v) || v < 0 || v === activeLot.bid_increment) return;
+                                  const { error } = await supabase.from("lots").update({ bid_increment: v }).eq("id", activeLot.id);
+                                  if (error) { toast.error("Erro ao atualizar incremento"); return; }
+                                  toast.success(`Incremento atualizado: ${formatBRL(v)}`);
+                                  fetchEventDetails(selectedEventId);
+                                }}
+                                className="h-8 w-28 bg-white/10 border-white/20 text-white font-bold text-center"
+                              />
+                            </div>
                          </div>
                       </div>
                     </div>
