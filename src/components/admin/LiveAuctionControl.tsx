@@ -984,23 +984,23 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                               </Button>
                           )}
                           {lot.id === liveEvent.active_lot_id && (
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-1.5">
                               <Button
                                 size="sm"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-[10px] px-2"
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-8 text-[11px]"
                                 onClick={() => sellLot(lot.id)}
                                 disabled={isActionLoading}
                               >
-                                <Check className="mr-1 h-3 w-3" /> Arrematar
+                                <Check className="mr-1.5 h-3.5 w-3.5" /> ARREMATAR
                               </Button>
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                className="h-7 text-[10px] px-2"
+                                className="w-full font-bold h-8 text-[11px]"
                                 onClick={() => passLot(lot.id)}
                                 disabled={isActionLoading}
                               >
-                                <Ban className="mr-1 h-3 w-3" /> Passou
+                                <Ban className="mr-1.5 h-3.5 w-3.5" /> PASSOU
                               </Button>
                             </div>
                           )}
