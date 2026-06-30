@@ -87,29 +87,6 @@ function NotFoundComponent() {
           { rel: "stylesheet", href: appCss },
           { rel: "preconnect", href: "https://fonts.googleapis.com" },
           { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-          {
-            rel: "preload",
-            as: "style",
-            href: "https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Dancing+Script:wght@400;700&display=swap",
-          },
-          {
-            rel: "stylesheet",
-            href: "https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Dancing+Script:wght@400;700&display=swap",
-          },
-          {
-            rel: "preload",
-            as: "font",
-            type: "font/woff2",
-            href: "https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_sxjsohD9F50Ruu7BMSo3Sup6.woff2",
-            crossOrigin: "anonymous",
-          },
-          {
-            rel: "preload",
-            as: "font",
-            type: "font/woff2",
-            href: "https://fonts.gstatic.com/s/cedarvillecursive/v17/yYL00g_a2veiudhUmxjo5VKkoqA-B_neJbBxw8BeTg.woff2",
-            crossOrigin: "anonymous",
-          },
           ...tags.links
         ],
      };

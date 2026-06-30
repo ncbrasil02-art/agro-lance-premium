@@ -70,7 +70,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
     const seoSettings = rootData?.seoSettings;
     
-    return generateMetaTags({
+    const tags = generateMetaTags({
       title: event?.seo_title || event?.name,
       description: event?.seo_description || event?.description,
       image: event?.banner_url,
@@ -80,6 +80,18 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
       ogDescription: event?.og_description,
       ogImage: event?.og_image_url
     });
+    // Per-route font: signature script used only on this page.
+    // Latin subset + single weight keeps it ~6KB.
+    const fontHref =
+      "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap&subset=latin";
+    return {
+      ...tags,
+      links: [
+        ...(tags.links ?? []),
+        { rel: "preload", as: "style", href: fontHref },
+        { rel: "stylesheet", href: fontHref },
+      ],
+    };
   },
   notFoundComponent: () => (
     <div className="container mx-auto px-4 py-20 text-center">
