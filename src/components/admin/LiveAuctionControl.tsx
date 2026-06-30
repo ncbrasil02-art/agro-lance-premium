@@ -611,10 +611,13 @@ import { StatusBadge } from "@/components/auctions/status-badge";
     };
  
    const handlePhoneBid = async () => {
-     if (!activeLot || phoneBid.amount <= (activeLot.current_price || activeLot.starting_price)) {
-       toast.error("Valor do lance deve ser maior que o atual");
-       return;
-     }
+    if (!activeLot) return;
+    const current = activeLot.current_price || activeLot.starting_price;
+    const minNext = current + (activeLot.bid_increment || 0);
+    if (phoneBid.amount < minNext) {
+      toast.error(`Valor mínimo para o próximo lance: ${formatBRL(minNext)}`);
+      return;
+    }
  
      setIsActionLoading(true);
       try {
@@ -888,9 +891,29 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                         {formatBRL(activeLot.current_price || activeLot.starting_price)}
                       </div>
                       <div className="mt-4 flex gap-4">
-                         <div className="flex flex-col">
+                         <div className="flex flex-col items-center">
                             <span className="text-[10px] text-white/40 uppercase font-bold">Mín. p/ Próximo</span>
-                            <span className="text-gold font-bold">{formatBRL((activeLot.current_price || activeLot.starting_price) + (activeLot.bid_increment || 500))}</span>
+                            <span className="text-gold font-bold">{formatBRL((activeLot.current_price || activeLot.starting_price) + (activeLot.bid_increment || 0))}</span>
+                         </div>
+                         <div className="flex flex-col items-center">
+                            <span className="text-[10px] text-white/40 uppercase font-bold">Incremento Mínimo</span>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Input
+                                type="number"
+                                min={0}
+                                step={50}
+                                defaultValue={activeLot.bid_increment || 0}
+                                onBlur={async (e) => {
+                                  const v = parseFloat(e.target.value);
+                                  if (isNaN(v) || v < 0 || v === activeLot.bid_increment) return;
+                                  const { error } = await supabase.from("lots").update({ bid_increment: v }).eq("id", activeLot.id);
+                                  if (error) { toast.error("Erro ao atualizar incremento"); return; }
+                                  toast.success(`Incremento atualizado: ${formatBRL(v)}`);
+                                  fetchEventDetails(selectedEventId);
+                                }}
+                                className="h-8 w-28 bg-white/10 border-white/20 text-white font-bold text-center"
+                              />
+                            </div>
                          </div>
                       </div>
                     </div>
@@ -1129,32 +1152,28 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                      
                      <div className="space-y-2">
                         <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Valor do Lance</Label>
-                        <div className="grid grid-cols-3 gap-2 mb-2">
-                          {[500, 1000, 2000, 5000].map((inc) => (
-                            <Button
-                              key={inc}
-                              size="sm"
-                              variant="outline"
-                              className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
-                              onClick={() => {
-                                const current = activeLot.current_price || activeLot.starting_price;
-                                setPhoneBid({ ...phoneBid, amount: current + inc });
-                              }}
-                            >
-                              +{formatBRL(inc)}
-                            </Button>
-                          ))}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
-                            onClick={() => {
-                              const current = activeLot.current_price || activeLot.starting_price;
-                              setPhoneBid({ ...phoneBid, amount: current + activeLot.bid_increment });
-                            }}
-                          >
-                            +Inc ({formatBRL(activeLot.bid_increment)})
-                          </Button>
+                        <p className="text-[10px] text-white/50 -mt-1 mb-1">
+                          Múltiplos do incremento do lote ({formatBRL(activeLot.bid_increment || 0)}) — impede lances abaixo do mínimo.
+                        </p>
+                        <div className="grid grid-cols-4 gap-2 mb-2">
+                          {[1, 2, 5, 10].map((mult) => {
+                            const inc = (activeLot.bid_increment || 0) * mult;
+                            return (
+                              <Button
+                                key={mult}
+                                size="sm"
+                                variant="outline"
+                                disabled={!activeLot.bid_increment}
+                                className="bg-white/5 border-gold/40 text-white hover:bg-gold hover:text-emerald-deep h-9 text-[10px] font-bold"
+                                onClick={() => {
+                                  const current = activeLot.current_price || activeLot.starting_price;
+                                  setPhoneBid({ ...phoneBid, amount: current + inc });
+                                }}
+                              >
+                                +{mult}x<br/>{formatBRL(inc)}
+                              </Button>
+                            );
+                          })}
                         </div>
                         <Input 
                           type="number" 
