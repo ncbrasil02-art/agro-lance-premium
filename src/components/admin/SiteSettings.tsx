@@ -79,7 +79,11 @@
       footer_text: "",
       partners_title: "Nossos Parceiros",
       partners_subtitle: "Vendedores",
-      hero_phrases: [] as string[]
+      hero_phrases: [] as string[],
+      hero_cta_primary_label: "",
+      hero_cta_primary_url: "",
+      hero_cta_secondary_label: "",
+      hero_cta_secondary_url: "",
     });
    const [isSaving, setIsSaving] = useState(false);
    const [isUploading, setIsUploading] = useState(false);
