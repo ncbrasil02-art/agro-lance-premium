@@ -24,13 +24,19 @@ export function BidSecurityAudit() {
         .select(`
           *,
           profile:profiles(full_name, risk_level, is_blocked, cpf),
-          lot:lots(lot_number, animal:animals(name))
+          lot:lots(lot_number, animal:animals(name)),
+          audit:bid_audit(ip_address, session_id, user_agent)
         `)
         .order("created_at", { ascending: false })
         .limit(100);
 
       if (error) throw error;
-      setBids(data || []);
+      const flat = (data || []).map((b: any) => ({
+        ...b,
+        ip_address: b.audit?.ip_address ?? null,
+        session_id: b.audit?.session_id ?? null,
+      }));
+      setBids(flat);
     } catch (error: any) {
       toast.error("Erro ao carregar auditoria: " + error.message);
     } finally {
@@ -56,13 +62,16 @@ export function BidSecurityAudit() {
             .select(`
               *,
               profile:profiles(full_name, risk_level, is_blocked, cpf),
-              lot:lots(lot_number, animal:animals(name))
+              lot:lots(lot_number, animal:animals(name)),
+              audit:bid_audit(ip_address, session_id, user_agent)
             `)
             .eq("id", payload.new.id)
             .single();
           
           if (bidWithDetails) {
-            setBids(prev => [bidWithDetails, ...prev].slice(0, 100));
+            const b: any = bidWithDetails;
+            const flat = { ...b, ip_address: b.audit?.ip_address ?? null, session_id: b.audit?.session_id ?? null };
+            setBids(prev => [flat, ...prev].slice(0, 100));
           }
         }
       )

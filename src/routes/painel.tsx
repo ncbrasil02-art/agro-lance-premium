@@ -2045,7 +2045,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
                </p>
 
                 <div className="bg-gray-50 p-4 border-l-4 border-emerald-deep my-6 italic text-xs">
-                  "Este contrato é gerado eletronicamente e possui validade jurídica mediante a confirmação do arremate pelo sistema de auditoria da {siteInfo?.name || "Premium Agro Leilões"}, com registro de IP {lot.last_bid_ip || '187.52.14.92'} em {new Date(lot.updated_at).toLocaleString('pt-BR')}."
+                  "Este contrato é gerado eletronicamente e possui validade jurídica mediante a confirmação do arremate pelo sistema de auditoria da {siteInfo?.name || "Premium Agro Leilões"} em {new Date(lot.updated_at).toLocaleString('pt-BR')}."
                 </div>
 
                <p>
