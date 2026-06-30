@@ -2,6 +2,7 @@
  import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { SiteSettings } from "@/components/admin/SiteSettings";
 import { ChatbotSettings } from "@/components/admin/ChatbotSettings";
+import { EmailSettings } from "@/components/admin/EmailSettings";
  import { EventManagement } from "@/components/admin/EventManagement";
  import { LotManagement } from "@/components/admin/LotManagement";
  import { AnimalManagement } from "@/components/admin/AnimalManagement";
@@ -35,7 +36,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
  import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
  
-  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments" | "alertas" | "chatbot";
+  type AdminTab = "dashboard" | "live" | "events" | "lots" | "animals" | "sellers" | "categories" | "event_requests" | "direct_sales" | "offers" | "contracts" | "users" | "security" | "rls_test" | "logs" | "audit" | "settings" | "posts" | "transactions" | "installments" | "alertas" | "chatbot" | "emails";
  
  const menuItems: { id: AdminTab; label: string; icon: ReactNode }[] = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="mr-2 h-4 w-4" /> },
@@ -59,6 +60,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
   { id: "audit", label: "Auditoria Completa", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
    { id: "logs", label: "Logs de Erro", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
    { id: "chatbot", label: "Chatbot Gustavo", icon: <Bot className="mr-2 h-4 w-4" /> },
+   { id: "emails", label: "E-mails (SMTP)", icon: <FileText className="mr-2 h-4 w-4 text-gold" /> },
    { id: "settings", label: "Configurações", icon: <Settings className="mr-2 h-4 w-4" /> }
  ];
  
@@ -374,6 +376,7 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
                 {activeTab === "transactions" && <TransactionManagement />}
                 {activeTab === "settings" && <SiteSettings initialTab={settingsTab} />}
                {activeTab === "chatbot" && <ChatbotSettings />}
+               {activeTab === "emails" && <EmailSettings />}
        </main>
      </div>
    );
