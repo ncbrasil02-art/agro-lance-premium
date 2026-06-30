@@ -23,12 +23,16 @@ const HeroSlider = ({
   phrases = [], 
   opacity = 50, 
   blur = 0,
+  duration = 6000,
+  effect = 'fade',
   className
 }: { 
   backgrounds: string[], 
   phrases: string[], 
   opacity: number, 
   blur: number,
+  duration?: number,
+  effect?: 'fade' | 'zoom' | 'slide' | 'kenburns' | 'none',
   className?: string
 }) => {
   const [index, setIndex] = useState(0);
@@ -60,11 +64,21 @@ const HeroSlider = ({
     if (maxIndex <= 1) return;
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % maxIndex);
-    }, 6000);
+    }, Math.max(1500, duration));
     return () => clearInterval(interval);
-  }, [maxIndex]);
+  }, [maxIndex, duration]);
 
   const currentImage = images[index % images.length] || images[0];
+
+  const variants = {
+    fade:     { initial: { opacity: 0 },                 animate: { opacity: 1 }, exit: { opacity: 0 } },
+    zoom:     { initial: { opacity: 0, scale: 1.1 },     animate: { opacity: 1, scale: 1 }, exit: { opacity: 0, scale: 0.95 } },
+    slide:    { initial: { opacity: 0, x: 60 },          animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -60 } },
+    kenburns: { initial: { opacity: 0 },                 animate: { opacity: 1 }, exit: { opacity: 0 } },
+    none:     { initial: { opacity: 1 },                 animate: { opacity: 1 }, exit: { opacity: 1 } },
+  } as const;
+  const v = variants[effect] ?? variants.fade;
+  const useKen = effect === 'kenburns' || effect === 'fade';
   const currentPhrase = phrases[index % phrases.length];
 
   // Preload upcoming image (optimized variant) to avoid flash on transition
@@ -82,17 +96,17 @@ const HeroSlider = ({
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={v.initial}
+          animate={v.animate}
+          exit={v.exit}
           transition={{ duration: 1.5, ease: "easeInOut" }}
           className="absolute inset-0"
         >
            <div className="absolute inset-0 overflow-hidden">
              <motion.div
-               initial={{ scale: 1.15, x: index % 2 === 0 ? -20 : 20 }}
-               animate={{ scale: 1, x: 0 }}
-               transition={{ duration: 7, ease: "easeOut" }}
+               initial={useKen ? { scale: 1.15, x: index % 2 === 0 ? -20 : 20 } : { scale: 1, x: 0 }}
+               animate={useKen ? { scale: 1, x: 0 } : { scale: 1, x: 0 }}
+               transition={{ duration: useKen ? 7 : 0, ease: "easeOut" }}
                className="absolute inset-0"
                style={{ opacity: opacity / 100, filter: `blur(${blur}px)` }}
              >
