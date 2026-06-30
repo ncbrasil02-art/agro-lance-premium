@@ -79,7 +79,11 @@
       footer_text: "",
       partners_title: "Nossos Parceiros",
       partners_subtitle: "Vendedores",
-      hero_phrases: [] as string[]
+      hero_phrases: [] as string[],
+      hero_cta_primary_label: "",
+      hero_cta_primary_url: "",
+      hero_cta_secondary_label: "",
+      hero_cta_secondary_url: "",
     });
    const [isSaving, setIsSaving] = useState(false);
    const [isUploading, setIsUploading] = useState(false);
@@ -726,6 +730,66 @@
                       max="20" 
                       value={homepage.hero_bg_blur ?? 0} 
                       onChange={e => setHomepage({...homepage, hero_bg_blur: parseInt(e.target.value)})} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Duração de cada slide ({((homepage.hero_slide_duration ?? 6000)/1000).toFixed(1)}s)</Label>
+                    <Input
+                      type="range"
+                      min="2000"
+                      max="20000"
+                      step="500"
+                      value={homepage.hero_slide_duration ?? 6000}
+                      onChange={e => setHomepage({...homepage, hero_slide_duration: parseInt(e.target.value)})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Efeito de transição</Label>
+                    <select
+                      className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                      value={homepage.hero_slide_effect ?? 'fade'}
+                      onChange={e => setHomepage({...homepage, hero_slide_effect: e.target.value as any})}
+                    >
+                      <option value="fade">Fade (suave)</option>
+                      <option value="zoom">Zoom</option>
+                      <option value="slide">Slide lateral</option>
+                      <option value="kenburns">Ken Burns (cinematográfico)</option>
+                      <option value="none">Sem efeito</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-6 pb-6 border-b">
+                  <div className="space-y-2">
+                    <Label>Botão 1 — Texto</Label>
+                    <Input
+                      placeholder="Assista Agora"
+                      value={customTexts.hero_cta_primary_label || ""}
+                      onChange={e => setCustomTexts({...customTexts, hero_cta_primary_label: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Botão 1 — Link</Label>
+                    <Input
+                      placeholder="/ao-vivo"
+                      value={customTexts.hero_cta_primary_url || ""}
+                      onChange={e => setCustomTexts({...customTexts, hero_cta_primary_url: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Botão 2 — Texto</Label>
+                    <Input
+                      placeholder="Catálogo Completo"
+                      value={customTexts.hero_cta_secondary_label || ""}
+                      onChange={e => setCustomTexts({...customTexts, hero_cta_secondary_label: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Botão 2 — Link</Label>
+                    <Input
+                      placeholder="/eventos"
+                      value={customTexts.hero_cta_secondary_url || ""}
+                      onChange={e => setCustomTexts({...customTexts, hero_cta_secondary_url: e.target.value})}
                     />
                   </div>
                 </div>
