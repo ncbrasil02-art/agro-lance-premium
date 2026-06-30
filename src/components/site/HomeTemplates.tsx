@@ -167,6 +167,8 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
         phrases={customTexts?.hero_phrases || []}
         opacity={homepageSettings?.hero_bg_opacity ?? 50} 
         blur={homepageSettings?.hero_bg_blur ?? 0} 
+        duration={homepageSettings?.hero_slide_duration ?? 6000}
+        effect={homepageSettings?.hero_slide_effect ?? 'fade'}
       />
       
       <div className="absolute inset-0 z-1 bg-gradient-to-r from-background via-background/70 to-transparent" />
@@ -204,17 +206,17 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
           </p>
 
           <div className="flex flex-wrap gap-4 mb-16">
-            <Link to="/ao-vivo">
+            <a href={customTexts?.hero_cta_primary_url || "/ao-vivo"}>
               <Button size="lg" className="bg-gold-gradient text-emerald-deep font-black uppercase tracking-wider px-8 h-14 hover:scale-105 transition-transform shadow-gold">
                 <Radio className="mr-2 h-4 w-4 animate-pulse" />
-                Assista Agora
+                {customTexts?.hero_cta_primary_label || "Assista Agora"}
               </Button>
-            </Link>
-              <Link to="/eventos">
-                <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold-gradient hover:text-emerald-deep hover:border-transparent font-black uppercase tracking-widest h-14 px-8 rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-gold/20 hover:scale-105">
-                  Catálogo Completo
-                </Button>
-              </Link>
+            </a>
+            <a href={customTexts?.hero_cta_secondary_url || "/eventos"}>
+              <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold-gradient hover:text-emerald-deep hover:border-transparent font-black uppercase tracking-widest h-14 px-8 rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-gold/20 hover:scale-105">
+                {customTexts?.hero_cta_secondary_label || "Catálogo Completo"}
+              </Button>
+            </a>
           </div>
 
           <div className="flex flex-col gap-12">
