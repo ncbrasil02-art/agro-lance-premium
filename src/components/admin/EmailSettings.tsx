@@ -176,7 +176,7 @@ function TemplatesTab() {
   function select(t: TemplateRow) {
     setSelected(t);
     const vars: Record<string, string> = {};
-    (t.variables || []).forEach(v => { vars[v] = "{{" + v + "}}"; });
+    (t.variables || []).forEach(v => { vars[v] = sampleValueFor(v); });
     setPreviewData(vars);
   }
 
