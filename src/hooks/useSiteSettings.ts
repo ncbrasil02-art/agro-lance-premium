@@ -62,6 +62,8 @@
   hero_backgrounds?: string[];
   hero_bg_opacity?: number;
   hero_bg_blur?: number;
+  hero_slide_duration?: number;
+  hero_slide_effect?: 'fade' | 'zoom' | 'slide' | 'kenburns' | 'none';
   mobile_mode_enabled?: boolean;
   partners_logo_fit?: 'cover' | 'contain';
    stats?: {
@@ -77,6 +79,10 @@
     hero_subtitle: string;
     footer_text: string;
   hero_phrases?: string[];
+  hero_cta_primary_label?: string;
+  hero_cta_primary_url?: string;
+  hero_cta_secondary_label?: string;
+  hero_cta_secondary_url?: string;
   }
  
     export function useSiteSettings(initialData?: { 
