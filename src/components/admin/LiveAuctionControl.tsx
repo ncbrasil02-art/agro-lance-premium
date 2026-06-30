@@ -946,6 +946,17 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                               </Button>
                             </div>
                           )}
+                          {(lot.status === 'sold' || lot.status === 'passed' || lot.status === 'finished') && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full h-7 text-[10px]"
+                              onClick={() => reopenLot(lot.id)}
+                              disabled={isActionLoading}
+                            >
+                              Reabrir lote
+                            </Button>
+                          )}
                         </div>
                      </div>
                    ))}
