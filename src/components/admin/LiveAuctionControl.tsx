@@ -1152,32 +1152,28 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                      
                      <div className="space-y-2">
                         <Label className="text-white/80 text-xs uppercase font-bold tracking-wider">Valor do Lance</Label>
-                        <div className="grid grid-cols-3 gap-2 mb-2">
-                          {[500, 1000, 2000, 5000].map((inc) => (
-                            <Button
-                              key={inc}
-                              size="sm"
-                              variant="outline"
-                              className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
-                              onClick={() => {
-                                const current = activeLot.current_price || activeLot.starting_price;
-                                setPhoneBid({ ...phoneBid, amount: current + inc });
-                              }}
-                            >
-                              +{formatBRL(inc)}
-                            </Button>
-                          ))}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-white/5 border-white/20 text-white hover:bg-white/20 h-8 text-[10px]"
-                            onClick={() => {
-                              const current = activeLot.current_price || activeLot.starting_price;
-                              setPhoneBid({ ...phoneBid, amount: current + activeLot.bid_increment });
-                            }}
-                          >
-                            +Inc ({formatBRL(activeLot.bid_increment)})
-                          </Button>
+                        <p className="text-[10px] text-white/50 -mt-1 mb-1">
+                          Múltiplos do incremento do lote ({formatBRL(activeLot.bid_increment || 0)}) — impede lances abaixo do mínimo.
+                        </p>
+                        <div className="grid grid-cols-4 gap-2 mb-2">
+                          {[1, 2, 5, 10].map((mult) => {
+                            const inc = (activeLot.bid_increment || 0) * mult;
+                            return (
+                              <Button
+                                key={mult}
+                                size="sm"
+                                variant="outline"
+                                disabled={!activeLot.bid_increment}
+                                className="bg-white/5 border-gold/40 text-white hover:bg-gold hover:text-emerald-deep h-9 text-[10px] font-bold"
+                                onClick={() => {
+                                  const current = activeLot.current_price || activeLot.starting_price;
+                                  setPhoneBid({ ...phoneBid, amount: current + inc });
+                                }}
+                              >
+                                +{mult}x<br/>{formatBRL(inc)}
+                              </Button>
+                            );
+                          })}
                         </div>
                         <Input 
                           type="number" 
