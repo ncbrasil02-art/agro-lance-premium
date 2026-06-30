@@ -46,6 +46,15 @@ const HeroSlider = ({
   const currentImage = images[index % images.length] || images[0];
   const currentPhrase = phrases[index % phrases.length];
 
+  // Preload upcoming image to avoid flash on transition
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const next = images[(index + 1) % images.length];
+    if (!next) return;
+    const img = new Image();
+    img.src = next;
+  }, [index, images]);
+
   return (
     <div className="absolute inset-0 z-0">
       <AnimatePresence mode="wait">
@@ -69,16 +78,14 @@ const HeroSlider = ({
                  src={currentImage} 
                  alt="Hero Background" 
                  width={1920} 
-                 className="h-full w-full object-cover" 
+                 className="h-full w-full object-cover"
+                 priority="high"
+                 loading="eager"
+                 fetchPriority="high"
+                 decoding="async"
+                 disablePlaceholder
                />
              </motion.div>
-             {/* Elegant Overlay Sweep */}
-             <motion.div 
-               initial={{ x: "-100%" }}
-               animate={{ x: "100%" }}
-               transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
-               className="absolute inset-0 z-10 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
-             />
            </div>
           
           {currentPhrase && (
