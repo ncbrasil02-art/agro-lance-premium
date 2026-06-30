@@ -586,6 +586,126 @@ export type Database = {
           },
         ]
       }
+      email_send_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          status: string
+          subject: string | null
+          template_name: string | null
+          to_email: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status: string
+          subject?: string | null
+          template_name?: string | null
+          to_email: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string
+          subject?: string | null
+          template_name?: string | null
+          to_email?: string
+        }
+        Relationships: []
+      }
+      email_smtp_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          from_email: string
+          from_name: string
+          host: string
+          id: string
+          password: string
+          port: number
+          reply_to: string | null
+          secure: boolean
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          from_email?: string
+          from_name?: string
+          host?: string
+          id?: string
+          password?: string
+          port?: number
+          reply_to?: string | null
+          secure?: boolean
+          updated_at?: string
+          username?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          from_email?: string
+          from_name?: string
+          host?: string
+          id?: string
+          password?: string
+          port?: number
+          reply_to?: string | null
+          secure?: boolean
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_html: string
+          category: string
+          created_at: string
+          enabled: boolean
+          footer_html: string
+          header_html: string
+          id: string
+          label: string
+          name: string
+          subject: string
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          body_html?: string
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          footer_html?: string
+          header_html?: string
+          id?: string
+          label: string
+          name: string
+          subject?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          body_html?: string
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          footer_html?: string
+          header_html?: string
+          id?: string
+          label?: string
+          name?: string
+          subject?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
       event_requests: {
         Row: {
           additional_info: string | null
