@@ -556,6 +556,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
     };
 
     const finalizeEvent = async () => {
+      const pendingWinners = lots.filter((l) => l.status === 'sold' && !l.winner_id);
+      if (pendingWinners.length > 0) {
+        toast.error(`Existem ${pendingWinners.length} lote(s) arrematado(s) sem arrematante vinculado. Resolva as pendências antes de encerrar.`);
+        return;
+      }
       if (!confirm("Deseja realmente encerrar este evento? Todos os lotes pendentes serão mantidos como estão.")) return;
       setIsActionLoading(true);
       try {
