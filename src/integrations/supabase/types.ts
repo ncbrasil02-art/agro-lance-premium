@@ -165,6 +165,13 @@ export type Database = {
             referencedRelation: "sellers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "animals_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       audit_logs: {
@@ -250,6 +257,38 @@ export type Database = {
         }
         Relationships: []
       }
+      bid_audit: {
+        Row: {
+          bid_id: string
+          created_at: string
+          ip_address: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          bid_id: string
+          created_at?: string
+          ip_address?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          bid_id?: string
+          created_at?: string
+          ip_address?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bid_audit_bid_id_fkey"
+            columns: ["bid_id"]
+            isOneToOne: true
+            referencedRelation: "bids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bids: {
         Row: {
           amount: number
@@ -257,12 +296,10 @@ export type Database = {
           bidder_name: string | null
           created_at: string
           id: string
-          ip_address: string | null
           is_manual: boolean | null
           is_phone_bid: boolean | null
           lot_id: string | null
           phone_bidder_identifier: string | null
-          session_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -271,12 +308,10 @@ export type Database = {
           bidder_name?: string | null
           created_at?: string
           id?: string
-          ip_address?: string | null
           is_manual?: boolean | null
           is_phone_bid?: boolean | null
           lot_id?: string | null
           phone_bidder_identifier?: string | null
-          session_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -285,12 +320,10 @@ export type Database = {
           bidder_name?: string | null
           created_at?: string
           id?: string
-          ip_address?: string | null
           is_manual?: boolean | null
           is_phone_bid?: boolean | null
           lot_id?: string | null
           phone_bidder_identifier?: string | null
-          session_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -889,6 +922,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "events_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_events_active_lot"
             columns: ["active_lot_id"]
             isOneToOne: false
@@ -1009,8 +1049,6 @@ export type Database = {
           installment_interval: string | null
           is_currently_live: boolean | null
           is_featured: boolean | null
-          last_bid_ip: string | null
-          last_bid_user_agent: string | null
           live_timer_seconds: number | null
           lot_number: number
           payment_formula: string | null
@@ -1040,8 +1078,6 @@ export type Database = {
           installment_interval?: string | null
           is_currently_live?: boolean | null
           is_featured?: boolean | null
-          last_bid_ip?: string | null
-          last_bid_user_agent?: string | null
           live_timer_seconds?: number | null
           lot_number: number
           payment_formula?: string | null
@@ -1071,8 +1107,6 @@ export type Database = {
           installment_interval?: string | null
           is_currently_live?: boolean | null
           is_featured?: boolean | null
-          last_bid_ip?: string | null
-          last_bid_user_agent?: string | null
           live_timer_seconds?: number | null
           lot_number?: number
           payment_formula?: string | null
@@ -1784,7 +1818,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      sellers_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          location: string | null
+          logo_url: string | null
+          name: string | null
+          slug: string | null
+          type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          location?: string | null
+          logo_url?: string | null
+          name?: string | null
+          slug?: string | null
+          type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          location?: string | null
+          logo_url?: string | null
+          name?: string | null
+          slug?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_user_risk: { Args: { p_user_id: string }; Returns: boolean }
