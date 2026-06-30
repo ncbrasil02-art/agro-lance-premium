@@ -8,3 +8,23 @@ DirectoryIndex index.html
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
+
+# ---- Cache / CDN headers (Hostinger / Apache) ----
+<IfModule mod_headers.c>
+  # Hashed Vite assets -> immutable, 1 year
+  <FilesMatch "\.(js|css|woff2?|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Media -> 30 days
+  <FilesMatch "\.(png|jpe?g|webp|avif|gif|svg|ico|mp4|webm)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  # HTML / manifests -> always revalidate so deploys go live
+  <FilesMatch "\.(html|json|xml|txt)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json image/svg+xml
+</IfModule>
