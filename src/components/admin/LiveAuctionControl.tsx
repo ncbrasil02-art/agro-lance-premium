@@ -394,6 +394,38 @@ import { StatusBadge } from "@/components/auctions/status-badge";
       setIsActionLoading(false);
     }
   };
+
+  const assignWinner = async (lotId: string, profileId: string) => {
+    if (!profileId) {
+      toast.error("Selecione um cadastro para vincular como arrematante.");
+      return;
+    }
+    setIsActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from("lots")
+        .update({
+          winner_id: profileId,
+          winner_link_reason: 'Vínculo manual pós-arremate (Telefone/Auditório)',
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", lotId);
+      if (error) throw error;
+      // also link the last bid to this user for audit
+      const { data: lastBid } = await supabase
+        .from("bids").select("id").eq("lot_id", lotId)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (lastBid?.id) {
+        await supabase.from("bids").update({ user_id: profileId }).eq("id", lastBid.id);
+      }
+      toast.success("Arrematante vinculado com sucesso!");
+      fetchEventDetails(selectedEventId);
+    } catch (e: any) {
+      toast.error("Erro ao vincular arrematante: " + e.message);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
  
      const sellLot = async (lotId: string) => {
        // Find the winner (last bid)
@@ -432,13 +464,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           toast.info(`Vinculando arremate automaticamente ao perfil: ${profiles.find(p => p.id === phoneBid.profileId)?.full_name}`);
         } else if (lastBid.user_id) {
           finalWinnerId = lastBid.user_id;
-        } else if (isGenericPhoneBid && !phoneBid.profileId) {
-          // Still generic, ask if they want to link it first
-          if (confirm(`Este arremate foi via TELEFONE (${lastBid.phone_bidder_identifier || 'não identificado'}).\n\nDeseja vinculá-lo a um perfil cadastrado agora?`)) {
-            toast.info("Selecione um 'Cadastro Real' na barra lateral e clique em Arrematar novamente.");
-            return;
-          }
-        }
+         } else if (isGenericPhoneBid && !phoneBid.profileId) {
+           // Allow sale but leave winner pending — surfaces in "Pendências de Arrematante"
+           finalWinnerId = null;
+           toast.warning(`Lote arrematado SEM vínculo (${lastBid.phone_bidder_identifier || 'telefone/auditório'}). Vincule um cadastro antes de encerrar o evento.`);
+         }
 
        setIsActionLoading(true);
        try {
@@ -447,7 +477,9 @@ import { StatusBadge } from "@/components/auctions/status-badge";
           status: 'sold', 
           is_currently_live: false,
           winner_id: finalWinnerId,
-          winner_link_reason: lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)',
+          winner_link_reason: !finalWinnerId
+            ? 'PENDENTE - Vínculo obrigatório (Lance Telefone/Auditório)'
+            : (lastBid.is_phone_bid ? 'Vínculo manual (Lance Telefone)' : 'Vínculo automático (Lance Online)'),
           updated_at: new Date().toISOString()
         }).eq("id", lotId).select('animal_id').single();
 
@@ -556,6 +588,11 @@ import { StatusBadge } from "@/components/auctions/status-badge";
     };
 
     const finalizeEvent = async () => {
+      const pendingWinners = lots.filter((l) => l.status === 'sold' && !l.winner_id);
+      if (pendingWinners.length > 0) {
+        toast.error(`Existem ${pendingWinners.length} lote(s) arrematado(s) sem arrematante vinculado. Resolva as pendências antes de encerrar.`);
+        return;
+      }
       if (!confirm("Deseja realmente encerrar este evento? Todos os lotes pendentes serão mantidos como estão.")) return;
       setIsActionLoading(true);
       try {
@@ -753,11 +790,18 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                          <RefreshCw className={`mr-2 h-4 w-4 ${isActionLoading ? 'animate-spin' : ''}`} /> Atualizar Usuários
                        </Button>
                         <div className="flex flex-col gap-2 w-full">
+                          <PendingWinnersCard
+                            lots={lots}
+                            profiles={profiles}
+                            onAssign={assignWinner}
+                            disabled={isActionLoading}
+                          />
                           <Button 
                             variant="destructive" 
                             onClick={finalizeEvent}
-                            disabled={isActionLoading}
+                            disabled={isActionLoading || lots.some(l => l.status === 'sold' && !l.winner_id)}
                             className="w-full"
+                            title={lots.some(l => l.status === 'sold' && !l.winner_id) ? "Resolva as pendências de arrematante antes de encerrar." : ""}
                           >
                             <Square className="mr-2 h-4 w-4" /> Encerrar Evento
                           </Button>
@@ -867,7 +911,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                       placeholder="Cole aqui o link do vídeo ao vivo (ex: https://www.youtube.com/watch?v=...)" 
                       value={transmissionLink}
                       onChange={(e) => setTransmissionLink(e.target.value)}
-                      className="flex-1 bg-white border-gold/30 focus:border-gold"
+                      className="flex-1 bg-white border-gold/40 focus:border-gold text-emerald-deep placeholder:text-emerald-deep/40 font-medium"
                     />
                     <Button 
                       onClick={updateTransmissionLink}
@@ -947,23 +991,23 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                               </Button>
                           )}
                           {lot.id === liveEvent.active_lot_id && (
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-1.5">
                               <Button
                                 size="sm"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-[10px] px-2"
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-8 text-[11px]"
                                 onClick={() => sellLot(lot.id)}
                                 disabled={isActionLoading}
                               >
-                                <Check className="mr-1 h-3 w-3" /> Arrematar
+                                <Check className="mr-1.5 h-3.5 w-3.5" /> ARREMATAR
                               </Button>
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                className="h-7 text-[10px] px-2"
+                                className="w-full font-bold h-8 text-[11px]"
                                 onClick={() => passLot(lot.id)}
                                 disabled={isActionLoading}
                               >
-                                <Ban className="mr-1 h-3 w-3" /> Passou
+                                <Ban className="mr-1.5 h-3.5 w-3.5" /> PASSOU
                               </Button>
                             </div>
                           )}
@@ -1213,3 +1257,72 @@ import { StatusBadge } from "@/components/auctions/status-badge";
      </div>
    );
  }
+
+function PendingWinnersCard({
+  lots,
+  profiles,
+  onAssign,
+  disabled,
+}: {
+  lots: any[];
+  profiles: any[];
+  onAssign: (lotId: string, profileId: string) => void;
+  disabled?: boolean;
+}) {
+  const pending = lots.filter((l) => l.status === 'sold' && !l.winner_id);
+  const [selection, setSelection] = useState<Record<string, string>>({});
+
+  if (pending.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-4 mb-2">
+      <div className="flex items-center gap-2 mb-3">
+        <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <h4 className="text-xs font-black uppercase tracking-widest text-amber-700">
+          Pendências de Arrematante ({pending.length})
+        </h4>
+      </div>
+      <p className="text-[11px] text-amber-800 mb-3 leading-snug">
+        Estes lotes foram arrematados via telefone/auditório/plaqueta sem cadastro vinculado.
+        É <strong>obrigatório</strong> atribuir um arrematante antes de encerrar o evento.
+      </p>
+      <div className="space-y-2">
+        {pending.map((lot) => (
+          <div key={lot.id} className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-white p-2 sm:flex-row sm:items-center">
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] font-bold text-emerald-deep">
+                LOTE {lot.lot_number} — {lot.animal?.name || 'Animal'}
+              </div>
+              <div className="text-[10px] text-muted-foreground truncate">
+                {formatBRL(lot.current_price || lot.starting_price)} · {lot.winner_link_reason || 'Sem vínculo'}
+              </div>
+            </div>
+            <Select
+              value={selection[lot.id] || ''}
+              onValueChange={(v) => setSelection((s) => ({ ...s, [lot.id]: v }))}
+            >
+              <SelectTrigger className="h-8 w-full text-[11px] sm:w-56">
+                <SelectValue placeholder="Selecionar arrematante..." />
+              </SelectTrigger>
+              <SelectContent>
+                {profiles.map((p) => (
+                  <SelectItem key={p.id} value={p.id} className="text-xs">
+                    {p.full_name || p.email || p.id.slice(0, 8)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              className="h-8 bg-amber-600 text-white hover:bg-amber-700 font-bold text-[11px]"
+              disabled={disabled || !selection[lot.id]}
+              onClick={() => onAssign(lot.id, selection[lot.id])}
+            >
+              <Check className="mr-1 h-3 w-3" /> Vincular
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
