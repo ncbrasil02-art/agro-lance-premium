@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:hostinger": "bun run build && node scripts/generate-static-index.mjs"
+    ,"lighthouse": "node scripts/run-lighthouse.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.1",
