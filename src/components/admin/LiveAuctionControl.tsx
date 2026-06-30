@@ -904,7 +904,7 @@ import { StatusBadge } from "@/components/auctions/status-badge";
                       placeholder="Cole aqui o link do vídeo ao vivo (ex: https://www.youtube.com/watch?v=...)" 
                       value={transmissionLink}
                       onChange={(e) => setTransmissionLink(e.target.value)}
-                      className="flex-1 bg-white border-gold/30 focus:border-gold"
+                      className="flex-1 bg-white border-gold/40 focus:border-gold text-emerald-deep placeholder:text-emerald-deep/40 font-medium"
                     />
                     <Button 
                       onClick={updateTransmissionLink}
