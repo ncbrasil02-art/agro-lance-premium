@@ -10,8 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build:hostinger": "bun run build && node scripts/generate-static-index.mjs"
-    ,"lighthouse": "node scripts/run-lighthouse.mjs"
+    "build:hostinger": "bun run build && node scripts/generate-static-index.mjs",
+    "lighthouse": "node scripts/run-lighthouse.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.1",
@@ -97,6 +97,7 @@
     "globals": "^15.15.0",
     "jsdom": "^29.0.2",
     "prettier": "^3.7.3",
+    "subset-font": "^2.5.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
