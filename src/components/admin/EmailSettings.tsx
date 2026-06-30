@@ -13,6 +13,54 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, Save, Send, Mail, FileText, ClipboardList } from "lucide-react";
 
+const SAMPLE_VALUES: Record<string, string> = {
+  name: "João da Silva",
+  user_name: "João da Silva",
+  first_name: "João",
+  full_name: "João da Silva",
+  email: "joao@exemplo.com.br",
+  user_email: "joao@exemplo.com.br",
+  site_name: "NC Agro Leilões",
+  site_url: "https://agro-ncbrasil.lovable.app",
+  url: "https://agro-ncbrasil.lovable.app/confirmar?token=abc123",
+  link: "https://agro-ncbrasil.lovable.app/confirmar?token=abc123",
+  confirmation_url: "https://agro-ncbrasil.lovable.app/confirmar?token=abc123",
+  reset_url: "https://agro-ncbrasil.lovable.app/recuperar?token=abc123",
+  action_url: "https://agro-ncbrasil.lovable.app/acao?token=abc123",
+  token: "ABC123XYZ",
+  code: "742193",
+  otp: "742193",
+  amount: "R$ 1.250,00",
+  value: "R$ 1.250,00",
+  total: "R$ 1.250,00",
+  date: new Date().toLocaleDateString("pt-BR"),
+  due_date: new Date(Date.now() + 7 * 86400000).toLocaleDateString("pt-BR"),
+  event_name: "Leilão Virtual Nelore Elite",
+  event_date: new Date(Date.now() + 14 * 86400000).toLocaleDateString("pt-BR"),
+  lot_name: "Lote 12 — Touro PO",
+  lot_number: "12",
+  bid_value: "R$ 18.500,00",
+  pix_key: "00020126360014BR.GOV.BCB.PIX0114+5511999990000",
+  invoice_number: "NF-2026-000123",
+  seller_name: "Fazenda Boa Vista",
+  buyer_name: "João da Silva",
+  phone: "(11) 99999-0000",
+  cpf: "123.456.789-00",
+  cnpj: "12.345.678/0001-90",
+};
+
+function sampleValueFor(name: string): string {
+  const key = name.toLowerCase();
+  if (SAMPLE_VALUES[key]) return SAMPLE_VALUES[key];
+  if (key.includes("url") || key.includes("link")) return "https://agro-ncbrasil.lovable.app/exemplo";
+  if (key.includes("email")) return "exemplo@ncbrasil.com.br";
+  if (key.includes("name") || key.includes("nome")) return "Exemplo";
+  if (key.includes("date") || key.includes("data")) return new Date().toLocaleDateString("pt-BR");
+  if (key.includes("value") || key.includes("amount") || key.includes("valor") || key.includes("total") || key.includes("price")) return "R$ 1.000,00";
+  if (key.includes("code") || key.includes("token") || key.includes("otp")) return "ABC123";
+  return "[" + name + "]";
+}
+
 type SmtpRow = {
   id: string;
   host: string;
