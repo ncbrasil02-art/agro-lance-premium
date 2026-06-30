@@ -1257,3 +1257,72 @@ import { StatusBadge } from "@/components/auctions/status-badge";
      </div>
    );
  }
+
+function PendingWinnersCard({
+  lots,
+  profiles,
+  onAssign,
+  disabled,
+}: {
+  lots: any[];
+  profiles: any[];
+  onAssign: (lotId: string, profileId: string) => void;
+  disabled?: boolean;
+}) {
+  const pending = lots.filter((l) => l.status === 'sold' && !l.winner_id);
+  const [selection, setSelection] = useState<Record<string, string>>({});
+
+  if (pending.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-4 mb-2">
+      <div className="flex items-center gap-2 mb-3">
+        <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <h4 className="text-xs font-black uppercase tracking-widest text-amber-700">
+          Pendências de Arrematante ({pending.length})
+        </h4>
+      </div>
+      <p className="text-[11px] text-amber-800 mb-3 leading-snug">
+        Estes lotes foram arrematados via telefone/auditório/plaqueta sem cadastro vinculado.
+        É <strong>obrigatório</strong> atribuir um arrematante antes de encerrar o evento.
+      </p>
+      <div className="space-y-2">
+        {pending.map((lot) => (
+          <div key={lot.id} className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-white p-2 sm:flex-row sm:items-center">
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] font-bold text-emerald-deep">
+                LOTE {lot.lot_number} — {lot.animal?.name || 'Animal'}
+              </div>
+              <div className="text-[10px] text-muted-foreground truncate">
+                {formatBRL(lot.current_price || lot.starting_price)} · {lot.winner_link_reason || 'Sem vínculo'}
+              </div>
+            </div>
+            <Select
+              value={selection[lot.id] || ''}
+              onValueChange={(v) => setSelection((s) => ({ ...s, [lot.id]: v }))}
+            >
+              <SelectTrigger className="h-8 w-full text-[11px] sm:w-56">
+                <SelectValue placeholder="Selecionar arrematante..." />
+              </SelectTrigger>
+              <SelectContent>
+                {profiles.map((p) => (
+                  <SelectItem key={p.id} value={p.id} className="text-xs">
+                    {p.full_name || p.email || p.id.slice(0, 8)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              className="h-8 bg-amber-600 text-white hover:bg-amber-700 font-bold text-[11px]"
+              disabled={disabled || !selection[lot.id]}
+              onClick={() => onAssign(lot.id, selection[lot.id])}
+            >
+              <Check className="mr-1 h-3 w-3" /> Vincular
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
