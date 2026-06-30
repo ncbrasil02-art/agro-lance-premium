@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, Radio, Sparkles, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
+import { getOptimizedImageUrl } from "@/utils/image-optimization";
 import { Countdown } from "@/components/auctions/countdown";
 import { formatBRL } from "@/utils/format";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,26 @@ const HeroSlider = ({
   className?: string
 }) => {
   const [index, setIndex] = useState(0);
+  const [vw, setVw] = useState<number>(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1280,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let t: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(t);
+      t = setTimeout(() => setVw(window.innerWidth), 150);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearTimeout(t);
+    };
+  }, []);
+
+  // Bucket viewport into a handful of widths so the CDN cache stays warm.
+  const targetWidth = vw <= 640 ? 768 : vw <= 1024 ? 1280 : vw <= 1536 ? 1600 : 1920;
   
   const images = backgrounds.length > 0 ? backgrounds : ["https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"];
   const maxIndex = Math.max(images.length, phrases.length);
@@ -46,14 +67,15 @@ const HeroSlider = ({
   const currentImage = images[index % images.length] || images[0];
   const currentPhrase = phrases[index % phrases.length];
 
-  // Preload upcoming image to avoid flash on transition
+  // Preload upcoming image (optimized variant) to avoid flash on transition
   useEffect(() => {
     if (images.length <= 1) return;
     const next = images[(index + 1) % images.length];
     if (!next) return;
     const img = new Image();
-    img.src = next;
-  }, [index, images]);
+    img.decoding = "async";
+    img.src = getOptimizedImageUrl(next, { width: targetWidth, quality: 75 });
+  }, [index, images, targetWidth]);
 
   return (
     <div className="absolute inset-0 z-0">
@@ -77,7 +99,8 @@ const HeroSlider = ({
                <OptimizedImage 
                  src={currentImage} 
                  alt="Hero Background" 
-                 width={1920} 
+                 width={targetWidth}
+                 quality={index === 0 ? 80 : 75}
                  className="h-full w-full object-cover"
                  priority="high"
                  loading="eager"
