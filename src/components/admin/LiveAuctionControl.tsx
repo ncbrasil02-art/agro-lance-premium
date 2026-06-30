@@ -611,10 +611,13 @@ import { StatusBadge } from "@/components/auctions/status-badge";
     };
  
    const handlePhoneBid = async () => {
-     if (!activeLot || phoneBid.amount <= (activeLot.current_price || activeLot.starting_price)) {
-       toast.error("Valor do lance deve ser maior que o atual");
-       return;
-     }
+    if (!activeLot) return;
+    const current = activeLot.current_price || activeLot.starting_price;
+    const minNext = current + (activeLot.bid_increment || 0);
+    if (phoneBid.amount < minNext) {
+      toast.error(`Valor mínimo para o próximo lance: ${formatBRL(minNext)}`);
+      return;
+    }
  
      setIsActionLoading(true);
       try {
