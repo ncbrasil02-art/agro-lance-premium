@@ -82,7 +82,7 @@ export const Route = createFileRoute("/sitemap.xml")({
             entries.push(
               ...(data || []).map((event: { slug: string; updated_at: string | null }) => ({
                 path: `/eventos/${encodeURIComponent(event.slug)}`,
-                lastmod: event.updated_at,
+                lastmod: event.updated_at ?? undefined,
                 changefreq: "hourly" as const,
                 priority: "0.9",
               }))
@@ -105,7 +105,7 @@ export const Route = createFileRoute("/sitemap.xml")({
             entries.push(
               ...(data || []).map((post: { slug: string; updated_at: string | null }) => ({
                 path: `/noticias/${encodeURIComponent(post.slug)}`,
-                lastmod: post.updated_at,
+                lastmod: post.updated_at ?? undefined,
                 changefreq: "weekly" as const,
                 priority: "0.7",
               }))
@@ -127,7 +127,7 @@ export const Route = createFileRoute("/sitemap.xml")({
             entries.push(
               ...(data || []).map((lot: { id: string; updated_at: string | null }) => ({
                 path: `/lotes/${lot.id}`,
-                lastmod: lot.updated_at,
+                lastmod: lot.updated_at ?? undefined,
                 changefreq: "hourly" as const,
                 priority: "0.6",
               }))
