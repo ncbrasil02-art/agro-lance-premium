@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as LotesRouteImport } from './routes/lotes'
@@ -32,6 +33,11 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PainelRoute = PainelRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/lotes': typeof LotesRouteWithChildren
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/api/chat': typeof ApiChatRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/api/chat': typeof ApiChatRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/lotes': typeof LotesRouteWithChildren
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/api/chat': typeof ApiChatRoute
   '/eventos/$eventSlug': typeof EventosEventSlugRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/lotes'
     | '/notificacoes'
     | '/painel'
+    | '/sitemap.xml'
     | '/sobre'
     | '/api/chat'
     | '/eventos/$eventSlug'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/notificacoes'
     | '/painel'
+    | '/sitemap.xml'
     | '/sobre'
     | '/api/chat'
     | '/eventos/$eventSlug'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/lotes'
     | '/notificacoes'
     | '/painel'
+    | '/sitemap.xml'
     | '/sobre'
     | '/api/chat'
     | '/eventos/$eventSlug'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   LotesRoute: typeof LotesRouteWithChildren
   NotificacoesRoute: typeof NotificacoesRoute
   PainelRoute: typeof PainelRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
   ApiChatRoute: typeof ApiChatRoute
   NoticiasSlugRoute: typeof NoticiasSlugRoute
@@ -276,6 +289,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/painel': {
@@ -442,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   LotesRoute: LotesRouteWithChildren,
   NotificacoesRoute: NotificacoesRoute,
   PainelRoute: PainelRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
   ApiChatRoute: ApiChatRoute,
   NoticiasSlugRoute: NoticiasSlugRoute,

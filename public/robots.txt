@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 
-# Sitemaps
+# Sitemap
 Sitemap: https://agro-ncbrasil.lovable.app/sitemap.xml
-Sitemap: https://agro-ncbrasil.lovable.app/sitemap.xml?type=news
