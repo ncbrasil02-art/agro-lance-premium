@@ -27,9 +27,11 @@ import { toast } from "sonner";
 
       export function Header() {
        const router = useRouter();
-      const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
- 
-      useEffect(() => {
+       const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+       const [mounted, setMounted] = useState(false);
+  
+       useEffect(() => {
+         setMounted(true);
         const handleOnline = () => setIsOnline(true);
         const handleOffline = () => setIsOnline(false);
  
@@ -117,7 +119,7 @@ import { toast } from "sonner";
            <TooltipProvider>
              <Tooltip>
                <TooltipTrigger asChild>
-                   <div className={`hidden md:flex items-center gap-2 cursor-help px-2 sm:px-3 py-1.5 rounded-full bg-secondary/50 border border-border/40 transition-smooth hover:bg-secondary ${!isOnline ? 'border-destructive/40' : ''}`}>
+                   {mounted && <div className={`hidden md:flex items-center gap-2 cursor-help px-2 sm:px-3 py-1.5 rounded-full bg-secondary/50 border border-border/40 transition-smooth hover:bg-secondary ${!isOnline ? 'border-destructive/40' : ''}`}>
                    {!isOnline ? (
                      <WifiOff className="h-3.5 w-3.5 text-destructive animate-pulse" />
                    ) : isPolling ? (
@@ -128,12 +130,12 @@ import { toast } from "sonner";
                      <span className={`text-[10px] font-bold uppercase tracking-wider hidden sm:inline ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
                       {!isOnline ? 'Offline' : isPolling ? 'Sincronizando' : 'Ao vivo'}
                    </span>
-                   {delaySeconds > 0 && (
+                   {mounted && delaySeconds > 0 && (
                      <span className="text-[10px] font-medium text-muted-foreground border-l border-border/60 pl-2">
                        {delaySeconds}s
                      </span>
                    )}
-                 </div>
+                 </div>}
                </TooltipTrigger>
                <TooltipContent side="bottom" className="text-xs max-w-xs">
                  <div className="space-y-1.5">
