@@ -332,7 +332,7 @@ function Home() {
                             <div className="flex flex-col">
                               <span className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em]">Audiência Real</span>
                               <span className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
-                                {Math.max(1, liveEvents[0].viewers).toLocaleString()} 
+                                {Math.max(1, liveEvents[0].viewers).toLocaleString("pt-BR")} 
                                 <span className="text-sm font-bold text-live animate-pulse">LIVE</span>
                               </span>
                             </div>

@@ -262,15 +262,15 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                </div>
                <div>
                   <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.totalAnimals || "Animais Registrados"}</div>
-                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.totalAnimals || 12847).toLocaleString()}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.totalAnimals || 12847).toLocaleString("pt-BR")}</div>
                </div>
                <div>
                   <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.totalUsers || "Base de Investidores"}</div>
-                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.totalUsers || 38420).toLocaleString()}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.totalUsers || 38420).toLocaleString("pt-BR")}</div>
                </div>
                <div>
                   <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.activeEvents || "Eventos Ativos"}</div>
-                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.activeEvents || 14).toLocaleString()}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.activeEvents || 14).toLocaleString("pt-BR")}</div>
                </div>
              </div>
           </div>
