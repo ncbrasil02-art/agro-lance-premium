@@ -35,7 +35,10 @@
         .eq("status", "published")
         .maybeSingle()
 
-      if (error) throw error
+      if (error) {
+        console.error("Erro ao carregar notícia:", error)
+        return { post: null }
+      }
       if (!post) return { post: null }
 
       const { data: category } = post.category_id
