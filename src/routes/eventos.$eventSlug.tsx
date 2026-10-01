@@ -48,7 +48,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
   
         const { data: lots, error: lotsError } = await supabase
           .from("lots")
-          .select("*, animal:animals(*, seller:sellers(name, logo_url)), winner:profiles(full_name)")
+          .select("*, animal:animals(*, seller:sellers(name, logo_url))")
           .eq("event_id", eventData.id)
           .order("lot_number", { ascending: true });
   
@@ -442,7 +442,6 @@ function EventDetail() {
                   viewers: l.viewers || 0,
                   endsAt: l.end_date || event.end_date || "",
                   status: l.status as any,
-                  winnerName: l.winner?.full_name,
                   eventStatus: event.status,
                   eventStartDate: event.start_date,
                   eventEndDate: event.end_date,
