@@ -65,6 +65,16 @@ import { SecurityAlerts } from "@/components/admin/SecurityAlerts";
  ];
  
  export const Route = createFileRoute("/admin")({
+    head: () => ({
+      meta: [
+        { title: "Painel Administrativo — Premium Agro Leilões" },
+        { name: "description", content: "Gerencie eventos, lotes, animais, notícias e usuários da Premium Agro Leilões." },
+        { property: "og:title", content: "Painel Administrativo — Premium Agro Leilões" },
+        { property: "og:description", content: "Área administrativa da Premium Agro Leilões." },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+      ],
+    }),
    component: AdminLayout,
  });
  

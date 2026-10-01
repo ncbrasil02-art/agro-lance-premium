@@ -71,6 +71,7 @@ import { toast } from "sonner";
      { to: "/lotes", label: "Lotes", show: true },
      { to: "/ao-vivo", label: "Ao Vivo", show: true },
       { to: "/sobre", label: aboutPage?.title || "Sobre", show: aboutPage?.enabled !== false },
+      { to: "/admin", label: "Administrar", show: profile?.role === "admin" },
    ].filter(i => i.show);
 
     const isDataLoaded = siteInfo && Object.keys(siteInfo).length > 0;
