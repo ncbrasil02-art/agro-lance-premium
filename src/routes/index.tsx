@@ -56,15 +56,18 @@ export const Route = createFileRoute("/")({
         supabase.from("animals").select("id,name,breed,species,photos,direct_sale_price,sale_status,location,categories(name)").eq("is_direct_sale", true).eq("sale_status", "available").order("created_at", { ascending: false }).limit(4),
       ]);
 
-      const getVal = (res: any) => res.status === 'fulfilled' ? res.value : { data: [] };
+      const getData = (result: PromiseSettledResult<any>, fallback: any) => {
+        if (result.status !== "fulfilled" || !result.value) return fallback;
+        return result.value.data ?? fallback;
+      };
 
       return {
-        events: getVal(results[0]).data || [],
-        lots: getVal(results[1]).data || [],
-        pastEvents: getVal(results[2]).data || [],
-        announcement: getVal(results[3]).data?.value || null,
-        articles: getVal(results[4]).data || [],
-        directSales: getVal(results[5]).data || [],
+        events: getData(results[0], []),
+        lots: getData(results[1], []),
+        pastEvents: getData(results[2], []),
+        announcement: getData(results[3], null)?.value ?? null,
+        articles: getData(results[4], []),
+        directSales: getData(results[5], []),
       };
     } catch (err) {
       console.error("Loader Home fatal error:", err);
@@ -87,7 +90,13 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const router = useRouter();
-   const { events, lots, pastEvents, announcement, articles, directSales } = Route.useLoaderData() as any;
+  const loaderData = Route.useLoaderData() as any;
+  const events = Array.isArray(loaderData?.events) ? loaderData.events : [];
+  const lots = Array.isArray(loaderData?.lots) ? loaderData.lots : [];
+  const pastEvents = Array.isArray(loaderData?.pastEvents) ? loaderData.pastEvents : [];
+  const announcement = loaderData?.announcement ?? null;
+  const articles = Array.isArray(loaderData?.articles) ? loaderData.articles : [];
+  const directSales = Array.isArray(loaderData?.directSales) ? loaderData.directSales : [];
   const context = Route.useRouteContext();
   const { siteInfo: ctxSiteInfo, theme: ctxTheme, homepage: ctxHomepage } = context || {};
    const { siteInfo: dynamicSiteInfo, homepage: sectionsSettings, customTexts, articleSettings, animations } = useSiteSettings({

@@ -79,7 +79,7 @@ const HeroSlider = ({
   } as const;
   const v = variants[effect] ?? variants.fade;
   const useKen = effect === 'kenburns' || effect === 'fade';
-  const currentPhrase = phrases[index % phrases.length];
+  const currentPhrase = phrases.length > 0 ? phrases[index % phrases.length] : undefined;
 
   // Preload upcoming image (optimized variant) to avoid flash on transition
   useEffect(() => {
@@ -156,6 +156,8 @@ const HeroSlider = ({
 
 export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => {
   const isMobileMode = homepageSettings?.mobile_mode_enabled;
+  const safeStats = stats ?? {};
+  const statLabels = safeStats.labels ?? {};
   
   return (
     <section className={cn(
@@ -255,20 +257,20 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
 
              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-12 max-w-4xl">
                <div>
-                 <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{stats.labels?.totalSold || "Volume Negociado"}</div>
-                 <div className="text-3xl font-black tracking-tighter text-white">{formatBRL(stats.totalSold || 184500000)}</div>
+                  <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.totalSold || "Volume Negociado"}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{formatBRL(safeStats.totalSold || 184500000)}</div>
                </div>
                <div>
-                 <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{stats.labels?.totalAnimals || "Animais Registrados"}</div>
-                 <div className="text-3xl font-black tracking-tighter text-white">{(stats.totalAnimals || 12847).toLocaleString()}</div>
+                  <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.totalAnimals || "Animais Registrados"}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.totalAnimals || 12847).toLocaleString()}</div>
                </div>
                <div>
-                 <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{stats.labels?.totalUsers || "Base de Investidores"}</div>
-                 <div className="text-3xl font-black tracking-tighter text-white">{(stats.totalUsers || 38420).toLocaleString()}</div>
+                  <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.totalUsers || "Base de Investidores"}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.totalUsers || 38420).toLocaleString()}</div>
                </div>
                <div>
-                 <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{stats.labels?.activeEvents || "Eventos Ativos"}</div>
-                 <div className="text-3xl font-black tracking-tighter text-white">{(stats.activeEvents || 14).toLocaleString()}</div>
+                  <div className="text-[10px] uppercase font-black text-gold tracking-widest mb-1 opacity-60">{statLabels.activeEvents || "Eventos Ativos"}</div>
+                  <div className="text-3xl font-black tracking-tighter text-white">{(safeStats.activeEvents || 14).toLocaleString()}</div>
                </div>
              </div>
           </div>
