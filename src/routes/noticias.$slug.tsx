@@ -27,14 +27,26 @@
         ogImage: post?.og_image_url
       });
     },
-    loader: async ({ params }: { params: any }) => {
-     const { data: post } = await supabase
-       .from("posts")
-       .select("*, category:categories(name)")
-       .eq("slug", params.slug)
-       .single()
-     return { post }
-   },
+    loader: async ({ params }) => {
+      const { data: post, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("slug", params.slug)
+        .eq("status", "published")
+        .maybeSingle()
+
+      if (error) {
+        console.error("Erro ao carregar notícia:", error)
+        return { post: null }
+      }
+      if (!post) return { post: null }
+
+      const { data: category } = post.category_id
+        ? await supabase.from("categories").select("name").eq("id", post.category_id).maybeSingle()
+        : { data: null }
+
+      return { post: { ...post, category } }
+    },
    component: NewsDetail,
  })
 
