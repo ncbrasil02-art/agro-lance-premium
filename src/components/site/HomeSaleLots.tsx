@@ -96,7 +96,7 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
                 <div className="mt-auto pt-6 border-t border-border/40 flex items-center justify-between">
                   <div className="flex flex-col">
                     <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Valor de Venda</span>
-                    <span className="text-2xl font-black text-foreground tracking-tighter">{formatBRL(animal.sale_price)}</span>
+                     <span className="text-2xl font-black text-foreground tracking-tighter">{formatBRL(Number(animal.sale_price ?? animal.direct_sale_price ?? 0))}</span>
                   </div>
                   <div className="h-12 w-12 rounded-2xl bg-gold/10 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-emerald-deep transition-all duration-300 shadow-inner">
                     <ShoppingCart className="h-6 w-6" />
@@ -114,7 +114,7 @@ export function HomeSaleLots({ directSales }: { directSales: any[] }) {
         item={selectedForOffer ? {
           id: selectedForOffer.id,
           name: selectedForOffer.name,
-          price: selectedForOffer.sale_price,
+           price: Number(selectedForOffer.sale_price ?? selectedForOffer.direct_sale_price ?? 0),
           type: 'animal'
         } : null}
       />
