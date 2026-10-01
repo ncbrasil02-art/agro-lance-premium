@@ -34,7 +34,7 @@ function SignupPage() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -50,6 +50,26 @@ function SignupPage() {
       });
 
       if (error) throw error;
+
+      if (data.user && data.session) {
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
+          email: formData.email.trim(),
+          full_name: formData.name,
+          cpf: formData.cpf,
+          phone: formData.phone,
+          address: formData.address,
+          cep: formData.cep,
+          nationality: formData.nationality,
+        });
+        if (profileError) throw profileError;
+
+        const { data: claimedAdmin, error: claimError } = await supabase.rpc("claim_initial_admin");
+        if (claimError) throw claimError;
+        if (claimedAdmin) {
+          await supabase.from("profiles").update({ is_approved: true }).eq("id", data.user.id);
+        }
+      }
 
       toast.success("Conta criada com sucesso!", {
         description: "Você receberá um e-mail de confirmação. Lembre-se que sua conta passará por uma aprovação manual por nossa equipe para que você possa dar lances.",

@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
         (payload) => {
           console.log("Current user profile updated in real-time:", payload.new);
-          setProfile(payload.new);
+          setProfile((current: any) => ({ ...payload.new, role: current?.role ?? "user" }));
           
           // Notify user if they were blocked
           if (payload.new.is_blocked && !payload.old?.is_blocked) {
@@ -85,14 +85,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+      let { data, error } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+
+      if (!data && !error) {
+        const { data: authData } = await supabase.auth.getUser();
+        const metadata = authData.user?.user_metadata ?? {};
+        const result = await supabase.from("profiles").insert({
+          id: userId,
+          email: authData.user?.email ?? null,
+          full_name: metadata.full_name ?? metadata.name ?? null,
+          avatar_url: metadata.avatar_url ?? metadata.picture ?? null,
+          cpf: metadata.cpf ?? null,
+          phone: metadata.phone ?? null,
+          address: metadata.address ?? null,
+          cep: metadata.cep ?? null,
+          nationality: metadata.nationality ?? "Brasileira",
+        }).select("*").single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
-      setProfile(data);
+      const { data: isAdmin } = await supabase.rpc("is_admin");
+      setProfile(data ? { ...data, role: isAdmin ? "admin" : "user" } : null);
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
