@@ -14,16 +14,1787 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      animals: {
+        Row: {
+          accepts_offers: boolean | null
+          birth_date: string | null
+          blood_percentage: string | null
+          blood_typing: string | null
+          book: string | null
+          breed: string | null
+          category_id: string | null
+          chip_number: string | null
+          color: string | null
+          created_at: string
+          default_bid_increment: number | null
+          description: string | null
+          direct_sale_price: number | null
+          genealogy: Json | null
+          health_info: Json | null
+          height: number | null
+          id: string
+          internal_code: string | null
+          is_direct_sale: boolean | null
+          location: string | null
+          name: string
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
+          payment_formula: string | null
+          pedigree_url: string | null
+          photos: string[] | null
+          registration_1cc: string | null
+          registration_2: string | null
+          registration_number: string | null
+          sale_price: number | null
+          sale_status: string | null
+          seller_id: string | null
+          seo_description: string | null
+          seo_title: string | null
+          sex: string | null
+          slug: string | null
+          species: string | null
+          updated_at: string
+          vaccination_records: Json | null
+          veterinary_history: Json | null
+          videos: string[] | null
+          weight: number | null
+          youtube_url: string | null
+        }
+        Insert: {
+          accepts_offers?: boolean | null
+          birth_date?: string | null
+          blood_percentage?: string | null
+          blood_typing?: string | null
+          book?: string | null
+          breed?: string | null
+          category_id?: string | null
+          chip_number?: string | null
+          color?: string | null
+          created_at?: string
+          default_bid_increment?: number | null
+          description?: string | null
+          direct_sale_price?: number | null
+          genealogy?: Json | null
+          health_info?: Json | null
+          height?: number | null
+          id?: string
+          internal_code?: string | null
+          is_direct_sale?: boolean | null
+          location?: string | null
+          name: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          payment_formula?: string | null
+          pedigree_url?: string | null
+          photos?: string[] | null
+          registration_1cc?: string | null
+          registration_2?: string | null
+          registration_number?: string | null
+          sale_price?: number | null
+          sale_status?: string | null
+          seller_id?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          sex?: string | null
+          slug?: string | null
+          species?: string | null
+          updated_at?: string
+          vaccination_records?: Json | null
+          veterinary_history?: Json | null
+          videos?: string[] | null
+          weight?: number | null
+          youtube_url?: string | null
+        }
+        Update: {
+          accepts_offers?: boolean | null
+          birth_date?: string | null
+          blood_percentage?: string | null
+          blood_typing?: string | null
+          book?: string | null
+          breed?: string | null
+          category_id?: string | null
+          chip_number?: string | null
+          color?: string | null
+          created_at?: string
+          default_bid_increment?: number | null
+          description?: string | null
+          direct_sale_price?: number | null
+          genealogy?: Json | null
+          health_info?: Json | null
+          height?: number | null
+          id?: string
+          internal_code?: string | null
+          is_direct_sale?: boolean | null
+          location?: string | null
+          name?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          payment_formula?: string | null
+          pedigree_url?: string | null
+          photos?: string[] | null
+          registration_1cc?: string | null
+          registration_2?: string | null
+          registration_number?: string | null
+          sale_price?: number | null
+          sale_status?: string | null
+          seller_id?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          sex?: string | null
+          slug?: string | null
+          species?: string | null
+          updated_at?: string
+          vaccination_records?: Json | null
+          veterinary_history?: Json | null
+          videos?: string[] | null
+          weight?: number | null
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "animals_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animals_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animals_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          new_data: Json | null
+          old_data: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      banners: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          link_url: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          link_url?: string | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          link_url?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      bid_audit: {
+        Row: {
+          bid_id: string
+          created_at: string
+          ip_address: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          bid_id: string
+          created_at?: string
+          ip_address?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          bid_id?: string
+          created_at?: string
+          ip_address?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bid_audit_bid_id_fkey"
+            columns: ["bid_id"]
+            isOneToOne: true
+            referencedRelation: "bids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bids: {
+        Row: {
+          amount: number
+          bid_type: string | null
+          bidder_name: string | null
+          created_at: string
+          id: string
+          is_manual: boolean | null
+          is_phone_bid: boolean | null
+          lot_id: string
+          phone_bidder_identifier: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          bid_type?: string | null
+          bidder_name?: string | null
+          created_at?: string
+          id?: string
+          is_manual?: boolean | null
+          is_phone_bid?: boolean | null
+          lot_id: string
+          phone_bidder_identifier?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          bid_type?: string | null
+          bidder_name?: string | null
+          created_at?: string
+          id?: string
+          is_manual?: boolean | null
+          is_phone_bid?: boolean | null
+          lot_id?: string
+          phone_bidder_identifier?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bids_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          parts: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parts?: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parts?: Json
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contracts: {
+        Row: {
+          contract_url: string | null
+          created_at: string
+          id: string
+          signed_at: string | null
+          status: string | null
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          contract_url?: string | null
+          created_at?: string
+          id?: string
+          signed_at?: string | null
+          status?: string | null
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          contract_url?: string | null
+          created_at?: string
+          id?: string
+          signed_at?: string | null
+          status?: string | null
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      db_errors: {
+        Row: {
+          created_at: string
+          error_context: string | null
+          error_message: string | null
+          function_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          error_context?: string | null
+          error_message?: string | null
+          function_name?: string | null
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          error_context?: string | null
+          error_message?: string | null
+          function_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      direct_sales: {
+        Row: {
+          accepted_at: string | null
+          accepted_ip: string | null
+          animal_id: string
+          buyer_email: string | null
+          buyer_id: string | null
+          buyer_name: string | null
+          buyer_phone: string | null
+          created_at: string
+          id: string
+          negotiated_terms: string | null
+          shipping_details: Json | null
+          status: string | null
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
+          animal_id: string
+          buyer_email?: string | null
+          buyer_id?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string
+          id?: string
+          negotiated_terms?: string | null
+          shipping_details?: Json | null
+          status?: string | null
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
+          animal_id?: string
+          buyer_email?: string | null
+          buyer_id?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string
+          id?: string
+          negotiated_terms?: string | null
+          shipping_details?: Json | null
+          status?: string | null
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_sales_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          animal_id: string | null
+          created_at: string
+          event_id: string | null
+          file_type: string | null
+          file_url: string
+          id: string
+          lot_id: string | null
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          animal_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          file_type?: string | null
+          file_url: string
+          id?: string
+          lot_id?: string | null
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          animal_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          lot_id?: string | null
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_send_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          status: string
+          subject: string | null
+          template_name: string | null
+          to_email: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status: string
+          subject?: string | null
+          template_name?: string | null
+          to_email: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string
+          subject?: string | null
+          template_name?: string | null
+          to_email?: string
+        }
+        Relationships: []
+      }
+      email_smtp_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          from_email: string
+          from_name: string
+          host: string
+          id: string
+          password: string
+          port: number
+          reply_to: string | null
+          secure: boolean
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          from_email?: string
+          from_name?: string
+          host?: string
+          id?: string
+          password?: string
+          port?: number
+          reply_to?: string | null
+          secure?: boolean
+          updated_at?: string
+          username?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          from_email?: string
+          from_name?: string
+          host?: string
+          id?: string
+          password?: string
+          port?: number
+          reply_to?: string | null
+          secure?: boolean
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_html: string
+          category: string
+          created_at: string
+          enabled: boolean
+          footer_html: string
+          header_html: string
+          id: string
+          label: string
+          name: string
+          subject: string
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          body_html?: string
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          footer_html?: string
+          header_html?: string
+          id?: string
+          label: string
+          name: string
+          subject?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          body_html?: string
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          footer_html?: string
+          header_html?: string
+          id?: string
+          label?: string
+          name?: string
+          subject?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
+      event_requests: {
+        Row: {
+          additional_info: string | null
+          category: string | null
+          created_at: string
+          email: string | null
+          estimated_animals: string | null
+          estimated_date: string | null
+          id: string
+          location: string | null
+          name: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+          whatsapp: string
+        }
+        Insert: {
+          additional_info?: string | null
+          category?: string | null
+          created_at?: string
+          email?: string | null
+          estimated_animals?: string | null
+          estimated_date?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp: string
+        }
+        Update: {
+          additional_info?: string | null
+          category?: string | null
+          created_at?: string
+          email?: string | null
+          estimated_animals?: string | null
+          estimated_date?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          active_lot_id: string | null
+          allows_pre_bidding: boolean | null
+          auctioneer_name: string | null
+          banner_url: string | null
+          commission_rate: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          event_type: string | null
+          id: string
+          is_featured: boolean | null
+          is_live_interactive: boolean | null
+          live_status_message: string | null
+          location: string | null
+          mode: string | null
+          name: string
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
+          photos: string[] | null
+          promoter_company: string | null
+          promoter_logo_url: string | null
+          regulation: string | null
+          seller_id: string | null
+          seller_name: string | null
+          seo_description: string | null
+          seo_title: string | null
+          show_countdown: boolean | null
+          slug: string | null
+          start_date: string
+          status: string | null
+          transmission_link: string | null
+          updated_at: string
+          video_url: string | null
+          viewers: number | null
+        }
+        Insert: {
+          active_lot_id?: string | null
+          allows_pre_bidding?: boolean | null
+          auctioneer_name?: string | null
+          banner_url?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_live_interactive?: boolean | null
+          live_status_message?: string | null
+          location?: string | null
+          mode?: string | null
+          name: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          photos?: string[] | null
+          promoter_company?: string | null
+          promoter_logo_url?: string | null
+          regulation?: string | null
+          seller_id?: string | null
+          seller_name?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          show_countdown?: boolean | null
+          slug?: string | null
+          start_date: string
+          status?: string | null
+          transmission_link?: string | null
+          updated_at?: string
+          video_url?: string | null
+          viewers?: number | null
+        }
+        Update: {
+          active_lot_id?: string | null
+          allows_pre_bidding?: boolean | null
+          auctioneer_name?: string | null
+          banner_url?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_live_interactive?: boolean | null
+          live_status_message?: string | null
+          location?: string | null
+          mode?: string | null
+          name?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          photos?: string[] | null
+          promoter_company?: string | null
+          promoter_logo_url?: string | null
+          regulation?: string | null
+          seller_id?: string | null
+          seller_name?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          show_countdown?: boolean | null
+          slug?: string | null
+          start_date?: string
+          status?: string | null
+          transmission_link?: string | null
+          updated_at?: string
+          video_url?: string | null
+          viewers?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_active_lot_fk"
+            columns: ["active_lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followed_lots: {
+        Row: {
+          created_at: string
+          id: string
+          lot_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lot_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followed_lots_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      installments: {
+        Row: {
+          amount: number
+          buyer_id: string
+          created_at: string
+          due_date: string
+          external_reference: string | null
+          gateway_status: string | null
+          id: string
+          installment_number: number
+          paid_at: string | null
+          payment_method: string | null
+          proof_url: string | null
+          status: string | null
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          buyer_id: string
+          created_at?: string
+          due_date: string
+          external_reference?: string | null
+          gateway_status?: string | null
+          id?: string
+          installment_number: number
+          paid_at?: string | null
+          payment_method?: string | null
+          proof_url?: string | null
+          status?: string | null
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          buyer_id?: string
+          created_at?: string
+          due_date?: string
+          external_reference?: string | null
+          gateway_status?: string | null
+          id?: string
+          installment_number?: number
+          paid_at?: string | null
+          payment_method?: string | null
+          proof_url?: string | null
+          status?: string | null
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installments_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lots: {
+        Row: {
+          accepted_at: string | null
+          accepted_ip: string | null
+          allows_pre_bidding: boolean | null
+          animal_id: string | null
+          bid_increment: number
+          bids_count: number | null
+          created_at: string
+          current_price: number | null
+          end_date: string | null
+          event_id: string | null
+          id: string
+          installment_count: number | null
+          installment_interval: string | null
+          is_currently_live: boolean | null
+          is_featured: boolean | null
+          last_bid_ip: string | null
+          last_bid_user_agent: string | null
+          live_timer_seconds: number | null
+          lot_number: number
+          payment_formula: string | null
+          payment_methods: string[] | null
+          reserve_price: number | null
+          starting_price: number
+          status: string | null
+          updated_at: string
+          viewers: number | null
+          winner_id: string | null
+          winner_link_reason: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
+          allows_pre_bidding?: boolean | null
+          animal_id?: string | null
+          bid_increment?: number
+          bids_count?: number | null
+          created_at?: string
+          current_price?: number | null
+          end_date?: string | null
+          event_id?: string | null
+          id?: string
+          installment_count?: number | null
+          installment_interval?: string | null
+          is_currently_live?: boolean | null
+          is_featured?: boolean | null
+          last_bid_ip?: string | null
+          last_bid_user_agent?: string | null
+          live_timer_seconds?: number | null
+          lot_number: number
+          payment_formula?: string | null
+          payment_methods?: string[] | null
+          reserve_price?: number | null
+          starting_price: number
+          status?: string | null
+          updated_at?: string
+          viewers?: number | null
+          winner_id?: string | null
+          winner_link_reason?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_ip?: string | null
+          allows_pre_bidding?: boolean | null
+          animal_id?: string | null
+          bid_increment?: number
+          bids_count?: number | null
+          created_at?: string
+          current_price?: number | null
+          end_date?: string | null
+          event_id?: string | null
+          id?: string
+          installment_count?: number | null
+          installment_interval?: string | null
+          is_currently_live?: boolean | null
+          is_featured?: boolean | null
+          last_bid_ip?: string | null
+          last_bid_user_agent?: string | null
+          live_timer_seconds?: number | null
+          lot_number?: number
+          payment_formula?: string | null
+          payment_methods?: string[] | null
+          reserve_price?: number | null
+          starting_price?: number
+          status?: string | null
+          updated_at?: string
+          viewers?: number | null
+          winner_id?: string | null
+          winner_link_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lots_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lots_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          recipient_id: string
+          sender_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          recipient_id: string
+          sender_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          recipient_id?: string
+          sender_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_logs: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          recipient_email: string | null
+          status: string | null
+          title: string | null
+          type: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          recipient_email?: string | null
+          status?: string | null
+          title?: string | null
+          type?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          recipient_email?: string | null
+          status?: string | null
+          title?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          link: string | null
+          message: string
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message: string
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message?: string
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      offers: {
+        Row: {
+          amount: number | null
+          animal_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          lot_id: string | null
+          negotiated_terms: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          animal_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lot_id?: string | null
+          negotiated_terms?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          animal_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lot_id?: string | null
+          negotiated_terms?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_gateways: {
+        Row: {
+          config: Json | null
+          created_at: string
+          id: string
+          is_enabled: boolean | null
+          label: string
+          name: string
+          updated_at: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          label: string
+          name: string
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          label?: string
+          name?: string
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          category_id: string | null
+          content: string
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
+          published_at: string | null
+          read_time: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string | null
+          category_id?: string | null
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          published_at?: string | null
+          read_time?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string | null
+          category_id?: string | null
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          published_at?: string | null
+          read_time?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          approved_at: string | null
+          approved_by: string | null
+          auto_unlock_at: string | null
+          avatar_url: string | null
+          block_reason: string | null
+          cep: string | null
+          cnpj: string | null
+          cpf: string | null
+          created_at: string
+          document_urls: string[] | null
+          email: string | null
+          full_name: string | null
+          id: string
+          is_approved: boolean
+          is_blocked: boolean
+          nationality: string | null
+          phone: string | null
+          pref_followed_lot_update: boolean | null
+          pref_new_event_email: boolean | null
+          pref_new_event_sms: boolean | null
+          pref_new_event_whatsapp: boolean | null
+          pref_outbid_email: boolean | null
+          pref_outbid_push: boolean | null
+          pref_outbid_sms: boolean | null
+          pref_outbid_whatsapp: boolean | null
+          risk_level: string
+          risk_score: number
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          auto_unlock_at?: string | null
+          avatar_url?: string | null
+          block_reason?: string | null
+          cep?: string | null
+          cnpj?: string | null
+          cpf?: string | null
+          created_at?: string
+          document_urls?: string[] | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          is_approved?: boolean
+          is_blocked?: boolean
+          nationality?: string | null
+          phone?: string | null
+          pref_followed_lot_update?: boolean | null
+          pref_new_event_email?: boolean | null
+          pref_new_event_sms?: boolean | null
+          pref_new_event_whatsapp?: boolean | null
+          pref_outbid_email?: boolean | null
+          pref_outbid_push?: boolean | null
+          pref_outbid_sms?: boolean | null
+          pref_outbid_whatsapp?: boolean | null
+          risk_level?: string
+          risk_score?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          auto_unlock_at?: string | null
+          avatar_url?: string | null
+          block_reason?: string | null
+          cep?: string | null
+          cnpj?: string | null
+          cpf?: string | null
+          created_at?: string
+          document_urls?: string[] | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_approved?: boolean
+          is_blocked?: boolean
+          nationality?: string | null
+          phone?: string | null
+          pref_followed_lot_update?: boolean | null
+          pref_new_event_email?: boolean | null
+          pref_new_event_sms?: boolean | null
+          pref_new_event_whatsapp?: boolean | null
+          pref_outbid_email?: boolean | null
+          pref_outbid_push?: boolean | null
+          pref_outbid_sms?: boolean | null
+          pref_outbid_whatsapp?: boolean | null
+          risk_level?: string
+          risk_score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sellers: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          location: string | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          slug: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          slug?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          slug?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      seo_audit_details: {
+        Row: {
+          audit_id: string | null
+          created_at: string
+          id: string
+          issues: Json
+          item_id: string
+          item_name: string | null
+          item_type: string
+        }
+        Insert: {
+          audit_id?: string | null
+          created_at?: string
+          id?: string
+          issues?: Json
+          item_id: string
+          item_name?: string | null
+          item_type: string
+        }
+        Update: {
+          audit_id?: string | null
+          created_at?: string
+          id?: string
+          issues?: Json
+          item_id?: string
+          item_name?: string | null
+          item_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_audit_details_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "seo_audits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_audits: {
+        Row: {
+          created_at: string
+          error_count: number | null
+          healthy_count: number | null
+          id: string
+          processed_items: number | null
+          progress_message: string | null
+          status: string
+          total_items: number | null
+          warning_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          error_count?: number | null
+          healthy_count?: number | null
+          id?: string
+          processed_items?: number | null
+          progress_message?: string | null
+          status?: string
+          total_items?: number | null
+          warning_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          error_count?: number | null
+          healthy_count?: number | null
+          id?: string
+          processed_items?: number | null
+          progress_message?: string | null
+          status?: string
+          total_items?: number | null
+          warning_count?: number | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          buyer_commission: number
+          buyer_id: string
+          checkout_url: string | null
+          created_at: string
+          final_price: number
+          gateway_reference: string | null
+          gateway_status: string | null
+          id: string
+          lot_id: string
+          payment_gateway_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          seller_commission: number
+          seller_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_commission?: number
+          buyer_id: string
+          checkout_url?: string | null
+          created_at?: string
+          final_price: number
+          gateway_reference?: string | null
+          gateway_status?: string | null
+          id?: string
+          lot_id: string
+          payment_gateway_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          seller_commission?: number
+          seller_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_commission?: number
+          buyer_id?: string
+          checkout_url?: string | null
+          created_at?: string
+          final_price?: number
+          gateway_reference?: string | null
+          gateway_status?: string | null
+          id?: string
+          lot_id?: string
+          payment_gateway_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          seller_commission?: number
+          seller_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_gateway_fk"
+            columns: ["payment_gateway_id"]
+            isOneToOne: false
+            referencedRelation: "payment_gateways"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: true
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_type: string | null
+          external_id: string
+          gateway_name: string
+          id: string
+          next_retry_at: string | null
+          payload: Json | null
+          processed_at: string | null
+          retry_count: number | null
+          scheduled_for: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_type?: string | null
+          external_id: string
+          gateway_name: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json | null
+          processed_at?: string | null
+          retry_count?: number | null
+          scheduled_for?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_type?: string | null
+          external_id?: string
+          gateway_name?: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json | null
+          processed_at?: string | null
+          retry_count?: number | null
+          scheduled_for?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      sellers_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          location: string | null
+          logo_url: string | null
+          name: string | null
+          slug: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          location?: string | null
+          logo_url?: string | null
+          name?: string | null
+          slug?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          location?: string | null
+          logo_url?: string | null
+          name?: string | null
+          slug?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      claim_initial_admin: { Args: never; Returns: boolean }
+      delete_bid_safe: {
+        Args: { p_bid_id: string; p_reason?: string }
+        Returns: Json
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      increment_lot_viewers: { Args: { p_lot_id: string }; Returns: undefined }
+      increment_viewer_count: {
+        Args: { p_entity_id: string; p_entity_type: string }
+        Returns: undefined
+      }
+      is_admin: { Args: never; Returns: boolean }
+      place_bid_safe: {
+        Args: {
+          p_amount: number
+          p_bid_type?: string
+          p_lot_id: string
+          p_session_id?: string
+        }
+        Returns: Json
+      }
+      revert_sold_lot: { Args: { p_lot_id: string }; Returns: Json }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +1921,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
