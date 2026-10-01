@@ -1765,6 +1765,10 @@ export type Database = {
     }
     Functions: {
       claim_initial_admin: { Args: never; Returns: boolean }
+      delete_bid_safe: {
+        Args: { p_bid_id: string; p_reason?: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1787,6 +1791,7 @@ export type Database = {
         }
         Returns: Json
       }
+      revert_sold_lot: { Args: { p_lot_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
