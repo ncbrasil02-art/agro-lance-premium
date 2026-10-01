@@ -57,8 +57,14 @@ const HeroSlider = ({
   // Bucket viewport into a handful of widths so the CDN cache stays warm.
   const targetWidth = vw <= 640 ? 768 : vw <= 1024 ? 1280 : vw <= 1536 ? 1600 : 1920;
   
-  const images = backgrounds.length > 0 ? backgrounds : ["https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"];
-  const maxIndex = Math.max(images.length, phrases.length);
+  const safeBackgrounds = Array.isArray(backgrounds)
+    ? backgrounds.filter((item): item is string => typeof item === "string" && item.length > 0)
+    : [];
+  const safePhrases = Array.isArray(phrases)
+    ? phrases.filter((item): item is string => typeof item === "string")
+    : [];
+  const images = safeBackgrounds.length > 0 ? safeBackgrounds : ["https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&q=80"];
+  const maxIndex = Math.max(images.length, safePhrases.length);
 
   useEffect(() => {
     if (maxIndex <= 1) return;
@@ -79,7 +85,7 @@ const HeroSlider = ({
   } as const;
   const v = variants[effect] ?? variants.fade;
   const useKen = effect === 'kenburns' || effect === 'fade';
-  const currentPhrase = phrases.length > 0 ? phrases[index % phrases.length] : undefined;
+  const currentPhrase = safePhrases.length > 0 ? safePhrases[index % safePhrases.length] : undefined;
 
   // Preload upcoming image (optimized variant) to avoid flash on transition
   useEffect(() => {
@@ -155,7 +161,13 @@ const HeroSlider = ({
 };
 
 export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSettings }: HeroProps) => {
-  const isMobileMode = homepageSettings?.mobile_mode_enabled;
+  const safeHomepageSettings = homepageSettings && typeof homepageSettings === "object" && !Array.isArray(homepageSettings)
+    ? homepageSettings
+    : {};
+  const safeCustomTexts = customTexts && typeof customTexts === "object" && !Array.isArray(customTexts)
+    ? customTexts
+    : {};
+  const isMobileMode = safeHomepageSettings.mobile_mode_enabled;
   const safeStats = stats ?? {};
   const statLabels = safeStats.labels ?? {};
   
@@ -165,12 +177,12 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
        isMobileMode ? "min-h-[80vh] pt-10" : "min-h-[95vh]"
     )}>
       <HeroSlider 
-        backgrounds={homepageSettings?.hero_backgrounds || []} 
-        phrases={customTexts?.hero_phrases || []}
-        opacity={homepageSettings?.hero_bg_opacity ?? 50} 
-        blur={homepageSettings?.hero_bg_blur ?? 0} 
-        duration={homepageSettings?.hero_slide_duration ?? 6000}
-        effect={homepageSettings?.hero_slide_effect ?? 'fade'}
+        backgrounds={Array.isArray(safeHomepageSettings.hero_backgrounds) ? safeHomepageSettings.hero_backgrounds : []}
+        phrases={Array.isArray(safeCustomTexts.hero_phrases) ? safeCustomTexts.hero_phrases : []}
+        opacity={safeHomepageSettings.hero_bg_opacity ?? 50}
+        blur={safeHomepageSettings.hero_bg_blur ?? 0}
+        duration={safeHomepageSettings.hero_slide_duration ?? 6000}
+        effect={safeHomepageSettings.hero_slide_effect ?? 'fade'}
       />
       
       <div className="absolute inset-0 z-1 bg-gradient-to-r from-background via-background/70 to-transparent" />
@@ -190,7 +202,7 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter uppercase"
               >
-               {customTexts?.hero_title || (
+               {safeCustomTexts.hero_title || (
                  <span className="flex flex-wrap items-baseline gap-x-3">
                    <span className="text-emerald-bright">
                      {siteInfo?.name && typeof siteInfo.name === 'string' ? siteInfo.name.split(' ')[0] : "NC"}
@@ -204,19 +216,19 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, stats, homepageSet
            </div>
           
           <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed font-medium italic">
-            {customTexts?.hero_subtitle || "Curadoria genética de excelência e tecnologia de ponta para o agronegócio global."}
+            {safeCustomTexts.hero_subtitle || "Curadoria genética de excelência e tecnologia de ponta para o agronegócio global."}
           </p>
 
           <div className="flex flex-wrap gap-4 mb-16">
-            <a href={customTexts?.hero_cta_primary_url || "/ao-vivo"}>
+            <a href={safeCustomTexts.hero_cta_primary_url || "/ao-vivo"}>
               <Button size="lg" className="bg-gold-gradient text-emerald-deep font-black uppercase tracking-wider px-8 h-14 hover:scale-105 transition-transform shadow-gold">
                 <Radio className="mr-2 h-4 w-4 animate-pulse" />
-                {customTexts?.hero_cta_primary_label || "Assista Agora"}
+                {safeCustomTexts.hero_cta_primary_label || "Assista Agora"}
               </Button>
             </a>
-            <a href={customTexts?.hero_cta_secondary_url || "/eventos"}>
+            <a href={safeCustomTexts.hero_cta_secondary_url || "/eventos"}>
               <Button size="lg" variant="outline" className="border-gold/50 text-gold hover:bg-gold-gradient hover:text-emerald-deep hover:border-transparent font-black uppercase tracking-widest h-14 px-8 rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-gold/20 hover:scale-105">
-                {customTexts?.hero_cta_secondary_label || "Catálogo Completo"}
+                {safeCustomTexts.hero_cta_secondary_label || "Catálogo Completo"}
               </Button>
             </a>
           </div>

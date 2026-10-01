@@ -125,13 +125,14 @@
           
           if (error) throw error;
   
-          const info = data.find(i => i.key === "site_info")?.value as any as SiteInfo;
-          const themeSettings = data.find(i => i.key === "theme")?.value as any as ThemeSettings;
-          const homeSettings = data.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
-          const textsSettings = data.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
-          const aboutSettings = data.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
-           const articleData = data.find(i => i.key === "article_settings")?.value as any as ArticleSettings;
-           const animationsData = data.find(i => i.key === "animations")?.value as any as AnimationsSettings;
+          const settings = Array.isArray(data) ? data : [];
+          const info = settings.find(i => i.key === "site_info")?.value as any as SiteInfo;
+          const themeSettings = settings.find(i => i.key === "theme")?.value as any as ThemeSettings;
+          const homeSettings = settings.find(i => i.key === "homepage_sections")?.value as any as HomepageSettings;
+          const textsSettings = settings.find(i => i.key === "custom_texts")?.value as any as CustomTexts;
+          const aboutSettings = settings.find(i => i.key === "about_page")?.value as any as AboutPageSettings;
+           const articleData = settings.find(i => i.key === "article_settings")?.value as any as ArticleSettings;
+           const animationsData = settings.find(i => i.key === "animations")?.value as any as AnimationsSettings;
 
           if (info) setSiteInfo(info);
           if (themeSettings) setTheme(themeSettings);
@@ -162,13 +163,18 @@
               const updated: any = payload.new;
               if (!updated || !updated.key) return;
               
-              if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...(updated.value as any) } as any));
-              if (updated.key === "theme") setTheme(prev => ({ ...prev, ...(updated.value as any) } as any));
-              if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...(updated.value as any) } as any));
-              if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...(updated.value as any) } as any));
-              if (updated.key === "about_page") setAboutPage(prev => ({ ...prev, ...(updated.value as any) } as any));
-               if (updated.key === "article_settings") setArticleSettings(prev => ({ ...prev, ...(updated.value as any) } as any));
-               if (updated.key === "animations") setAnimations(prev => ({ ...prev, ...(updated.value as any) } as any));
+              const nextValue = updated.value && typeof updated.value === "object" && !Array.isArray(updated.value)
+                ? updated.value
+                : null;
+              if (!nextValue) return;
+
+              if (updated.key === "site_info") setSiteInfo(prev => ({ ...prev, ...nextValue } as SiteInfo));
+              if (updated.key === "theme") setTheme(prev => ({ ...prev, ...nextValue } as ThemeSettings));
+              if (updated.key === "homepage_sections") setHomepage(prev => ({ ...prev, ...nextValue } as HomepageSettings));
+              if (updated.key === "custom_texts") setCustomTexts(prev => ({ ...prev, ...nextValue } as CustomTexts));
+              if (updated.key === "about_page") setAboutPage(prev => ({ ...prev, ...nextValue } as AboutPageSettings));
+               if (updated.key === "article_settings") setArticleSettings(prev => ({ ...prev, ...nextValue } as ArticleSettings));
+               if (updated.key === "animations") setAnimations(prev => ({ ...prev, ...nextValue } as AnimationsSettings));
             }
           )
           .subscribe((newStatus) => {
