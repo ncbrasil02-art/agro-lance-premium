@@ -105,20 +105,29 @@ function Home() {
     homepage: ctxHomepage 
   });
   
-  const currentSiteInfo = dynamicSiteInfo || ctxSiteInfo;
-  const baseSettings = sectionsSettings || ctxHomepage || { 
+  const currentSiteInfo = dynamicSiteInfo && typeof dynamicSiteInfo === "object"
+    ? dynamicSiteInfo
+    : ctxSiteInfo && typeof ctxSiteInfo === "object"
+      ? ctxSiteInfo
+      : null;
+  const settingsCandidate = sectionsSettings || ctxHomepage;
+  const baseSettings = settingsCandidate && typeof settingsCandidate === "object" && !Array.isArray(settingsCandidate)
+    ? settingsCandidate
+    : { 
     show_articles: true, 
     show_upcoming_events: true, 
     show_featured_lots: true,
+    show_sale_menu: true,
     show_animated_slides: true,
     template_id: 'model1'
   };
-  
+
+  const defaultSectionOrder = ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"];
   const activeSections = {
     ...baseSettings,
-    order: Array.isArray((baseSettings as any)?.order) 
-      ? (baseSettings as any).order 
-      : ["banners", "live_now", "upcoming_events", "featured_lots", "sale_menu", "articles", "sellers"]
+    order: Array.isArray((baseSettings as any).order)
+      ? (baseSettings as any).order.filter((sectionId: unknown): sectionId is string => typeof sectionId === "string")
+      : defaultSectionOrder
   };
 
    useEffect(() => {
@@ -260,7 +269,7 @@ function Home() {
       )}
 
       <div className="flex flex-col gap-0">
-         {(activeSections.order || []).map((sectionId: string) => (
+          {activeSections.order.map((sectionId: string) => (
            <ErrorBoundary 
              key={sectionId} 
             tag={sectionId}
