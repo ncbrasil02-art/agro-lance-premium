@@ -23,7 +23,7 @@ export function generateMetaTags({
 }: SEOProps) {
   const seoSuffix = seoSettings?.global_title_suffix || " | Premium Agro Leilões";
   const defaultDesc = seoSettings?.global_description || "A plataforma brasileira de leilões agropecuários com tecnologia de ponta.";
-  const siteUrl = seoSettings?.site_url || "https://plataformaleiloesagro.site";
+  const siteUrl = "https://plataformaleiloesagro.site";
   const finalTitle = title ? `${title}${seoSuffix}` : "Premium Agro Leilões";
   const finalDesc = description || defaultDesc;
 
