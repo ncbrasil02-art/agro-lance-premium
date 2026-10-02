@@ -85,6 +85,21 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     // by `scripts/subset-fonts.mjs` at build time. Same-origin -> 1 RTT,
     // long-cached via public/_headers, no Google round-trip.
     const fontHref = "/fonts/subset.css";
+    const eventUrl = `https://plataformaleiloesagro.site/eventos/${event?.slug || ""}`;
+    const eventJsonLd = event ? {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: event.name,
+      description: event.description || `Leilão agropecuário ${event.name}`,
+      startDate: event.start_date,
+      endDate: event.end_date || undefined,
+      eventStatus: event.status === "finished" ? "https://schema.org/EventCompleted" : event.status === "cancelled" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
+      eventAttendanceMode: event.event_type === "ao_vivo" ? "https://schema.org/MixedEventAttendanceMode" : "https://schema.org/OnlineEventAttendanceMode",
+      location: event.location ? { "@type": "Place", name: event.location, address: event.location } : { "@type": "VirtualLocation", url: eventUrl },
+      image: event.banner_url ? [event.banner_url] : undefined,
+      url: eventUrl,
+      organizer: { "@type": "Organization", name: event.promoter_company || "Premium Agro Leilões", url: "https://plataformaleiloesagro.site" },
+    } : null;
     return {
       ...tags,
       links: [
@@ -92,6 +107,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
         { rel: "preload", as: "style", href: fontHref },
         { rel: "stylesheet", href: fontHref },
       ],
+      scripts: eventJsonLd ? [{ type: "application/ld+json", children: JSON.stringify(eventJsonLd) }] : [],
     };
   },
   notFoundComponent: () => (
@@ -128,7 +144,7 @@ function EventDetail() {
       <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
         <OptimizedImage 
           src={event.banner_url || ""} 
-          alt="" 
+          alt={`Imagem de fundo do evento ${event.name}`}
           width={100}
           quality={10}
           className="h-full w-full blur-sm brightness-50" 
@@ -153,7 +169,7 @@ function EventDetail() {
                 {/* Blurred background to fill gaps */}
                 <OptimizedImage 
                   src={event.banner_url || ""} 
-                  alt="" 
+                  alt={`Fundo ampliado do encarte do evento ${event.name}`}
                   width={100}
                   quality={10}
                   className="absolute inset-0 h-full w-full blur-2xl opacity-40 scale-110" 
@@ -206,7 +222,7 @@ function EventDetail() {
                       <div className="h-8 w-8 bg-white/10 rounded-lg p-1.5 backdrop-blur-md">
                         <img 
                           src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
-                          alt="Logo" 
+                          alt="Marca da Premium Agro Leilões" 
                           className="h-full object-contain opacity-60"
                         />
                       </div>
@@ -392,7 +408,7 @@ function EventDetail() {
                   <div className="relative w-full h-full flex items-center justify-center p-4">
                     <OptimizedImage 
                       src={photo} 
-                      alt={`Foto ${index + 1}`}
+                      alt={`Foto ${index + 1} da galeria do evento ${event.name}`}
                       width={1600}
                       className="max-w-full max-h-[85vh] object-contain" 
                     />

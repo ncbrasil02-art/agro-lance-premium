@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = "https://agro-ncbrasil.lovable.app";
+const BASE_URL = "https://plataformaleiloesagro.site";
 
 interface SitemapEntry {
   path: string;
@@ -76,8 +76,7 @@ export const Route = createFileRoute("/sitemap.xml")({
               .order("id")
               .range(offset, offset + pageSize - 1);
             if (error) {
-              console.error("Sitemap: erro ao buscar eventos:", error.message);
-              break;
+              throw new Error(`Sitemap: erro ao buscar eventos: ${error.message}`);
             }
             entries.push(
               ...(data || []).map((event: { slug: string; updated_at: string | null }) => ({
@@ -99,8 +98,7 @@ export const Route = createFileRoute("/sitemap.xml")({
               .order("id")
               .range(offset, offset + pageSize - 1);
             if (error) {
-              console.error("Sitemap: erro ao buscar notícias:", error.message);
-              break;
+              throw new Error(`Sitemap: erro ao buscar notícias: ${error.message}`);
             }
             entries.push(
               ...(data || []).map((post: { slug: string; updated_at: string | null }) => ({
@@ -121,8 +119,7 @@ export const Route = createFileRoute("/sitemap.xml")({
               .order("id")
               .range(offset, offset + pageSize - 1);
             if (error) {
-              console.error("Sitemap: erro ao buscar lotes:", error.message);
-              break;
+              throw new Error(`Sitemap: erro ao buscar lotes: ${error.message}`);
             }
             entries.push(
               ...(data || []).map((lot: { id: string; updated_at: string | null }) => ({
@@ -136,6 +133,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           }
         } catch (err: any) {
           console.error("Sitemap: falha ao montar entradas dinâmicas:", err?.message);
+          return new Response("Não foi possível gerar o sitemap completo.", {
+            status: 503,
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
+          });
         }
 
         const xml = buildXml(entries);

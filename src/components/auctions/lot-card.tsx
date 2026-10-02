@@ -100,7 +100,7 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
                 src={`https://www.youtube.com/embed/${lot.youtube_url.split('v=')[1]?.split('&')[0] || lot.youtube_url.split('/').pop()}?autoplay=0&mute=1&controls=0&loop=1&playlist=${lot.youtube_url.split('v=')[1]?.split('&')[0] || lot.youtube_url.split('/').pop()}`}
                 className="w-full h-full pointer-events-none"
                 allow="autoplay; encrypted-media"
-                title="Animal Video"
+                title={`Vídeo do lote ${lot?.number || ""}: ${lot?.name || "animal em leilão"}`}
               />
               <div className="absolute inset-0 bg-transparent z-10" />
             </div>
@@ -108,7 +108,7 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
             <div className="relative h-full w-full">
               <OptimizedImage 
                 src={(lot.photos && lot.photos.length > 0) ? lot.photos[currentPhotoIndex] : (lot?.cover || "")} 
-                alt={lot?.name || "Animal"} 
+                alt={lot?.name ? `${lot.name}, animal do lote ${lot?.number || "em destaque"}` : `Animal do lote ${lot?.number || "em destaque"}`} 
                  width={800}
                  aspectRatio="landscape"
                 category={lot?.breed?.toLowerCase()?.includes("milha") || lot?.breed?.toLowerCase()?.includes("mangalarga") ? "horse" : "cattle"}
@@ -121,6 +121,7 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
                     variant="secondary"
                     size="icon"
                     className="h-10 w-10 rounded-full bg-black/60 border-white/30 backdrop-blur-md hover:bg-gold hover:text-emerald-deep hover:scale-110 transition-all shadow-lg"
+                    aria-label={`Ver foto anterior de ${lot?.name || "este lote"}`}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -133,6 +134,7 @@ const AnimalIcon = ({ breed }: { breed?: string }) => {
                     variant="secondary"
                     size="icon"
                     className="h-10 w-10 rounded-full bg-black/60 border-white/30 backdrop-blur-md hover:bg-gold hover:text-emerald-deep hover:scale-110 transition-all shadow-lg"
+                    aria-label={`Ver próxima foto de ${lot?.name || "este lote"}`}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();

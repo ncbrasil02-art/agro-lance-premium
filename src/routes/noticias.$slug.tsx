@@ -15,7 +15,7 @@
       const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
       const seoSettings = rootData?.seoSettings;
       
-      return generateMetaTags({
+      const tags = generateMetaTags({
         title: post?.seo_title || post?.title,
         description: post?.seo_description || post?.excerpt,
         image: post?.featured_image,
@@ -26,6 +26,22 @@
         ogDescription: post?.og_description,
         ogImage: post?.og_image_url
       });
+      const articleJsonLd = post ? {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description: post.seo_description || post.excerpt,
+        image: post.featured_image ? [post.featured_image] : undefined,
+        datePublished: post.published_at || undefined,
+        dateModified: post.updated_at || post.published_at || undefined,
+        author: { "@type": post.author_name ? "Person" : "Organization", name: post.author_name || "Premium Agro Leilões" },
+        publisher: { "@type": "Organization", name: "Premium Agro Leilões", url: "https://plataformaleiloesagro.site" },
+        mainEntityOfPage: `https://plataformaleiloesagro.site/noticias/${post.slug}`,
+      } : null;
+      return {
+        ...tags,
+        scripts: articleJsonLd ? [{ type: "application/ld+json", children: JSON.stringify(articleJsonLd) }] : [],
+      };
     },
     loader: async ({ params }) => {
       const { data: post, error } = await supabase
@@ -87,7 +103,7 @@
               )}
             </div>
            <div className="ml-auto flex gap-4">
-             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full"><Share2 className="h-4 w-4" /></Button>
+             <Button variant="ghost" size="icon" aria-label={`Compartilhar a notícia ${post.title}`} className="h-8 w-8 rounded-full"><Share2 className="h-4 w-4" /></Button>
            </div>
          </div>
        </div>

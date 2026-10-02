@@ -252,7 +252,7 @@ function Home() {
                <div className="h-8 w-8 bg-emerald-deep/5 rounded-lg p-1 hidden sm:flex items-center justify-center">
                   <img 
                     src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
-                    alt="Logo" 
+                    alt={`${currentSiteInfo?.name || "Premium Agro Leilões"} — marca oficial`} 
                     className="h-full object-contain"
                   />
                </div>
@@ -262,7 +262,7 @@ function Home() {
                </div>
             </div>
             {(announcement as any).link && (
-              <Link to={(announcement as any).link} className="bg-emerald-deep text-gold px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">Saiba mais</Link>
+              <Link to={(announcement as any).link} className="bg-emerald-deep text-gold px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">Ver detalhes do anúncio</Link>
             )}
           </div>
         </div>
@@ -513,6 +513,21 @@ function Home() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border/60 bg-card/30">
+        <div className="container mx-auto flex flex-col gap-6 px-4 py-14 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase text-gold">Conteúdo educativo</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground">Como investir em gado de elite</h2>
+            <p className="mt-3 text-muted-foreground">Conheça os critérios de avaliação, os riscos e as etapas de participação em um leilão agropecuário.</p>
+          </div>
+          <Link to="/guia-investidor-agro">
+            <Button size="lg" variant="outline" className="border-gold/40 text-gold hover:bg-gold/10">
+              Ler o guia do investidor <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </section>
 

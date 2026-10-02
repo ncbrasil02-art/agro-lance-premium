@@ -63,7 +63,7 @@
                  params={{ slug: post.slug }}
                  className="inline-flex items-center gap-2 text-gold font-bold hover:underline"
                >
-                 Ler mais <ArrowRight className="h-4 w-4" />
+                 Ler a notícia completa: {post.title} <ArrowRight className="h-4 w-4" />
                </Link>
              </div>
            </div>

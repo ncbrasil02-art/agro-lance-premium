@@ -118,7 +118,7 @@ const HeroSlider = ({
              >
                <OptimizedImage 
                  src={currentImage} 
-                 alt="Hero Background" 
+                  alt="Cenário rural do leilão agropecuário em destaque" 
                  width={targetWidth}
                  quality={index === 0 ? 80 : 75}
                  className="h-full w-full object-cover"
