@@ -44,6 +44,8 @@ import { motion, AnimatePresence } from "framer-motion";
       { name: "description", content: "Assista aos leilões agropecuários ao vivo com lances em tempo real." },
       { property: "og:title", content: "Leilão ao Vivo" },
       { property: "og:description", content: "Transmissão em tempo real com lances instantâneos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
    loader: async () => {

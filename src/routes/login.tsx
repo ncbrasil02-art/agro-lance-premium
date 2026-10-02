@@ -10,7 +10,14 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-provider";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Entrar — Premium Agro Leilões" }] }),
+  head: () => ({ meta: [
+    { title: "Entrar — Premium Agro Leilões" },
+    { name: "description", content: "Acesse sua conta para participar dos leilões da Premium Agro Leilões." },
+    { property: "og:title", content: "Entrar — Premium Agro Leilões" },
+    { property: "og:description", content: "Acesse sua conta para participar dos leilões da Premium Agro Leilões." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: LoginPage,
   pendingComponent: FormSkeleton,
 });

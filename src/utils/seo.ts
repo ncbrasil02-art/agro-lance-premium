@@ -24,26 +24,13 @@ export function generateMetaTags({
   const seoSuffix = seoSettings?.global_title_suffix || " | Premium Agro Leilões";
   const defaultDesc = seoSettings?.global_description || "A plataforma brasileira de leilões agropecuários com tecnologia de ponta.";
   const siteUrl = seoSettings?.site_url || "https://agro-ncbrasil.lovable.app";
-  const supabaseUrl = "https://ccrslflbnxdazvadjlvj.supabase.co";
-
   const finalTitle = title ? `${title}${seoSuffix}` : "Premium Agro Leilões";
   const finalDesc = description || defaultDesc;
-  
-  // Logic for dynamic OG image
-  let dynamicOgImage = "";
-  if (title) {
-    const params = new URLSearchParams();
-    params.append('title', title);
-    if (type) params.append('type', type);
-    if (image) params.append('imageUrl', image);
-    dynamicOgImage = `${supabaseUrl}/functions/v1/og-image?${params.toString()}`;
-  }
-
-  const finalImage = ogImage || dynamicOgImage || image || seoSettings?.og_default_image || "https://storage.googleapis.com/gpt-engineer-file-uploads/rqE5I25elIdK1C06SOEoftOdMw42/social-images/social-1777123688040-326248141_680976500478168_4709444458226195209_n.webp";
 
   const finalOgTitle = ogTitle || finalTitle;
   const finalOgDesc = ogDescription || finalDesc;
-  const finalOgImage = ogImage || finalImage;
+  // Social images must be the actual page image, not a generated or generic placeholder.
+  const finalOgImage = [image, ogImage].find((url) => typeof url === 'string' && /^https:\/\//i.test(url));
 
   const meta = [
     { title: finalTitle },
@@ -52,7 +39,6 @@ export function generateMetaTags({
     // Open Graph
      { property: "og:title", content: finalOgTitle },
      { property: "og:description", content: finalOgDesc },
-     { property: "og:image", content: finalOgImage },
     { property: "og:type", content: type },
     { property: "og:url", content: canonical ? `${siteUrl}${canonical}` : siteUrl },
     { property: "og:site_name", content: "Premium Agro Leilões" },
@@ -62,8 +48,12 @@ export function generateMetaTags({
     { name: "twitter:card", content: "summary_large_image" },
      { name: "twitter:title", content: finalOgTitle },
      { name: "twitter:description", content: finalOgDesc },
-     { name: "twitter:image", content: finalOgImage },
   ];
+
+  if (finalOgImage) {
+    meta.push({ property: "og:image", content: finalOgImage });
+    meta.push({ name: "twitter:image", content: finalOgImage });
+  }
 
   if (seoSettings?.twitter_handle) {
     meta.push({ name: "twitter:site", content: seoSettings.twitter_handle });
