@@ -17,8 +17,12 @@ export const Route = createFileRoute("/notificacoes")({
   component: NotificationsCenter,
   head: () => ({
     meta: [
-      { title: "Central de Notificações" },
+      { title: "Notificações — Premium Agro Leilões" },
       { name: "description", content: "Acompanhe alertas de segurança, lances superados e atualizações da plataforma." },
+      { property: "og:title", content: "Notificações — Premium Agro Leilões" },
+      { property: "og:description", content: "Acompanhe alertas de segurança, lances superados e atualizações da plataforma." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   errorComponent: ({ error, reset }) => {

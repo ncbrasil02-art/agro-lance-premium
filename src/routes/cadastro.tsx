@@ -10,7 +10,14 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/cadastro")({
-  head: () => ({ meta: [{ title: "Cadastre-se — Premium Agro Leilões" }] }),
+  head: () => ({ meta: [
+    { title: "Cadastre-se — Premium Agro Leilões" },
+    { name: "description", content: "Crie sua conta para acompanhar lotes e participar dos leilões da Premium Agro Leilões." },
+    { property: "og:title", content: "Cadastre-se — Premium Agro Leilões" },
+    { property: "og:description", content: "Crie sua conta para acompanhar lotes e participar dos leilões da Premium Agro Leilões." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SignupPage,
   pendingComponent: FormSkeleton,
 });

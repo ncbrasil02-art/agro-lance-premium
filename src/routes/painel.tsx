@@ -463,6 +463,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
  import { PanelSkeleton } from "@/components/ui/page-skeleton";
  
  export const Route = createFileRoute("/painel")({
+   head: () => ({ meta: [
+     { title: "Minha conta — Premium Agro Leilões" },
+     { name: "description", content: "Acompanhe seus lances, arremates e pagamentos na Premium Agro Leilões." },
+     { property: "og:title", content: "Minha conta — Premium Agro Leilões" },
+     { property: "og:description", content: "Acompanhe seus lances, arremates e pagamentos na Premium Agro Leilões." },
+     { property: "og:type", content: "website" },
+     { name: "twitter:card", content: "summary" },
+   ] }),
    pendingComponent: PanelSkeleton,
   component: UserDashboard,
 });

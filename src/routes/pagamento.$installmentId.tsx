@@ -6,6 +6,14 @@
   import { PageSkeleton } from "@/components/ui/page-skeleton";
  
   export const Route = createFileRoute("/pagamento/$installmentId")({
+    head: () => ({ meta: [
+      { title: "Status do pagamento — Premium Agro Leilões" },
+      { name: "description", content: "Consulte o status do seu pagamento na Premium Agro Leilões." },
+      { property: "og:title", content: "Status do pagamento — Premium Agro Leilões" },
+      { property: "og:description", content: "Consulte o status do seu pagamento na Premium Agro Leilões." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
     pendingComponent: PageSkeleton,
    component: PaymentStatusPage,
  });

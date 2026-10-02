@@ -29,6 +29,8 @@
       { name: "description", content: "Todos os lotes em leilão: cavalos, bovinos e embriões de alta linhagem." },
       { property: "og:title", content: "Lotes em Leilão" },
       { property: "og:description", content: "Animais e embriões selecionados para leilão." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
      loader: async ({ deps }: any) => {
