@@ -1,9 +1,10 @@
 import { generateMetaTags } from "@/utils/seo";
- import { createFileRoute, Navigate } from "@tanstack/react-router";
+ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
  import { useState, useEffect } from "react";
  import { supabase } from "@/integrations/supabase/client";
  import { Loader2 } from "lucide-react";
 import { ShieldCheck, Trophy, Users, Radio, Check, Star, Award, Heart, Shield, Zap, Target, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
  
 const iconMap: Record<string, any> = {
   Radio,
@@ -83,6 +84,13 @@ const iconMap: Record<string, any> = {
             </div>
           );
         })}
+      </div>
+      <div className="mt-12 border-t border-border pt-10">
+        <h2 className="text-2xl font-bold">Quer se preparar antes de participar?</h2>
+        <p className="mt-3 max-w-2xl text-muted-foreground">Nosso guia explica como avaliar oportunidades, documentos, riscos e custos em leilões de animais de elite.</p>
+        <Link to="/guia-investidor-agro" className="mt-6 inline-block">
+          <Button className="bg-gold text-emerald-deep hover:bg-gold-bright">Acessar o guia do investidor agro</Button>
+        </Link>
       </div>
     </div>
   );

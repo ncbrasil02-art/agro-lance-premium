@@ -1024,7 +1024,7 @@ import { motion, AnimatePresence } from "framer-motion";
                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-emerald-deep via-emerald-deep/40 to-transparent text-center">
                  <OptimizedImage 
                    src={liveLot.animal?.photos?.[0] || ""} 
-                   alt={liveLot.animal?.name || "Animal"} 
+                   alt={liveLot.animal?.name ? `${liveLot.animal.name}, animal do lote ao vivo ${liveLot.lot_number}` : `Animal do lote ao vivo ${liveLot.lot_number}`} 
                    width={1280}
                    category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
                    className="absolute inset-0 h-full w-full object-cover opacity-30" 
@@ -1111,7 +1111,7 @@ import { motion, AnimatePresence } from "framer-motion";
                 <div className="relative aspect-[4/3] h-full group">
                   <OptimizedImage 
                     src={liveLot.animal?.photos?.[activePhotoIndex] || ""} 
-                    alt={liveLot.animal?.name || "Animal"} 
+                    alt={liveLot.animal?.name ? `${liveLot.animal.name}, animal do lote ao vivo ${liveLot.lot_number}` : `Animal do lote ao vivo ${liveLot.lot_number}`} 
                     width={1000}
                     aspectRatio="landscape"
                     category={liveLot.animal?.breed?.toLowerCase().includes("milha") ? "horse" : "cattle"}
@@ -1138,18 +1138,24 @@ import { motion, AnimatePresence } from "framer-motion";
                 
                 {liveLot.animal?.photos?.length > 1 && (
                   <>
-                    <button 
+                    <Button 
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Ver foto anterior de ${liveLot.animal?.name || "este lote"}`}
                       onClick={() => prevPhoto(liveLot.animal.photos)}
                       className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-gold/80 transition-colors backdrop-blur-sm"
                     >
                       <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <button 
+                    </Button>
+                    <Button 
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Ver próxima foto de ${liveLot.animal?.name || "este lote"}`}
                       onClick={() => nextPhoto(liveLot.animal.photos)}
                       className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-gold/80 transition-colors backdrop-blur-sm"
                     >
                       <ChevronRight className="h-4 w-4" />
-                    </button>
+                    </Button>
                   </>
                 )}
 
@@ -1316,6 +1322,7 @@ import { motion, AnimatePresence } from "framer-motion";
                         className={`h-12 w-12 p-0 transition-colors ${isFavorite ? 'border-gold text-gold bg-gold/5' : 'border-emerald-deep/20 text-emerald-deep hover:bg-emerald-deep hover:text-white'}`}
                         onClick={toggleFavorite}
                         disabled={isFavoriteLoading || !liveEvent?.active_lot_id}
+                        aria-label={isFavorite ? "Remover lote dos favoritos" : "Adicionar lote aos favoritos"}
                       >
                         {isFavoriteLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <BadgeCheck className={`h-5 w-5 ${isFavorite ? 'fill-gold' : ''}`} />}
                       </Button>
@@ -1341,13 +1348,14 @@ import { motion, AnimatePresence } from "framer-motion";
                           }
                         }}
                         disabled={!liveEvent?.active_lot_id}
+                        aria-label="Compartilhar lote ao vivo"
                       >
                         <Share2 className="h-5 w-5" />
                       </Button>
 
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
+                          <Button variant="outline" aria-label="Ver informações completas do animal" className="border-emerald-deep/20 h-12 w-12 p-0 text-emerald-deep hover:bg-emerald-deep hover:text-white transition-colors">
                             <Info className="h-5 w-5" />
                           </Button>
                         </DialogTrigger>

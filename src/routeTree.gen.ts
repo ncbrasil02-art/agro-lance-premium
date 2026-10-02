@@ -15,6 +15,7 @@ import { Route as PainelRouteImport } from './routes/painel'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as LotesRouteImport } from './routes/lotes'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GuiaInvestidorAgroRouteImport } from './routes/guia-investidor-agro'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AoVivoRouteImport } from './routes/ao-vivo'
@@ -58,6 +59,11 @@ const LotesRoute = LotesRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaInvestidorAgroRoute = GuiaInvestidorAgroRouteImport.update({
+  id: '/guia-investidor-agro',
+  path: '/guia-investidor-agro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventosRoute = EventosRouteImport.update({
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/eventos': typeof EventosRouteWithChildren
+  '/guia-investidor-agro': typeof GuiaInvestidorAgroRoute
   '/login': typeof LoginRoute
   '/lotes': typeof LotesRouteWithChildren
   '/notificacoes': typeof NotificacoesRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
+  '/guia-investidor-agro': typeof GuiaInvestidorAgroRoute
   '/login': typeof LoginRoute
   '/notificacoes': typeof NotificacoesRoute
   '/painel': typeof PainelRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/ao-vivo': typeof AoVivoRoute
   '/cadastro': typeof CadastroRoute
   '/eventos': typeof EventosRouteWithChildren
+  '/guia-investidor-agro': typeof GuiaInvestidorAgroRoute
   '/login': typeof LoginRoute
   '/lotes': typeof LotesRouteWithChildren
   '/notificacoes': typeof NotificacoesRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/ao-vivo'
     | '/cadastro'
     | '/eventos'
+    | '/guia-investidor-agro'
     | '/login'
     | '/lotes'
     | '/notificacoes'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ao-vivo'
     | '/cadastro'
+    | '/guia-investidor-agro'
     | '/login'
     | '/notificacoes'
     | '/painel'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/ao-vivo'
     | '/cadastro'
     | '/eventos'
+    | '/guia-investidor-agro'
     | '/login'
     | '/lotes'
     | '/notificacoes'
@@ -269,6 +281,7 @@ export interface RootRouteChildren {
   AoVivoRoute: typeof AoVivoRoute
   CadastroRoute: typeof CadastroRoute
   EventosRoute: typeof EventosRouteWithChildren
+  GuiaInvestidorAgroRoute: typeof GuiaInvestidorAgroRoute
   LoginRoute: typeof LoginRoute
   LotesRoute: typeof LotesRouteWithChildren
   NotificacoesRoute: typeof NotificacoesRoute
@@ -324,6 +337,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia-investidor-agro': {
+      id: '/guia-investidor-agro'
+      path: '/guia-investidor-agro'
+      fullPath: '/guia-investidor-agro'
+      preLoaderRoute: typeof GuiaInvestidorAgroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eventos': {
@@ -458,6 +478,7 @@ const rootRouteChildren: RootRouteChildren = {
   AoVivoRoute: AoVivoRoute,
   CadastroRoute: CadastroRoute,
   EventosRoute: EventosRouteWithChildren,
+  GuiaInvestidorAgroRoute: GuiaInvestidorAgroRoute,
   LoginRoute: LoginRoute,
   LotesRoute: LotesRouteWithChildren,
   NotificacoesRoute: NotificacoesRoute,

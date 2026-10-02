@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://agro-ncbrasil.lovable.app/sitemap.xml
+Sitemap: https://plataformaleiloesagro.site/sitemap.xml

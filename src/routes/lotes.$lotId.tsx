@@ -98,7 +98,7 @@ export const Route = createFileRoute("/lotes/$lotId")({
     const rootData = ctx.matches.find((m: any) => m.id === '__root__')?.loaderData as any;
     const seoSettings = rootData?.seoSettings;
     
-    return generateMetaTags({
+    const tags = generateMetaTags({
        title: lot?.animal?.og_title || lot?.animal?.seo_title || (lot ? `Lote ${lot.lot_number} — ${lot.animal?.name || 'Animal'}` : "Detalhe do Lote"),
        description: lot?.animal?.og_description || lot?.animal?.seo_description || lot?.animal?.description,
        image: lot?.animal?.og_image_url || lot?.animal?.photos?.[0],
@@ -108,6 +108,28 @@ export const Route = createFileRoute("/lotes/$lotId")({
        ogDescription: lot?.animal?.og_description,
        ogImage: lot?.animal?.og_image_url
     });
+    const price = lot?.current_price || lot?.starting_price;
+    const productJsonLd = lot ? {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: lot.animal?.name || `Lote ${lot.lot_number}`,
+      description: lot.animal?.description || `${lot.animal?.breed || "Animal"} disponível no lote ${lot.lot_number}`,
+      image: Array.isArray(lot.animal?.photos) ? lot.animal.photos : [],
+      sku: lot.animal?.registration_number || lot.id,
+      category: lot.animal?.breed || lot.animal?.species || "Animal de elite",
+      url: `https://plataformaleiloesagro.site/lotes/${lot.id}`,
+      offers: price ? {
+        "@type": "Offer",
+        priceCurrency: "BRL",
+        price,
+        availability: ["sold", "passed", "finished"].includes(lot.status) ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+        url: `https://plataformaleiloesagro.site/lotes/${lot.id}`,
+      } : undefined,
+    } : null;
+    return {
+      ...tags,
+      scripts: productJsonLd ? [{ type: "application/ld+json", children: JSON.stringify(productJsonLd) }] : [],
+    };
   },
   component: LotDetail,
   pendingComponent: LotDetailSkeleton,
@@ -683,7 +705,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
             <div className="space-y-8 order-2 lg:order-1">
                <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
                 <div className="relative">
-                  <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name || "Animal"} width={1200} aspectRatio="landscape" />
+                  <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name ? `${lot.animal.name}, animal apresentado no lote ${lot.lot_number}` : `Animal apresentado no lote ${lot.lot_number}`} width={1200} aspectRatio="landscape" />
                   <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <div className="bg-emerald-deep/80 backdrop-blur-md p-4 rounded-full border border-gold/40 shadow-gold">
                       <Expand className="h-8 w-8 text-gold" />
@@ -735,7 +757,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                </div>
                <div className="grid grid-cols-5 gap-3">
                  {lot.animal?.photos?.map((s:string, i:number) => (
-                   <button key={i} onClick={() => setActivePhoto(i)} className={`rounded-xl overflow-hidden border-2 ${activePhoto === i ? 'border-gold' : 'border-transparent'}`}>
+                   <button key={i} aria-label={`Exibir foto ${i + 1} de ${lot.animal?.name || `lote ${lot.lot_number}`}`} onClick={() => setActivePhoto(i)} className={`rounded-xl overflow-hidden border-2 ${activePhoto === i ? 'border-gold' : 'border-transparent'}`}>
                     <OptimizedImage src={s} alt={`${lot.animal?.name} - foto ${i + 1}`} width={200} aspectRatio="square" />
                    </button>
                  ))}
@@ -947,7 +969,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                                <div className="rounded-2xl border border-gold/20 overflow-hidden bg-black/40 group cursor-pointer" onClick={() => window.open(lot.animal.veterinary_history.health_photo_url, '_blank')}>
                                  <OptimizedImage 
                                    src={lot.animal.veterinary_history.health_photo_url} 
-                                   alt="Exame de Saúde"
+                                   alt={`Exame veterinário de ${lot.animal?.name || `animal do lote ${lot.lot_number}`}`}
                                    aspectRatio="video"
                                    className="w-full h-auto group-hover:scale-110 transition-transform duration-500"
                                  />
