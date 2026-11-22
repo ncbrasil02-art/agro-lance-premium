@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { getOptimizedImageUrl, IMAGE_FALLBACKS } from "@/utils/image-optimization";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
@@ -60,11 +60,15 @@ export function OptimizedImage({
   }, [src, width, height, finalQuality, finalFallback]);
 
   const [currentSrc, setCurrentSrc] = useState(optimizedUrl);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setCurrentSrc(optimizedUrl);
     setIsLoading(true);
     setError(false);
+    if (imageRef.current?.complete && imageRef.current.naturalWidth > 0) {
+      setIsLoading(false);
+    }
   }, [optimizedUrl]);
 
   const handleLoad = () => {
@@ -99,6 +103,7 @@ export function OptimizedImage({
         <Skeleton className="absolute inset-0 z-10 h-full w-full" />
       )}
       <img
+        ref={imageRef}
         src={currentSrc}
         alt={alt}
         width={width}

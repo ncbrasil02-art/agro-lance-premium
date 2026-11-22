@@ -65,6 +65,7 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
   
   const [buyerInfo, setBuyerInfo] = useState({
@@ -76,8 +77,8 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
 
   const filteredAnimals = useMemo(() => {
     return animals.filter((animal: any) => {
-      const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = (animal.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           (animal.breed || "").toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = categoryFilter === "all" || animal.category_id === categoryFilter;
       return matchesSearch && matchesCategory;
     });
@@ -146,6 +147,7 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
+            aria-label="Buscar animais por nome ou raça"
             placeholder="Buscar por nome ou raça..." 
             className="pl-10 h-12 bg-background/50 border-border/50 focus:border-gold/50 rounded-xl"
             value={searchTerm}
@@ -178,7 +180,7 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
           </div>
         ) : (
           filteredAnimals.map((animal: any) => (
-            <Card key={animal.id} className="group overflow-hidden border-border/50 bg-card/30 hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:shadow-gold/5 rounded-2xl flex flex-col h-full">
+            <Card key={animal.id} className="group overflow-hidden border-border/50 bg-card/30 hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:shadow-gold/5 rounded-lg flex flex-col h-full">
               <div className="relative aspect-[4/3] overflow-hidden">
                 {animal.photos && animal.photos.length > 0 ? (
                   <OptimizedImage 
@@ -194,7 +196,7 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
                   </div>
                 )}
                 <div className="absolute top-3 left-3 flex flex-col gap-2">
-                  <Badge className="bg-black/60 backdrop-blur-md border-white/10 text-white font-medium">
+                  <Badge className="bg-background/95 border-border text-foreground font-medium">
                     {animal.categories?.name || animal.species}
                   </Badge>
                   {animal.sale_status !== 'available' && (
@@ -209,7 +211,8 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-xs font-bold text-gold uppercase tracking-wider mb-1">{animal.breed}</p>
-                    <CardTitle className="text-xl group-hover:text-gold transition-colors">{animal.name}</CardTitle>
+                    <CardTitle className="text-lg leading-snug">{animal.name}</CardTitle>
+                    {animal.internal_code?.startsWith("DEMO-") && <p className="mt-1 text-xs text-muted-foreground">Demonstração · foto ilustrativa</p>}
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">Local</p>
@@ -241,7 +244,8 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex w-full flex-col gap-2">
+                  <Button variant="outline" className="w-full" onClick={() => { setSelectedAnimal(animal); setDetailsOpen(true); }}>Ver ficha completa <ArrowRight className="ml-2 h-4 w-4" /></Button>
                  {animal.accepts_offers && (
                    <Button 
                      variant="outline"
@@ -250,7 +254,7 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
                        setSelectedAnimal(animal);
                        setIsOfferDialogOpen(true);
                      }}
-                     disabled={animal.sale_status !== 'available'}
+                     disabled={animal.sale_status !== 'available' || animal.internal_code?.startsWith('DEMO-')}
                    >
                      Fazer Oferta
                    </Button>
@@ -258,10 +262,10 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
                   <Button 
                     className="bg-gold-gradient text-emerald-deep font-bold h-12 rounded-xl shadow-gold hover:opacity-90 disabled:opacity-50 disabled:grayscale"
                     onClick={() => handlePurchase(animal)}
-                    disabled={animal.sale_status !== 'available'}
+                    disabled={animal.sale_status !== 'available' || animal.internal_code?.startsWith('DEMO-')}
                   >
                     <ShoppingCart className="h-4 w-4 mr-1" />
-                    Comprar
+                    {animal.internal_code?.startsWith('DEMO-') ? 'Venda ilustrativa' : 'Solicitar compra'}
                   </Button>
                 </div>
               </CardFooter>
@@ -293,6 +297,11 @@ import { OfferDialog } from "@/components/auctions/OfferDialog";
         } : null}
       />
 
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"><DialogHeader><DialogTitle>{selectedAnimal?.name}</DialogTitle><DialogDescription>{selectedAnimal?.description || "Ficha do animal disponível para venda direta."}</DialogDescription></DialogHeader>
+          {selectedAnimal && <><OptimizedImage src={selectedAnimal.photos?.[0] || ""} alt={selectedAnimal.name} width={900} className="aspect-[4/3] w-full rounded-md object-cover" /><dl className="grid grid-cols-2 gap-4 text-sm">{[["Raça", selectedAnimal.breed], ["Sexo", selectedAnimal.sex === "M" ? "Macho" : "Fêmea"], ["Nascimento", selectedAnimal.birth_date], ["Peso", `${selectedAnimal.weight || "—"} kg`], ["Altura", `${selectedAnimal.height || "—"} m`], ["Localização", selectedAnimal.location], ["Identificação", selectedAnimal.registration_number], ["Pai", selectedAnimal.genealogy?.father], ["Mãe", selectedAnimal.genealogy?.mother]].map(([label, value]) => <div key={label}><dt className="text-muted-foreground">{label}</dt><dd className="mt-1 font-semibold">{value || "Não informado"}</dd></div>)}</dl><p className="text-sm text-muted-foreground">{selectedAnimal.health_info?.notes || "Consulte os documentos sanitários com o vendedor."}</p></>}
+        </DialogContent>
+      </Dialog>
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
         <DialogContent className="sm:max-w-[500px] rounded-3xl border-gold/20 shadow-2xl shadow-gold/10">
           <DialogHeader>

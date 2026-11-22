@@ -337,7 +337,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
   const { user, profile } = useAuth();
    const [lot, setLot] = useState(initialLot);
    const [viewIncremented, setViewIncremented] = useState(false);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+   const [isOffline, setIsOffline] = useState(false);
   const [recentBids, setRecentBids] = useState<any[]>(initialBids);
   const [isBidding, setIsBidding] = useState(false);
   const [showConfirmBid, setShowConfirmBid] = useState(false);
@@ -374,6 +374,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
    });
  
     useEffect(() => {
+      setIsOffline(!navigator.onLine);
       const handleOnline = () => setIsOffline(false);
       const handleOffline = () => setIsOffline(true);
       window.addEventListener('online', handleOnline);

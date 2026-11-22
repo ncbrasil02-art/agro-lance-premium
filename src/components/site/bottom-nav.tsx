@@ -9,7 +9,7 @@
  
     const navItems = [
       { to: "/", label: "Início", icon: Home, show: true },
-      { to: "/eventos", label: "Eventos", icon: Calendar, show: true },
+      { to: "/eventos", label: "Leilões", icon: Calendar, show: true },
       { to: "/ao-vivo", label: "Ao Vivo", icon: PlayCircle, show: true },
       { to: "/lotes", label: "Lotes", icon: Gavel, show: true },
       { to: "/sobre", label: aboutPage?.title || "Sobre", icon: Info, show: aboutPage?.enabled !== false },
