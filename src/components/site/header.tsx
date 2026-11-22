@@ -66,10 +66,10 @@ import { toast } from "sonner";
  
    const nav = [
      { to: "/", label: "Início", show: true },
-     { to: "/eventos", label: "Eventos", show: true },
+     { to: "/eventos", label: "Leilões", show: true },
      { to: "/compra-direta", label: "Venda Direta", show: homepage?.show_sale_menu !== false },
      { to: "/lotes", label: "Lotes", show: true },
-     { to: "/ao-vivo", label: "Ao Vivo", show: true },
+     { to: "/ao-vivo", label: "Acompanhar leilão", show: true },
       { to: "/sobre", label: aboutPage?.title || "Sobre", show: aboutPage?.enabled !== false },
       { to: "/admin", label: "Administrar", show: profile?.role === "admin" },
    ].filter(i => i.show);
@@ -80,7 +80,7 @@ import { toast } from "sonner";
      <header className={cn(
          "sticky top-0 z-50 border-b transition-all duration-300",
          isMobileMode ? "bg-emerald-deep/95 border-gold/20 h-14" : 
-         isHome && isElite ? "bg-transparent border-transparent h-20" : 
+         isHome && isElite ? "bg-background border-border h-20" : 
          "bg-background/80 backdrop-blur-xl border-border/60 h-16"
        )}>
         <div className="container mx-auto flex items-center justify-between px-4 h-full" style={{ gap: `${headerGap}px` }}>
@@ -129,7 +129,7 @@ import { toast } from "sonner";
                      <Zap className="h-3.5 w-3.5 text-emerald-500" />
                    )}
                      <span className={`text-[10px] font-bold uppercase tracking-wider hidden sm:inline ${!isOnline ? 'text-destructive' : isPolling ? 'text-amber-500' : 'text-emerald-500'}`}>
-                      {!isOnline ? 'Offline' : isPolling ? 'Sincronizando' : 'Ao vivo'}
+                      {!isOnline ? 'Sem conexão' : isPolling ? 'Atualizando' : 'Conectado'}
                    </span>
                    {mounted && delaySeconds > 0 && (
                      <span className="text-[10px] font-medium text-muted-foreground border-l border-border/60 pl-2">

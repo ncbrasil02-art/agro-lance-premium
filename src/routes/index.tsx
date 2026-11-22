@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
     const rootData = matches.find(m => m.id === '__root__')?.loaderData as any;
     const seoSettings = rootData?.seoSettings;
     return generateMetaTags({
-      title: seoSettings?.home_title || "Home",
+      title: seoSettings?.home_title || "Bovinos e cavalos em leilão e à venda",
       description: seoSettings?.home_description,
       seoSettings,
       canonical: "",
@@ -286,94 +286,11 @@ function Home() {
               )}
  
               {sectionId === "live_now" && liveEvents.length > 0 && (
-               <section className="container mx-auto px-4 py-8 lg:py-12 relative z-20">
-                 <motion.div 
-                   initial={{ opacity: 0, y: 30 }}
-                   whileInView={{ opacity: 1, y: 0 }}
-                   viewport={{ once: true }}
-                    className="group relative overflow-hidden rounded-[2.5rem] border border-live/30 bg-emerald-deep shadow-[0_30px_60px_-15px_rgba(239,68,68,0.4)] transition-all duration-700 hover:shadow-live/50"
-                 >
-                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-                   <div className="flex flex-col md:flex-row items-stretch min-h-[350px]">
-                     {/* Image Section */}
-                     <div className="relative w-full md:w-[45%] overflow-hidden">
-                       <OptimizedImage 
-                         src={liveEvents[0].cover} 
-                         alt={liveEvents[0].name}
-                         width={800}
-                         className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                       />
-                       <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-emerald-deep" />
-                       <div className="absolute left-6 top-6">
-                         <div className="inline-flex items-center gap-2 rounded-full bg-live px-4 py-2 text-[10px] font-black text-white uppercase tracking-[0.2em] shadow-xl animate-pulse">
-                           <span className="h-2 w-2 rounded-full bg-white" />
-                           Leilão Ao Vivo
-                         </div>
-                       </div>
-                     </div>
-
-                      {/* Content Section with Super Elegant Effect */}
-                      <div className="flex-1 p-10 md:p-16 flex flex-col justify-center gap-8 relative overflow-hidden">
-                        {/* Animated Glow Backdrops */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-live/10 rounded-full blur-[100px] -mr-32 -mt-32" />
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gold/5 rounded-full blur-[80px] -ml-24 -mb-24" />
-                        
-                        <div className="relative z-10">
-                          <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 }}
-                          >
-                            <h2 className="text-5xl md:text-7xl font-black text-white uppercase italic tracking-tighter leading-[0.9] mb-6 group-hover:text-gold transition-colors duration-700">
-                              {liveEvents[0].name}
-                            </h2>
-                            <p className="text-white/80 text-lg md:text-2xl max-w-lg italic font-medium leading-tight border-l-2 border-live/50 pl-6 py-2">
-                              {liveEvents[0].description || "Participe agora do nosso leilão de elite em tempo real."}
-                            </p>
-                          </motion.div>
-                        </div>
- 
-                        <div className="flex flex-wrap items-center justify-between gap-8 pt-8 border-t border-white/10 relative z-10">
-                          <div className="flex items-center gap-4 text-live">
-                            <div className="h-14 w-14 rounded-2xl bg-live/20 flex items-center justify-center border border-live/40 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
-                              <Radio className="h-7 w-7 animate-pulse" />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em]">Audiência Real</span>
-                              <span className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
-                                {Math.max(1, liveEvents[0].viewers).toLocaleString("pt-BR")} 
-                                <span className="text-sm font-bold text-live animate-pulse">LIVE</span>
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <Link 
-                            to="/eventos/$eventSlug" 
-                            params={{ eventSlug: liveEvents[0].slug }}
-                            className="w-full md:w-auto"
-                          >
-                            <Button 
-                              size="lg" 
-                              className="bg-live hover:bg-live/90 text-white font-black uppercase italic tracking-[0.15em] h-20 px-12 rounded-[1.25rem] shadow-[0_15px_40px_-10px_rgba(239,68,68,0.5)] hover:scale-105 hover:shadow-live transition-all duration-500 w-full group/btn relative overflow-hidden"
-                            >
-                              <span className="relative z-10 flex items-center gap-3 text-lg">
-                                ENTRAR NO LEILÃO
-                                <ArrowRight className="h-6 w-6 group-hover/btn:translate-x-1 transition-transform" />
-                              </span>
-                              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                   </div>
-                 </motion.div>
-                 {liveEvents.length > 1 && (
-                   <div className="mt-6 flex justify-end">
-                     <Link to="/ao-vivo" className="flex items-center gap-2 text-gold hover:text-gold-bright text-xs font-black uppercase tracking-widest transition-colors">
-                       Ver outros {liveEvents.length - 1} eventos ao vivo <ArrowRight className="h-4 w-4" />
-                     </Link>
-                   </div>
-                 )}
+               <section className="border-b border-border bg-card/40">
+                 <div className="container mx-auto px-4 py-10">
+                   <div className="mb-6 flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-semibold text-emerald-bright">Lances abertos</p><h2 className="mt-1 text-2xl font-bold text-foreground">Leilões em andamento</h2></div><Link to="/eventos"><Button variant="outline">Todos os leilões <ArrowRight className="ml-2 h-4 w-4" /></Button></Link></div>
+                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{liveEvents.map((event: any) => <EventCard key={event.id} event={event} />)}</div>
+                 </div>
                </section>
              )}
                {sectionId === "upcoming_events" && (activeSections as any)?.show_upcoming_events && (
@@ -396,16 +313,7 @@ function Home() {
                {sectionId === "featured_lots" && (activeSections as any)?.show_featured_lots && (
                  <div className="relative py-12">
                    {mappedLots.length > 0 ? (
-                     <>
-                       <FeaturedLotsCarousel lots={mappedLots} variant="model1" />
-                       <section className="container mx-auto px-4 py-8 lg:hidden relative z-10">
-                         <div className="grid gap-6 sm:grid-cols-2">
-                            {mappedLots.slice(0, 4).map((lot: any) => (
-                               <LotCard key={lot.id} lot={lot} />
-                            ))}
-                         </div>
-                       </section>
-                     </>
+                     <section className="container mx-auto px-4"><div className="mb-6 flex flex-wrap items-center justify-between gap-3"><h2 className="text-2xl font-bold">Animais em leilão</h2><Link to="/lotes"><Button variant="outline">Ver todos os lotes <ArrowRight className="ml-2 h-4 w-4" /></Button></Link></div><div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{mappedLots.slice(0, 6).map((lot: any) => <LotCard key={lot.id} lot={lot} />)}</div></section>
                    ) : (
                      <SectionFallback 
                        title="Lotes em Destaque" 
@@ -435,9 +343,9 @@ function Home() {
              )}
               {sectionId === "sale_menu" && (activeSections as any)?.show_sale_menu && (
                 <section className="container mx-auto px-4 py-16">
-                  <div className="rounded-3xl bg-emerald-deep/40 border border-gold/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="border-y border-border py-8 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div>
-                      <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">Compra Direta de Elite</h2>
+                      <h2 className="text-3xl font-bold text-foreground mb-4">Animais à venda</h2>
                       <p className="text-white/60 max-w-md">Acesse nosso catálogo exclusivo de venda direta e garanta seu animal sem a necessidade de disputa em leilão.</p>
                     </div>
                     <Link to="/compra-direta">
@@ -472,7 +380,7 @@ function Home() {
       <section className="border-y border-border/60 bg-card/40">
         <div className="container mx-auto grid gap-8 px-4 py-16 md:grid-cols-3">
           {[
-            { icon: Radio, title: "Lances em tempo real", desc: "WebSocket de baixa latência com atualização instantânea, contagem regressiva inteligente e alertas visuais." },
+            { icon: Radio, title: "Lances em tempo real", desc: "Acompanhe os valores e a abertura dos lotes em cada leilão." },
             { icon: ShieldCheck, title: "Curadoria veterinária", desc: "Cada animal passa por avaliação genealógica, exames e laudos antes de entrar em leilão." },
             { icon: Trophy, title: "Compradores qualificados", desc: "Cadastro com aprovação manual, comprovação financeira e contratos assinados digitalmente." },
           ].map((item) => (
@@ -490,9 +398,9 @@ function Home() {
       </section>
 
       <section className="container mx-auto px-4 py-20">
-        <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-hero-gradient p-10 md:p-16">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-emerald/30 blur-3xl" />
+        <div className="border-t border-border py-10 md:py-16">
+          
+          
           <div className="relative max-w-2xl">
             <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
               Pronto para <span className="text-gradient-gold">arrematar</span> o melhor do agronegócio?

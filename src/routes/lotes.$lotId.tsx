@@ -470,7 +470,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
   }, [lot.id, user]);
 
   const placeBid = (amount: number) => {
-    if (!user) { toast.error("Faça login para dar lances."); return; }
+    if (!user) { toast.error("Entre na sua conta para dar lance."); return; }
     setPendingBidAmount(amount);
     setShowConfirmBid(true);
   };
@@ -490,6 +490,8 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
       const result = data as { success: boolean; message: string; previous_bidder_id?: string };
       if (result.success) {
         toast.success(result.message || "Lance efetuado!");
+        const { data: refreshedLot } = await supabase.from("lots").select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)").eq("id", lot.id).maybeSingle();
+        if (refreshedLot) setLot(refreshedLot as any);
 
         // Enviar notificação por e-mail se houver um licitante anterior superado
         if (result.previous_bidder_id && user && result.previous_bidder_id !== user.id) {
@@ -685,7 +687,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                     <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all cursor-help ${isOffline ? 'bg-destructive/10 border-destructive/30 text-destructive' : isPolling ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'}`}>
                       {isOffline ? <WifiOff className="h-3 w-3 animate-pulse" /> : isPolling ? <ZapOff className="h-3 w-3 animate-pulse" /> : <Zap className="h-3 w-3" />}
                       <span className="text-[9px] font-black uppercase tracking-widest hidden sm:inline">
-                        {isOffline ? 'Off' : isPolling ? 'Sync' : 'Live'}
+                        {isOffline ? 'Sem conexão' : isPolling ? 'Atualizando' : 'Conectado'}
                       </span>
                       {delaySeconds > 0 && <span className="text-[8px] opacity-70 ml-1">{delaySeconds}s</span>}
                     </div>
@@ -1065,11 +1067,11 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                      )}
                       <Button 
                         size="lg" 
-                        className={`w-full h-20 font-black text-2xl rounded-2xl transition-all duration-300 ${!isBiddingOpen ? 'bg-gray-500 cursor-not-allowed grayscale' : 'bg-gold-gradient text-emerald-deep shadow-gold'} ${isBiddingOpen && (animations?.bid_button_pulse || lot.event?.is_live_interactive) ? 'animate-pulse scale-[1.02] shadow-[0_0_30px_rgba(212,175,55,0.4)]' : ''}`} 
+                        className={`w-full min-h-14 h-auto py-4 font-semibold text-lg whitespace-normal rounded-lg transition-all duration-300 ${!isBiddingOpen ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-primary text-primary-foreground'} ${isBiddingOpen && (animations?.bid_button_pulse || lot.event?.is_live_interactive) ? 'animate-pulse scale-[1.02] shadow-[0_0_30px_rgba(212,175,55,0.4)]' : ''}`} 
                         onClick={() => isBiddingOpen && placeBid(nextBid)}
                         disabled={!isBiddingOpen}
                       >
-                        {isSold ? 'LOTE ARREMATADO' : isPassed ? 'LOTE FINALIZADO' : !isBiddingOpen ? 'AGUARDANDO ABERTURA' : 'CONFIRMAR LANCE'}
+                        {isSold ? 'LOTE ARREMATADO' : isPassed ? 'LOTE FINALIZADO' : !isBiddingOpen ? 'Aguardando abertura' : !user ? 'Entre para dar lance' : `Dar lance de ${formatBRL(nextBid)}`}
                       </Button>
                    <div className="grid grid-cols-2 gap-4">
                      <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
