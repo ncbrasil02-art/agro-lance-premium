@@ -651,14 +651,14 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
          </div>
        </div>
 
-      <div className="min-h-screen bg-background print:hidden overflow-x-hidden w-full relative">
-        <header className="border-b border-gold/20 bg-emerald-deep py-4 sticky top-0 z-50 shadow-lg">
-          <div className="container mx-auto px-4 flex items-center justify-between gap-4">
-            <Link to="/ao-vivo" className="text-white flex items-center gap-1 hover:text-gold transition-colors">
+      <div className="auction-surface min-h-screen bg-background print:hidden w-full relative">
+        <header className="border-b border-border bg-card py-4 sticky top-0 z-50">
+          <div className="container mx-auto px-4 grid grid-cols-[auto_minmax(0,1fr)] sm:grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+            <Link to="/ao-vivo" className="text-foreground flex items-center gap-1 hover:text-gold transition-colors">
               <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">Voltar</span>
             </Link>
             
-             <div className="flex items-center gap-2 sm:gap-6">
+             <div className="min-w-0 flex items-center justify-center gap-2 sm:gap-6">
                {prevLotId ? (
                  <Link to="/lotes/$lotId" params={{ lotId: prevLotId }} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-emerald-deep transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)]">
                    <ChevronLeft className="h-6 w-6" />
@@ -667,9 +667,9 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                  <div className="h-10 w-10 sm:h-12 sm:w-12" />
                )}
                
-               <div className="text-center min-w-[140px]">
+               <div className="min-w-0 text-center">
                  <div className="text-gold/60 text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Navegar Lotes</div>
-                 <h1 className="text-white font-black uppercase text-base sm:text-xl tracking-tighter italic">Lote #{lot.lot_number}</h1>
+                 <h1 className="text-foreground font-black uppercase text-base sm:text-xl tracking-tighter italic">Lote #{lot.lot_number}</h1>
                </div>
  
                {nextLotId ? (
@@ -681,7 +681,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                )}
              </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-2 sm:gap-3">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -704,9 +704,9 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
         </header>
 
         <div className="container mx-auto px-4 py-8">
-          <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] flex-col-reverse lg:flex-row">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] flex-col-reverse lg:flex-row">
             <div className="space-y-8 order-2 lg:order-1">
-               <div className="rounded-3xl overflow-hidden border border-white/10 relative group">
+               <div className="rounded-3xl overflow-hidden border border-border relative group">
                 <div className="relative">
                   <OptimizedImage src={lot.animal?.photos?.[activePhoto] || ""} alt={lot.animal?.name ? `${lot.animal.name}, animal apresentado no lote ${lot.lot_number}` : `Animal apresentado no lote ${lot.lot_number}`} width={1200} aspectRatio="landscape" />
                   <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
@@ -739,7 +739,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                       <Link 
                         to="/lotes/$lotId" 
                         params={{ lotId: prevLotId }}
-                        className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all shadow-xl"
+                        className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-border flex items-center justify-center text-foreground hover:bg-gold hover:text-emerald-deep transition-all shadow-xl"
                       >
                         <ChevronLeft className="h-6 w-6" />
                       </Link>
@@ -750,7 +750,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                       <Link 
                         to="/lotes/$lotId" 
                         params={{ lotId: nextLotId }}
-                        className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-gold hover:text-emerald-deep transition-all shadow-xl"
+                        className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-border flex items-center justify-center text-foreground hover:bg-gold hover:text-emerald-deep transition-all shadow-xl"
                       >
                         <ChevronRight className="h-6 w-6" />
                       </Link>
@@ -774,61 +774,61 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                     <TabsTrigger value="lances" className="text-[10px] sm:text-sm">Lances</TabsTrigger>
                   </TabsList>
                   <TabsContent value="lances" className="mt-6">
-                    <Card className="bg-card/50 border-white/5 p-6 rounded-[2rem]">
+                    <Card className="bg-card/50 border-border p-6 rounded-[2rem]">
                       <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
                         <Gavel className="h-4 w-4" /> Histórico de Lances
                       </h3>
                       <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {recentBids.length > 0 ? (
                           recentBids.map((bid, idx) => (
-                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'bg-white/5 border-white/5'}`}>
+                            <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'bg-muted border-border'}`}>
                               <div className="flex items-center gap-3">
-                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-muted text-foreground/40'}`}>
                                   {idx + 1}
                                 </div>
                                 <div>
-                                  <p className="text-xs font-bold text-white leading-none mb-1">
+                                  <p className="text-xs font-bold text-foreground leading-none mb-1">
                                     {bid.bidder_name || (bid.user_id === user?.id ? profile?.full_name : 'Licitante')}
                                   </p>
-                                  <p className="text-[10px] text-white/40">{new Date(bid.created_at).toLocaleTimeString('pt-BR')}</p>
+                                  <p className="text-[10px] text-foreground/40">{new Date(bid.created_at).toLocaleTimeString('pt-BR')}</p>
                                 </div>
                               </div>
-                              <div className={`font-black italic ${idx === 0 ? 'text-gold text-lg' : 'text-white text-sm'}`}>
+                              <div className={`font-black italic ${idx === 0 ? 'text-gold text-lg' : 'text-foreground text-sm'}`}>
                                 {formatBRL(bid.amount)}
                               </div>
                             </div>
                           ))
                         ) : (
-                          <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-3xl">
-                            <Gavel className="h-12 w-12 text-white/10 mx-auto mb-4" />
-                            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum lance recebido</p>
+                          <div className="text-center py-12 border-2 border-dashed border-border rounded-3xl">
+                            <Gavel className="h-12 w-12 text-foreground/10 mx-auto mb-4" />
+                            <p className="text-foreground/40 font-bold uppercase tracking-widest text-xs">Nenhum lance recebido</p>
                           </div>
                         )}
                       </div>
                     </Card>
                   </TabsContent>
                  <TabsContent value="detalhes" className="mt-6">
-                   <Card className="bg-card/50 border-white/5 p-8">
-                     <p className="text-white/80 leading-relaxed italic">{lot.animal?.description}</p>
+                   <Card className="bg-card/50 border-border p-8">
+                     <p className="text-foreground/80 leading-relaxed italic">{lot.animal?.description}</p>
                      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                       <div className="p-4 bg-white/5 rounded-2xl text-center">
+                       <div className="p-4 bg-muted rounded-2xl text-center">
                          <p className="text-[10px] text-gold/40 uppercase font-black">Raça</p>
-                         <p className="font-bold text-white">{lot.animal?.breed}</p>
+                         <p className="font-bold text-foreground">{lot.animal?.breed}</p>
                        </div>
-                        <div className="p-4 bg-white/5 rounded-2xl text-center">
+                        <div className="p-4 bg-muted rounded-2xl text-center">
                           <p className="text-[10px] text-gold/40 uppercase font-black">Idade</p>
-                          <p className="font-bold text-white">{getAge(lot.animal?.birth_date)}</p>
+                          <p className="font-bold text-foreground">{getAge(lot.animal?.birth_date)}</p>
                         </div>
                         {lot.animal?.weight && (
-                          <div className="p-4 bg-white/5 rounded-2xl text-center">
+                          <div className="p-4 bg-muted rounded-2xl text-center">
                             <p className="text-[10px] text-gold/40 uppercase font-black">Peso</p>
-                            <p className="font-bold text-white">{lot.animal.weight}kg</p>
+                            <p className="font-bold text-foreground">{lot.animal.weight}kg</p>
                           </div>
                         )}
                         {lot.animal?.location && (
-                          <div className="p-4 bg-white/5 rounded-2xl text-center">
+                          <div className="p-4 bg-muted rounded-2xl text-center">
                             <p className="text-[10px] text-gold/40 uppercase font-black">Localização</p>
-                            <p className="font-bold text-white">{lot.animal.location}</p>
+                            <p className="font-bold text-foreground">{lot.animal.location}</p>
                           </div>
                         )}
                       </div>
@@ -840,19 +840,19 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                           </h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {(typeof lot.animal.vaccination_records === 'string' ? lot.animal.vaccination_records.split(',').map((s: string) => s.trim()).filter(Boolean) : lot.animal.vaccination_records).map((v: any, idx: number) => (
-                              <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center">
+                              <div key={idx} className="bg-muted p-3 rounded-xl border border-border flex justify-between items-center">
                                  <div className="flex items-center gap-3">
                                    <div className="h-7 w-7 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
                                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                                    </div>
                                    <div className="flex flex-col">
                                      <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">VACINADO (SIM)</span>
-                                     <span className="text-xs font-bold text-white/90 leading-tight">
+                                     <span className="text-xs font-bold text-foreground/90 leading-tight">
                                        {typeof v === 'string' ? v : (v.vaccine || v.name || v.label)}
                                      </span>
                                    </div>
                                  </div>
-                                {v.date && <span className="text-[10px] text-white/40">{v.date}</span>}
+                                {v.date && <span className="text-[10px] text-foreground/40">{v.date}</span>}
                               </div>
                             ))}
                           </div>
@@ -882,21 +882,21 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                         />
                       ) : (
                         <div className="text-center space-y-4">
-                          <Video className="h-12 w-12 text-white/20 mx-auto" />
-                          <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Nenhum vídeo disponível</p>
+                          <Video className="h-12 w-12 text-foreground/20 mx-auto" />
+                          <p className="text-foreground/40 font-bold uppercase tracking-widest text-xs">Nenhum vídeo disponível</p>
                         </div>
                       )}
                     </div>
                   </TabsContent>
                    <TabsContent value="saude" className="mt-6">
-                     <Card className="bg-card/50 border-white/5 p-8">
+                     <Card className="bg-card/50 border-border p-8">
                        <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
                          <Stethoscope className="h-4 w-4" /> Saúde do Animal
                        </h3>
                        
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                          <div className="space-y-4">
-                           <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Checklist de Saúde</p>
+                           <p className="text-[10px] uppercase font-black text-foreground/40 tracking-widest">Checklist de Saúde</p>
                             <div className="grid grid-cols-1 gap-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                               {(() => {
                                 const staticItems = [
@@ -932,8 +932,8 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                                   if (!shouldShow) return null;
 
                                return (
-                                 <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                                   <span className="text-xs text-white/80">{item.label}</span>
+                                 <div key={item.id} className="flex items-center justify-between p-3 bg-muted rounded-xl border border-border">
+                                   <span className="text-xs text-foreground/80">{item.label}</span>
                                    <div className="flex items-center gap-3">
                                        {val === true ? (
                                          <div className="flex items-center gap-2">
@@ -951,9 +951,9 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                                           </div>
                                        ) : (
                                          <div className="flex items-center gap-2">
-                                           <span className="text-xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded border border-white/10">PENDENTE</span>
-                                           <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                                             <AlertCircle className="h-4 w-4 text-white/10" />
+                                           <span className="text-xs font-black uppercase text-foreground/20 bg-muted px-2 py-0.5 rounded border border-border">PENDENTE</span>
+                                           <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
+                                             <AlertCircle className="h-4 w-4 text-foreground/10" />
                                            </div>
                                          </div>
                                        )}
@@ -968,7 +968,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                          <div className="space-y-6">
                            {lot.animal?.veterinary_history?.health_photo_url && (
                              <div>
-                               <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Imagens de Exames (Raio-X)</p>
+                               <p className="text-[10px] uppercase font-black text-foreground/40 tracking-widest mb-3">Imagens de Exames (Raio-X)</p>
                                <div className="rounded-2xl border border-gold/20 overflow-hidden bg-black/40 group cursor-pointer" onClick={() => window.open(lot.animal.veterinary_history.health_photo_url, '_blank')}>
                                  <OptimizedImage 
                                    src={lot.animal.veterinary_history.health_photo_url} 
@@ -982,8 +982,8 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                            )}
 
                            <div>
-                             <p className="text-[10px] uppercase font-black text-white/40 tracking-widest mb-3">Observações Veterinárias</p>
-                             <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-white/60 italic leading-relaxed">
+                             <p className="text-[10px] uppercase font-black text-foreground/40 tracking-widest mb-3">Observações Veterinárias</p>
+                             <div className="p-4 bg-muted rounded-2xl border border-border text-sm text-foreground/60 italic leading-relaxed">
                                {lot.animal?.veterinary_history?.other_info || "Nenhuma observação adicional registrada."}
                              </div>
                            </div>
@@ -991,8 +991,8 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                            {/* Detalhamento Expansivo */}
                            <div className="pt-4">
                               <div className="flex flex-col gap-2">
-                                <p className="text-[10px] uppercase font-black text-white/40 tracking-widest">Detalhamento do Animal</p>
-                                <div className="p-4 bg-emerald-deep/40 rounded-2xl border border-gold/10 text-white/90">
+                                <p className="text-[10px] uppercase font-black text-foreground/40 tracking-widest">Detalhamento do Animal</p>
+                                <div className="p-4 bg-emerald-deep/40 rounded-2xl border border-gold/10 text-foreground/90">
                                   <p className="text-sm leading-relaxed whitespace-pre-line">
                                     {lot.animal?.description || "Informações detalhadas não informadas."}
                                   </p>
@@ -1007,9 +1007,9 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
               </div>
 
               <div className="space-y-6 order-1 lg:order-2" id="bid-actions">
-                <Card className="bg-emerald-deep/95 border-gold/20 p-8 rounded-[2.3rem] w-full shadow-2xl">
+                <Card className="bg-card border-border p-5 md:p-6 rounded-lg w-full">
                   <div className="flex justify-between items-start mb-6">
-                    <h2 className="text-4xl font-black text-white italic leading-none">{lot.animal?.name}</h2>
+                    <h2 className="text-2xl font-semibold text-foreground leading-tight">{lot.animal?.name}</h2>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -1020,18 +1020,18 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                     </Button>
                   </div>
                   
-                  <div className="mt-4 p-8 bg-black/40 rounded-[2rem] border border-white/5">
+                  <div className="mt-4 py-5 border-y border-border">
                    <p className="text-gold font-black uppercase text-[10px]">Oferta Atual</p>
                     <div className="flex flex-col">
-                      <p className="text-5xl font-black text-white italic">{formatBRL(currentPrice)}</p>
+                      <p className="text-3xl font-semibold text-foreground tabular-nums">{formatBRL(currentPrice)}</p>
                       {COMMISSION_RATE > 0 && (
-                        <p className="text-[10px] text-white/40 mt-1 uppercase font-bold tracking-widest">
+                        <p className="text-[10px] text-foreground/40 mt-1 uppercase font-bold tracking-widest">
                           + {COMMISSION_RATE}% de comissão do leiloeiro
                         </p>
                       )}
                     </div>
-                   <div className="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
-                     <p className="text-white/60 font-bold">30x {formatBRL(installmentValue)}</p>
+                   <div className="mt-6 pt-6 border-t border-border flex justify-between items-center">
+                     <p className="text-foreground/60 font-bold">30x {formatBRL(installmentValue)}</p>
                      <InstallmentSimulator price={currentPrice} commissionRate={COMMISSION_RATE} />
                    </div>
                  </div>
@@ -1041,7 +1041,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                          <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
                          <div>
                            <p className="text-amber-500 font-black text-[10px] uppercase tracking-wider mb-1">Cadastro em Análise</p>
-                           <p className="text-white/80 text-xs leading-relaxed">
+                           <p className="text-foreground/80 text-xs leading-relaxed">
                              Você ainda não está habilitado para dar lances. Seu cadastro está sendo revisado pela nossa equipe. 
                              <a href="https://wa.me/5581989437877" target="_blank" className="text-gold hover:underline font-bold block mt-1">Clique aqui para agilizar no WhatsApp</a>
                            </p>
@@ -1057,7 +1057,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                              <Button 
                                key={inc} 
                                variant="outline" 
-                               className="h-12 border-white/10 bg-white/5 hover:bg-gold/20 hover:border-gold/50 text-white font-black text-xs"
+                               className="h-12 border-border bg-muted hover:bg-gold/20 hover:border-gold/50 text-foreground font-black text-xs"
                                onClick={() => placeBid(currentPrice + inc)}
                              >
                                +{formatBRL(inc).replace('R$', '').trim()}
@@ -1074,13 +1074,13 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                       >
                         {isSold ? 'LOTE ARREMATADO' : isPassed ? 'LOTE FINALIZADO' : !isBiddingOpen ? 'Aguardando abertura' : !user ? 'Entre para dar lance' : `Dar lance de ${formatBRL(nextBid)}`}
                       </Button>
-                   <div className="grid grid-cols-2 gap-4">
-                     <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-white'}`} onClick={toggleFavorite}>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                     <Button variant="outline" className={`h-14 rounded-2xl ${isFavorite ? 'text-gold border-gold' : 'text-foreground'}`} onClick={toggleFavorite}>
                        <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-gold' : ''}`} /> {isFavorite ? 'SEGUINDO' : 'SEGUIR'}
                      </Button>
                       <Button
                         variant="outline"
-                        className="h-14 rounded-2xl text-white"
+                        className="h-14 rounded-2xl text-foreground"
                         onClick={() => {
                           const url = window.location.href;
                           const text = `Confira o lote #${lot.lot_number} - ${lot.animal?.name} na Premium Agro!`;
@@ -1105,7 +1105,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                      <div className="flex flex-col gap-3 mt-2">
                       {lot.animal?.accepts_offers && (dynamicStatus === 'pre_lance' || dynamicStatus === 'scheduled' || dynamicStatus === 'loteamento') && (
                         <Button 
-                          className="w-full h-14 rounded-2xl bg-emerald-bright text-white hover:bg-emerald-bright/90 gap-2 font-black italic shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                          className="w-full h-14 rounded-2xl bg-emerald-bright text-foreground hover:bg-emerald-bright/90 gap-2 font-black italic shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                           onClick={() => setIsOfferDialogOpen(true)}
                         >
                           <MessageSquare className="h-5 w-5" /> FAZER OFERTA DE COMPRA
@@ -1125,7 +1125,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                       
                       <Button
                         variant="outline"
-                        className="w-full h-14 rounded-2xl bg-white/5 text-white hover:bg-white/10 border-gold/20 gap-2 font-bold"
+                        className="w-full h-14 rounded-2xl bg-muted text-foreground hover:bg-muted border-gold/20 gap-2 font-bold"
                         onClick={() => window.print()}
                       >
                         <Printer className="h-4 w-4 text-gold" /> IMPRIMIR ENCARTE (PDF)
@@ -1134,7 +1134,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                   </div>
                 </Card>
 
-                <Card className="bg-card/50 border-white/5 p-6 rounded-[2rem]">
+                <Card className="bg-card/50 border-border p-6 rounded-[2rem]">
                   <h3 className="text-sm font-black uppercase text-gold/60 mb-6 flex items-center gap-2">
                     <Gavel className="h-4 w-4" /> Histórico de Lances
                   </h3>
@@ -1142,22 +1142,22 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                   <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                     {recentBids.length > 0 ? (
                       recentBids.map((bid, idx) => (
-                        <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-white/5 border-white/5'}`}>
+                        <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border ${idx === 0 ? 'bg-gold/10 border-gold/30' : 'bg-muted border-border'}`}>
                           <div className="flex items-center gap-3">
-                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-white/10 text-white/40'}`}>
+                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black ${idx === 0 ? 'bg-gold text-emerald-deep' : 'bg-muted text-foreground/40'}`}>
                               {idx + 1}
                             </div>
                              <div>
-                                 <p className="text-xs font-bold text-white leading-none mb-1">
+                                 <p className="text-xs font-bold text-foreground leading-none mb-1">
                                     {bid.bidder_name || (bid.user_id === user?.id ? profile?.full_name : 'Licitante')}
                                  </p>
-                               <p className="text-[8px] text-white/40 uppercase font-bold">
+                               <p className="text-[8px] text-foreground/40 uppercase font-bold">
                                 {new Date(bid.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className={`text-sm font-black italic ${idx === 0 ? 'text-gold' : 'text-white'}`}>
+                            <p className={`text-sm font-black italic ${idx === 0 ? 'text-gold' : 'text-foreground'}`}>
                               {formatBRL(bid.amount)}
                             </p>
                             {idx === 0 && <span className="text-[7px] font-black uppercase bg-gold text-emerald-deep px-1.5 py-0.5 rounded-full">LANCE ATUAL</span>}
@@ -1166,16 +1166,16 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
                       ))
                     ) : (
                       <div className="py-8 text-center space-y-3">
-                        <Gavel className="h-8 w-8 text-white/10 mx-auto" />
-                        <p className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Ainda não há lances</p>
+                        <Gavel className="h-8 w-8 text-foreground/10 mx-auto" />
+                        <p className="text-foreground/40 font-bold uppercase tracking-widest text-[10px]">Ainda não há lances</p>
                       </div>
                     )}
                   </div>
                 </Card>
 
                <div className="p-8 rounded-[2rem] border border-emerald-bright/20 bg-emerald-bright/5">
-                 <h3 className="text-white font-black uppercase text-sm mb-4">Pagamento & Envio</h3>
-                 <ul className="text-white/60 text-xs space-y-2">
+                 <h3 className="text-foreground font-black uppercase text-sm mb-4">Pagamento & Envio</h3>
+                 <ul className="text-foreground/60 text-xs space-y-2">
                    <li>• À vista com 5% de desconto no PIX.</li>
                    <li>• Parcelamento em 33x (1+2+30).</li>
                    <li>• Comissão de {COMMISSION_RATE}% sobre o valor do arremate.</li>

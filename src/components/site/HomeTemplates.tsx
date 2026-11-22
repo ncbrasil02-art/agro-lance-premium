@@ -7,6 +7,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Countdown } from "@/components/auctions/countdown";
 import cattlePhoto from "@/assets/catalog/cattle-1.webp.asset.json";
 import horsePhoto from "@/assets/catalog/horse-1.webp.asset.json";
+import { catalogSlidePhotos } from "@/components/auctions/catalog-media";
 
 interface HeroProps { siteInfo: any; nextEvent: any; customTexts: any; stats: any; homepageSettings?: any }
 
@@ -16,7 +17,7 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }
   const [index, setIndex] = useState(0);
   const reducedMotion = useReducedMotion();
   const backgrounds: string[] = Array.isArray(settings.hero_backgrounds) && settings.hero_backgrounds.some((v: unknown) => typeof v === "string" && v.length > 0)
-    ? settings.hero_backgrounds.filter((v: unknown) => typeof v === "string" && v.length > 0) : [cattlePhoto.url, horsePhoto.url];
+    ? settings.hero_backgrounds.filter((v: unknown) => typeof v === "string" && v.length > 0).map((url: string) => url === cattlePhoto.url ? catalogSlidePhotos[0] : url === horsePhoto.url ? catalogSlidePhotos[1] : url) : catalogSlidePhotos;
   const phrases: string[] = Array.isArray(texts.hero_phrases) ? texts.hero_phrases.filter((v: unknown) => typeof v === "string" && v.length > 0) : [];
   const count = Math.max(backgrounds.length, phrases.length);
   const duration = Math.max(1500, Number(settings.hero_slide_duration) || 6000);
@@ -37,25 +38,25 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }
         </motion.div>
       </AnimatePresence>
       <div className="ranch-hero-shade absolute inset-0 -z-10" />
-      <div className="container mx-auto px-4 py-16 md:py-20">
+      <div className="container mx-auto px-4 py-12 md:py-14">
         <div className="max-w-2xl">
           <p className="mb-5 flex items-center gap-2 text-sm font-semibold text-hero-foreground"><Gavel className="h-4 w-4" /> Bovinos e cavalos · Leilões e venda direta</p>
-          <h1 className="ranch-hero-title text-4xl font-bold leading-tight text-hero-foreground md:text-6xl">
+          <h1 className="ranch-hero-title text-4xl font-semibold leading-tight text-hero-foreground md:text-5xl">
             {texts.hero_title || siteInfo?.name || "NC Agro Leilões"}
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-hero-foreground">{texts.hero_subtitle || "Escolha seu próximo animal com informação, organização e confiança."}</p>
           <p className="mt-4 min-h-12 max-w-xl text-base text-hero-foreground" aria-live="off">{phrases[index % Math.max(1, phrases.length)] || "Consulte os lotes, compare os animais e acompanhe os leilões abertos."}</p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <a href={texts.hero_cta_primary_url || "/eventos"}><Button size="lg" className="h-12 rounded-md px-6 font-semibold"><Gavel className="mr-2 h-4 w-4" />{texts.hero_cta_primary_label || "Ver leilões e dar lance"}</Button></a>
-            <a href={texts.hero_cta_secondary_url || "/compra-direta"}><Button size="lg" variant="outline" className="h-12 rounded-md border-hero-foreground/50 bg-background/20 px-6 text-hero-foreground hover:bg-background/40 hover:text-hero-foreground">{texts.hero_cta_secondary_label || "Animais à venda"}<ArrowRight className="ml-2 h-4 w-4" /></Button></a>
+            <Button asChild size="lg" className="h-12 rounded-md px-6 font-semibold"><a href={texts.hero_cta_primary_url || "/eventos"}><Gavel className="h-4 w-4" />{texts.hero_cta_primary_label === "Ver leilões e dar lance" ? "Ver leilões" : texts.hero_cta_primary_label || "Ver leilões"}</a></Button>
+            <Button asChild size="lg" variant="outline" className="h-12 rounded-md border-hero-foreground/50 bg-background/20 px-6 text-hero-foreground hover:bg-background/40 hover:text-hero-foreground"><a href={texts.hero_cta_secondary_url || "/compra-direta"}>{texts.hero_cta_secondary_label || "Animais à venda"}<ArrowRight className="h-4 w-4" /></a></Button>
           </div>
           {backgrounds.length > 1 && <div className="mt-8 flex gap-2" role="group" aria-label="Fotos em destaque">{backgrounds.map((_, i) => <Button key={i} variant="ghost" size="icon" aria-label={`Ver foto ${i + 1}`} aria-pressed={index % backgrounds.length === i} onClick={() => setIndex(i)} className="h-8 w-8 rounded-sm text-hero-foreground"><span className={`h-1 w-5 ${index % backgrounds.length === i ? "bg-primary" : "bg-hero-foreground/50"}`} /></Button>)}</div>}
         </div>
       </div>
-      {nextEvent && <div className="border-t border-hero-foreground/20 bg-background/90"><div className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-5">
-        <div><p className="text-xs font-semibold uppercase text-primary">Próximo leilão</p><h2 className="mt-1 text-lg font-semibold text-foreground">{nextEvent.name}</h2><p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><Calendar className="h-4 w-4" />{new Date(nextEvent.date).toLocaleDateString("pt-BR")}</p></div>
+      {nextEvent && <div className="border-t border-border bg-card"><div className="container mx-auto grid items-center gap-4 px-4 py-5 sm:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_auto_auto]">
+        <div className="min-w-0"><p className="text-xs font-semibold uppercase text-primary">Próximo leilão</p><h2 className="mt-1 text-lg font-semibold text-foreground">{nextEvent.name}</h2><p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><Calendar className="h-4 w-4" />{new Date(nextEvent.date).toLocaleDateString("pt-BR")}</p></div>
         <Countdown endsAt={nextEvent.date} variant="segmented" />
-        <Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}><Button variant="outline">Ver os animais <ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+        <Button asChild variant="outline"><Link to="/eventos/$eventSlug" params={{ eventSlug: nextEvent.slug }}>Ver programação <ArrowRight className="h-4 w-4" /></Link></Button>
       </div></div>}
     </section>
   );

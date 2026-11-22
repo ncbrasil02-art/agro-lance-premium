@@ -191,9 +191,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
    const { user, profile } = useAuth();
    const [liveEvent, setLiveEvent] = useState(initialEvent);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isOffline, setIsOffline] = useState(false);
   const [realtimeStatus, setRealtimeStatus] = useState<string>("connected");
-  const [lastSyncAt, setLastSyncAt] = useState<Date>(new Date());
+  const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null);
   const [syncTrigger, setSyncTrigger] = useState(0);
   // pollingRetryCount removido pois agora é controlado pelo hook useRealtimeFallback
    const [reconnectTrigger, setReconnectTrigger] = useState(0);
@@ -247,6 +247,8 @@ import { motion, AnimatePresence } from "framer-motion";
    };
 
   useEffect(() => {
+    setIsOffline(!navigator.onLine);
+    setLastSyncAt(new Date());
     const handleOnline = () => {
       setIsOffline(false);
       toast.success("Conexão restabelecida", { description: "Sincronizando dados..." });
@@ -906,7 +908,7 @@ import { motion, AnimatePresence } from "framer-motion";
   }
 
     return (
-     <div className="container mx-auto px-4 py-8">
+     <div className="auction-surface container mx-auto px-4 py-8">
       <AlertDialog open={showConfirmBid} onOpenChange={setShowConfirmBid}>
         <AlertDialogContent className="bg-emerald-deep border-gold/20 text-white">
           <AlertDialogHeader>
@@ -1007,10 +1009,10 @@ import { motion, AnimatePresence } from "framer-motion";
          </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px] flex-col lg:flex-row">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] flex-col lg:flex-row">
         {/* Player + Lote em destaque */}
         <ErrorBoundary tag="live-player" fallback={<SectionFallback title="Transmissão" message="Falha ao carregar o player de vídeo." variant="error" />}>
-          <div className="space-y-6 order-1 flex flex-col">
+          <div className="space-y-6 order-1 flex flex-col lg:col-start-1 lg:row-start-1">
            <div className="relative aspect-video overflow-hidden rounded-2xl border border-gold/30 bg-emerald-deep shadow-elegant">
              {liveEvent.transmission_link ? (
                <iframe
@@ -1105,10 +1107,10 @@ import { motion, AnimatePresence } from "framer-motion";
           </div>
 
           {/* Lote em destaque - Otimizado */}
-          <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500 order-3">
-            <div className="grid md:grid-cols-[1fr_1.2fr]">
+          <div className="overflow-hidden rounded-2xl border border-gold/30 bg-card shadow-gold transition-all duration-500 order-3 lg:col-start-1 lg:row-start-2">
+            <div className="grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                {/* Lado Esquerdo: Foto Grande */}
-                <div className="relative aspect-[4/3] h-full group">
+                <div className="relative aspect-video overflow-hidden group">
                   <OptimizedImage 
                     src={liveLot.animal?.photos?.[activePhotoIndex] || ""} 
                     alt={liveLot.animal?.name ? `${liveLot.animal.name}, animal do lote ao vivo ${liveLot.lot_number}` : `Animal do lote ao vivo ${liveLot.lot_number}`} 
@@ -1201,7 +1203,7 @@ import { motion, AnimatePresence } from "framer-motion";
               </div>
 
               {/* Lado Direito: Info e Lances */}
-              <div className="p-6 flex flex-col">
+              <div className="min-w-0 p-5 flex flex-col">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -1221,7 +1223,7 @@ import { motion, AnimatePresence } from "framer-motion";
                       }
                       animate={{ y: 0, opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="text-2xl font-black text-emerald-deep tracking-tighter leading-none"
+                      className="text-2xl font-semibold text-foreground leading-tight"
                     >
                       {liveLot.animal?.name}
                     </motion.h2>
@@ -1248,9 +1250,9 @@ import { motion, AnimatePresence } from "framer-motion";
                       <ShieldAlert className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-amber-500 font-black text-[9px] uppercase tracking-wider mb-0.5">Cadastro em Análise</p>
-                        <p className="text-emerald-deep/80 text-[10px] leading-tight">
+                        <p className="text-muted-foreground text-sm leading-relaxed">
                           Habilitação pendente. 
-                          <a href="https://wa.me/5581989437877" target="_blank" className="text-emerald-deep hover:underline font-bold ml-1">Chamar no WhatsApp</a>
+                          <a href="https://wa.me/5581989437877" target="_blank" className="text-primary hover:underline font-semibold ml-1">Chamar no WhatsApp</a>
                         </p>
                       </div>
                     </div>
@@ -1263,7 +1265,7 @@ import { motion, AnimatePresence } from "framer-motion";
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
                       <div className="h-2 w-2 rounded-full bg-live animate-pulse" /> Lance atual
                     </div>
-                    <div className="text-4xl font-black text-gradient-gold tracking-tighter">{formatBRL(currentPrice)}</div>
+                    <div className="text-3xl font-semibold text-foreground tabular-nums">{formatBRL(currentPrice)}</div>
                     
                     <div className="mt-4 grid grid-cols-3 gap-2">
                       {[1, 5, 10].map((mult) => (
@@ -1281,7 +1283,7 @@ import { motion, AnimatePresence } from "framer-motion";
                     </div>
                   </div>
 
-                  <div className="flex gap-2 items-center">
+                  <div className="flex flex-col gap-3 items-stretch">
                     <motion.div
                       className="flex-1"
                       animate={animations.bid_button_pulse && !(isBidding || liveLot.status === 'sold' || liveLot.status === 'passed') ? {
@@ -1299,7 +1301,7 @@ import { motion, AnimatePresence } from "framer-motion";
                       }}
                     >
                       <Button
-                        className="w-full bg-gold-gradient text-emerald-deep hover:scale-[1.02] transition-transform shadow-gold h-12 font-black text-sm uppercase tracking-wider"
+                        className="w-full min-h-12 h-auto py-3 whitespace-normal bg-primary text-primary-foreground font-semibold text-sm"
                         disabled={isBidding || liveLot.status === 'sold' || liveLot.status === 'passed'}
                         onClick={() => placeBid(currentPrice + liveLot.bid_increment)}
                       >
@@ -1312,7 +1314,7 @@ import { motion, AnimatePresence } from "framer-motion";
                         )}
                         {liveLot.status === 'sold' ? 'LOTE ARREMATADO' : 
                          liveLot.status === 'passed' ? 'LOTE FINALIZADO' : 
-                         `DAR LANCE (${formatBRL(currentPrice + liveLot.bid_increment)})`}
+                         `Dar lance de ${formatBRL(currentPrice + liveLot.bid_increment)}`}
                       </Button>
                     </motion.div>
 
@@ -1538,7 +1540,7 @@ import { motion, AnimatePresence } from "framer-motion";
          </div>
  
            {/* Chat / Histórico de lances */}
-        <aside className="rounded-2xl border border-border bg-card order-2 lg:order-none">
+        <aside className="hidden rounded-2xl border border-border bg-card lg:block lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start">
           <div className="border-b border-border p-4 space-y-3">
             {statusMessage && (
               <div className="bg-gold/10 border border-gold/30 rounded-xl p-3 animate-in slide-in-from-top-2 duration-300">
@@ -1560,7 +1562,7 @@ import { motion, AnimatePresence } from "framer-motion";
                       : "Modo de atualização segura (polling)"}
                   </p>
                   <p className="text-[10px] text-muted-foreground/60">
-                    Sincronizado às {lastSyncAt.toLocaleTimeString("pt-BR")}
+                    {lastSyncAt ? `Sincronizado às ${lastSyncAt.toLocaleTimeString("pt-BR")}` : "Sincronizando"}
                   </p>
                 </div>
               </div>

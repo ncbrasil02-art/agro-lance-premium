@@ -1,4 +1,6 @@
 # Tarefas
+- [x] Padronizar fontes, imagens, cartões e botões na página inicial, programação e telas de leilão, com referência visual do ArrobaPlay.
+- [x] Validar catálogo e abertura de leilões em computador e celular: páginas 200, 15 lotes, fotos uniformes e nenhum erro; aviso de encerramento testado sem repetição.
 - [x] Reorganizar a apresentação do catálogo, dos leilões e dos slides com linguagem clara em português.
 - [x] Cadastrar 50 animais de demonstração completos: 30 em leilão e 20 em venda direta.
 - [x] Disponibilizar dois leilões de demonstração em andamento; lance de comprador comum aprovado confirmado e lido novamente na tela.

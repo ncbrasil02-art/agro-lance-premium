@@ -29,6 +29,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HomeSaleLots } from "@/components/site/HomeSaleLots";
 import { EliteHero } from "@/components/site/HomeTemplates";
+import { catalogEventCover } from "@/components/auctions/catalog-media";
  import { SectionFallback } from "@/components/site/SectionFallback";
 
 export const Route = createFileRoute("/")({
@@ -151,7 +152,7 @@ function Home() {
     date: e?.start_date || new Date().toISOString(),
     city: (e?.location as string)?.split("-")?.[0]?.trim() || "Brasil",
     state: (e?.location as string)?.split("-")?.[1]?.trim() || "",
-    cover: e?.banner_url || "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80",
+    cover: catalogEventCover(e?.slug || "", e?.banner_url || ""),
     status: e.status as any,
     end_date: (e as any).end_date,
      lotsCount: e.lots?.length || 0,
@@ -346,11 +347,11 @@ function Home() {
                   <div className="border-y border-border py-8 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div>
                       <h2 className="text-3xl font-bold text-foreground mb-4">Animais à venda</h2>
-                      <p className="text-white/60 max-w-md">Acesse nosso catálogo exclusivo de venda direta e garanta seu animal sem a necessidade de disputa em leilão.</p>
+                      <p className="text-muted-foreground max-w-md">Consulte os animais disponíveis para compra direta e as condições de cada vendedor.</p>
                     </div>
                     <Link to="/compra-direta">
-                      <Button size="lg" className="bg-gold text-emerald-deep font-black uppercase italic tracking-widest h-16 px-8 rounded-2xl shadow-gold hover:scale-105 transition-transform">
-                        Acessar Catálogo
+                      <Button size="lg" className="h-12 px-6 font-semibold">
+                        Ver animais à venda
                       </Button>
                     </Link>
                   </div>
@@ -402,20 +403,20 @@ function Home() {
           
           
           <div className="relative max-w-2xl">
-            <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
+            <h2 className="text-3xl font-semibold text-foreground md:text-4xl">
               Pronto para <span className="text-gradient-gold">arrematar</span> o melhor do agronegócio?
             </h2>
-            <p className="mt-4 text-lg text-white/80">
+            <p className="mt-4 text-lg text-muted-foreground">
               Cadastre-se, receba aprovação e participe dos próximos leilões em poucos cliques.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/cadastro">
-                <Button size="lg" className="bg-gold-gradient text-emerald-deep hover:opacity-90 shadow-gold">
+                <Button size="lg">
                   Criar conta grátis
                 </Button>
               </Link>
               <Link to="/eventos">
-                <Button size="lg" variant="outline" className="border-white/30 bg-white/5 text-white hover:bg-white/10">
+                <Button size="lg" variant="outline">
                   Explorar leilões
                 </Button>
               </Link>

@@ -1,9 +1,10 @@
- import { useEffect, useState } from "react";
+ import { useEffect, useState, useRef } from "react";
  import { cn } from "@/lib/utils";
 
   export function Countdown({ endsAt, className, variant = "default", onEnd }: { endsAt: string; className?: string; variant?: "default" | "segmented", onEnd?: () => void }) {
     const [mounted, setMounted] = useState(false);
     const [now, setNow] = useState(0);
+    const notifiedEnd = useRef<string | null>(null);
   
     useEffect(() => {
       setMounted(true);
@@ -17,10 +18,11 @@
     const diff = Math.max(0, endTime - now);
 
     useEffect(() => {
-      if (mounted && diff <= 0 && onEnd) {
+      if (mounted && Number.isFinite(endTime) && diff <= 0 && onEnd && notifiedEnd.current !== endsAt) {
+        notifiedEnd.current = endsAt;
         onEnd();
       }
-    }, [diff, mounted, onEnd]);
+    }, [diff, mounted, onEnd, endsAt, endTime]);
 
     if (isNaN(endTime)) return <span className={className}>Data inválida</span>;
     if (!mounted) return <span className={className} suppressHydrationWarning>--:--:--</span>;

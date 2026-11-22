@@ -7,3 +7,4 @@
 - Shared auction cards own their state in non-null child components so missing rows never change hook ordering.
 - Catalog demonstration records use DEMO internal codes and explicit illustrative descriptions; direct-sale demonstrations cannot submit purchase requests.
 - Use system sans-serif typography for the shared catalog and slides to avoid font changes while loading.
+- Catalog cards reserve a fixed 16:9 media frame with a full-size block link; auction screens use scoped shared surface styles to preserve consistent sizing without changing bidding logic.

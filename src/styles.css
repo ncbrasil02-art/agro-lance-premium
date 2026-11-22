@@ -352,10 +352,27 @@
 /* A restrained, consistent ranch catalog. */
 body, button, input, select, textarea, h1, h2, h3, h4 { font-family: Arial, Helvetica, sans-serif; letter-spacing: 0; }
 .dark { --background: oklch(0.17 0.008 150); --card: oklch(0.22 0.009 150); --border: oklch(0.34 0.009 150); --primary: oklch(0.75 0.13 85); --muted-foreground: oklch(0.76 0.008 150); }
-.ranch-hero { min-height: 580px; }
-.ranch-hero-shade { background: linear-gradient(90deg, oklch(0.13 0.015 150 / 0.88), oklch(0.13 0.015 150 / 0.30)); }
+.ranch-hero { min-height: 480px; }
+.ranch-hero-shade { background: linear-gradient(90deg, oklch(0.13 0.015 150 / 0.90), oklch(0.13 0.015 150 / 0.12)); }
 .ranch-hero-title { max-width: 650px; overflow-wrap: anywhere; }
 .animate-neon, .animate-neon-urgent, .animate-blink-fast { animation: none; }
 .hover-neon:hover { box-shadow: none; transform: none; border-color: var(--primary) !important; }
-@media (max-width: 640px) { .ranch-hero { min-height: 560px; } }
+@media (max-width: 640px) { .ranch-hero { min-height: 480px; } }
+.catalog-card { box-shadow: var(--shadow-catalog); transition: border-color .2s ease; }
+.catalog-card:hover { border-color: var(--primary); }
+:root { --shadow-catalog: 0 4px 16px oklch(0.15 0.01 150 / .06); }
+.dark { --shadow-catalog: 0 4px 16px oklch(0.1 0 0 / .18); }
+.auction-surface { font-family: var(--font-sans); }
+.auction-surface :is(h1,h2,h3,h4,button,a,p,span) { letter-spacing: 0; }
+.auction-surface .font-black { font-weight: 600; }
+.auction-surface .italic { font-style: normal; }
+.auction-surface :is(.rounded-xl,.rounded-2xl,.rounded-3xl,[class*="rounded-["]) { border-radius: var(--radius); }
+.auction-surface :is(.shadow-gold,.shadow-elegant,.shadow-2xl,[class*="shadow-["]) { box-shadow: none; }
+.auction-surface .text-gradient-gold { color: var(--foreground); background: none; }
+.auction-surface .bg-gold-gradient { background: var(--primary); color: var(--primary-foreground); }
+.auction-surface [class*="tracking-"] { letter-spacing: 0; }
+.auction-surface :is(button,a) { max-width: 100%; }
+.auction-surface .uppercase { text-transform: none; }
+.auction-surface [class*="grid-cols-"] > * { min-width: 0; }
+.auction-surface :is(h1,h2,h3) { overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

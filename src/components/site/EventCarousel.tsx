@@ -24,10 +24,10 @@ import { cn } from "@/lib/utils"
         "py-16",
         variant === 'model3' ? "bg-emerald-deep text-white" : "container mx-auto px-4"
       )}>
-        <div className={cn("mb-10 flex items-center justify-between", variant === 'model3' && "container mx-auto px-4")}>
-         <div>
+        <div className={cn("mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4", variant === 'model3' && "container mx-auto px-4")}>
+         <div className="min-w-0">
             <h2 className={cn(
-              "text-3xl font-bold tracking-tight md:text-4xl",
+              "text-2xl font-semibold md:text-3xl",
               variant === 'model3' && "text-white"
             )}>{title}</h2>
             <p className={cn(
@@ -41,7 +41,8 @@ import { cn } from "@/lib/utils"
                variant="outline" 
                size="icon" 
                onClick={scrollPrev}
-                className="rounded-full border-gold/30 hover:bg-gold/10 text-gold lg:hidden"
+                aria-label="Leilões anteriores"
+                className="shrink-0 lg:hidden"
              >
                <ChevronLeft className="h-4 w-4" />
              </Button>
@@ -49,7 +50,8 @@ import { cn } from "@/lib/utils"
                variant="outline" 
                size="icon" 
                onClick={scrollNext}
-                className="rounded-full border-gold/30 hover:bg-gold/10 text-gold lg:hidden"
+                aria-label="Próximos leilões"
+                className="shrink-0 lg:hidden"
              >
                <ChevronRight className="h-4 w-4" />
              </Button>

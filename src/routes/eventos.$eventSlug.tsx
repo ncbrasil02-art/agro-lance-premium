@@ -16,6 +16,7 @@ import { SectionFallback } from "@/components/site/SectionFallback";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
+import { catalogEventCover } from "@/components/auctions/catalog-media";
 
 export const Route = createFileRoute("/eventos/$eventSlug")({
    loader: async ({ params }) => {
@@ -73,7 +74,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     const tags = generateMetaTags({
       title: event?.seo_title || event?.name,
       description: event?.seo_description || event?.description,
-      image: event?.banner_url,
+      image: event ? catalogEventCover(event.slug || "", event.banner_url || "") : undefined,
       seoSettings,
       canonical: `/eventos/${event?.slug}`,
       ogTitle: event?.og_title,
@@ -84,7 +85,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
     // Self-hosted subset (Basic Latin + Latin-1 + Latin Extended-A) emitted
     // by `scripts/subset-fonts.mjs` at build time. Same-origin -> 1 RTT,
     // long-cached via public/_headers, no Google round-trip.
-    const fontHref = "/fonts/subset.css";
+
     const eventUrl = `https://plataformaleiloesagro.site/eventos/${event?.slug || ""}`;
     const eventJsonLd = event ? {
       "@context": "https://schema.org",
@@ -96,7 +97,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
       eventStatus: event.status === "finished" ? "https://schema.org/EventCompleted" : event.status === "cancelled" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
       eventAttendanceMode: event.event_type === "ao_vivo" ? "https://schema.org/MixedEventAttendanceMode" : "https://schema.org/OnlineEventAttendanceMode",
       location: event.location ? { "@type": "Place", name: event.location, address: event.location } : { "@type": "VirtualLocation", url: eventUrl },
-      image: event.banner_url ? [event.banner_url] : undefined,
+      image: catalogEventCover(event.slug || "", event.banner_url || "") ? [catalogEventCover(event.slug || "", event.banner_url || "")] : undefined,
       url: eventUrl,
       organizer: { "@type": "Organization", name: event.promoter_company || "Premium Agro Leilões", url: "https://plataformaleiloesagro.site" },
     } : null;
@@ -104,8 +105,7 @@ export const Route = createFileRoute("/eventos/$eventSlug")({
       ...tags,
       links: [
         ...(tags.links ?? []),
-        { rel: "preload", as: "style", href: fontHref },
-        { rel: "stylesheet", href: fontHref },
+
       ],
       scripts: eventJsonLd ? [{ type: "application/ld+json", children: JSON.stringify(eventJsonLd) }] : [],
     };
@@ -139,236 +139,38 @@ function EventDetail() {
    const isConnected = status === 'SUBSCRIBED';
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header com transição suave para o conteúdo */}
-      <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
-        <OptimizedImage 
-          src={event.banner_url || ""} 
-          alt={`Imagem de fundo do evento ${event.name}`}
-          width={100}
-          quality={10}
-          className="h-full w-full blur-sm brightness-50" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-      </div>
-
-       <section className="relative -mt-40 md:-mt-60 z-10 pb-16">
-         {/* Connection Indicator */}
-         {!isConnected && (
-           <div className="absolute top-0 right-4 z-50 flex items-center gap-2 rounded-full bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] text-white/60 border border-white/5">
-             <RefreshCw className="h-3 w-3 animate-spin" />
-             Sincronizando...
-           </div>
-         )}
-        <div className="container mx-auto px-4">
-          <div className="grid gap-8 lg:grid-cols-[1fr_1.8fr] items-start">
-            {/* Main Rectangular Banner */}
-            <div className="relative group mx-auto w-full max-w-md lg:max-w-none flex flex-col gap-4">
-              <div className="absolute -inset-2 bg-gold/10 blur-3xl rounded-[2.5rem] opacity-30 group-hover:opacity-50 transition-opacity" />
-               <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 bg-emerald-deep shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:border-gold/30 group/banner print-block">
-                {/* Blurred background to fill gaps */}
-                <OptimizedImage 
-                  src={event.banner_url || ""} 
-                  alt={`Fundo ampliado do encarte do evento ${event.name}`}
-                  width={100}
-                  quality={10}
-                  className="absolute inset-0 h-full w-full blur-2xl opacity-40 scale-110" 
-                />
-                {/* Main image - now object-cover to fill the space as requested */}
-                 {event.banner_url ? (
-                   <OptimizedImage 
-                     src={event.banner_url} 
-                     alt={event.name} 
-                     width={1200}
-                     className="relative h-full w-full object-cover transition-transform duration-700 group-hover/banner:scale-[1.03]" 
-                   />
-                 ) : (
-                   <div className="w-full h-full flex items-center justify-center bg-white/5 text-white/20">
-                     <ImageIcon className="h-20 w-20" />
-                   </div>
-                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
-                    <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em]">Encarte Oficial</span>
-                  </div>
-                  <div className="text-[9px] text-white/40 uppercase tracking-widest font-bold">
-                    Sugestão: 1200x1500px (4:5)
-                  </div>
-                </div>
+    <div className="auction-surface min-h-screen bg-background pb-20">
+      <section className="border-b border-border">
+        <div className="container mx-auto px-4 py-8 md:py-12">
+          <Link to="/eventos" className="text-sm text-muted-foreground hover:text-primary">Leilões / {event.name}</Link>
+          <div className="mt-6 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+            <div className="min-w-0">
+              <div className="aspect-video overflow-hidden rounded-lg bg-muted">
+                <OptimizedImage src={catalogEventCover(event.slug, event.banner_url || "")} alt={`Imagem do leilão ${event.name}`} width={1200} priority="high" className="h-full w-full" objectFit="contain" />
               </div>
-              
-               <Dialog open={isFlyerOpen} onOpenChange={(open) => setIsFlyerOpen(open)}>
-                 <DialogTrigger asChild onClick={(e) => { e.preventDefault(); setIsFlyerOpen(true); }}>
-                  <Button 
-                    variant="outline" 
-                    className="w-full h-12 rounded-2xl border-white/10 bg-white/5 hover:bg-gold/10 hover:border-gold/30 hover:text-gold transition-all flex items-center gap-2 group/btn shadow-lg"
-                    onClick={() => setIsFlyerOpen(true)}
-                  >
-                    <Maximize2 className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
-                    VER ENCARTE COMPLETO
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-white/10">
-                  <div className="relative w-full h-full flex items-center justify-center p-4 min-h-[50vh]">
-                    <OptimizedImage 
-                      src={event.banner_url || ""} 
-                      alt={event.name} 
-                      width={1600}
-                      className="max-w-full max-h-[90vh] object-contain" 
-                    />
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                      <div className="h-8 w-8 bg-white/10 rounded-lg p-1.5 backdrop-blur-md">
-                        <img 
-                          src="https://ccrslflbnxdazvadjlvj.supabase.co/storage/v1/object/public/public_assets/logo-0.9588475542778425.png" 
-                          alt="Marca da Premium Agro Leilões" 
-                          className="h-full object-contain opacity-60"
-                        />
-                      </div>
-                      <div className="text-[8px] text-white/30 uppercase tracking-[0.3em] font-bold text-center">
-                        NC Agro Leilões - Encarte Oficial
-                      </div>
-                    </div>
-                  </div>
-                </DialogContent>
+              <Dialog open={isFlyerOpen} onOpenChange={setIsFlyerOpen}>
+                <DialogTrigger asChild><Button variant="outline" className="mt-4 h-11 w-full"><Maximize2 />Ampliar imagem do leilão</Button></DialogTrigger>
+                <DialogContent className="max-w-4xl"><DialogHeader><DialogTitle>{event.name}</DialogTitle></DialogHeader><OptimizedImage src={catalogEventCover(event.slug, event.banner_url || "")} alt={event.name} width={1600} objectFit="contain" className="max-h-[75vh] w-full" /></DialogContent>
               </Dialog>
+              {event.slug?.startsWith("demonstracao-") && <p className="mt-2 text-xs text-muted-foreground">Leilão de demonstração · imagem ilustrativa</p>}
             </div>
-
-            {/* Event Header Info */}
-            <div className="flex flex-col lg:pt-12">
-              <div className="flex flex-wrap items-center gap-3 mb-8">
-                <StatusBadge status={event.status} className="scale-110" />
-                <div className="h-4 w-px bg-white/10" />
-                 <span className="text-xs font-black uppercase tracking-[0.2em] text-gold">{event.event_type === 'ao_vivo' ? 'LEILÃO AO VIVO' : 'LEILÃO ONLINE'}</span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-3"><StatusBadge status={effectiveStatus} /><span className="text-sm text-muted-foreground">{event.event_type === "ao_vivo" ? "Leilão ao vivo" : "Leilão online"}</span>{!isConnected && <RefreshCw aria-label="Atualizando" className="h-4 w-4 animate-spin text-muted-foreground" />}</div>
+              <h1 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">{event.name}</h1>
+              <p className="mt-4 whitespace-pre-wrap text-base leading-relaxed text-muted-foreground">{event.description || "Consulte os animais e as condições de participação deste leilão."}</p>
+              <dl className="my-6 grid gap-4 border-y border-border py-5 sm:grid-cols-2">
+                <div><dt className="flex items-center gap-2 text-sm text-muted-foreground"><Calendar className="h-4 w-4" />Data e horário</dt><dd className="mt-1 font-medium">{new Date(event.start_date).toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" })}</dd></div>
+                <div><dt className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />Local</dt><dd className="mt-1 font-medium">{event.location || "Online"}</dd></div>
+                <div><dt className="text-sm text-muted-foreground">Leiloeiro</dt><dd className="mt-1 font-medium">{event.auctioneer_name || "A confirmar"}</dd></div>
+                <div><dt className="text-sm text-muted-foreground">Animais em catálogo</dt><dd className="mt-1 font-medium">{eventLots.length} lotes</dd></div>
+                {(event.seller?.name || event.seller_name) && <div><dt className="text-sm text-muted-foreground">Vendedor</dt><dd className="mt-1 font-medium">{event.seller?.name || event.seller_name}</dd></div>}
+                {event.promoter_company && <div><dt className="text-sm text-muted-foreground">Organização</dt><dd className="mt-1 font-medium">{event.promoter_company}</dd></div>}
+              </dl>
+              <div className="flex flex-wrap gap-3">
+                <Dialog><DialogTrigger asChild><Button variant="outline" className="h-11"><FileText />Regulamento</Button></DialogTrigger><DialogContent className="max-h-[85vh] overflow-y-auto"><DialogHeader><DialogTitle>Regulamento do leilão</DialogTitle></DialogHeader><p className="whitespace-pre-wrap text-sm leading-relaxed">{event.regulation || "O regulamento ainda não foi disponibilizado."}</p></DialogContent></Dialog>
+                {["live", "recebendo_lances", "incondicional"].includes(effectiveStatus) && <Button asChild className="h-11"><Link to="/ao-vivo"><Gavel />Acompanhar leilão</Link></Button>}
               </div>
-              
-               <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-foreground mb-8 uppercase leading-[0.85] italic">
-                {event.name}
-              </h1>
-              
-              <div className="relative mb-12 max-w-2xl">
-                <div className="absolute -left-6 top-0 bottom-0 w-1.5 bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full" />
-                 <div className="bg-card/40 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-border/10 shadow-2xl">
-                   <p className="text-lg md:text-2xl text-foreground/90 leading-relaxed font-medium italic whitespace-pre-wrap">
-                    {event.description || "Participe deste evento exclusivo com os melhores exemplares do agronegócio premium selecionados cuidadosamente por nossa curadoria genética."}
-                  </p>
-                </div>
-              </div>
-
-              {/* Marcas e Assinaturas */}
-              <div className="flex flex-wrap items-center gap-8 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-                {(event.seller?.logo_url || event.seller?.name || event.seller_name) && (
-                  <div className="flex flex-col gap-2 group cursor-default">
-                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Vendedor</span>
-                    <div className="flex items-center gap-4">
-                      {event.seller?.logo_url && (
-                        <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
-                          <img src={event.seller.logo_url} alt={event.seller.name} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
-                        </div>
-                      )}
-                      <div className="h-16 flex flex-col justify-center">
-                       <div className="text-3xl md:text-4xl font-signature text-gold opacity-90 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter drop-shadow-sm">
-                          {event.seller?.name || event.seller_name}
-                        </div>
-                        <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] -mt-1">
-                          Assinatura Autorizada
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {event.promoter_logo_url && (
-                  <div className="flex flex-col gap-2 group cursor-default">
-                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Promotora</span>
-                    <div className="h-16 w-32 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 p-3 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:bg-white group-hover:border-gold/50 shadow-xl group-hover:shadow-gold/10">
-                      <img src={event.promoter_logo_url} alt={event.promoter_company} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
-                    </div>
-                  </div>
-                )}
-
-                {event.auctioneer_name && (
-                  <div className="flex flex-col gap-2 group cursor-default">
-                    <span className="text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">Leiloeiro</span>
-                    <div className="h-16 flex items-center px-4">
-                       <div className="text-2xl md:text-3xl font-signature text-foreground opacity-80 group-hover:opacity-100 transition-all duration-700 italic tracking-tighter drop-shadow-sm">
-                        {event.auctioneer_name}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-12">
-                {[
-                   { icon: Calendar, label: "Cronograma", value: new Date(event.start_date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
-                   { icon: MapPin, label: "Local", value: event.location || "Arena Digital" },
-                   { icon: Gavel, label: "Responsável", value: event.auctioneer_name || "Convidado Especial" },
-                   { icon: FileText, label: "Regulamento", value: "Ver Regulamento", isRegulation: true },
-                 ].map((m) => m.isRegulation ? (
-                   <Dialog key="regulation-trigger">
-                     <DialogTrigger asChild>
-                       <button className="p-5 md:p-6 rounded-[2rem] bg-gold/20 border border-gold/50 shadow-[0_0_20px_rgba(212,175,55,0.3)] backdrop-blur-xl animate-blink-fast flex flex-col justify-center text-left hover:bg-gold/30 transition-all group">
-                         <div className="flex items-center gap-3 mb-3">
-                           <div className="h-8 w-8 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/40 transition-colors">
-                             <FileText className="h-4 w-4 text-gold" />
-                           </div>
-                           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Regulamento</span>
-                         </div>
-                         <div className="text-base md:text-lg font-black text-foreground leading-tight uppercase tracking-tight">Ver Regulamento</div>
-                       </button>
-                     </DialogTrigger>
-                     <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
-                       <DialogHeader className="p-6 border-b border-border/10">
-                         <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Regulamento do Evento</DialogTitle>
-                       </DialogHeader>
-                       <div className="flex-1 overflow-y-auto p-8 bg-card/50">
-                         <div className="prose prose-invert max-w-none">
-                           <p className="whitespace-pre-wrap text-foreground/80 leading-relaxed font-medium">
-                             {event.regulation || "O regulamento para este evento ainda não foi disponibilizado."}
-                           </p>
-                         </div>
-                       </div>
-                     </DialogContent>
-                   </Dialog>
-                 ) : (
-                   <div key={m.label} className="p-5 md:p-6 rounded-[2rem] bg-emerald-deep/40 border border-white/5 backdrop-blur-xl group hover:bg-gold/5 hover:border-gold/20 transition-all flex flex-col justify-center">
-                     <div className="flex items-center gap-3 mb-3">
-                       <div className="h-8 w-8 rounded-full bg-gold/10 flex items-center justify-center">
-                         <m.icon className="h-4 w-4 text-gold" />
-                       </div>
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60">{m.label}</span>
-                     </div>
-                      <div className="text-base md:text-lg font-black text-foreground leading-tight uppercase tracking-tight">{m.value}</div>
-                   </div>
-                 ))}
-              </div>
-
-                <div className="flex flex-col gap-6">
-                  {/* Countdown Area - Show if event hasn't started yet */}
-                  {new Date(event.start_date).getTime() > Date.now() && (
-                    <div className="flex flex-col justify-center p-6 rounded-[2.5rem] border border-gold/20 bg-gold/5 backdrop-blur-sm shadow-inner">
-                      <div className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-3 text-center">Faltam para o início</div>
-                      <Countdown endsAt={event.start_date} variant="segmented" className="text-foreground justify-center" />
-                    </div>
-                  )}
- 
-                  {/* Action Area */}
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    {['live', 'recebendo_lances', 'incondicional'].includes(effectiveStatus) ? (
-                      <Link to="/ao-vivo" className="flex-1">
-                        <Button size="lg" className="w-full h-20 bg-gold-gradient text-emerald-deep font-black text-2xl shadow-[0_10px_40px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all rounded-[1.5rem] tracking-tighter italic">
-                          ASSISTIR AGORA
-                        </Button>
-                      </Link>
-                    ) : (
-                      <div className="flex-1 p-6 rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 text-center">
-                        <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest italic">Aguardando Início do Evento</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+              {new Date(event.start_date).getTime() > Date.now() && <div className="mt-6"><p className="mb-2 text-sm text-muted-foreground">Faltam para o início</p><Countdown endsAt={event.start_date} variant="segmented" /></div>}
             </div>
           </div>
         </div>
@@ -383,7 +185,7 @@ function EventDetail() {
               <ImageIcon className="h-6 w-6 text-gold" />
             </div>
             <div>
-              <h2 className="text-3xl md:text-5xl font-black text-foreground uppercase tracking-tighter">Galeria do Evento</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Galeria do Evento</h2>
               <p className="text-muted-foreground font-medium">Registros oficiais e momentos exclusivos.</p>
             </div>
           </div>
@@ -426,17 +228,17 @@ function EventDetail() {
         <section className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-             <h2 className="text-3xl md:text-5xl font-black text-foreground uppercase tracking-tighter">Lotes Disponíveis</h2>
+             <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Lotes Disponíveis</h2>
             <p className="mt-2 text-muted-foreground font-medium">Exemplares selecionados exclusivamente para este evento.</p>
           </div>
           <div className="h-px flex-1 bg-white/5 hidden md:block mx-8" />
           <div className="text-right">
-            <span className="text-5xl font-black text-gold/20 tabular-nums">#{eventLots.length}</span>
+            <span className="text-lg font-semibold text-muted-foreground tabular-nums">#{eventLots.length}</span>
           </div>
         </div>
 
         {eventLots.length > 0 ? (
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {eventLots.map((l: any) => (
               <LotCard 
                 key={l.id} 
