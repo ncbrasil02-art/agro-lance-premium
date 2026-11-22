@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 import { Button } from "./button";
 
 interface ErrorFallbackProps {
-  error: Error;
+  error: unknown;
   reset?: () => void;
 }
 
@@ -83,7 +83,7 @@ export function ErrorFallback({ error, reset }: ErrorFallbackProps) {
       
       {process.env.NODE_ENV === "development" && (
         <div className="mt-4 max-w-lg overflow-auto rounded-lg bg-muted p-4 text-left text-xs font-mono text-destructive">
-          {error?.message || 'Erro desconhecido'}
+          {error instanceof Error ? error.message : 'Erro desconhecido'}
         </div>
       )}
 

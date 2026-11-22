@@ -3,7 +3,7 @@ import { routeTree } from "./routeTree.gen";
 
  import { ErrorFallback } from "@/components/ui/error-fallback";
  
- function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+ function DefaultErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
    return <ErrorFallback error={error} reset={reset} />;
  }
 

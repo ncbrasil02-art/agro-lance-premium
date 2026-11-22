@@ -3,7 +3,7 @@
  import { supabase } from "@/integrations/supabase/client";
  import { ErrorFallback } from "@/components/ui/error-fallback";
  import { setupGlobalErrorLogging } from "@/utils/error-logger";
-function GlobalErrorComponent({ error }: { error: Error }) {
+function GlobalErrorComponent({ error }: { error: unknown }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <ErrorFallback error={error} />

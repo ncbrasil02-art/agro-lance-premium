@@ -9,76 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SobreRouteImport } from './routes/sobre'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as PainelRouteImport } from './routes/painel'
-import { Route as NotificacoesRouteImport } from './routes/notificacoes'
-import { Route as LotesRouteImport } from './routes/lotes'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as GuiaInvestidorAgroRouteImport } from './routes/guia-investidor-agro'
-import { Route as EventosRouteImport } from './routes/eventos'
-import { Route as CadastroRouteImport } from './routes/cadastro'
-import { Route as AoVivoRouteImport } from './routes/ao-vivo'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as NoticiasIndexRouteImport } from './routes/noticias.index'
-import { Route as LotesIndexRouteImport } from './routes/lotes.index'
-import { Route as EventosIndexRouteImport } from './routes/eventos.index'
-import { Route as CompraDiretaIndexRouteImport } from './routes/compra-direta.index'
-import { Route as PagamentoInstallmentIdRouteImport } from './routes/pagamento.$installmentId'
-import { Route as NoticiasSlugRouteImport } from './routes/noticias.$slug'
-import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
-import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AoVivoRouteImport } from './routes/ao-vivo'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as GuiaInvestidorAgroRouteImport } from './routes/guia-investidor-agro'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LotesRouteImport } from './routes/lotes'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as CompraDiretaIndexRouteImport } from './routes/compra-direta.index'
+import { Route as EventosIndexRouteImport } from './routes/eventos.index'
+import { Route as EventosEventSlugRouteImport } from './routes/eventos.$eventSlug'
+import { Route as LotesIndexRouteImport } from './routes/lotes.index'
+import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
+import { Route as NoticiasIndexRouteImport } from './routes/noticias.index'
+import { Route as NoticiasSlugRouteImport } from './routes/noticias.$slug'
+import { Route as PagamentoInstallmentIdRouteImport } from './routes/pagamento.$installmentId'
 
-const SobreRoute = SobreRouteImport.update({
-  id: '/sobre',
-  path: '/sobre',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PainelRoute = PainelRouteImport.update({
-  id: '/painel',
-  path: '/painel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificacoesRoute = NotificacoesRouteImport.update({
-  id: '/notificacoes',
-  path: '/notificacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LotesRoute = LotesRouteImport.update({
-  id: '/lotes',
-  path: '/lotes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GuiaInvestidorAgroRoute = GuiaInvestidorAgroRouteImport.update({
-  id: '/guia-investidor-agro',
-  path: '/guia-investidor-agro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventosRoute = EventosRouteImport.update({
-  id: '/eventos',
-  path: '/eventos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CadastroRoute = CadastroRouteImport.update({
-  id: '/cadastro',
-  path: '/cadastro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AoVivoRoute = AoVivoRouteImport.update({
-  id: '/ao-vivo',
-  path: '/ao-vivo',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -86,34 +41,89 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AoVivoRoute = AoVivoRouteImport.update({
+  id: '/ao-vivo',
+  path: '/ao-vivo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NoticiasIndexRoute = NoticiasIndexRouteImport.update({
-  id: '/noticias/',
-  path: '/noticias/',
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LotesIndexRoute = LotesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LotesRoute,
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventosIndexRoute = EventosIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EventosRoute,
+const GuiaInvestidorAgroRoute = GuiaInvestidorAgroRouteImport.update({
+  id: '/guia-investidor-agro',
+  path: '/guia-investidor-agro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LotesRoute = LotesRouteImport.update({
+  id: '/lotes',
+  path: '/lotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CompraDiretaIndexRoute = CompraDiretaIndexRouteImport.update({
   id: '/compra-direta/',
   path: '/compra-direta/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PagamentoInstallmentIdRoute = PagamentoInstallmentIdRouteImport.update({
-  id: '/pagamento/$installmentId',
-  path: '/pagamento/$installmentId',
+const EventosIndexRoute = EventosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventosRoute,
+} as any)
+const EventosEventSlugRoute = EventosEventSlugRouteImport.update({
+  id: '/$eventSlug',
+  path: '/$eventSlug',
+  getParentRoute: () => EventosRoute,
+} as any)
+const LotesIndexRoute = LotesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LotesRoute,
+} as any)
+const LotesLotIdRoute = LotesLotIdRouteImport.update({
+  id: '/$lotId',
+  path: '/$lotId',
+  getParentRoute: () => LotesRoute,
+} as any)
+const NoticiasIndexRoute = NoticiasIndexRouteImport.update({
+  id: '/noticias/',
+  path: '/noticias/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NoticiasSlugRoute = NoticiasSlugRouteImport.update({
@@ -121,19 +131,9 @@ const NoticiasSlugRoute = NoticiasSlugRouteImport.update({
   path: '/noticias/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LotesLotIdRoute = LotesLotIdRouteImport.update({
-  id: '/$lotId',
-  path: '/$lotId',
-  getParentRoute: () => LotesRoute,
-} as any)
-const EventosEventSlugRoute = EventosEventSlugRouteImport.update({
-  id: '/$eventSlug',
-  path: '/$eventSlug',
-  getParentRoute: () => EventosRoute,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const PagamentoInstallmentIdRoute = PagamentoInstallmentIdRouteImport.update({
+  id: '/pagamento/$installmentId',
+  path: '/pagamento/$installmentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -297,74 +297,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sobre': {
-      id: '/sobre'
-      path: '/sobre'
-      fullPath: '/sobre'
-      preLoaderRoute: typeof SobreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/painel': {
-      id: '/painel'
-      path: '/painel'
-      fullPath: '/painel'
-      preLoaderRoute: typeof PainelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notificacoes': {
-      id: '/notificacoes'
-      path: '/notificacoes'
-      fullPath: '/notificacoes'
-      preLoaderRoute: typeof NotificacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lotes': {
-      id: '/lotes'
-      path: '/lotes'
-      fullPath: '/lotes'
-      preLoaderRoute: typeof LotesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/guia-investidor-agro': {
-      id: '/guia-investidor-agro'
-      path: '/guia-investidor-agro'
-      fullPath: '/guia-investidor-agro'
-      preLoaderRoute: typeof GuiaInvestidorAgroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/eventos': {
-      id: '/eventos'
-      path: '/eventos'
-      fullPath: '/eventos'
-      preLoaderRoute: typeof EventosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cadastro': {
-      id: '/cadastro'
-      path: '/cadastro'
-      fullPath: '/cadastro'
-      preLoaderRoute: typeof CadastroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ao-vivo': {
-      id: '/ao-vivo'
-      path: '/ao-vivo'
-      fullPath: '/ao-vivo'
-      preLoaderRoute: typeof AoVivoRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -374,33 +311,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/ao-vivo': {
+      id: '/ao-vivo'
+      path: '/ao-vivo'
+      fullPath: '/ao-vivo'
+      preLoaderRoute: typeof AoVivoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/noticias/': {
-      id: '/noticias/'
-      path: '/noticias'
-      fullPath: '/noticias/'
-      preLoaderRoute: typeof NoticiasIndexRouteImport
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lotes/': {
-      id: '/lotes/'
-      path: '/'
-      fullPath: '/lotes/'
-      preLoaderRoute: typeof LotesIndexRouteImport
-      parentRoute: typeof LotesRoute
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/eventos/': {
-      id: '/eventos/'
-      path: '/'
-      fullPath: '/eventos/'
-      preLoaderRoute: typeof EventosIndexRouteImport
-      parentRoute: typeof EventosRoute
+    '/guia-investidor-agro': {
+      id: '/guia-investidor-agro'
+      path: '/guia-investidor-agro'
+      fullPath: '/guia-investidor-agro'
+      preLoaderRoute: typeof GuiaInvestidorAgroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lotes': {
+      id: '/lotes'
+      path: '/lotes'
+      fullPath: '/lotes'
+      preLoaderRoute: typeof LotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/compra-direta/': {
       id: '/compra-direta/'
@@ -409,11 +395,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompraDiretaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pagamento/$installmentId': {
-      id: '/pagamento/$installmentId'
-      path: '/pagamento/$installmentId'
-      fullPath: '/pagamento/$installmentId'
-      preLoaderRoute: typeof PagamentoInstallmentIdRouteImport
+    '/eventos/': {
+      id: '/eventos/'
+      path: '/'
+      fullPath: '/eventos/'
+      preLoaderRoute: typeof EventosIndexRouteImport
+      parentRoute: typeof EventosRoute
+    }
+    '/eventos/$eventSlug': {
+      id: '/eventos/$eventSlug'
+      path: '/$eventSlug'
+      fullPath: '/eventos/$eventSlug'
+      preLoaderRoute: typeof EventosEventSlugRouteImport
+      parentRoute: typeof EventosRoute
+    }
+    '/lotes/': {
+      id: '/lotes/'
+      path: '/'
+      fullPath: '/lotes/'
+      preLoaderRoute: typeof LotesIndexRouteImport
+      parentRoute: typeof LotesRoute
+    }
+    '/lotes/$lotId': {
+      id: '/lotes/$lotId'
+      path: '/$lotId'
+      fullPath: '/lotes/$lotId'
+      preLoaderRoute: typeof LotesLotIdRouteImport
+      parentRoute: typeof LotesRoute
+    }
+    '/noticias/': {
+      id: '/noticias/'
+      path: '/noticias'
+      fullPath: '/noticias/'
+      preLoaderRoute: typeof NoticiasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/noticias/$slug': {
@@ -423,25 +437,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NoticiasSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lotes/$lotId': {
-      id: '/lotes/$lotId'
-      path: '/$lotId'
-      fullPath: '/lotes/$lotId'
-      preLoaderRoute: typeof LotesLotIdRouteImport
-      parentRoute: typeof LotesRoute
-    }
-    '/eventos/$eventSlug': {
-      id: '/eventos/$eventSlug'
-      path: '/$eventSlug'
-      fullPath: '/eventos/$eventSlug'
-      preLoaderRoute: typeof EventosEventSlugRouteImport
-      parentRoute: typeof EventosRoute
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/pagamento/$installmentId': {
+      id: '/pagamento/$installmentId'
+      path: '/pagamento/$installmentId'
+      fullPath: '/pagamento/$installmentId'
+      preLoaderRoute: typeof PagamentoInstallmentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

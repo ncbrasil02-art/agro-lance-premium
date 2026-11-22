@@ -30,7 +30,7 @@ export const Route = createFileRoute("/notificacoes")({
     return (
       <div className="container py-12 text-center">
         <p className="text-destructive font-semibold">Erro ao carregar notificações.</p>
-        <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+        <p className="text-sm text-muted-foreground mt-2">{error instanceof Error ? error.message : "Erro desconhecido"}</p>
         <Button className="mt-4" onClick={() => { reset(); router.invalidate(); }}>Tentar novamente</Button>
       </div>
     );
