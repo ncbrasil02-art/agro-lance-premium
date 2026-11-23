@@ -1,4 +1,7 @@
 # Tarefas
+- [ ] Corrigir atualização dos lances na lista de lotes e verificar com conta conectada.
+- [ ] Corrigir troca e exibição de fotos dos eventos sem tornar arquivos privados públicos.
+- [ ] Aproximar textos dos slides e verificar os efeitos em computador e celular.
 - [x] Padronizar fontes, imagens, cartões e botões na página inicial, programação e telas de leilão, com referência visual do ArrobaPlay.
 - [x] Validar catálogo e abertura de leilões em computador e celular: páginas 200, 15 lotes, fotos uniformes e nenhum erro; aviso de encerramento testado sem repetição.
 - [x] Reorganizar a apresentação do catálogo, dos leilões e dos slides com linguagem clara em português.
