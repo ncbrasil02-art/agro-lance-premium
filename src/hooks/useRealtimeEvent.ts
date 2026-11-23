@@ -1,4 +1,4 @@
- import { useEffect, useState } from 'react';
+ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
  import { useRealtimeFallback } from './useRealtimeFallback';
@@ -8,6 +8,11 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
  export function useRealtimeEvent(eventId: string, onUpdate: () => void, onManualUpdate?: () => void) {
   const [status, setStatus] = useState<ChannelStatus>('INITIAL');
   const [retryCount, setRetryCount] = useState(0);
+  const updateRef = useRef(onUpdate);
+  const manualRef = useRef(onManualUpdate);
+  useEffect(() => { updateRef.current = onUpdate; manualRef.current = onManualUpdate; }, [onUpdate, onManualUpdate]);
+  const refresh = () => { updateRef.current(); manualRef.current?.(); };
+  useCatalogReconciliation(refresh);
 
   useEffect(() => {
     if (!eventId) return;
@@ -27,8 +32,7 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
         },
          (payload) => {
            logger.info('Mudança detectada nos lotes do evento', { eventId, payload });
-           onUpdate();
-           onManualUpdate?.();
+           refresh();
          }
       )
       .on(
@@ -41,8 +45,7 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
         },
          (payload) => {
            logger.info('Mudança detectada nos dados do evento', { eventId, payload });
-           onUpdate();
-           onManualUpdate?.();
+           refresh();
          }
       )
       .subscribe((newStatus) => {
@@ -51,7 +54,7 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
         // Se voltamos de um erro para inscrito, forçamos uma atualização para garantir que não perdemos nada
         if (status !== 'INITIAL' && status !== 'SUBSCRIBED' && newStatus === 'SUBSCRIBED') {
           logger.info('Conexão restabelecida, forçando atualização de dados');
-          onUpdate();
+          refresh();
         }
         
         setStatus(newStatus);
@@ -67,7 +70,7 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
     // Monitoramento de volta da internet
     const handleOnline = () => {
       logger.info('Internet detectada, forçando reconexão e atualização');
-      onUpdate();
+       refresh();
       setRetryCount(prev => prev + 1);
     };
 
@@ -87,7 +90,7 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
       authSubscription.unsubscribe();
       window.removeEventListener('online', handleOnline);
     };
-  }, [eventId, onUpdate, retryCount]);
+   }, [eventId, retryCount]);
 
     const fallback = useRealtimeFallback({
       status,
@@ -103,6 +106,11 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
    export function useHomeRealtime(onUpdate: () => void, onManualUpdate?: () => void) {
    const [status, setStatus] = useState<ChannelStatus>('INITIAL');
    const [retryCount, setRetryCount] = useState(0);
+   const updateRef = useRef(onUpdate);
+   const manualRef = useRef(onManualUpdate);
+   useEffect(() => { updateRef.current = onUpdate; manualRef.current = onManualUpdate; }, [onUpdate, onManualUpdate]);
+   const refresh = () => { updateRef.current(); manualRef.current?.(); };
+   useCatalogReconciliation(refresh);
  
    useEffect(() => {
      const channelId = `home-updates-${Math.random().toString(36).substring(2, 9)}`;
@@ -111,13 +119,11 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
        .channel(channelId)
        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
          logger.info("Evento alterado, atualizando via realtime...");
-          onUpdate();
-          onManualUpdate?.();
+          refresh();
        })
        .on('postgres_changes', { event: '*', schema: 'public', table: 'lots' }, () => {
          logger.info("Lote alterado, atualizando via realtime...");
-          onUpdate();
-          onManualUpdate?.();
+          refresh();
        })
        .subscribe((newStatus) => {
          setStatus(newStatus);
@@ -129,7 +135,7 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
      return () => {
        supabase.removeChannel(channel);
      };
-   }, [onUpdate, retryCount]);
+   }, [retryCount]);
  
     const fallback = useRealtimeFallback({
       status,
@@ -144,3 +150,23 @@ type ChannelStatus = 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | '
  export function useRealtimeLots(onUpdate: () => void) {
     return useHomeRealtime(onUpdate);
  }
+
+// A joined socket does not guarantee table change delivery. Reconcile visible
+// catalogs and refresh on return without tearing down channels on every render.
+function useCatalogReconciliation(onUpdate: () => void) {
+  const updateRef = useRef(onUpdate);
+  useEffect(() => { updateRef.current = onUpdate; }, [onUpdate]);
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === "visible") updateRef.current(); };
+    const timer = window.setInterval(refresh, 10000);
+    window.addEventListener("focus", refresh);
+    window.addEventListener("catalog:bid-saved", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("catalog:bid-saved", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
+}

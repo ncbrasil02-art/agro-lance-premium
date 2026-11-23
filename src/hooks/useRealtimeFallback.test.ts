@@ -14,6 +14,7 @@
  describe('useRealtimeFallback', () => {
    beforeEach(() => {
      vi.useFakeTimers();
+     vi.spyOn(Math, 'random').mockReturnValue(0.5);
    });
  
    afterEach(() => {

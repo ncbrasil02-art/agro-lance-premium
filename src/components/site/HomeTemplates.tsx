@@ -17,8 +17,8 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }
   const [index, setIndex] = useState(0);
   const reducedMotion = useReducedMotion();
   const backgrounds: string[] = Array.isArray(settings.hero_backgrounds) && settings.hero_backgrounds.some((v: unknown) => typeof v === "string" && v.length > 0)
-    ? settings.hero_backgrounds.filter((v: unknown) => typeof v === "string" && v.length > 0).map((url: string) => url === cattlePhoto.url ? catalogSlidePhotos[0] : url === horsePhoto.url ? catalogSlidePhotos[1] : url) : catalogSlidePhotos;
-  const phrases: string[] = Array.isArray(texts.hero_phrases) ? texts.hero_phrases.filter((v: unknown) => typeof v === "string" && v.length > 0) : [];
+    ? settings.hero_backgrounds.map((url: unknown, i: number) => typeof url === "string" && url ? url === cattlePhoto.url ? catalogSlidePhotos[0] : url === horsePhoto.url ? catalogSlidePhotos[1] : url : catalogSlidePhotos[i % catalogSlidePhotos.length]) : catalogSlidePhotos;
+  const phrases: string[] = Array.isArray(texts.hero_phrases) ? texts.hero_phrases.map((v: unknown) => typeof v === "string" ? v : "") : [];
   const count = Math.max(backgrounds.length, phrases.length);
   const duration = Math.max(1500, Number(settings.hero_slide_duration) || 6000);
   useEffect(() => {
@@ -27,11 +27,12 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }
     return () => clearInterval(timer);
   }, [count, duration, reducedMotion]);
   const effect = reducedMotion ? "none" : settings.hero_slide_effect || "fade";
-  const initial = effect === "slide" ? { opacity: 0, x: 40 } : effect === "zoom" ? { opacity: 0, scale: 1.05 } : { opacity: effect === "none" ? 1 : 0 };
+  const initial = effect === "slide" ? { opacity: 0, x: "100%" } : effect === "zoom" ? { opacity: 0, scale: 1.08 } : { opacity: effect === "none" ? 1 : 0 };
+  const exit = effect === "slide" ? { opacity: 0, x: "-100%" } : { opacity: effect === "none" ? 1 : 0 };
   return (
     <section className="ranch-hero relative isolate overflow-hidden">
       <AnimatePresence mode="sync">
-        <motion.div key={index} initial={initial} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: effect === "none" ? 1 : 0 }} transition={{ duration: effect === "none" ? 0 : 0.8 }} className="absolute inset-0 -z-20">
+        <motion.div key={index} initial={initial} animate={{ opacity: 1, x: 0, scale: 1 }} exit={exit} transition={{ duration: effect === "none" ? 0 : 0.8 }} className="absolute inset-0 -z-20">
           <motion.div className="h-full w-full" animate={effect === "kenburns" ? { scale: [1, 1.05] } : { scale: 1 }} transition={{ duration: duration / 1000 }} style={{ opacity: Math.max(40, settings.hero_bg_opacity ?? 100) / 100, filter: `blur(${settings.hero_bg_blur ?? 0}px)` }}>
             <OptimizedImage src={backgrounds[index % backgrounds.length] || cattlePhoto.url} alt="Animal no pasto de uma fazenda — imagem ilustrativa do catálogo" width={1600} priority="high" loading="eager" fetchPriority="high" disablePlaceholder className="h-full w-full object-cover" />
           </motion.div>
@@ -40,13 +41,13 @@ export const EliteHero = ({ siteInfo, nextEvent, customTexts, homepageSettings }
       <div className="ranch-hero-shade absolute inset-0 -z-10" />
       <div className="container mx-auto px-4 py-12 md:py-14">
         <div className="max-w-2xl">
-          <p className="mb-5 flex items-center gap-2 text-sm font-semibold text-hero-foreground"><Gavel className="h-4 w-4" /> Bovinos e cavalos · Leilões e venda direta</p>
+          <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-hero-foreground"><Gavel className="h-4 w-4" /> Bovinos e cavalos · Leilões e venda direta</p>
           <h1 className="ranch-hero-title text-4xl font-semibold leading-tight text-hero-foreground md:text-5xl">
             {texts.hero_title || siteInfo?.name || "NC Agro Leilões"}
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-hero-foreground">{texts.hero_subtitle || "Escolha seu próximo animal com informação, organização e confiança."}</p>
-          <p className="mt-4 min-h-12 max-w-xl text-base text-hero-foreground" aria-live="off">{phrases[index % Math.max(1, phrases.length)] || "Consulte os lotes, compare os animais e acompanhe os leilões abertos."}</p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <p className="mt-3 max-w-xl text-lg leading-snug text-hero-foreground">{texts.hero_subtitle || "Escolha seu próximo animal com informação, organização e confiança."}</p>
+          <div className="mt-2 min-h-12 max-w-xl text-base leading-snug text-hero-foreground" aria-live="off"><AnimatePresence mode="wait"><motion.p key={index} initial={{ opacity: effect === "none" ? 1 : 0, y: effect === "slide" ? 8 : 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: effect === "none" ? 1 : 0 }} transition={{ duration: effect === "none" ? 0 : 0.25 }}>{phrases[index % Math.max(1, phrases.length)] || "Consulte os lotes, compare os animais e acompanhe os leilões abertos."}</motion.p></AnimatePresence></div>
+          <div className="mt-4 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 rounded-md px-6 font-semibold"><a href={texts.hero_cta_primary_url || "/eventos"}><Gavel className="h-4 w-4" />{texts.hero_cta_primary_label === "Ver leilões e dar lance" ? "Ver leilões" : texts.hero_cta_primary_label || "Ver leilões"}</a></Button>
             <Button asChild size="lg" variant="outline" className="h-12 rounded-md border-hero-foreground/50 bg-background/20 px-6 text-hero-foreground hover:bg-background/40 hover:text-hero-foreground"><a href={texts.hero_cta_secondary_url || "/compra-direta"}>{texts.hero_cta_secondary_label || "Animais à venda"}<ArrowRight className="h-4 w-4" /></a></Button>
           </div>

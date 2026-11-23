@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { generateMetaTags } from "@/utils/seo";
 import { Eye, Gavel, Heart, Share2, Award, Loader2, FileText, Video, Stethoscope, ChevronRight, Calculator, Info, MessageSquare, Zap, ZapOff, WifiOff, Download, Scale, Ruler, Fingerprint, Calendar, MapPin, Sparkles, Timer, PlayCircle, Users, ShieldAlert, CheckCircle2, AlertCircle, AlertTriangle, XCircle, Printer, Expand, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -78,8 +78,8 @@ export const Route = createFileRoute("/lotes/$lotId")({
       .order("lot_number", { ascending: true });
 
     const currentLotIndex = (eventLotsData || []).findIndex(l => l.id === lotId);
-    const prevLotId = currentLotIndex > 0 ? eventLotsData![currentLotIndex - 1].id : null;
-    const nextLotId = currentLotIndex < (eventLotsData?.length || 0) - 1 ? eventLotsData![currentLotIndex + 1].id : null;
+    const prevLotId = currentLotIndex > 0 ? eventLotsData?.[currentLotIndex - 1]?.id ?? null : null;
+    const nextLotId = currentLotIndex >= 0 ? eventLotsData?.[currentLotIndex + 1]?.id ?? null : null;
 
     try {
       const validatedLot = lotSchema.parse(lotRes.data);
@@ -335,6 +335,7 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
    const { lot: initialLot, initialBids, prevLotId, nextLotId } = Route.useLoaderData() as any;
    const { animations } = Route.useRouteContext();
   const { user, profile } = useAuth();
+  const router = useRouter();
    const [lot, setLot] = useState(initialLot);
    const [viewIncremented, setViewIncremented] = useState(false);
    const [isOffline, setIsOffline] = useState(false);
@@ -493,6 +494,9 @@ function InstallmentSimulator({ price, commissionRate }: { price: number, commis
         toast.success(result.message || "Lance efetuado!");
         const { data: refreshedLot } = await supabase.from("lots").select("*, animal:animals(*, seller:sellers(name)), event:events!lots_event_id_fkey(*)").eq("id", lot.id).maybeSingle();
         if (refreshedLot) setLot(refreshedLot as any);
+        await fetchLatestData();
+        window.dispatchEvent(new Event("catalog:bid-saved"));
+        await router.invalidate();
 
         // Enviar notificação por e-mail se houver um licitante anterior superado
         if (result.previous_bidder_id && user && result.previous_bidder_id !== user.id) {

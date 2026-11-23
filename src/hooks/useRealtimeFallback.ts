@@ -83,6 +83,7 @@
  
      const onManualUpdate = () => {
        setLastUpdateTime(Date.now());
+       setCurrentDelay(0);
      };
  
      return {

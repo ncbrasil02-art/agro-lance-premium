@@ -17,6 +17,8 @@
  import { PaymentManagement } from "./PaymentManagement";
  import { LotCard } from "../auctions/lot-card";
  import { OptimizedImage } from "@/components/ui/optimized-image";
+ import { PrivateMediaImage } from "@/components/ui/private-media-image";
+ import { uploadCatalogImage } from "@/utils/upload-catalog-image";
 
  function ColorPicker({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
    return (
@@ -272,25 +274,17 @@
 
     const handleSlideImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
       const file = e.target.files?.[0];
+      e.target.value = "";
       if (!file || !validateImage(file)) return;
 
       setIsUploading(true);
       try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `slide-${index}-${Math.random()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('public_assets')
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('public_assets')
-          .getPublicUrl(fileName);
-
-        const newBgs = [...(homepage.hero_backgrounds || [])];
-        newBgs[index] = publicUrl;
-        setHomepage({ ...homepage, hero_backgrounds: newBgs });
+        const publicUrl = await uploadCatalogImage(file, "public-assets", "slides");
+        setHomepage((prev: typeof homepage) => {
+          const newBgs = [...(prev.hero_backgrounds || [])];
+          newBgs[index] = publicUrl;
+          return { ...prev, hero_backgrounds: newBgs };
+        });
         toast.success("Imagem do slide enviada!");
       } catch (error: any) {
         toast.error("Erro no upload da imagem: " + error.message);
@@ -750,9 +744,9 @@
                       value={homepage.hero_slide_effect ?? 'fade'}
                       onChange={e => setHomepage({...homepage, hero_slide_effect: e.target.value as any})}
                     >
-                      <option value="fade">Fade (suave)</option>
+                      <option value="fade">Dissolver (suave)</option>
                       <option value="zoom">Zoom</option>
-                      <option value="slide">Slide lateral</option>
+                      <option value="slide">Deslizar lateralmente</option>
                       <option value="kenburns">Ken Burns (cinematográfico)</option>
                       <option value="none">Sem efeito</option>
                     </select>
@@ -825,11 +819,16 @@
                       
                       // Persistir automaticamente após reordenar
                       try {
-                        await supabase.from("site_settings").upsert({ key: "homepage_sections", value: updatedHomepage }, { onConflict: 'key' });
-                        await supabase.from("site_settings").upsert({ key: "custom_texts", value: updatedCustomTexts }, { onConflict: 'key' });
+                        const results = await Promise.all([
+                          supabase.from("site_settings").upsert({ key: "homepage_sections", value: updatedHomepage }, { onConflict: 'key' }),
+                          supabase.from("site_settings").upsert({ key: "custom_texts", value: updatedCustomTexts }, { onConflict: 'key' }),
+                        ]);
+                        const failed = results.find(result => result.error);
+                        if (failed?.error) throw failed.error;
                         toast.success("Ordem dos slides salva!");
                       } catch (err) {
                         console.error("Erro ao salvar ordem:", err);
+                        toast.error("Não foi possível salvar a ordem dos slides.");
                       }
                     }}
                      className="space-y-4"
@@ -863,7 +862,7 @@
                               <Label className="text-[10px] uppercase font-bold text-muted-foreground">Imagem</Label>
                               <div className="relative group aspect-video rounded-lg overflow-hidden border border-gold/20 bg-muted/20">
                                 {url ? (
-                                  <OptimizedImage src={url} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
+                                  <PrivateMediaImage src={url} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                     <Upload className="h-6 w-6" />
@@ -918,12 +917,21 @@
                    </Reorder.Group>
 
                   <Button 
-                    className="w-full bg-gold-gradient text-emerald-deep font-black uppercase tracking-widest h-12 shadow-gold" 
+                    className="w-full h-12 font-semibold"
                     onClick={async () => {
-                      await handleSave("homepage_sections", homepage);
-                      await handleSave("custom_texts", customTexts);
+                      setIsSaving(true);
+                      try {
+                        const results = await Promise.all([
+                          supabase.from("site_settings").upsert({ key: "homepage_sections", value: homepage }, { onConflict: "key" }),
+                          supabase.from("site_settings").upsert({ key: "custom_texts", value: customTexts }, { onConflict: "key" }),
+                        ]);
+                        const failed = results.find(result => result.error);
+                        if (failed?.error) throw failed.error;
+                        toast.success("Slides salvos com sucesso!");
+                      } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível salvar os slides."); }
+                      finally { setIsSaving(false); }
                     }}
-                    disabled={isSaving}
+                    disabled={isSaving || isUploading}
                   >
                     {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                     <Save className="h-4 w-4 mr-2" /> Salvar Alterações dos Slides

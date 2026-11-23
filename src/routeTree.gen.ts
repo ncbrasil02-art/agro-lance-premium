@@ -30,6 +30,7 @@ import { Route as LotesLotIdRouteImport } from './routes/lotes.$lotId'
 import { Route as NoticiasIndexRouteImport } from './routes/noticias.index'
 import { Route as NoticiasSlugRouteImport } from './routes/noticias.$slug'
 import { Route as PagamentoInstallmentIdRouteImport } from './routes/pagamento.$installmentId'
+import { Route as ApiPublicCatalogMediaRouteImport } from './routes/api/public/catalog-media'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -136,6 +137,11 @@ const PagamentoInstallmentIdRoute = PagamentoInstallmentIdRouteImport.update({
   path: '/pagamento/$installmentId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCatalogMediaRoute = ApiPublicCatalogMediaRouteImport.update({
+  id: '/api/public/catalog-media',
+  path: '/api/public/catalog-media',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/eventos/': typeof EventosIndexRoute
   '/lotes/': typeof LotesIndexRoute
   '/noticias/': typeof NoticiasIndexRoute
+  '/api/public/catalog-media': typeof ApiPublicCatalogMediaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosIndexRoute
   '/lotes': typeof LotesIndexRoute
   '/noticias': typeof NoticiasIndexRoute
+  '/api/public/catalog-media': typeof ApiPublicCatalogMediaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/eventos/': typeof EventosIndexRoute
   '/lotes/': typeof LotesIndexRoute
   '/noticias/': typeof NoticiasIndexRoute
+  '/api/public/catalog-media': typeof ApiPublicCatalogMediaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/eventos/'
     | '/lotes/'
     | '/noticias/'
+    | '/api/public/catalog-media'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/lotes'
     | '/noticias'
+    | '/api/public/catalog-media'
   id:
     | '__root__'
     | '/'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/eventos/'
     | '/lotes/'
     | '/noticias/'
+    | '/api/public/catalog-media'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -293,6 +305,7 @@ export interface RootRouteChildren {
   PagamentoInstallmentIdRoute: typeof PagamentoInstallmentIdRoute
   CompraDiretaIndexRoute: typeof CompraDiretaIndexRoute
   NoticiasIndexRoute: typeof NoticiasIndexRoute
+  ApiPublicCatalogMediaRoute: typeof ApiPublicCatalogMediaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -444,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PagamentoInstallmentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/catalog-media': {
+      id: '/api/public/catalog-media'
+      path: '/api/public/catalog-media'
+      fullPath: '/api/public/catalog-media'
+      preLoaderRoute: typeof ApiPublicCatalogMediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -490,6 +510,7 @@ const rootRouteChildren: RootRouteChildren = {
   PagamentoInstallmentIdRoute: PagamentoInstallmentIdRoute,
   CompraDiretaIndexRoute: CompraDiretaIndexRoute,
   NoticiasIndexRoute: NoticiasIndexRoute,
+  ApiPublicCatalogMediaRoute: ApiPublicCatalogMediaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

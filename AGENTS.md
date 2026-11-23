@@ -8,3 +8,5 @@
 - Catalog demonstration records use DEMO internal codes and explicit illustrative descriptions; direct-sale demonstrations cannot submit purchase requests.
 - Use system sans-serif typography for the shared catalog and slides to avoid font changes while loading.
 - Catalog cards reserve a fixed 16:9 media frame with a full-size block link; auction screens use scoped shared surface styles to preserve consistent sizing without changing bidding logic.
+- Resolve private catalog images through exact references authorized by anonymous record RLS; sign unpublished previews with the user's storage permissions, never publish buckets or persist expiring URLs.
+- Catalog synchronization keeps channel callbacks in refs and reconciles visible lists independently of socket status, so re-renders and missing table notifications cannot leave bid prices stale.

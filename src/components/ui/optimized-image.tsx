@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { getOptimizedImageUrl, IMAGE_FALLBACKS } from "@/utils/image-optimization";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
+import { catalogMediaUrl } from "@/utils/catalog-storage";
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -56,7 +57,7 @@ export function OptimizedImage({
   }, [loading, priority]);
 
   const optimizedUrl = useMemo(() => {
-    return getOptimizedImageUrl(src, { width, height, quality: finalQuality }, finalFallback);
+    return getOptimizedImageUrl(catalogMediaUrl(src), { width, height, quality: finalQuality }, finalFallback);
   }, [src, width, height, finalQuality, finalFallback]);
 
   const [currentSrc, setCurrentSrc] = useState(optimizedUrl);

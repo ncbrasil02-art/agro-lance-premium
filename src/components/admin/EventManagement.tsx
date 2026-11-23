@@ -24,9 +24,25 @@ import { SeoAnalysis } from "./SeoAnalysis";
 import { RichResultsPreview } from "./RichResultsPreview";
 import { SocialPreview } from "./SocialPreview";
 import { useAuth } from "@/components/auth/auth-provider";
+import { uploadCatalogImage } from "@/utils/upload-catalog-image";
+import { PrivateMediaImage } from "@/components/ui/private-media-image";
+import { useRouter } from "@tanstack/react-router";
  
   export function EventManagement({ onManageLots }: { onManageLots?: (id: string) => void }) {
     const { profile: adminProfile } = useAuth();
+    const router = useRouter();
+    const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const uploadFormMedia = async (file: File, field: "banner_url" | "promoter_logo_url") => {
+      setIsUploadingMedia(true);
+      const tid = toast.loading("Enviando imagem...");
+      try {
+        const url = await uploadCatalogImage(file, field === "banner_url" ? "banners" : "public-assets", "events");
+        setFormData(prev => ({ ...prev, [field]: url }));
+        toast.success("Imagem enviada. Salve o evento para aplicar.");
+      } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível enviar a imagem."); }
+      finally { setIsUploadingMedia(false); toast.dismiss(tid); }
+    };
      const [events, setEvents] = useState<any[]>([]);
      const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
      const [expandedData, setExpandedData] = useState<any>({});
@@ -495,6 +511,7 @@ import { useAuth } from "@/components/auth/auth-provider";
       });
  
     const handleSave = async () => {
+      if (isUploadingMedia || isSaving) return;
       if (!formData.name || !formData.start_date) {
         toast.error("Preencha o nome e a data de início");
         return;
@@ -515,7 +532,7 @@ import { useAuth } from "@/components/auth/auth-provider";
         return;
       }
 
-      console.log("Saving event...", formData);
+      setIsSaving(true);
       try {
          if (editingEvent) {
            const { error } = await supabase
@@ -541,9 +558,12 @@ import { useAuth } from "@/components/auth/auth-provider";
                   viewers: formData.viewers,
                    seo_title: formData.seo_title,
                    seo_description: formData.seo_description,
+                   og_title: formData.og_title,
+                   og_description: formData.og_description,
+                   og_image_url: formData.og_image_url,
                    promoter_logo_url: formData.promoter_logo_url
                })
-             .eq("id", editingEvent.id);
+             .eq("id", editingEvent.id).select("id").single();
           if (error) throw error;
           toast.success("Evento atualizado com sucesso");
         } else {
@@ -577,6 +597,9 @@ import { useAuth } from "@/components/auth/auth-provider";
               viewers: formData.viewers,
                seo_title: formData.seo_title,
                seo_description: formData.seo_description,
+               og_title: formData.og_title,
+               og_description: formData.og_description,
+               og_image_url: formData.og_image_url,
                promoter_logo_url: formData.promoter_logo_url
             });
           if (error) throw error;
@@ -585,9 +608,12 @@ import { useAuth } from "@/components/auth/auth-provider";
  
         setIsDialogOpen(false);
         resetForm();
-       fetchEvents();
+       await fetchEvents();
+       await router.invalidate();
      } catch (error: any) {
         toast.error("Erro ao salvar evento: " + error.message);
+     } finally {
+       setIsSaving(false);
      }
    };
  
@@ -1082,33 +1108,23 @@ import { useAuth } from "@/components/auth/auth-provider";
                         id="banner-upload" 
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
-                          if (!file || !validateImage(file)) return;
-                          const toastId = toast.loading("Enviando banner...");
-                          const fileExt = file.name.split('.').pop();
-                          const fileName = `${Math.random()}.${fileExt}`;
-                          const { data, error } = await supabase.storage.from('banners').upload(fileName, file);
-                          if (error) {
-                            toast.error(`Erro no upload: ${error.message}`);
-                          } else {
-                            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(data.path);
-                            setFormData({ ...formData, banner_url: publicUrl });
-                            toast.success("Banner enviado!");
-                          }
-                          toast.dismiss(toastId);
+                          e.target.value = "";
+                          if (file) await uploadFormMedia(file, "banner_url");
                         }}
                       />
                       <Button 
                         type="button" 
                         variant="outline" 
+                        disabled={isUploadingMedia}
                         className="flex-1 border-dashed h-24 flex-col gap-2" 
                         onClick={() => document.getElementById('banner-upload')?.click()}
                       >
                         <PlusCircle className="h-6 w-6" /> 
-                        {formData.banner_url ? "Trocar Banner" : "Upload Banner"}
+                        {isUploadingMedia ? "Enviando imagem..." : formData.banner_url ? "Trocar foto" : "Enviar foto"}
                       </Button>
                     </div>
                     {formData.banner_url && (
-                      <p className="text-[10px] text-emerald-500 font-medium">✓ Imagem carregada com sucesso</p>
+                      <PrivateMediaImage src={formData.banner_url} alt="Foto selecionada para o leilão" className="aspect-video w-full rounded-md" objectFit="contain" />
                     )}
                   </div>
                    <div className="grid grid-cols-2 gap-4">
@@ -1116,7 +1132,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                        <Label>Logo da Promotora</Label>
                        <div className="flex gap-2">
                           {formData.promoter_logo_url && (
-                            <img src={formData.promoter_logo_url} alt="" className="h-10 w-10 rounded object-contain border bg-white" />
+                            <PrivateMediaImage src={formData.promoter_logo_url} alt="Logo da promotora" className="h-10 w-10 rounded border bg-background" objectFit="contain" />
                           )}
                           <Input 
                             type="file" 
@@ -1125,18 +1141,8 @@ import { useAuth } from "@/components/auth/auth-provider";
                             id="promoter-logo-upload" 
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
-                              if (!file || !validateImage(file)) return;
-                              const tid = toast.loading("Enviando logo...");
-                              const fileExt = file.name.split('.').pop();
-                              const fileName = `promoter_${Math.random()}.${fileExt}`;
-                              const { data, error } = await supabase.storage.from('public_assets').upload(fileName, file);
-                              if (error) toast.error("Erro: " + error.message);
-                              else {
-                                const { data: { publicUrl } } = supabase.storage.from('public_assets').getPublicUrl(data.path);
-                                setFormData({ ...formData, promoter_logo_url: publicUrl });
-                                toast.success("Logo enviado!");
-                              }
-                              toast.dismiss(tid);
+                              e.target.value = "";
+                              if (file) await uploadFormMedia(file, "promoter_logo_url");
                             }}
                           />
                           <Button 
@@ -1168,7 +1174,7 @@ import { useAuth } from "@/components/auth/auth-provider";
               </Tabs>
              <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-                <Button className="bg-gold text-emerald-deep" onClick={handleSave}>
+                <Button disabled={isUploadingMedia || isSaving} onClick={handleSave}>
                   {editingEvent ? "Salvar Alterações" : "Criar Evento"}
                </Button>
              </DialogFooter>
@@ -1428,7 +1434,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                               <TooltipProvider>
                                <Tooltip>
                                  <TooltipTrigger asChild>
-                                   <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
+                                   <Button variant="ghost" size="icon" aria-label={`Editar ${event.name}`} onClick={() => handleEdit(event)}>
                                      <Pencil className="h-4 w-4" />
                                    </Button>
                                  </TooltipTrigger>
@@ -1471,35 +1477,36 @@ import { useAuth } from "@/components/auth/auth-provider";
                                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gold mb-1">
                                     <ImageIcon className="h-3 w-3" /> Mídia do Evento
                                   </div>
-                                  <div className="relative group aspect-video rounded-xl overflow-hidden border bg-background flex items-center justify-center">
+                                  <div className="relative group aspect-video rounded-lg overflow-hidden border bg-background flex items-center justify-center">
                                     {event.banner_url ? (
-                                      <img src={event.banner_url} alt="" className="w-full h-full object-cover" />
+                                      <PrivateMediaImage src={event.banner_url} alt={`Foto do leilão ${event.name}`} className="w-full h-full" />
                                     ) : (
                                       <div className="text-muted-foreground text-[10px]">Sem banner cadastrado</div>
                                     )}
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <div className="absolute inset-x-0 bottom-0 bg-background/80 flex items-center justify-center gap-2 p-2">
                                       <Input 
                                         type="file" 
+                                        accept="image/*"
                                         className="hidden" 
                                         id={`replace-banner-${event.id}`} 
                                         onChange={async (e) => {
                                           const file = e.target.files?.[0];
-                                          if (!file || !validateImage(file)) return;
+                                          e.target.value = "";
+                                          if (!file) return;
                                           const tid = toast.loading("Substituindo banner...");
-                                          const fileExt = file.name.split('.').pop();
-                                          const fileName = `${event.id}_${Math.random()}.${fileExt}`;
-                                          const { data: uploadData, error } = await supabase.storage.from('banners').upload(fileName, file);
-                                          if (error) toast.error("Erro: " + error.message);
-                                          else {
-                                            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(uploadData.path);
-                                            await supabase.from('events').update({ banner_url: publicUrl }).eq('id', event.id);
+                                          setIsUploadingMedia(true);
+                                          try {
+                                            const publicUrl = await uploadCatalogImage(file, "banners", `events/${event.id}`);
+                                            const { error } = await supabase.from('events').update({ banner_url: publicUrl }).eq('id', event.id).select("id").single();
+                                            if (error) throw error;
                                             toast.success("Banner atualizado!");
-                                            fetchEvents();
-                                          }
-                                          toast.dismiss(tid);
+                                            await fetchEvents();
+                                            await router.invalidate();
+                                          } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível trocar a foto."); }
+                                          finally { toast.dismiss(tid); setIsUploadingMedia(false); }
                                         }}
                                       />
-                                      <Button size="sm" variant="secondary" className="h-7 text-[10px]" onClick={() => document.getElementById(`replace-banner-${event.id}`)?.click()}>
+                                      <Button disabled={isUploadingMedia} size="sm" variant="secondary" className="h-9 text-xs" onClick={() => document.getElementById(`replace-banner-${event.id}`)?.click()}>
                                         Substituir Foto
                                       </Button>
                                     </div>
@@ -1551,7 +1558,7 @@ import { useAuth } from "@/components/auth/auth-provider";
                                         <div key={lot.id} className="flex items-center gap-3 p-2 rounded-lg bg-background border hover:border-gold/30 transition-colors">
                                           <div className="relative group h-10 w-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
                                             {lot.animal?.photos?.[0] ? (
-                                              <img src={lot.animal.photos[0]} alt="" className="w-full h-full object-cover" />
+                                              <PrivateMediaImage src={lot.animal.photos[0]} alt={`Foto de ${lot.animal.name}`} className="w-full h-full" />
                                             ) : (
                                               <div className="w-full h-full flex items-center justify-center"><ImageIcon className="h-4 w-4 text-muted-foreground/30" /></div>
                                             )}
@@ -1562,19 +1569,19 @@ import { useAuth } from "@/components/auth/auth-provider";
                                                 id={`replace-animal-${lot.animal?.id}`} 
                                                 onChange={async (e) => {
                                                   const file = e.target.files?.[0];
-                                                  if (!file || !validateImage(file)) return;
+                                                  e.target.value = "";
+                                                  if (!file || !lot.animal?.id) return;
                                                   const tid = toast.loading("Atualizando foto...");
-                                                  const fileExt = file.name.split('.').pop();
-                                                  const fileName = `${lot.animal?.id}_${Math.random()}.${fileExt}`;
-                                                  const { data: uploadData, error } = await supabase.storage.from('animals').upload(fileName, file);
-                                                  if (error) toast.error("Erro: " + error.message);
-                                                  else {
-                                                    const { data: { publicUrl } } = supabase.storage.from('animals').getPublicUrl(uploadData.path);
-                                                    await supabase.from('animals').update({ photos: [publicUrl] }).eq('id', lot.animal?.id);
+                                                  try {
+                                                    const publicUrl = await uploadCatalogImage(file, "animals", `animals/${lot.animal.id}`);
+                                                    const photos = Array.isArray(lot.animal.photos) ? lot.animal.photos : [];
+                                                    const { error } = await supabase.from('animals').update({ photos: [publicUrl, ...photos.slice(1)] }).eq('id', lot.animal.id).select("id").single();
+                                                    if (error) throw error;
                                                     toast.success("Foto atualizada!");
-                                                    fetchExpandedData(event.id);
-                                                  }
-                                                  toast.dismiss(tid);
+                                                    await fetchExpandedData(event.id);
+                                                    await router.invalidate();
+                                                  } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível trocar a foto."); }
+                                                  finally { toast.dismiss(tid); }
                                                 }}
                                               />
                                               <Button 
